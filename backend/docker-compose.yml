@@ -19,7 +19,7 @@ services:
       context: .
       dockerfile: ./docker/node/Dockerfile
     image: "jobtogo_backend"
-    command: ["npm", "run", "dev"]
+    command: "npm run dev"
     stdin_open: true
     tty: true
     volumes:
