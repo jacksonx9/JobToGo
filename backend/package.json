@@ -9,8 +9,17 @@
     "lint": "eslint src"
   },
   "dependencies": {
+    "axios": "^0.19.0",
+    "cheerio": "^1.0.0-rc.3",
     "express": "^4.13.3",
-    "mongodb": "^3.3.2"
+    "indeed-scraper": "^3.0.2",
+    "mongodb": "^3.3.2",
+    "resume-parser": "git://github.com:aginanjar/resume-parser.git#fbac2ee",
+    "retext-keywords": "^5.0.0",
+    "retext": "^7.0.0",
+    "nlcst-to-string": "^2.0.0",
+    "retext-pos": "^2.0.0",
+    "pdf-parse": "^1.1.1"
   },
   "devDependencies": {
     "babel-cli": "^6.9.0",
