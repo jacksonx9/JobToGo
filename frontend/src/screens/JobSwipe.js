@@ -13,30 +13,20 @@ class JobSwipe extends Component {
       myText: 'I\'m ready to get swiped!',
       gestureName: 'none',
       backgroundColor: '#fff',
-      jobs: '',
+      jobs: [],
       jobIndex: 0,
-      currJob: 'hi'
+      loaded: 0
     };
   }
 
   async componentDidMount() {
     console.log('HIIIIIIII')
     const jobs = await axios.get('http://10.0.2.2:8080/jobs/javascript').catch(e => console.log(e));
-
-    
     
     this.setState({
-      jobs: jobs.data
+      jobs: jobs.data,
+      loaded: 1
     })
-
-    currJob = this.state.jobs[0].title
-
-    this.setState({
-      currJob: currJob
-    })
-
-    console.log(this.state.currJob)
-    
     
   }
  
@@ -54,14 +44,9 @@ class JobSwipe extends Component {
 
   onSwipeRight = (gestureState) => {
     console.log('swipe')
-    //console.log(this.state.jobs[this.state.jobIndex].title)
-    currJob = this.state.jobs[0].title
-
-    this.setState({
-      currJob: currJob
-    })
     this.setState({myText: 'You swiped right!'});
     this.setState({jobIndex: this.state.jobIndex +1})
+
   }
 
   onSwipe = (gestureName, gestureState) => {
@@ -90,7 +75,10 @@ class JobSwipe extends Component {
       velocityThreshold: 0.3,
       directionalOffsetThreshold: 80
     };
+    if(this.state.loaded == 0) return null;
+
     return (
+
       <GestureRecognizer
         onSwipe={this.onSwipe}
         onSwipeUp={this.onSwipeUp}
@@ -105,7 +93,7 @@ class JobSwipe extends Component {
         >
         <Text>{this.state.myText}</Text>
         <Text>onSwipe callback received gesture: {this.state.gestureName}</Text>
-        <Text>Job info: {this.state.currJob}</Text> 
+        <Text>Job info: {this.state.jobs[this.state.jobIndex].title}</Text>
       </GestureRecognizer>
     );
   }
