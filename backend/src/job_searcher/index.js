@@ -15,11 +15,15 @@ class JobSearcher {
       const jobPage = await axios.get(result.url).catch(e => console.log(e));
       const $ = cheerio.load(jobPage.data);
       result.description = $('#jobDescriptionText').text();
-      console.log(result.title);
     }
 
     return results;
   }
+
+  // if under 100 jobs, add non-existant jobs
+
+
+  // remove outdated jobs, db.collections.deleteMany()
 };
 
 export default JobSearcher;

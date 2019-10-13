@@ -1,6 +1,6 @@
 import express from 'express';
 import { MongoClient } from 'mongodb';
-import JobSearcher from './job_search';
+import JobSearcher from './job_searcher';
 import JobAnalyzer from './job_analyzer';
 
 
@@ -30,9 +30,6 @@ mongoClient.connect(async (e) => {
           location: {
             bsonType: String,
           },
-          summary: { 		// may delete this if useless
-            bsonType: String,
-          },
           url: {
             bsonType: String,
           },
@@ -44,9 +41,6 @@ mongoClient.connect(async (e) => {
           },
           description: {
             bsonType: String,
-          },
-          keywords: {
-            bsonType: Array,
           }
         }
       }
@@ -55,17 +49,17 @@ mongoClient.connect(async (e) => {
 
   const jobSearcher = new JobSearcher();
   const jobAnalyzer = new JobAnalyzer(db);
-  const jobsCollection = db.collection('jobs');
+
+  // const jobsCollection = db.collection('jobs');
+  // const jobArray = await jobSearcher.getJobs("javascript");
+  // await jobsCollection.insertMany(jobArray).catch(e => console.log(e));
 
 
 
-
-  
-  const jobArray = await jobSearcher.getJobs("javascript");
-
-  await jobsCollection.insertMany(jobArray).catch(e => console.log(e));
-
-  const relatedJobs = jobAnalyzer.getRelatedJobs();
+  //purely for testing query database; querying for javascript and C jobs
+  app.get('/jobs/testGetDBJobs', async (req, res) => {
+    res.json(await jobAnalyzer.getDBJobs(["javascript", "C"]));
+  });
 
   app.get('/jobs/:query', async (req, res) => {
     res.json(await jobSearcher.getJobs(req.params.query));
