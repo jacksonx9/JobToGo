@@ -14,15 +14,30 @@ class JobSwipe extends Component {
       gestureName: 'none',
       backgroundColor: '#fff',
       jobs: '',
-      jobIndex: 0
+      jobIndex: 0,
+      currJob: 'hi'
     };
   }
 
   async componentDidMount() {
-    const jobs = await axios.get('http://10.0.0.42:8080/jobs/javascript').catch(e => console.log(e));
+    console.log('HIIIIIIII')
+    const jobs = await axios.get('http://10.0.2.2:8080/jobs/javascript').catch(e => console.log(e));
+
+    
+    
     this.setState({
-      jobs: jobs.data,
+      jobs: jobs.data
     })
+
+    currJob = this.state.jobs[0].title
+
+    this.setState({
+      currJob: currJob
+    })
+
+    console.log(this.state.currJob)
+    
+    
   }
  
   onSwipeUp = (gestureState) => {
@@ -38,6 +53,13 @@ class JobSwipe extends Component {
   }
 
   onSwipeRight = (gestureState) => {
+    console.log('swipe')
+    //console.log(this.state.jobs[this.state.jobIndex].title)
+    currJob = this.state.jobs[0].title
+
+    this.setState({
+      currJob: currJob
+    })
     this.setState({myText: 'You swiped right!'});
     this.setState({jobIndex: this.state.jobIndex +1})
   }
@@ -68,7 +90,6 @@ class JobSwipe extends Component {
       velocityThreshold: 0.3,
       directionalOffsetThreshold: 80
     };
- 
     return (
       <GestureRecognizer
         onSwipe={this.onSwipe}
@@ -84,7 +105,7 @@ class JobSwipe extends Component {
         >
         <Text>{this.state.myText}</Text>
         <Text>onSwipe callback received gesture: {this.state.gestureName}</Text>
-        <Text>Job info: {this.state.jobs[this.state.jobIndex].title}</Text>
+        <Text>Job info: {this.state.currJob}</Text> 
       </GestureRecognizer>
     );
   }
