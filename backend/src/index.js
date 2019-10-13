@@ -3,6 +3,7 @@ import { MongoClient } from 'mongodb';
 
 import JobSearcher from './job_searcher';
 import JobAnalyzer from './job_analyzer';
+import User from './user';
 
 
 const PORT = 8080;
@@ -17,6 +18,8 @@ mongoClient.connect(async (e) => {
   }
    
   const jobsDB = mongoClient.db('jobs');
+  const usersDB = mongoClient.db('user');
+
   await jobsDB.createCollection('jobs', {
     validator: {
       $jsonSchema: {
@@ -48,10 +51,6 @@ mongoClient.connect(async (e) => {
     }
   }).catch(e => console.log(e));
 
-  const jobSearcher = new JobSearcher(jobsDB);
-  const jobAnalyzer = new JobAnalyzer(jobsDB);
-
-  const usersDB = mongoClient.db('user');
   await usersDB.createCollection('user', {
     validator: {
       $jsonSchema: {
@@ -69,7 +68,7 @@ mongoClient.connect(async (e) => {
             bsonType: Object,
             properties: {              
               location: { bsonType: String },
-              jobType: { enum: [ 'full-time', 'part-time', 'internship', 'unspecified' ] },
+              jobType: { enum: [ 'full-time', 'part-time', 'internship' ], default : 'unspecified' },
               skillsExperiences: { bsonType: Array }
             }            
           },
@@ -105,14 +104,46 @@ mongoClient.connect(async (e) => {
       }
     }
   }).catch(e => console.log(e));
-  const uersCollection = usersDB.collection('user');
 
-  await uersCollection.insertMany([
-    {
-      resumePath: 'test'
-    }
-  ]).catch(e => console.log(e));
+  const jobSearcher = new JobSearcher(jobsDB);
+  const jobAnalyzer = new JobAnalyzer(jobsDB);
+  const user = new User(usersDB);
 
+
+  app.get('users/testCreateUser', async (req, res) => {
+    await user.createUser({ 
+      credentials: { 
+        userName: "name", 
+        email: "mail", 
+        password: "word" 
+      },
+      userInfo: {             
+        location: "Vancouver, BC",
+        jobType: "full-time",
+        skillsExperiences: [ "javascript", "C", "java" ]
+      },            
+      keywords: [{
+        score: 1,
+        jobCount: 2,
+        timeStamp: Date.now()
+      },
+      {
+        score: 0,
+        jobCount: 21,
+        timeStamp: Date.now()          
+      }],
+      keywordStatistic: {
+          score: 10,
+          jobCount: 30,
+          timeStamp: Date.now()
+      },
+      friends: [1, 2, 3, 4, 5],
+      jobShortList: [9, 8, 7],
+      resumePath: "./resume.pdf"
+    });
+
+    res.json("Done");
+  });
 
   //purely for testing adding to database
   app.get('/jobs/testAddJobs', async (req, res) => {
