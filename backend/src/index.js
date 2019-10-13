@@ -16,10 +16,12 @@ mongoClient.connect(async (e) => {
   if (e) {
     throw Error('Database connection failed!');
   }
-   
+  
+  /************************ Database Initalization *********************************/
   const jobsDB = mongoClient.db('jobs');
   const usersDB = mongoClient.db('user');
 
+  /************************ Database Schema *********************************/
   await jobsDB.createCollection('jobs', {
     validator: {
       $jsonSchema: {
@@ -105,22 +107,40 @@ mongoClient.connect(async (e) => {
     }
   }).catch(e => console.log(e));
 
+  /******************* Database Manipulation Objects ****************************/
   const jobSearcher = new JobSearcher(jobsDB);
   const jobAnalyzer = new JobAnalyzer(jobsDB);
   const user = new User(usersDB);
 
+  /************************ Routing *********************************/
+  
+  // TODO: Implement get and listen for remaining functionality
+  // TODO: make mapping first
 
-  app.get('users/testCreateUser', async (req, res) => {
+  app.get('/jobs/:query', async (req, res) => {
+    res.json(await jobSearcher.getJobs(req.params.query));
+  });
+
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+
+  /************************ Testing *********************************/
+  app.get('/users/testgetUser', async (req, res) => {
+    res.json(await user.getUser('mail'));
+  });
+
+  app.get('/users/testCreateUser', async (req, res) => {
     await user.createUser({ 
       credentials: { 
-        userName: "name", 
-        email: "mail", 
-        password: "word" 
+        userName: 'name', 
+        email: 'mail', 
+        password: 'word' 
       },
       userInfo: {             
-        location: "Vancouver, BC",
-        jobType: "full-time",
-        skillsExperiences: [ "javascript", "C", "java" ]
+        location: 'Vancouver, BC',
+        jobType: 'full-time',
+        skillsExperiences: [ 'javascript', 'C', 'java' ]
       },            
       keywords: [{
         score: 1,
@@ -139,30 +159,63 @@ mongoClient.connect(async (e) => {
       },
       friends: [1, 2, 3, 4, 5],
       jobShortList: [9, 8, 7],
-      resumePath: "./resume.pdf"
+      resumePath: './resume.pdf'
     });
 
-    res.json("Done");
+    res.send('Done');
+  });
+
+  app.get('/users/testCreateUserAndUserExists', async (req, res) => {
+    const userEmail = 'uniqueUserName';
+
+    await user.createUser({ 
+      credentials: { 
+        userName: 'name', 
+        email: userEmail, 
+        password: 'word' 
+      },
+      userInfo: {             
+        location: 'Vancouver, BC',
+        jobType: 'full-time',
+        skillsExperiences: [ 'javascript', 'C', 'java' ]
+      },            
+      keywords: [{
+        score: 1,
+        jobCount: 2,
+        timeStamp: Date.now()
+      },
+      {
+        score: 0,
+        jobCount: 21,
+        timeStamp: Date.now()          
+      }],
+      keywordStatistic: {
+          score: 10,
+          jobCount: 30,
+          timeStamp: Date.now()
+      },
+      friends: [1, 2, 3, 4, 5],
+      jobShortList: [9, 8, 7],
+      resumePath: './resume.pdf'
+    });
+
+    if (await user.userExists(userEmail)) {
+      res.send('user exists test passed');
+    } else {
+      res.send('user exists test failed');
+    }
   });
 
   //purely for testing adding to database
   app.get('/jobs/testAddJobs', async (req, res) => {
-    await jobSearcher.updateJobs("javascript");
-    await jobSearcher.updateJobs("C");
+    await jobSearcher.updateJobs('javascript');
+    await jobSearcher.updateJobs('C');
 
-    res.json("Done");
+    res.send('Done');
   });
 
   //purely for testing query database; querying for javascript and C jobs
   app.get('/jobs/testGetDBJobs', async (req, res) => {
-    res.json(await jobAnalyzer.getDBJobs(["javascript", "C"]));
-  });
-
-  app.get('/jobs/:query', async (req, res) => {
-    res.json(await jobSearcher.getJobs(req.params.query));
-  });
-
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    res.json(await jobAnalyzer.getDBJobs(['javascript', 'C']));
   });
 });

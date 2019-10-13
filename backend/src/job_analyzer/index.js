@@ -12,11 +12,11 @@ class JobAnalyzer {
         let jobs = new Set();
 
         for (let keyword of keywords) {
-            const re = new RegExp(keyword, "i");
+            const re = new RegExp(keyword, 'i');
             
             const jobsMatchingKeyword = await jobsCollection.find(
-                { "description": { $regex: re } },
-                { "title": { $regex: re } }   
+                { 'description': { $regex: re } },
+                { 'title': { $regex: re } }   
             ).project({ _id: 0 }).toArray();
             jobsMatchingKeyword.forEach(item => jobs.add(item))
         }
