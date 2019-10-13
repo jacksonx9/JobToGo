@@ -1,5 +1,6 @@
 import express from 'express';
 import { MongoClient } from 'mongodb';
+
 import JobSearcher from './job_searcher';
 import JobAnalyzer from './job_analyzer';
 
@@ -47,14 +48,18 @@ mongoClient.connect(async (e) => {
     }
   }).catch(e => console.log(e));
 
-  const jobSearcher = new JobSearcher();
+  const jobSearcher = new JobSearcher(db);
   const jobAnalyzer = new JobAnalyzer(db);
 
-  // const jobsCollection = db.collection('jobs');
-  // const jobArray = await jobSearcher.getJobs("javascript");
-  // await jobsCollection.insertMany(jobArray).catch(e => console.log(e));
 
 
+  //purely for testing adding to database
+  app.get('/jobs/testAddJobs', async (req, res) => {
+    await jobSearcher.updateJobs("javascript");
+    await jobSearcher.updateJobs("C");
+
+    res.json("Done");
+  });
 
   //purely for testing query database; querying for javascript and C jobs
   app.get('/jobs/testGetDBJobs', async (req, res) => {

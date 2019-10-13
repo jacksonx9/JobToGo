@@ -2,7 +2,13 @@ import indeed from 'indeed-scraper';
 import axios from 'axios';
 import cheerio from 'cheerio';
 
+import mongoClient from '..';
+
 class JobSearcher {
+  constructor(database) {
+    this.db = database;
+  }
+
   async getJobs(query) {
     const results = await indeed.query({
       query,
@@ -20,10 +26,16 @@ class JobSearcher {
     return results;
   }
 
-  // if under 100 jobs, add non-existant jobs
+  // TODO: if under 100 jobs, add non-existant jobs
+  async updateJobs(query) {
+    const jobsCollection = this.db.collection('jobs');
+    const jobs = await this.getJobs(query);
+
+    await jobsCollection.insertMany(jobs).catch(e => console.log(e));
+  }
 
 
-  // remove outdated jobs, db.collections.deleteMany()
+  // TODO: remove outdated jobs, db.collections.deleteMany()
 };
 
 export default JobSearcher;
