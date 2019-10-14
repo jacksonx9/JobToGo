@@ -1,10 +1,12 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image} from 'react-native';
+import { StyleSheet, Text, View, Image } from 'react-native';
+import { ImageButton } from '../components';
 import { images, colours, fonts } from '../constants'
 
 const JobDetails = ({ company, job, location }) => {
     const {
         containerStyle,
+        textContainerStyle,
         subHeaderContainerStyle,
         headerStyle,
         subHeaderStyle,
@@ -12,7 +14,12 @@ const JobDetails = ({ company, job, location }) => {
     } = styles;
 
     return (
-            <View style={[containerStyle]}>
+        <View style={[containerStyle]}>
+            <ImageButton
+                source={images.iconChevronUp}
+                onPress={() => console.log('hi')}
+            />
+            <View style={[textContainerStyle]}>
                 <Text style={[headerStyle]}>{company}</Text>
                 <View style={[subHeaderContainerStyle]}>
                     <Image
@@ -29,13 +36,21 @@ const JobDetails = ({ company, job, location }) => {
                     <Text style={[subHeaderStyle]}>{location}</Text>
                 </View>
             </View>
+        </View>
 
     );
 };
 
 const styles = StyleSheet.create({
     containerStyle: {
-        padding: 30,
+        paddingTop: 50,
+        justifyContent: 'center',
+        height: 100,
+        overflow: 'scroll'
+    },
+    textContainerStyle: {
+        paddingVertical: 7,
+        paddingHorizontal: 30,
         flexDirection: 'column',
         justifyContent: 'flex-start',
         height: 100,
