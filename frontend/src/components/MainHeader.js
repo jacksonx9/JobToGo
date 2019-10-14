@@ -27,7 +27,7 @@ const MainHeader = () => {
   
 const styles = StyleSheet.create({
   containerStyle: {
-    paddingTop: 12,
+    paddingTop: 5,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-evenly',
