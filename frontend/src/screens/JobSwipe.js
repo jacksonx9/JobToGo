@@ -4,15 +4,14 @@ import React, {Component} from 'react';
 import {View, Text} from 'react-native';
 import GestureRecognizer from 'react-native-swipe-gestures';
 import axios from 'axios';
+import { MainHeader } from '../components';
  
-class JobSwipe extends Component {
+export default class JobSwipe extends Component {
  
   constructor(props) {
     super(props);
     this.state = {
       myText: 'I\'m ready to get swiped!',
-      gestureName: 'none',
-      backgroundColor: '#fff',
       jobs: [],
       jobIndex: 0,
       loading: 1
@@ -20,56 +19,51 @@ class JobSwipe extends Component {
   }
 
   async componentDidMount() {
-    const jobs = await axios.get('http://10.0.2.2:8080/jobs/javascript').catch(e => console.log(e));
-    
+    //const jobs = await axios.get('http://10.0.2.2:8080/jobs/javascript').catch(e => console.log(e));
+    const jobs = []
     this.setState({
       jobs: jobs.data,
       loading: 0
     })
-    
   }
  
-  onSwipeUp = () => {
+  shareJob = () => {
     this.setState({myText: 'shared job'});
   }
 
-  onSwipeLeft = () => {
+  dislikeJob = () => {
     this.setState({myText: 'disliked job'});
   }
 
-  onSwipeRight = () => {
+  likeJob = () => {
     this.setState({myText: 'liked job'});
     this.setState({jobIndex: this.state.jobIndex +1})
 
   }
 
-  
-
- 
   render() {
- 
     const config = {
       velocityThreshold: 0.3,
       directionalOffsetThreshold: 80
     };
+
     if(this.state.loading) return null;
 
     return (
 
       <GestureRecognizer
-        onSwipeUp={this.onSwipeUp}
-        onSwipeLeft={this.onSwipeLeft}
-        onSwipeRight={this.onSwipeRight}
+        onSwipeUp={this.shareJob}
+        onSwipeLeft={this.dislikeJob}
+        onSwipeRight={this.likeJob}
         config={config}
         style={{
           flex: 1,
-          backgroundColor: this.state.backgroundColor
         }}
         >
-        <Text>Job info: {this.state.jobs[this.state.jobIndex].title}</Text>
+          <MainHeader/>
+          {/* <Text>Job info: {this.state.jobs[this.state.jobIndex].title}</Text> */}
       </GestureRecognizer>
-    );
+    )
   }
 }
  
-export default JobSwipe;

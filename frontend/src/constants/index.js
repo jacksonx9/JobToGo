@@ -1,7 +1,7 @@
-const fonts = {
-    light: 'Exo-Light',
-    regular: 'Exo-Regular',
-    bold: 'Exo-Bold'
-  };
+
+export const images = {
+  logoLight: require('../../assets/logo-light.png'),
+  iconSend: require('../../assets/icon-send.png'),
+  iconMenu: require('../../assets/icon-menu.png')
+}; 
   
-  export default fonts;

@@ -24,8 +24,15 @@ export default class App extends React.Component {
   }
 }
 
-const AppStack = createStackNavigator({ JobSwipe: JobSwipe});
-const AuthStack = createStackNavigator({ SignIn: SignIn, SignUp: SignUp });
+const navConfig = {
+  headerMode: 'none',
+  navigationOptions: {
+    headerVisible: false,
+  }
+}
+
+const AppStack = createStackNavigator({ JobSwipe: JobSwipe }, navConfig);
+const AuthStack = createStackNavigator({ SignIn: SignIn, SignUp: SignUp }, navConfig);
 
 AppContainer = createAppContainer(
   createSwitchNavigator(
