@@ -1,13 +1,13 @@
 'use strict';
- 
-import React, {Component} from 'react';
-import {View, Text} from 'react-native';
+
+import React, { Component } from 'react';
+import { View, Text } from 'react-native';
 import GestureRecognizer from 'react-native-swipe-gestures';
 import axios from 'axios';
-import { MainHeader } from '../components';
- 
+import { MainHeader, JobImage, Loader } from '../components';
+
 export default class JobSwipe extends Component {
- 
+
   constructor(props) {
     super(props);
     this.state = {
@@ -19,25 +19,25 @@ export default class JobSwipe extends Component {
   }
 
   async componentDidMount() {
-    //const jobs = await axios.get('http://10.0.2.2:8080/jobs/javascript').catch(e => console.log(e));
-    const jobs = []
+    const jobs = await axios.get('http://10.0.2.2:8080/jobs/javascript').catch(e => console.log(e));
+
     this.setState({
       jobs: jobs.data,
       loading: 0
     })
   }
- 
+
   shareJob = () => {
-    this.setState({myText: 'shared job'});
+    this.setState({ myText: 'shared job' });
   }
 
   dislikeJob = () => {
-    this.setState({myText: 'disliked job'});
+    this.setState({ myText: 'disliked job' });
   }
 
   likeJob = () => {
-    this.setState({myText: 'liked job'});
-    this.setState({jobIndex: this.state.jobIndex +1})
+    this.setState({ myText: 'liked job' });
+    this.setState({ jobIndex: this.state.jobIndex + 1 })
 
   }
 
@@ -47,23 +47,26 @@ export default class JobSwipe extends Component {
       directionalOffsetThreshold: 80
     };
 
-    if(this.state.loading) return null;
+    if (this.state.loading) return <Loader/>
 
     return (
-
-      <GestureRecognizer
-        onSwipeUp={this.shareJob}
-        onSwipeLeft={this.dislikeJob}
-        onSwipeRight={this.likeJob}
-        config={config}
-        style={{
-          flex: 1,
-        }}
+      <View>
+        <MainHeader />
+        <GestureRecognizer
+          onSwipeUp={this.shareJob}
+          onSwipeLeft={this.dislikeJob}
+          onSwipeRight={this.likeJob}
+          config={config}
+          style={{
+            flex: 1,
+          }}
         >
-          <MainHeader/>
-          {/* <Text>Job info: {this.state.jobs[this.state.jobIndex].title}</Text> */}
-      </GestureRecognizer>
+          <JobImage
+            companyName={this.state.jobs[this.state.jobIndex].company}
+          />
+        </GestureRecognizer>
+      </View>
     )
   }
 }
- 
+
