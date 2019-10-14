@@ -17,11 +17,10 @@ import SignIn from './screens/SignIn';
 import SignUp from './screens/SignUp';
 import JobSwipe from './screens/JobSwipe';
 
-
 export default class App extends React.Component {
   render() {
-    return <AppContainer />;
-  }
+    return <AppContainer styles={styles.containerStyle} />;
+  } 
 }
 
 const navConfig = {
@@ -48,7 +47,7 @@ AppContainer = createAppContainer(
 );
 
 const styles = StyleSheet.create({
-  container: {
+  containerStyle: {
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',

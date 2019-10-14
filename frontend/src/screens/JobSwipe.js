@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { View, Text } from 'react-native';
 import GestureRecognizer from 'react-native-swipe-gestures';
 import axios from 'axios';
-import { MainHeader, JobImage, Loader } from '../components';
+import { MainHeader, JobImage, JobDetails, Loader } from '../components';
 
 export default class JobSwipe extends Component {
 
@@ -63,6 +63,11 @@ export default class JobSwipe extends Component {
         >
           <JobImage
             companyName={this.state.jobs[this.state.jobIndex].company}
+          />
+          <JobDetails
+            company={this.state.jobs[this.state.jobIndex].company}
+            job={this.state.jobs[this.state.jobIndex].title}
+            location={this.state.jobs[this.state.jobIndex].location}
           />
         </GestureRecognizer>
       </View>
