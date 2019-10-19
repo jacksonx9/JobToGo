@@ -50,18 +50,18 @@ export default class SignIn extends Component {
             style={[styles.buttonStyle]}
             onPress={this.onPressSignIn.bind(this)}
           />
-          {/* <TouchableOpacity
+          <TouchableOpacity
             style={[styles.linkStyle]}
-            onPress={this.props.navigation.navigate('SignUp')}
+            onPress={() => {this.props.navigation.navigate('SignUp')}}
           >
-            <Text>Sign Up</Text>
+            <Text style={[styles.textStyle]}>Sign Up</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.linkStyle]}
-            onPress={this.props.navigation.navigate('SignUp')}
+            onPress={() => {this.props.navigation.navigate('SignUp')}}
           >
-            <Text>Forgot Password</Text>
-          </TouchableOpacity> */}
+            <Text style={[styles.textStyle]}>Forgot Password</Text>
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -100,10 +100,15 @@ const styles = StyleSheet.create({
     fontFamily: fonts.normal,
   },
   buttonStyle: {
-    marginTop: 5
+    marginTop: 5,
+    marginBottom: 20
   },
   linkStyle: {
-    color: 'white'
+    alignItems: 'center'
+  },
+  textStyle: {
+    color: 'white',
+    textDecorationColor: 'white'
   }
 });
  
