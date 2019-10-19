@@ -70,7 +70,7 @@ mongoClient.connect(async (e) => {
             bsonType: Object,
             properties: {              
               location: { bsonType: String },
-              jobType: { enum: [ 'full-time', 'part-time', 'internship' ], default : 'unspecified' },
+              jobType: { enum: [ 'full-time', 'part-time', 'internship', 'unspecified' ] },
               skillsExperiences: { bsonType: Array }
             }            
           },
