@@ -1,19 +1,24 @@
-// var mongoose = require('mongoose');
-// mongoose.connect('localhost:27017');
-// var Schema = mongoose.Schema;
+import mongoose from 'mongoose';
 
-// var jobDataSchema = new Schema({
-//   title: {type: String, required: true},
-//   companyName: String,
-//   location: String,
-//   url: String,
-//   postDate: String,
-//   salary: String,
-//   description: String,
-//   author: String
-// });
+const jobSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+  },
+  company: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  location: String,
+  url: String,
+  postDate: String,
+  salary: String,
+});
 
-// var JobData = mongoose.model('JobData', jobDataSchema);
+const Jobs = mongoose.model('Jobs', jobSchema);
 
-
-// export default JobData;
+export default Jobs;

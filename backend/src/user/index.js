@@ -1,12 +1,8 @@
-import mongoClient from '..';
+import { Users } from '../schema';
 
 class User {
-  constructor(db) {
-    this.usersCollection = db.collection('user');
-  }
-
   async createUser(query) {
-    await this.usersCollection.insert({
+    await Users.create({
         credentials: query.credentials,            
         userInfo: query.userInfo,
         keywords: query.keywords,
@@ -18,20 +14,19 @@ class User {
 
   // check for existing user in database (via email)
   async userExists(userEmail) {
-    const user = await this.usersCollection.find(
-        { 'credentials.email': userEmail }
-    ).project({ _id: 0 }).toArray();
-
+    const user = await Users.find(
+        { 'credentials.email': userEmail },
+        { _id: 0, __v: 0 }
+    ).catch(e => console.log(e));
     return user.length > 0;
   }
 
   // get User
   async getUser(userEmail) {
-    const usersCollection = this.db.collection('user');
-
-    const user = await usersCollection.find(
-        { 'credentials.email': userEmail }
-    ).project({ _id: 0 }).toArray();
+    const user = await Users.find(
+        { 'credentials.email': userEmail },
+        { _id: 0, __v: 0 }
+    ).catch(e => console.log(e));
 
     return user.length > 0 ? user[0] : null;
   }

@@ -1,12 +1,13 @@
 import indeed from 'indeed-scraper';
 import axios from 'axios';
 import cheerio from 'cheerio';
-
-import mongoClient from '..';
+import { Jobs } from '../schema';
 
 class JobSearcher {
-  constructor(database) {
-    this.db = database;
+  constructor(app) {
+    app.get('/jobs/:query', async (req, res) => {
+      res.json(await this.getJobs(req.params.query));
+    });
   }
 
   async getJobs(query) {
@@ -28,10 +29,8 @@ class JobSearcher {
 
   // TODO: if under 100 jobs, add non-existant jobs
   async updateJobs(query) {
-    const jobsCollection = this.db.collection('jobs');
     const jobs = await this.getJobs(query);
-
-    await jobsCollection.insertMany(jobs).catch(e => console.log(e));
+    await Jobs.insertMany(jobs).catch(e => console.log(e));
   }
 
 
