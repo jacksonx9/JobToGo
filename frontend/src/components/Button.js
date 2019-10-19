@@ -25,18 +25,14 @@ const Button = ({ style, backgroundColor, textColor, title, enable = true, onPre
   );
 };
 
-const margin = 14;
 const styles = StyleSheet.create({
   containerStyle: {
     alignItems: 'center',
     borderRadius: 5,
-    margin,
     height: 50
   },
   textStyle: {
-    //fontFamily: fonts.regular,
     fontSize: 16,
-    margin
   }
 });
 

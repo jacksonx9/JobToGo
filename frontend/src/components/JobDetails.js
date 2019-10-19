@@ -4,6 +4,7 @@ import { ImageButton } from '../components';
 import { images, colours, fonts } from '../constants'
 
 const JobDetails = ({ company, job, location }) => {
+    
     const {
         containerStyle,
         textContainerStyle,
@@ -12,6 +13,11 @@ const JobDetails = ({ company, job, location }) => {
         subHeaderStyle,
         iconStyle,
     } = styles;
+
+
+    onPressExpand = () => {
+        //this.state.expanded
+      }
 
     return (
         <View style={[containerStyle]}>
@@ -46,7 +52,8 @@ const styles = StyleSheet.create({
         paddingTop: 50,
         justifyContent: 'center',
         height: 100,
-        overflow: 'scroll'
+        overflow: 'scroll',
+        backgroundColor: 'white'
     },
     textContainerStyle: {
         paddingVertical: 7,

@@ -9,9 +9,9 @@ const JobImage = ({ companyName }) => {
     } = styles;
 
     return (
-            <ImageBackground source={images.tempBg1} style={[containerStyle]}>
-                <Text style={[textStyle]}>{companyName}</Text>
-            </ImageBackground>
+        <ImageBackground source={images.tempBg1} style={[containerStyle]}>
+            <Text style={[textStyle]}>{companyName}</Text>
+        </ImageBackground>
 
     );
 };

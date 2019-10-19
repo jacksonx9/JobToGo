@@ -19,7 +19,7 @@ export default class JobSwipe extends Component {
   }
 
   async componentDidMount() {
-    const jobs = await axios.get('http://10.0.2.2:8080/jobs/javascript').catch(e => console.log(e));
+    const jobs = await axios.get('http://3.16.169.130:8080/jobs/javascript').catch(e => console.log(e));
 
     this.setState({
       jobs: jobs.data,
@@ -33,6 +33,7 @@ export default class JobSwipe extends Component {
 
   dislikeJob = () => {
     this.setState({ myText: 'disliked job' });
+    this.setState({ jobIndex: this.state.jobIndex + 1 })
   }
 
   likeJob = () => {
