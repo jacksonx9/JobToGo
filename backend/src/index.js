@@ -1,33 +1,20 @@
 import express from 'express';
-import { MongoClient } from 'mongodb';
+import mongoose from 'mongoose';
+
+import JobSearcher from './job_searcher';
 
 const PORT = 8080;
-const MONGO_URL = 'mongodb://171.0.0.3:27017';
+const MONGO_URL = 'mongodb://171.0.0.3:27017/JobToGo';
 
 const app = express();
-const mongoClient = MongoClient(MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true });
 
-mongoClient.connect(async (e) => {
-  if (e) {
-    throw Error('Database connection failed!');
-  }
+mongoose.connect(MONGO_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).catch(e => console.log(e));
 
-  const db = mongoClient.db('test');
-  const collection = db.collection('test');
-  const collectionData = await collection.find({}).toArray();
+new JobSearcher(app);
 
-  // If collection is empty, insert Hello World message
-  if (collectionData.length === 0) {
-    await collection.insertOne({ message: 'Hello World!' }).catch((e) => console.log(e));
-  }
-
-  // On / access, return Hello World message from db
-  app.get('/', async (req, res) => {
-    const helloWorldData = await collection.find({}).toArray();
-    res.send(helloWorldData[0].message);
-  });
-
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
