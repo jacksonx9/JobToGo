@@ -28,6 +28,7 @@ const Button = ({ style, backgroundColor, textColor, title, enable = true, onPre
 const styles = StyleSheet.create({
   containerStyle: {
     alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: 5,
     height: 50
   },

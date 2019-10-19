@@ -72,7 +72,7 @@ export default class JobSwipe extends Component {
           />
         </GestureRecognizer>
       </View>
-    )
-  }
-}
+    );
+  };
+};
 
