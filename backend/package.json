@@ -13,7 +13,9 @@
     "cheerio": "^1.0.0-rc.3",
     "express": "^4.13.3",
     "indeed-scraper": "^3.0.2",
-    "mongoose": "^5.7.5"
+    "mongoose": "^5.7.5",
+    "pdf-parse": "^1.1.1",
+    "stopword": "^0.3.3"
   },
   "devDependencies": {
     "babel-cli": "^6.9.0",
