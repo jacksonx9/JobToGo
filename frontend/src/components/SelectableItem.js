@@ -38,8 +38,8 @@ class SelectableItem extends Component {
 
 
             <View style={[styles.infoStyle]}>
-                <Text>Header</Text>
-                <Text>SubHeader</Text>
+                <Text>{this.props.header}</Text>
+                <Text>{this.props.subHeader}</Text>
             </View>
 
   
@@ -60,9 +60,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-evenly',
     height: 80,
-    paddingHorizontal: 15,
+    width: '100%',
+    paddingHorizontal: 20,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    backgroundColor: 'pink'
+    backgroundColor: 'white'
   },
   textStyle: {
     fontSize: 16,
