@@ -1,13 +1,13 @@
 import { Jobs } from '../schema';
 
-
 class JobAnalyzer {
   // TODO: change to passing in User and getting user's keywords
-  async getDBJobs(keywords) {
+  async findJobs(keywords) {
     let jobs = new Set();
 
     for (const keyword of keywords) {
-      const re = new RegExp(keyword, 'i');
+      const escapedKeyword = keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      const re = new RegExp(escapedKeyword, 'i');
       
       const jobsMatchingKeyword = await Jobs.find(
         {
