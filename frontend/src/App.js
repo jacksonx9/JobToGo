@@ -6,6 +6,7 @@ import { createStackNavigator } from 'react-navigation-stack';
 import SignIn from './screens/SignIn';
 import SignUp from './screens/SignUp';
 import JobSwipe from './screens/JobSwipe';
+import SendLikedJobs from './screens/SendLikedJobs';
 
 export default class App extends React.Component {
   render() {
@@ -20,7 +21,7 @@ const navConfig = {
   }
 }
 
-const AppStack = createStackNavigator({ JobSwipe: JobSwipe }, navConfig);
+const AppStack = createStackNavigator({ JobSwipe: SendLikedJobs }, navConfig);
 const AuthStack = createStackNavigator({ SignIn: SignIn, SignUp: SignUp }, navConfig);
 
 AppContainer = createAppContainer(

@@ -32,7 +32,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-evenly',
     height: 80,
-    borderBottomWidth: StyleSheet.hairlineWidth
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    backgroundColor: 'white',
+    width: '100%'
   },
   logoStyle: {
     width: 170,

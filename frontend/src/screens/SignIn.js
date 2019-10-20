@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native';
 import  { Button, SelectableItem } from '../components';
 import { images, colours, fonts } from '../constants'
+//mport { GoogleSignin, GoogleSigninButton } from 'react-native-google-signin';
 
 export default class SignIn extends Component {
   
@@ -9,7 +10,10 @@ export default class SignIn extends Component {
     super(props);
     this.state = {
       email: '',
-      password: ''
+      password: '',
+      isAuthenticated: false, 
+      user: null, 
+      token: ''
     };
   }
 
@@ -64,8 +68,6 @@ export default class SignIn extends Component {
           </TouchableOpacity>
         </View>
       </View>
-
-      //<SelectableItem/>
 
     );
   };
