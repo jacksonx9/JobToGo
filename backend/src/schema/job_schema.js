@@ -14,7 +14,12 @@ const jobSchema = new mongoose.Schema({
     required: true,
   },
   location: String,
-  url: String,
+  url: {
+    type: String,
+    index: {
+      unique: true,
+    }
+  },
   postDate: String,
   salary: String,
 });
