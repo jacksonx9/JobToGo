@@ -9,18 +9,17 @@ export default class SendLikedJobs extends Component {
     constructor(props) {
         super(props);
         this.state = {
-          myText: 'I\'m ready to get swiped!',
-          jobs: [],
+          likedJobs: [],
           jobIndex: 0,
           loading: 1
         };
       }
     
     async componentDidMount() {
-        const jobs = await axios.get('http://3.16.169.130:8080/jobs/javascript').catch(e => console.log(e));
+        const likedJobs = await axios.get('http://3.16.169.130:8080/jobs/javascript').catch(e => console.log(e));
     
         this.setState({
-          jobs: jobs.data,
+          likedJobs: likedJobs.data,
           loading: 0
         })
     }
@@ -34,7 +33,7 @@ export default class SendLikedJobs extends Component {
                 <MainHeader/>
                 <FlatList
                     style
-                    data={this.state.jobs}
+                    data={this.state.likedJobs}
                     keyExtractor={(item, index) => item.key}
                     renderItem={({item}) => <SelectableItem key={item.company} header={item.company} subHeader={item.title}/>}
                 />

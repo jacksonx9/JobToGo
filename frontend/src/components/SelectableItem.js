@@ -2,14 +2,14 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { fonts } from '../constants'
 
-const SelectableItem = ({ style, backgroundColor, textColor, title, enable = true, onPress }) => {
+const SelectableItem = ({ header, subHeader, onPress }) => {
   
     return (
         <View style={[styles.containerStyle]}>
 
             <View style={[styles.infoStyle]}>
-                <Text>{this.props.header}</Text>
-                <Text>{this.props.subHeader}</Text>
+                <Text>{header}</Text>
+                <Text>{subHeader}</Text>
             </View>
 
             <TouchableOpacity
