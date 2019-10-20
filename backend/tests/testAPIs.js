@@ -10,11 +10,12 @@ class TestAPIs {
     const jobAnalyzer = new JobAnalyzer();
     const user = new User(app);
     const testEmail = 'uniqueUserName';
+    const testPassword = 'word';
     const testUser = {
       credentials: {
         userName: 'name',
         email: testEmail,
-        password: 'word'
+        password: testPassword
       },
       userInfo: {
         location: 'Vancouver, BC',
@@ -41,9 +42,8 @@ class TestAPIs {
       resumePath: './resume.pdf'
     };
 
-    app.get('/test/users/testlogin', async (req, res) => {
+    app.get('/test/users/updateUserInfo', async (req, res) => {
       const userId = await user.createUser(testUser);
-      console.log(userId);
       const updatedName = 'updateName';
       const userUpdateInfo = {
         credentials: {
@@ -51,11 +51,11 @@ class TestAPIs {
           email: testEmail,
           password: 'word'
         },
-        userInfo: {
-          location: 'Vancouver, BC',
-          jobType: 'full-time',
-          skillsExperiences: [ 'javascript', 'C', 'java' ]
-        },
+        // userInfo: {
+        //   location: 'Vancouver, BC',
+        //   jobType: 'full-time',
+        //   skillsExperiences: [ 'javascript', 'C', 'java' ]
+        // },
         keywords: [{
           score: 1,
           jobCount: 2,
@@ -78,7 +78,8 @@ class TestAPIs {
 
       if (await user.updateUserInfo(userId, userUpdateInfo)) {
         const updatedUser = await Users.findById(userId);
-        if (updatedUser.credentials.userName == updatedName) {
+        if (updatedUser.credentials.userName == updatedName &&
+            updatedUser.userInfo.location == 'Vancouver, BC') {
           res.send('succeed');
         } else {
           res.send('failed');
@@ -86,6 +87,26 @@ class TestAPIs {
       } else {
         res.send('userId is not valid; check createUser');
       }
+    });
+
+    app.get('/test/users/testlogin', async (req, res) => {
+      const testuserId = await user._getUser(testEmail);
+      const userId = await user.login(testEmail, testPassword);
+
+      if (userId.equals(testuserId._id))
+        console.log('Passed: valid login test...\n');
+      else
+        console.log('Failed: valid login test...\n');
+
+      if (await user.login("invalid email", testPassword) == -1)
+        console.log('Passed: invalid email test...\n');
+      else
+        console.log('Failed: invalid email test...\n');
+
+      if (await user.login(testEmail, "invalid password") == -1)
+        console.log('Passed: invalid password test...\n');
+      else
+        console.log('Failed: invalid password test...\n');
     });
 
     app.get('/test/users/testgetUser', async (req, res) => {
@@ -103,7 +124,7 @@ class TestAPIs {
 
       await user.createUser(testUser);
 
-      if (await user.userExists(userEmail)) {
+      if (await user._userExists(userEmail)) {
         res.send('user exists test passed');
       } else {
         res.send('user exists test failed');

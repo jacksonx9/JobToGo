@@ -17,51 +17,53 @@ class User {
 
   // return: userId if succeeds and -1 otherwise
   async createUser(query) {
-    const { credentials, userInfo, keywords, friends, jobShortList, resumePath } = query;
+    const user = await Users.create(query).catch(e => console.log(e));
+    return typeof user === 'undefined' ? -1 : user.id;
+  }
 
-    const user = await Users.create({
-        credentials, userInfo, keywords, friends, jobShortList, resumePath
-    }).catch(e => console.log(e));
-
-    return user == undefined ? -1 : user.id;
+  // check for existing user in database (via email)
+  async _userExists(userEmail) {
+    const user = await Users.find(
+        { 'credentials.email': userEmail },
+        { _id: 0 }
+    ).catch(e => console.log(e));
+    return !user.length;
   }
 
   // Returns userId if succeeds, -1 otherwise
   async login(userEmail, userPassword) {
-    const user = await Users.find(
-      { 'credentials.email': userEmail },
-      { __v: 0 }
-    ).catch(e => console.log(e));
+    const userIdObj = await Users.findOne(
+      { 'credentials.email': userEmail, 'credentials.password': userPassword },
+      '_id').catch(e => console.log(e));
 
-    return !user.length && user.userPassword == userPassword ? user.id : -1;
+    return userIdObj == null ? -1 : userIdObj._id;
   }
 
-  //.lean() raw js object
-
-  // Returns true if succeeded and false otherwise
+  // Can pass in only fields that need to be updated
+  // Returns true if success and false otherwise
   async updateUserInfo(userId, info) {
-    const res = await Users.replaceOne({ _id: userId }, info).catch(e => console.log(e));
+    const res = await Users.updateOne({ _id: userId }, info)
+                                      .catch(e => console.log(e));
 
     return res.nModified == 1 ? true : false;
   }
 
-  // return bool
+  // Returns true if success and false otherwise
   async addFriend(userID, friendID) {
+    const res = Users.updateOne(
+      { _id: userID },
+      { $push: { friends: friendID }}).catch(e => console.log(e));
 
+    return res.nModified == 1 ? true : false;
   }
 
-  // return bool
+  // Returns true if success and false otherwise
   async removeFriend(userID, friendID) {
 
   }
 
-  // return bool
+  // Returns true if success and false otherwise
   async confirmFriend(userID, friendID) {
-
-  }
-
-  // Array[strings]
-  async getSkills(userID) {
 
   }
 
@@ -70,20 +72,15 @@ class User {
 
   }
 
-  // check for existing user in database (via email)
-  async userExists(userEmail) {
-    const user = await Users.find(
-        { 'credentials.email': userEmail },
-        { _id: 0, __v: 0 }
-    ).catch(e => console.log(e));
-    return !user.length;
+  // Array[strings]
+  async getSkills(userID) {
+
   }
 
-  // get User
-  async getUser(userEmail) {
+  // get UserId
+  async _getUser(userEmail) {
     const user = await Users.find(
-        { 'credentials.email': userEmail },
-        { _id: 0, __v: 0 }
+        { 'credentials.email': userEmail }, '_id'
     ).catch(e => console.log(e));
 
     return user.length > 0 ? user[0] : null;
