@@ -13,7 +13,7 @@ mongoose.connect(MONGO_URL, {
   useUnifiedTopology: true
 }).catch(e => console.log(e));
 
-new JobSearcher(app);
+new JobSearcher();
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
