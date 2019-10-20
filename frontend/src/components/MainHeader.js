@@ -13,7 +13,7 @@ const MainHeader = () => {
     <View style = {[containerStyle]}>
         <ImageButton
         source = {images.iconMenu}
-        onPress = {() => console.log('hi')} 
+        onPress={() => { this.props.navigation.openDrawer() }}
         />
         <Image source = {images.logoLight} style = {[logoStyle]} />
         <ImageButton

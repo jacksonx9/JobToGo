@@ -1,8 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-//import fonts from '../contants/fonts';
-
 const Button = ({ style, backgroundColor, textColor, title, enable = true, onPress }) => {
   const {
     containerStyle,

@@ -1,13 +1,14 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
+
 import GestureRecognizer from 'react-native-swipe-gestures';
 import axios from 'axios';
 import { MainHeader, JobImage, JobDetails, Loader } from '../components';
 
 export default class JobSwipe extends Component {
-
+  
   constructor(props) {
     super(props);
     this.state = {

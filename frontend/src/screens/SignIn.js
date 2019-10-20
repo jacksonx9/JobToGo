@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native';
-import { Button } from '../components';
+import  { Button, SelectableItem } from '../components';
 import { images, colours, fonts } from '../constants'
 
 export default class SignIn extends Component {
@@ -64,6 +64,9 @@ export default class SignIn extends Component {
           </TouchableOpacity>
         </View>
       </View>
+
+      //<SelectableItem/>
+
     );
   };
 };
