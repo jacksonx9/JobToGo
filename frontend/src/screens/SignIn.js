@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native';
 import  { Button, SelectableItem } from '../components';
 import { images, colours, fonts } from '../constants'
-import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
+import { GoogleSignin, GoogleSignInOptions, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 
 export default class SignIn extends Component {
   
@@ -26,16 +26,14 @@ export default class SignIn extends Component {
 
   signIn = async () => {
     try {
+
       await GoogleSignin.configure({
-        webClientId: '753427453652-eomsu2jpkhot804a0gs04co1vsqnbeuk.apps.googleusercontent.com'
+        webClientId: '617405875578-f23h0uql1ol1qhk64qd16mcubqludhah.apps.googleusercontent.com'
       });
-      await GoogleSignin.hasPlayServices();
-      console.log('lol')
-      const userInfo = await GoogleSignin.signIn();
-      console.log('lolol')
-      this.setState({ userInfo: userInfo });
-      //console.log("sdkjfhkfjhkjhkjh")
-      alert("this.state.userInfo")
+
+      await GoogleSignin.hasPlayServices()
+      const userInfo = await GoogleSignin.signIn()
+      this.setState({ userInfo: userInfo })
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         console.log('sign in cancelled')
@@ -44,8 +42,7 @@ export default class SignIn extends Component {
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         console.log('play service not available')
       } else {
-        console.log("SDFASDFAS");
-        console.log(error);
+        console.log(error)
       }
     }
   };
