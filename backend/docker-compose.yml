@@ -5,9 +5,12 @@ services:
   mongodb:
     container_name: jobtogo_db
     hostname: jobtogo_db
-    image: mongo:4.2.0
-    ports:
-      - "27017:27017"
+    build:
+      context: .
+      dockerfile: ./docker/mongodb/Dockerfile
+    image: "jobtogo_db"
+    volumes: 
+      - ./mongodata:/data/db:Z
     networks:
       jobtogo_net:
         ipv4_address: 171.0.0.3
