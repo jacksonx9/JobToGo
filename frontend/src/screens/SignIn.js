@@ -19,14 +19,12 @@ export default class SignIn extends Component {
     };
   }
 
-
   onPressSignIn = () => {
     this.props.navigation.navigate('App')
   }
 
-  signIn = async () => {
+  onPressGoogleSignIn = async () => {
     try {
-
       await GoogleSignin.configure({
         webClientId: '617405875578-f23h0uql1ol1qhk64qd16mcubqludhah.apps.googleusercontent.com'
       });
@@ -34,6 +32,7 @@ export default class SignIn extends Component {
       await GoogleSignin.hasPlayServices()
       const userInfo = await GoogleSignin.signIn()
       this.setState({ userInfo: userInfo })
+      this.props.navigation.navigate('App')
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         console.log('sign in cancelled')
@@ -80,17 +79,16 @@ export default class SignIn extends Component {
             style={[styles.buttonStyle]}
             onPress={this.onPressSignIn.bind(this)}
           />
+          <View style={[styles.linkStyle]}>
+            <Text style={[styles.textStyle]}>or</Text>
+          </View>
 
-<GoogleSigninButton
-    style={{ width: 192, height: 48 }}
-    size={GoogleSigninButton.Size.Wide}
-    color={GoogleSigninButton.Color.Dark}
-    onPress={this.signIn.bind(this)}
-    disabled={false} />
-
-
-
-
+          <GoogleSigninButton
+              style={[styles.buttonStyle]}
+              size={GoogleSigninButton.Size.Wide}
+              color={GoogleSigninButton.Color.Light}
+              onPress={this.onPressGoogleSignIn.bind(this)}
+              disabled={false} />
 
           <TouchableOpacity
             style={[styles.linkStyle]}
@@ -144,7 +142,9 @@ const styles = StyleSheet.create({
   },
   buttonStyle: {
     marginTop: 5,
-    marginBottom: 20
+    marginBottom: 20,
+    width: '100%',
+    height: 50
   },
   linkStyle: {
     alignItems: 'center'

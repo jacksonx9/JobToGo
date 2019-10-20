@@ -4,20 +4,20 @@ import  { Button, SelectableItem, Loader, NavHeader} from '../components';
 import { images, colours, fonts } from '../constants'
 import axios from 'axios';
 
-export default class SendLikedJobs extends Component {
+export default class EditFriends extends Component {
   
-    static navigationOptions = {
-        drawerLabel: 'Liked Jobs',
-    };
-    
-    constructor(props) {
-        super(props);
-        this.state = {
-          likedJobs: [],
-          jobIndex: 0,
-          loading: 1
-        };
-      }
+  static navigationOptions = {
+    drawerLabel: 'Friends',
+  };
+  
+  constructor(props) {
+      super(props);
+      this.state = {
+        likedJobs: [],
+        jobIndex: 0,
+        loading: 1
+      };
+    }
     
     async componentDidMount() {
         const likedJobs = await axios.get('http://3.16.169.130:8080/jobs/javascript').catch(e => console.log(e));
@@ -34,7 +34,7 @@ export default class SendLikedJobs extends Component {
         return (
             <View style={[styles.containerStyle]}>
                 <NavHeader
-                    title='Your Liked Jobs'
+                    title='Friends'
                     image={images.iconSend}
                     onPressBack={() => this.props.navigation.goBack()}
                     onPressBtn={() => this.props.navigation.navigate('SendLikedJobs')}

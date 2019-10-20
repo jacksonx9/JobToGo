@@ -7,6 +7,7 @@ const images = {
   iconMenu: require('../../assets/icon-menu.png'),
   iconLocation: require('../../assets/icon-location.png'),
   iconChevronUp: require('../../assets/icon-chevron-up.png'),
+  iconChevronLeft: require('../../assets/icon-chevron-left.png'),
   iconJob: require('../../assets/icon-job.png'),
 
   tempBg1: require('../../assets/temp-bg1.png'),

@@ -9,6 +9,8 @@ import SignIn from './screens/SignIn';
 import SignUp from './screens/SignUp';
 import JobSwipe from './screens/JobSwipe';
 import SendLikedJobs from './screens/SendLikedJobs';
+import EditFriends from './screens/EditFriends';
+import EditSkills from './screens/EditSkills';
 
 export default class App extends React.Component {
   render() {
@@ -35,8 +37,8 @@ createDrawerNavigator(
     { 
       JobSwipe: JobSwipe, 
       SendLikedJobs: SendLikedJobs,
-      EditFriends: JobSwipe,
-      EditSkills: JobSwipe
+      EditFriends: EditFriends,
+      EditSkills: EditSkills
     }, 
     drawerNavConfig
   );

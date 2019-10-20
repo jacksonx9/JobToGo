@@ -1,9 +1,9 @@
 import React from 'react';
-import { StyleSheet, View, Image } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import { ImageButton } from '../components'
 import { images } from '../constants'
 
-const MainHeader = ({ onPressMenu, onPressSend }) => {
+const NavHeader = ({ title, image, onPressBack, onPressBtn }) => {
     const {
         containerStyle,
         logoStyle
@@ -12,13 +12,13 @@ const MainHeader = ({ onPressMenu, onPressSend }) => {
   return (
     <View style = {[containerStyle]}>
         <ImageButton
-        source = {images.iconMenu}
-        onPress={onPressMenu} 
+        source = {images.iconChevronLeft}
+        onPress={onPressBack} 
         />
-        <Image source = {images.logoLight} style = {[logoStyle]} />
+        <Text>{title}</Text>
         <ImageButton
-        source = {images.iconSend}
-        onPress = {onPressSend} 
+        source = {image}
+        onPress = {onPressBtn} 
         />
     </View>
   );
@@ -42,4 +42,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export { MainHeader };
+export { NavHeader };

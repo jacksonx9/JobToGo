@@ -5,7 +5,8 @@ import { View } from 'react-native';
 
 import GestureRecognizer from 'react-native-swipe-gestures';
 import axios from 'axios';
-import { MainHeader, JobImage, JobDetails, Loader } from '../components';
+import { JobImage, JobDetails, Loader, MainHeader } from '../components';
+
 
 export default class JobSwipe extends Component {
   
