@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native';
 import  { Button, SelectableItem } from '../components';
 import { images, colours, fonts } from '../constants'
-//mport { GoogleSignin, GoogleSigninButton } from 'react-native-google-signin';
+import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 
 export default class SignIn extends Component {
   
@@ -13,13 +13,42 @@ export default class SignIn extends Component {
       password: '',
       isAuthenticated: false, 
       user: null, 
-      token: ''
+      token: '',
+      userInfo: []
+
     };
   }
+
 
   onPressSignIn = () => {
     this.props.navigation.navigate('App')
   }
+
+  signIn = async () => {
+    try {
+      await GoogleSignin.configure({
+        webClientId: '753427453652-eomsu2jpkhot804a0gs04co1vsqnbeuk.apps.googleusercontent.com'
+      });
+      await GoogleSignin.hasPlayServices();
+      console.log('lol')
+      const userInfo = await GoogleSignin.signIn();
+      console.log('lolol')
+      this.setState({ userInfo: userInfo });
+      //console.log("sdkjfhkfjhkjhkjh")
+      alert("this.state.userInfo")
+    } catch (error) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        console.log('sign in cancelled')
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        console.log('in progress already')
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        console.log('play service not available')
+      } else {
+        console.log("SDFASDFAS");
+        console.log(error);
+      }
+    }
+  };
 
   render() {
     return (
@@ -54,6 +83,18 @@ export default class SignIn extends Component {
             style={[styles.buttonStyle]}
             onPress={this.onPressSignIn.bind(this)}
           />
+
+<GoogleSigninButton
+    style={{ width: 192, height: 48 }}
+    size={GoogleSigninButton.Size.Wide}
+    color={GoogleSigninButton.Color.Dark}
+    onPress={this.signIn.bind(this)}
+    disabled={false} />
+
+
+
+
+
           <TouchableOpacity
             style={[styles.linkStyle]}
             onPress={() => {this.props.navigation.navigate('SignUp')}}
