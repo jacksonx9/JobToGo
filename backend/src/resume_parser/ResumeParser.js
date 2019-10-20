@@ -44,7 +44,7 @@ class ResumeParser {
 
     // Get keywords
     const res = await axios.get(
-      `${EXTRACTION_ENDPOINT}?` + 
+      `${EXTRACTION_ENDPOINT}?` +
       `min_confidence=${String(MIN_CONFIDENCE)}&` +
       `text=${encodeURIComponent(text)}&` +
       `token=${credentials.token}`

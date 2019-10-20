@@ -9,7 +9,7 @@ class JobAnalyzer {
     for (const keyword of keywords) {
       const escapedKeyword = keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
       const re = new RegExp(escapedKeyword, 'i');
-      
+
       const jobsMatchingKeyword = await Jobs.find(
         {
           description: { $regex: re },
@@ -29,7 +29,7 @@ class JobAnalyzer {
         jobsUrls.add(job.url);
       });
     }
-            
+
     return jobs;
   }
 };

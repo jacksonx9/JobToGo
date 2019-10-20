@@ -9,6 +9,9 @@ const userSchema = new mongoose.Schema({
     email: {
       type: String,
       required: true,
+      index: {
+        unique: true,
+      }
     },
     password: {
       type: String,
@@ -42,7 +45,9 @@ const userSchema = new mongoose.Schema({
     }
   ],
   resumePath: String
-});
+},
+{ versionKey: false }
+);
 
 const Users = mongoose.model('Users', userSchema);
 
