@@ -9,7 +9,7 @@ export default class SignIn extends Component {
     super(props);
     this.state = {
       email: '',
-      passowrd: ''
+      password: ''
     };
   }
 
@@ -38,7 +38,7 @@ export default class SignIn extends Component {
             value={this.state.password}
             secureTextEntry={true}
             placeholderTextColor={colours.lightBlue}
-            onChangeText={(text) => this.setState({passowrd: text})}
+            onChangeText={(text) => this.setState({password: text})}
           />
           
           <Button
