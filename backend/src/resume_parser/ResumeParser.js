@@ -29,9 +29,9 @@ class ResumeParser {
     // TODO: Dandelion API request has a maximum length of 4096 characters
     // Remove all non-ascii characters, excess spaces, and stopwords
     const text = stopword.removeStopwords(resume.text
-      .replace(/[^\x00-\x7F]/g, " ")
-      .replace(/[^\w.\-+]/g, " ")
-      .replace(/[ ]{2,}/g, " ")
+      .replace(/[^\x00-\x7F]/g, ' ')
+      .replace(/[^\w.\-+]/g, ' ')
+      .replace(/[ ]{2,}/g, ' ')
       .toLowerCase()
       .split(' ')).join(' ');
 

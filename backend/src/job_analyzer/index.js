@@ -3,7 +3,8 @@ import { Jobs } from '../schema';
 class JobAnalyzer {
   // TODO: change to passing in User and getting user's keywords
   async findJobs(keywords) {
-    let jobs = new Set();
+    let jobs = [];
+    let jobsUrls = new Set();
 
     for (const keyword of keywords) {
       const escapedKeyword = keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
@@ -19,7 +20,14 @@ class JobAnalyzer {
           __v: 0,
         }
       );
-      jobsMatchingKeyword.forEach(item => jobs.add(item))
+
+      jobsMatchingKeyword.forEach(job => {
+        if (jobsUrls.has(job.url)) {
+          return;
+        }
+        jobs.push(job);
+        jobsUrls.add(job.url);
+      });
     }
             
     return jobs;

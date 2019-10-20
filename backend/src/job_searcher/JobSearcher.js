@@ -16,7 +16,7 @@ class JobSearcher {
       return;
     }
 
-    console.log("Less than 100 jobs, searching...");
+    console.log('Less than 100 jobs, searching...');
 
     // TODO: Change this to not only software
     const jobs = await this.searchJobs(['software']);
