@@ -3,7 +3,7 @@ import { StyleSheet, View, Image } from 'react-native';
 import { ImageButton } from '../components'
 import { images } from '../constants'
 
-const MainHeader = () => {
+const MainHeader = ({ onPressMenu, onPressSend }) => {
     const {
         containerStyle,
         logoStyle
@@ -13,12 +13,12 @@ const MainHeader = () => {
     <View style = {[containerStyle]}>
         <ImageButton
         source = {images.iconMenu}
-        onPress={() => { this.props.navigation.openDrawer() }}
+        onPress={onPressMenu}
         />
         <Image source = {images.logoLight} style = {[logoStyle]} />
         <ImageButton
         source = {images.iconSend}
-        onPress = {() => console.log('hi')} 
+        onPress = {onPressSend} 
         />
     </View>
   );

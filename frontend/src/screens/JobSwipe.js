@@ -43,6 +43,10 @@ export default class JobSwipe extends Component {
 
   }
 
+  onPressSignIn = () => {
+    this.props.navigation.navigate('SendLikedJobs')
+  }
+
   render() {
     const config = {
       velocityThreshold: 0.3,
@@ -53,7 +57,11 @@ export default class JobSwipe extends Component {
 
     return (
       <View>
-        <MainHeader />
+        <MainHeader 
+          nav={this.props.navigation}
+          onPressMenu={() => this.props.navigation.openDrawer()}
+          onPressSend={() => this.props.navigation.navigate('SendLikedJobs')}
+          />
         <GestureRecognizer
           onSwipeUp={this.shareJob}
           onSwipeLeft={this.dislikeJob}

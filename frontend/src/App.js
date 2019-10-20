@@ -2,6 +2,8 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
+import Animated from 'react-native-reanimated';
+import { createDrawerNavigator } from 'react-navigation-drawer';
 
 import SignIn from './screens/SignIn';
 import SignUp from './screens/SignUp';
@@ -21,8 +23,31 @@ const navConfig = {
   }
 }
 
-const AppStack = createStackNavigator({ JobSwipe: SendLikedJobs }, navConfig);
-const AuthStack = createStackNavigator({ SignIn: SignIn, SignUp: SignUp }, navConfig);
+const drawerNavConfig = {
+  initialRouteName: 'JobSwipe',
+  navigationOptions: {
+    headerVisible: false,
+  }
+}
+
+const AppStack = 
+createDrawerNavigator(
+    { 
+      JobSwipe: JobSwipe, 
+      SendLikedJobs: SendLikedJobs,
+      EditFriends: JobSwipe,
+      EditSkills: JobSwipe
+    }, 
+    drawerNavConfig
+  );
+const AuthStack = 
+  createStackNavigator(
+    { 
+      SignIn: SignIn, 
+      SignUp: SignUp 
+    }, 
+    navConfig
+  );
 
 AppContainer = createAppContainer(
   createSwitchNavigator(

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, FlatList, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native';
-import  { Button, SelectableItem, Loader, MainHeader } from '../components';
+import  { Button, SelectableItem, Loader, MainHeader} from '../components';
 import { images, colours, fonts } from '../constants'
 import axios from 'axios';
 
@@ -24,6 +24,12 @@ export default class SendLikedJobs extends Component {
         })
     }
 
+
+    static navigationOptions = {
+        drawerLabel: 'Notifications',
+        
+      };
+
     render() {
         //const likedJob = this.state.jobs.map(item => <SelectableItem header='header' subHeader='subHeader'/> );
         if (this.state.loading) return <Loader/>
@@ -35,7 +41,12 @@ export default class SendLikedJobs extends Component {
                     style
                     data={this.state.likedJobs}
                     keyExtractor={(item, index) => item.key}
-                    renderItem={({item}) => <SelectableItem key={item.company} header={item.company} subHeader={item.title}/>}
+                    renderItem={({item}) => <SelectableItem 
+                    key={item.company} 
+                    header={item.company} 
+                    subHeader={item.title}
+                    onPress={() => this.props.navigation.openDrawer()}
+                    />}
                 />
             </View>
         );
