@@ -42,7 +42,9 @@ const userSchema = new mongoose.Schema({
     }
   ],
   resumePath: String
-});
+},
+{ versionKey: false }
+);
 
 const Users = mongoose.model('Users', userSchema);
 
