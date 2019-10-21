@@ -4,6 +4,13 @@ import credentials from '../../credentials/google';
 
 class User {
   constructor(app) {
+    app.post('/users/googleLogin/', async (req, res) => {
+      const loginRes = await this.loginGoogle(req.body.idToken);
+      res.status(loginRes.status).send(loginRes.id);
+    });
+
+    this.googleAuth = new OAuth2Client(credentials.clientID);
+
     // param: user that contains the user's id and a json object userInfo
     app.get('/users/update/:user', async (req, res) => {
       await this.updateUserInfo(req.params.user.id, req.params.user.info);
@@ -16,12 +23,15 @@ class User {
                                 req.params.userEmailPassword.userPassword));
     });
 
-    app.post('/users/googleLogin/', async (req, res) => {
-      const loginRes = await this.loginGoogle(req.body.idToken);
-      res.status(loginRes.status).send(loginRes.id);
+    app.post('/users/addFriend', async (req, res) => {
+      const result = this.addFriend(req.body.user1, req.body.user2);
+      res.status(result.status).send(result.success);
     });
 
-    this.googleAuth = new OAuth2Client(credentials.clientID);
+    app.post('/users/removeFriend', async (req, res) => {
+      const result = this.addFriend(req.body.user1, req.body.user2);
+      res.status(result.status).send(result.success);
+    });
   }
 
   // return: userId if succeeds and null otherwise
@@ -93,7 +103,7 @@ class User {
       const doc = await Users.findById(userId);
       Object.assign(doc.userInfo, info);
       await doc.save();
-  
+
       return true;
     } catch(e) {
       console.log(e);
@@ -101,28 +111,54 @@ class User {
     }
   }
 
+  // Adds the user making the friend request to the friend's pendingFriend array
   // Returns true if success and false otherwise
   async addFriend(userID, friendID) {
-    const res = Users.updateOne(
-      { _id: userID },
-      { $push: { friends: friendID }}).catch(e => console.log(e));
+    //TODO: check both friends exits
+    const res = Users.updateOne({ _id: friendID },
+      { $push: { pendingFriends: userID }}).catch(e => console.log(e));
 
-    return res.nModified == 1 ? true : false;
+    return {
+      status: res.nModified === 1 ? 200: 400,
+      success: res.nModified === 1
+    }
   }
 
   // Returns true if success and false otherwise
   async removeFriend(userID, friendID) {
-
+    Users.updateOne( { _id: userID },
+      { $pullAll: {friends: [friendID] }}).catch(e => console.log(e));
+    Users.updateOne( { _id: friendID },
+      { $pullAll: {friends: [userID] }}).catch(e => console.log(e));
+    return true;
   }
 
-  // Returns true if success and false otherwise
+  // userId belongs to the user confirming the friend request.
+  // Returns true if success and false otherwise.
   async confirmFriend(userID, friendID) {
+    const oldFriendUserObj = await Users.findOneAndUpdate(
+      { _id: userID, pendingFriends: friendID },
+      { $pullAll: {pendingFriends: [friendID] }, $push: { friends: [friendID] }})
+      .catch(e => console.log(e));
 
+    // Checks the friendId existed in the user's pendingFriend array
+    if (!oldFriendUserObj.pendingFriends.includes(userID))
+      return false;
+
+    // Add user's id to friend's friend array
+    const res = Users.updateOne({ _id: friendID },
+      { $push: { friends: [userID] }}).catch(e => console.log(e));
+
+    return res.nModified === 1;
   }
 
-  // Array[Users]
+  // Array[userId]
   async getFriends(userID) {
+    const friends = await Users.find(
+      { _id : userID }, 'friends'
+    ).catch(e => console.log(e));
 
+    return friends.length  == 1 ? friends[0] : 400;
   }
 
   // Array[strings]
