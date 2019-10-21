@@ -3,10 +3,15 @@ import { Jobs } from '../schema';
 class JobAnalyzer {
   constructor(app, user) {
     app.get('/jobs/findJobs', async (req, res) => {
-      const userId = req.body.userId;
-      const skills = await user.getSkills(userId);
-      const jobsRes = await this.findJobs(skills);
-      res.status(jobsRes.status).send(jobsRes.jobs);
+      try {
+        const userId = req.body.userId;
+        const skills = await user.getSkills(userId);
+        const jobsRes = await this.findJobs(skills);
+        res.status(jobsRes.status).send(jobsRes.jobs);
+      } catch(e) {
+        console.log(e);
+        res.status(500).send(false);
+      }
     })
   }
 

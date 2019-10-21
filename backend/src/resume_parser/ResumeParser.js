@@ -13,11 +13,16 @@ class ResumeParser {
   constructor(app, user) {
     app.post('/users/resume/upload', async (req, res) => {
       const userId = req.body.userId;
-      const resumeKeywords = await this.parse('Vicki');
-      const updateStatus = await user.updateUserInfo(userId, {
-        skillsExperiences: resumeKeywords
-      });
-      res.status(updateStatus ? 200 : 400).send(updateStatus);
+      try {
+        const resumeKeywords = await this.parse('Vicki');
+        const updateStatus = await user.updateUserInfo(userId, {
+          skillsExperiences: resumeKeywords
+        });
+        res.status(updateStatus ? 200 : 400).send(updateStatus);
+      } catch(e) {
+        console.log(e);
+        res.status(500).send(false);
+      }
     });
   }
 

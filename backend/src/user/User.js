@@ -129,6 +129,10 @@ class User {
   async getSkills(userId) {
     try {
       const doc = await Users.findById(userId);
+      if (typeof doc.userInfo === 'undefined' ||
+          typeof doc.userInfo.skillsExperiences === 'undefined') {
+        throw "UserInfo document is malformed";
+      }
       return doc.userInfo.skillsExperiences;
     } catch(e) {
       console.log(e);
