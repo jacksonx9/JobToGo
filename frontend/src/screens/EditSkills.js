@@ -10,6 +10,15 @@ export default class EditSkills extends Component {
       drawerLabel: 'Edit Skills',
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      likedJobs: [],
+      resumeFile: '',
+      uploaded: false
+    };
+  }
+
   onPressUpload = () => {
     FilePickerManager.showFilePicker(null, (response) => {
       console.log('Response = ', response);
@@ -21,7 +30,22 @@ export default class EditSkills extends Component {
         console.log('FilePickerManager Error: ', response.error);
       }
       else {
-        alert('yay')
+        var photo = {
+          uri: response.uri,
+          type: response.type,
+          name: response.fileName,
+      };
+      
+        var body = new FormData();
+        body.append('authToken', 'secret');
+        body.append('photo', photo);
+        body.append('title', 'A beautiful photo!');
+        
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'http://3.16.169.130:8080/jobs/javascript');
+        xhr.send(body);
+
+        alert("hi")
       }
     });
   }
@@ -100,4 +124,8 @@ const styles = StyleSheet.create({
     textDecorationColor: 'white'
   }
 });
+
+
+
+
  
