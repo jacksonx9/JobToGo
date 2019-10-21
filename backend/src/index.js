@@ -6,6 +6,7 @@ import JobSearcher from './job_searcher';
 import User from './user';
 import ResumeParser from './resume_parser';
 import JobAnalyzer from './job_analyzer';
+import JobShortLister from './job_shortlister';
 
 
 const PORT = 8080;
@@ -23,7 +24,8 @@ mongoose.connect(MONGO_URL, {
 new JobSearcher(app);
 const user = new User(app);
 new ResumeParser(app, user);
-new JobAnalyzer(app, user);
+const shortlister = new JobShortLister(app);
+new JobAnalyzer(app, user, shortlister);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

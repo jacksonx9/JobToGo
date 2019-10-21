@@ -66,11 +66,8 @@ const userSchema = new mongoose.Schema({
     ],
     default: undefined
   },
-  jobShortList: [
-    {
-      jobId: mongoose.ObjectId,
-    }
-  ],
+  likedJobs: [ String ],
+  dislikedJobs: [ String ],
   resumePath: String
 },
 { versionKey: false }
