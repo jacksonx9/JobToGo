@@ -4,6 +4,7 @@ import  { Button, SelectableItem } from '../components';
 import { images, colours, fonts, serverIp } from '../constants'
 import { GoogleSignin, GoogleSignInOptions, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 import axios from 'axios';
+import firebase, { Notification, RemoteMessage } from 'react-native-firebase';
 
 export default class SignIn extends Component {
   
@@ -20,8 +21,42 @@ export default class SignIn extends Component {
     };
   }
 
-  onPressSignIn = () => {
-    this.props.navigation.navigate('App')
+  onPressSignIn = async () => {
+    //this.props.navigation.navigate('App')
+
+    if (Platform.OS === 'android') {
+      try {
+        console.log("!!!!!!!")
+        const res = await firebase.messaging().requestPermission();
+        const fcmToken = await firebase.messaging().getToken();
+        if (fcmToken) {
+          console.log('FCM Token: ', fcmToken);
+          const enabled = await firebase.messaging().hasPermission();
+          if (enabled) {
+            console.log('FCM messaging has permission:' + enabled)
+          } else {
+            try {
+              await firebase.messaging().requestPermission();
+              console.log('FCM permission granted')
+            } catch (error) {
+              console.log('FCM Permission Error', error);
+            }
+          }
+          firebase.notifications().onNotificationDisplayed((notification: Notification) => {
+            // Process your notification as required
+            // ANDROID: Remote notifications do not contain the channel ID. You will have to specify this manually if you'd like to re-display the notification.
+            console.log('Notification: ', notification)
+          });
+          this.notificationListener = firebase.notifications().onNotification((notification: Notification) => {
+            console.log('Notification: ', notification)
+          });
+        } else {
+          console.log('FCM Token not available');
+        }
+      } catch (e) {
+        console.log('Error initializing FCM', e);
+      }
+  
   }
 
   onPressGoogleSignIn = async () => {
@@ -51,6 +86,7 @@ export default class SignIn extends Component {
       }
     }
   };
+}
 
   render() {
     return (
@@ -89,12 +125,12 @@ export default class SignIn extends Component {
             <Text style={[styles.textStyle]}>or</Text>
           </View>
 
-          <GoogleSigninButton
+          {/* <GoogleSigninButton
               style={[styles.buttonStyle]}
               size={GoogleSigninButton.Size.Wide}
               color={GoogleSigninButton.Color.Light}
               onPress={this.onPressGoogleSignIn.bind(this)}
-              disabled={false} />
+              disabled={false} /> */}
 
           <TouchableOpacity
             style={[styles.linkStyle]}
