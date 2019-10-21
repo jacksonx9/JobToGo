@@ -37,7 +37,6 @@ class TestAPIs {
           jobCount: 30,
           timeStamp: Date.now()
       },
-      friends: [],
       jobShortList: [],
       resumePath: './resume.pdf'
     };
@@ -71,7 +70,6 @@ class TestAPIs {
             jobCount: 30,
             timeStamp: Date.now()
         },
-        friends: [],
         jobShortList: [],
         resumePath: './resume.pdf'
       };
