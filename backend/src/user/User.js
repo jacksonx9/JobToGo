@@ -1,24 +1,33 @@
 import { Users } from '../schema';
+import { OAuth2Client } from 'google-auth-library';
+import credentials from '../../credentials/google';
 
 class User {
   constructor(app) {
     // param: user that contains the user's id and a json object userInfo
     app.get('/users/update/:user', async (req, res) => {
-      this.updateUserInfo(req.params.user.id, req.params.user.info);
+      await this.updateUserInfo(req.params.user.id, req.params.user.info);
     });
 
     // param: userEmailPassword that contain the user's email and password
     // return: userId if succeeds and -1 otherwise
     app.get('/users/update/:userEmailPassword', async (req, res) => {
-      res.send(this.login(req.params.userEmailPassword.userEmail,
-                          req.params.userEmailPassword.userPassword));
+      res.send(await this.login(req.params.userEmailPassword.userEmail,
+                                req.params.userEmailPassword.userPassword));
     });
+
+    app.post('/users/googleLogin/', async (req, res) => {
+      const loginRes = await this.loginGoogle(req.body.idToken);
+      res.status(loginRes.status).send(loginRes.id);
+    });
+
+    this.googleAuth = new OAuth2Client(credentials.clientID);
   }
 
-  // return: userId if succeeds and -1 otherwise
+  // return: userId if succeeds and null otherwise
   async createUser(query) {
     const user = await Users.create(query).catch(e => console.log(e));
-    return typeof user === 'undefined' ? -1 : user.id;
+    return typeof user === 'undefined' ? null : user._id;
   }
 
   // check for existing user in database (via email)
@@ -37,6 +46,44 @@ class User {
       '_id').catch(e => console.log(e));
 
     return userIdObj == null ? -1 : userIdObj._id;
+  }
+
+   // return: userId if succeeds and null otherwise
+  async loginGoogle(idToken) {
+    try {
+      const ticket = await this.googleAuth.verifyIdToken({
+        idToken,
+        audience: credentials.clientID,
+      });
+      const email = ticket.payload.email;
+
+      const user = await this._getUser(email);
+
+      if (user === null) {
+        const newUser = await this.createUser({
+          credentials: {
+            userName: email,
+            email,
+            token: ticket.payload,
+          }
+        });
+        return {
+          id: newUser.id,
+          status: 200,
+        };
+      }
+
+      return {
+        id: user.id,
+        status: 200,
+      };
+    } catch (e) {
+      console.log(e);
+      return {
+        id: null,
+        status: 400,
+      };
+    }
   }
 
   // Can pass in only fields that need to be updated
