@@ -13,7 +13,7 @@ class User {
     this.googleAuth = new OAuth2Client(credentials.clientID);
 
     app.post('/users/create', async (req, res) => {
-      const result = await user.createUser(testUser);
+      const result = await user.createUser(req.body.userData);
       res.status(result.status).send(result.id);
     });
 
@@ -39,22 +39,22 @@ class User {
     // update function names
 
     app.post('/users/removeFriend', async (req, res) => {
-      const result = await this.removeFriend(ObjectId(req.body.user1Id), ObjectId(req.body.user2Id));
+      const result = await this.removeFriend(new ObjectId(req.body.user1Id), new ObjectId(req.body.user2Id));
       res.status(result.status).send(result.success);
     });
 
     app.post('/users/confirmFriend', async (req, res) => {
-      const result = await this.confirmFriend(ObjectId(req.body.user1Id), ObjectId(req.body.user2Id));
+      const result = await this.confirmFriend(new ObjectId(req.body.user1Id), new ObjectId(req.body.user2Id));
       res.status(result.status).send(result.success);
     });
 
     app.post('/users/getFriends', async (req, res) => {
-      const result = await this.getFriends(ObjectId(req.body.userId));
+      const result = await this.getFriends(new ObjectId(req.body.userId));
       res.status(result.status).send(result.friends);
     });
 
     app.post('/users/getSkills', async (req, res) => {
-      const result = await this.getSkills(ObjectId(req.body.userId));
+      const result = await this.getSkills(new ObjectId(req.body.userId));
       res.status(result.status).send(result.skills);
     });
   }
