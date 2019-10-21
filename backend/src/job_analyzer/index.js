@@ -20,7 +20,21 @@ class JobAnalyzer {
     let jobsUrls = new Set();
 
     try {
+      if (keywords.length === 0) {
+        // TODO: Change arbitrary value
+        jobs.push(...await Jobs.find({}).limit(20));
+        return {
+          jobs,
+          status: 200,
+        };
+      }
+
       for (const keyword of keywords) {
+        // TODO: Change arbitrary value
+        if (jobs.length == 20) {
+          break;
+        }
+
         const escapedKeyword = keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
         const re = new RegExp(escapedKeyword, 'i');
   
