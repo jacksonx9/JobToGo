@@ -9,7 +9,7 @@ class TestAPIs {
     const jobSearcher = new JobSearcher(app);
     const jobAnalyzer = new JobAnalyzer();
     const user = new User(app);
-    const testEmail = 'uniqueUserName';
+    const testEmail = 'uniqueUserName2';
     const testPassword = 'word';
     const testUser = {
       credentials: {
@@ -113,8 +113,8 @@ class TestAPIs {
       res.json(await user.getUser('mail'));
     });
 
-    app.get('/test/users/testCreateUser', async (req, res) => {
-      await user.createUser(testUser);
+    app.post('/test/users/testCreateUser', async (req, res) => {
+      const c = await user.createUser(testUser);
 
       res.send('Done');
     });

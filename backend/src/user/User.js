@@ -1,6 +1,7 @@
 import { Users } from '../schema';
 import { OAuth2Client } from 'google-auth-library';
 import credentials from '../../credentials/google';
+import { ObjectId } from 'mongoose';
 
 class User {
   constructor(app) {
@@ -10,6 +11,11 @@ class User {
     });
 
     this.googleAuth = new OAuth2Client(credentials.clientID);
+
+    app.post('/users/create', async (req, res) => {
+      const result = await user.createUser(testUser);
+      res.status(result.status).send(result.id);
+    });
 
     // param: user that contains the user's id and a json object userInfo
     app.get('/users/update/:user', async (req, res) => {
@@ -24,20 +30,42 @@ class User {
     });
 
     app.post('/users/addFriend', async (req, res) => {
-      const result = this.addFriend(req.body.user1, req.body.user2);
+      const result = await this.addFriend(new ObjectId(req.body.user1Id), new ObjectId(req.body.user2Id));
+      console.log(result);
       res.status(result.status).send(result.success);
     });
 
+    // wrap in new ObjectId()
+    // update function names
+
     app.post('/users/removeFriend', async (req, res) => {
-      const result = this.addFriend(req.body.user1, req.body.user2);
+      const result = await this.removeFriend(ObjectId(req.body.user1Id), ObjectId(req.body.user2Id));
       res.status(result.status).send(result.success);
+    });
+
+    app.post('/users/confirmFriend', async (req, res) => {
+      const result = await this.confirmFriend(ObjectId(req.body.user1Id), ObjectId(req.body.user2Id));
+      res.status(result.status).send(result.success);
+    });
+
+    app.post('/users/getFriends', async (req, res) => {
+      const result = await this.getFriends(ObjectId(req.body.userId));
+      res.status(result.status).send(result.friends);
+    });
+
+    app.post('/users/getSkills', async (req, res) => {
+      const result = await this.getSkills(ObjectId(req.body.userId));
+      res.status(result.status).send(result.skills);
     });
   }
 
   // return: userId if succeeds and null otherwise
   async createUser(query) {
     const user = await Users.create(query).catch(e => console.log(e));
-    return typeof user === 'undefined' ? null : user._id;
+    return {
+      id: typeof user === 'undefined' ? null : user._id,
+      status: typeof user === 'undefined' ? 404 : 200
+    };
   }
 
   // check for existing user in database (via email)
@@ -115,22 +143,26 @@ class User {
   // Returns true if success and false otherwise
   async addFriend(userID, friendID) {
     //TODO: check both friends exits
-    const res = Users.updateOne({ _id: friendID },
+    const res = Users.updateOne({ _id: new friendID },
       { $push: { pendingFriends: userID }}).catch(e => console.log(e));
 
     return {
-      status: res.nModified === 1 ? 200: 400,
-      success: res.nModified === 1
+      status: res.nModified === 1 ? 200 : 400,
+      success: true
     }
   }
 
   // Returns true if success and false otherwise
   async removeFriend(userID, friendID) {
-    Users.updateOne( { _id: userID },
+    const res1 = Users.updateOne( { _id: userID },
       { $pullAll: {friends: [friendID] }}).catch(e => console.log(e));
-    Users.updateOne( { _id: friendID },
+    const res2 = Users.updateOne( { _id: friendID },
       { $pullAll: {friends: [userID] }}).catch(e => console.log(e));
-    return true;
+
+    return {
+      status: res1.nModified === 1 && res2.nModified === 1 ? 200 : 400,
+      success: true
+    };
   }
 
   // userId belongs to the user confirming the friend request.
@@ -143,13 +175,19 @@ class User {
 
     // Checks the friendId existed in the user's pendingFriend array
     if (!oldFriendUserObj.pendingFriends.includes(userID))
-      return false;
+      return {
+        status: 404,
+        success: false
+      };
 
     // Add user's id to friend's friend array
     const res = Users.updateOne({ _id: friendID },
       { $push: { friends: [userID] }}).catch(e => console.log(e));
 
-    return res.nModified === 1;
+    return {
+      status: res.nModified === 1 ? 200 : 400,
+      success: true
+    };
   }
 
   // Array[userId]
@@ -158,7 +196,10 @@ class User {
       { _id : userID }, 'friends'
     ).catch(e => console.log(e));
 
-    return friends.length  == 1 ? friends[0] : 400;
+    return {
+      status: friends.length == 1 ? 200 : 400,
+      friends: friends.length == 1 ? friends[0] : null
+    };
   }
 
   // Array[strings]

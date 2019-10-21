@@ -36,22 +36,36 @@ const userSchema = new mongoose.Schema({
       timeStamp: Date,
     }
   ],
-  pendingFriends: [
-    {
-      friendId: mongoose.ObjectId,
-      index: {
-        unique: true,
+  pendingFriends: {
+    type: [
+      {
+        friendId: {
+          type: mongoose.ObjectId,
+          default: '',
+          index: {
+            unique: true,
+            sparse: true
+          }
+        }
       }
-    }
-  ],
-  friends: [
-    {
-      friendId: mongoose.ObjectId,
-      index: {
-        unique: true,
+    ],
+    default: undefined
+  },
+  friends: {
+    type: [
+      {
+        friendId: {
+          type: mongoose.ObjectId,
+          default: '',
+          index: {
+            unique: true,
+            sparse: true
+          }
+        }
       }
-    }
-  ],
+    ],
+    default: undefined
+  },
   jobShortList: [
     {
       jobId: mongoose.ObjectId,
