@@ -60,7 +60,7 @@ class User {
       const user = await this._getUser(email);
 
       if (user === null) {
-        const newUser = await this.createUser({
+        const newUserId = await this.createUser({
           credentials: {
             userName: email,
             email,
@@ -68,7 +68,7 @@ class User {
           }
         });
         return {
-          id: newUser.id,
+          id: newUserId,
           status: 200,
         };
       }
@@ -89,10 +89,16 @@ class User {
   // Can pass in only fields that need to be updated
   // Returns true if success and false otherwise
   async updateUserInfo(userId, info) {
-    const res = await Users.updateOne({ _id: userId }, info)
-                                      .catch(e => console.log(e));
-
-    return res.nModified == 1 ? true : false;
+    try {
+      const doc = await Users.findById(userId);
+      Object.assign(doc.userInfo, info);
+      await doc.save();
+  
+      return true;
+    } catch(e) {
+      console.log(e);
+      return false;
+    }
   }
 
   // Returns true if success and false otherwise
@@ -120,8 +126,18 @@ class User {
   }
 
   // Array[strings]
-  async getSkills(userID) {
-
+  async getSkills(userId) {
+    try {
+      const doc = await Users.findById(userId);
+      if (typeof doc.userInfo === 'undefined' ||
+          typeof doc.userInfo.skillsExperiences === 'undefined') {
+        throw "UserInfo document is malformed";
+      }
+      return doc.userInfo.skillsExperiences;
+    } catch(e) {
+      console.log(e);
+      return [];
+    }
   }
 
   // get UserId
