@@ -36,11 +36,36 @@ const userSchema = new mongoose.Schema({
       timeStamp: Date,
     }
   ],
-  friends: [
-    {
-      friendId: mongoose.ObjectId,
-    }
-  ],
+  friends: { // IMPORTANT: Do not initalize this on create
+    type: [
+      {
+        friendId: {
+          type: mongoose.ObjectId,
+          default: '',
+          index: {
+            unique: true,
+            sparse: true
+          }
+        }
+      }
+    ],
+    default: undefined
+  },
+  pendingFriends: { // IMPORTANT: Do not initalize this on create
+    type: [
+      {
+        friendId: { // TODO: duplicates
+          type: mongoose.ObjectId,
+          default: '',
+          index: {
+            unique: true,
+            sparse: true
+          }
+        }
+      }
+    ],
+    default: undefined
+  },
   jobShortList: [
     {
       jobId: mongoose.ObjectId,

@@ -11,7 +11,7 @@ class JobSearcher {
   async updateJobStore() {
     const count = await Jobs.countDocuments({});
 
-    // TODO: Change this arbitrary condition 
+    // TODO: Change this arbitrary condition
     if (count > 100) {
       return;
     }
@@ -27,7 +27,7 @@ class JobSearcher {
   }
 
   async searchJobs(keyphrases) {
-    let jobs = []; 
+    let jobs = [];
 
     for (const keyphrase of keyphrases) {
       // TODO: change these hardcoded params
@@ -37,7 +37,7 @@ class JobSearcher {
         sort: 'relevance',
         limit: 100,
       }).catch(e => console.log(e));
-  
+
       // Add description to each result by scraping the webpage
       for (let result of results) {
         const jobPage = await axios.get(result.url).catch(e => console.log(e));

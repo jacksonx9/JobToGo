@@ -37,7 +37,6 @@ class TestAPIs {
           jobCount: 30,
           timeStamp: Date.now()
       },
-      friends: [],
       jobShortList: [],
       resumePath: './resume.pdf'
     };
@@ -71,7 +70,6 @@ class TestAPIs {
             jobCount: 30,
             timeStamp: Date.now()
         },
-        friends: [],
         jobShortList: [],
         resumePath: './resume.pdf'
       };
@@ -113,8 +111,8 @@ class TestAPIs {
       res.json(await user.getUser('mail'));
     });
 
-    app.get('/test/users/testCreateUser', async (req, res) => {
-      await user.createUser(testUser);
+    app.post('/test/users/testCreateUser', async (req, res) => {
+      const c = await user.createUser(testUser);
 
       res.send('Done');
     });
