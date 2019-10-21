@@ -198,7 +198,7 @@ class User {
 
 
     // Add user's id to friend's friend array
-    const res = await Users.updateOne({ _id: friendID },
+    await Users.updateOne({ _id: friendID },
       { $addToSet: { 'friends.friendId': userID }})
       .catch(e => {
         console.log(e);
