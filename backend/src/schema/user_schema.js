@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema({
       timeStamp: Date,
     }
   ],
-  friends: {
+  friends: { // IMPORTANT: Do not initalize this on create
     type: [
       {
         friendId: {
@@ -51,10 +51,10 @@ const userSchema = new mongoose.Schema({
     ],
     default: undefined
   },
-  pendingFriends: {
-    type: [ // IMPORTANT YOU added initalization in test. did it break anything?
+  pendingFriends: { // IMPORTANT: Do not initalize this on create
+    type: [
       {
-        friendId: { // TODO: remove nested structure? Do we need default: undefined??
+        friendId: { // TODO: duplicates
           type: mongoose.ObjectId,
           default: '',
           index: {

@@ -5,7 +5,7 @@ import { Jobs } from '../schema';
 
 class JobSearcher {
   constructor() {
-    //this.updateJobStore().then({});
+    this.updateJobStore().then({});
   }
 
   async updateJobStore() {
