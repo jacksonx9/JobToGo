@@ -22,6 +22,9 @@ const jobSchema = new mongoose.Schema({
   },
   postDate: String,
   salary: String,
+},
+{
+  versionKey: false,
 });
 
 const Jobs = mongoose.model('Jobs', jobSchema);

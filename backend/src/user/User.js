@@ -126,8 +126,14 @@ class User {
   }
 
   // Array[strings]
-  async getSkills(userID) {
-
+  async getSkills(userId) {
+    try {
+      const doc = await Users.findById(userId);
+      return doc.userInfo.skillsExperiences;
+    } catch(e) {
+      console.log(e);
+      return [];
+    }
   }
 
   // get UserId
