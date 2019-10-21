@@ -89,10 +89,16 @@ class User {
   // Can pass in only fields that need to be updated
   // Returns true if success and false otherwise
   async updateUserInfo(userId, info) {
-    const res = await Users.updateOne({ _id: userId }, info)
-                                      .catch(e => console.log(e));
-
-    return res.nModified == 1 ? true : false;
+    try {
+      const doc = await Users.findById(userId);
+      Object.assign(doc.userInfo, info);
+      await doc.save();
+  
+      return true;
+    } catch(e) {
+      console.log(e);
+      return false;
+    }
   }
 
   // Returns true if success and false otherwise

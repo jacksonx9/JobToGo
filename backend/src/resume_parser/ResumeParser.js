@@ -10,9 +10,14 @@ const MIN_CONFIDENCE = 0.8;
 const RESUME_PATH = 'mediafiles/resumes/';
 
 class ResumeParser {
-  constructor(app) {
-    app.get('/resume_parser/:path', async (req, res) => {
-      res.send(await this.parse(req.params.path));
+  constructor(app, user) {
+    app.post('/users/resume/upload', async (req, res) => {
+      const userId = req.body.userId;
+      const resumeKeywords = await this.parse('Vicki');
+      const updateStatus = await user.updateUserInfo(userId, {
+        skillsExperiences: resumeKeywords
+      });
+      res.status(updateStatus ? 200 : 400).send(updateStatus);
     });
   }
 
