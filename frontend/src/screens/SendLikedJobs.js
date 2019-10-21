@@ -5,23 +5,23 @@ import { images, colours, fonts } from '../constants'
 import axios from 'axios';
 
 export default class SendLikedJobs extends Component {
-  
+
     static navigationOptions = {
         drawerLabel: 'Liked Jobs',
     };
-    
+
     constructor(props) {
         super(props);
         this.state = {
           likedJobs: [],
+          ids: [],
           jobIndex: 0,
           loading: 1
         };
       }
-    
+
     async componentDidMount() {
         const likedJobs = await axios.get('http://3.16.169.130:8080/jobs/javascript').catch(e => console.log(e));
-    
         this.setState({
           likedJobs: likedJobs.data,
           loading: 0
@@ -42,12 +42,12 @@ export default class SendLikedJobs extends Component {
                 <FlatList
                     style
                     data={this.state.likedJobs}
-                    keyExtractor={(item, index) => item.key}
-                    renderItem={({item}) => <SelectableItem 
-                    key={item.company} 
-                    header={item.company} 
-                    subHeader={item.title}
-                    onPress={() => this.props.navigation.openDrawer()}
+                    keyExtractor={(item) => item.url}
+                    renderItem={({item}) => <SelectableItem
+                      key={item.url}
+                      header={item.company}
+                      subHeader={item.title}
+                      onPress={() => this.props.navigation.openDrawer()}
                     />}
                 />
             </View>
@@ -98,4 +98,3 @@ const styles = StyleSheet.create({
     textDecorationColor: 'white'
   }
 });
- 

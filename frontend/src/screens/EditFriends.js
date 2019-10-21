@@ -42,10 +42,10 @@ export default class EditFriends extends Component {
                 <FlatList
                     style
                     data={this.state.likedJobs}
-                    keyExtractor={(item, index) => item.key}
-                    renderItem={({item}) => <SelectableItem 
-                    key={item.company} 
-                    header={item.company} 
+                    keyExtractor={(item, index) => item.url}
+                    renderItem={({item}) => <SelectableItem
+                    key={item.url}
+                    header={item.company}
                     subHeader={item.title}
                     onPress={() => this.props.navigation.openDrawer()}
                     />}
