@@ -37,7 +37,7 @@ export default class EditSkills extends Component {
           uri: response.uri,
           type: response.type,
           name: response.fileName,
-      };
+        };
 
       const res = await axios.post('http://128.189.26.177:8080/users/resume/upload', 
       {
