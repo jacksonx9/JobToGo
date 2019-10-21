@@ -9,7 +9,7 @@ class TestAPIs {
     const jobSearcher = new JobSearcher(app);
     const jobAnalyzer = new JobAnalyzer();
     const user = new User(app);
-    const testEmail = 'uniqueUserName2';
+    const testEmail = 'uniqueUserName';
     const testPassword = 'word';
     const testUser = {
       credentials: {

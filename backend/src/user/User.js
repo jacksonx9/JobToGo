@@ -35,9 +35,6 @@ class User {
       res.status(result.status).send(result.success);
     });
 
-    // wrap in new ObjectId()
-    // update function names
-
     app.post('/users/removeFriend', async (req, res) => {
       const result = await this.removeFriend(new ObjectId(req.body.user1Id), new ObjectId(req.body.user2Id));
       res.status(result.status).send(result.success);
@@ -143,7 +140,7 @@ class User {
   // Returns true if success and false otherwise
   async addFriend(userID, friendID) {
     //TODO: check both friends exits
-    const res = Users.updateOne({ _id: new friendID },
+    const res = Users.updateOne({ _id: friendID },
       { $push: { pendingFriends: userID }}).catch(e => console.log(e));
 
     return {
