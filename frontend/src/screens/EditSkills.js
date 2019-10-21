@@ -3,6 +3,7 @@ import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'reac
 import  { Button, NavHeader } from '../components';
 import { images, colours, fonts } from '../constants'
 import FilePickerManager from 'react-native-file-picker';
+import axios from 'axios';
 
 export default class EditSkills extends Component {
   
@@ -20,7 +21,7 @@ export default class EditSkills extends Component {
   }
 
   onPressUpload = () => {
-    FilePickerManager.showFilePicker(null, (response) => {
+    FilePickerManager.showFilePicker(null, async (response) => {
       console.log('Response = ', response);
      
       if (response.didCancel) {
@@ -35,6 +36,13 @@ export default class EditSkills extends Component {
           type: response.type,
           name: response.fileName,
       };
+
+      // const res = await axios.post('http://10.231.110.76:8080/users/resume/upload', 
+      // {
+      //   authToken: 'secret',
+      //   photo,
+      //   title: 'A beautiful photo!'
+      // }).catch(e => console.log(e));
       
         var body = new FormData();
         body.append('authToken', 'secret');
@@ -42,7 +50,7 @@ export default class EditSkills extends Component {
         body.append('title', 'A beautiful photo!');
         
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', 'http://3.16.169.130:8080/jobs/javascript');
+        xhr.open('POST', 'http://10.231.110.76:8080/users/resume/upload');
         xhr.send(body);
 
         alert("hi")
@@ -70,7 +78,7 @@ export default class EditSkills extends Component {
             textColor={colours.blue}
             backgroundColor='white'
             style={[styles.buttonStyle]}
-            onPress={this.onPressUpload.bind(this)}
+            onPress={() => this.onPressUpload()}
           />
 
       </View>
