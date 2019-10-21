@@ -60,7 +60,7 @@ class User {
       const user = await this._getUser(email);
 
       if (user === null) {
-        const newUser = await this.createUser({
+        const newUserId = await this.createUser({
           credentials: {
             userName: email,
             email,
@@ -68,7 +68,7 @@ class User {
           }
         });
         return {
-          id: newUser.id,
+          id: newUserId,
           status: 200,
         };
       }
