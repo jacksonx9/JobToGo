@@ -199,6 +199,7 @@ dependencies {
     implementation "com.facebook.react:react-native:+"  // From node_modules
     implementation "com.android.support:appcompat-v7:23.0.1"
     implementation(project(":react-native-google-signin"))
+    compile project(':react-native-file-picker')
 
     if (enableHermes) {
       def hermesPath = "../../node_modules/hermesvm/android/";

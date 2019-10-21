@@ -2,12 +2,30 @@ import React, { Component } from 'react';
 import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native';
 import  { Button, NavHeader } from '../components';
 import { images, colours, fonts } from '../constants'
+import FilePickerManager from 'react-native-file-picker';
 
 export default class EditSkills extends Component {
   
-    static navigationOptions = {
-        drawerLabel: 'Edit Skills',
-    };
+  static navigationOptions = {
+      drawerLabel: 'Edit Skills',
+  };
+
+  onPressUpload = () => {
+    FilePickerManager.showFilePicker(null, (response) => {
+      console.log('Response = ', response);
+     
+      if (response.didCancel) {
+        console.log('User cancelled file picker');
+      }
+      else if (response.error) {
+        console.log('FilePickerManager Error: ', response.error);
+      }
+      else {
+        alert('yay')
+      }
+    });
+  }
+
 
 
   render() {
@@ -28,7 +46,7 @@ export default class EditSkills extends Component {
             textColor={colours.blue}
             backgroundColor='white'
             style={[styles.buttonStyle]}
-            onPress={()=>console.log("hi}")}
+            onPress={this.onPressUpload.bind(this)}
           />
 
       </View>
