@@ -37,14 +37,7 @@ export default class App extends React.Component {
               console.log('FCM Permission Error', error);
             }
           }
-          firebase.notifications().onNotificationDisplayed((notification: Notification) => {
-            // Process your notification as required
-            // ANDROID: Remote notifications do not contain the channel ID. You will have to specify this manually if you'd like to re-display the notification.
-            console.log('Notification: ', notification)
-          });
-          this.notificationListener = firebase.notifications().onNotification((notification: Notification) => {
-            console.log('Notification: ', notification)
-          });
+        this.createNotificationListeners();
         } else {
           console.log('FCM Token not available');
         }
@@ -53,6 +46,56 @@ export default class App extends React.Component {
       }
     }
   }
+
+  componentWillUnmount() {
+    this.notificationListener();
+    this.notificationOpenedListener();
+  }
+
+  async createNotificationListeners() {
+    /*
+    * Triggered when a particular notification has been received in foreground
+    * */
+    this.notificationListener = firebase.notifications().onNotification((notification) => {
+        const { title, body } = notification;
+        this.showAlert(title, body);
+    });
+  
+    /*
+    * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
+    * */
+    this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
+        const { title, body } = notificationOpen.notification;
+        this.showAlert(title, body);
+    });
+  
+    /*
+    * If your app is closed, you can check if it was opened by a notification being clicked / tapped / opened as follows:
+    * */
+    const notificationOpen = await firebase.notifications().getInitialNotification();
+    if (notificationOpen) {
+        const { title, body } = notificationOpen.notification;
+        this.showAlert(title, body);
+    }
+    /*
+    * Triggered for data only payload in foreground
+    * */
+    this.messageListener = firebase.messaging().onMessage((message) => {
+      //process data message
+      console.log(JSON.stringify(message));
+    });
+  }
+  
+  showAlert(title, body) {
+    alert(
+      title, body,
+      [
+          { text: 'OK', onPress: () => console.log('OK Pressed') },
+      ],
+      { cancelable: false },
+    );
+  }
+  
 
   // async checkPermission() {
   //   const enabled = await firebase.messaging().hasPermission();
