@@ -15,14 +15,16 @@ const userSchema = new mongoose.Schema({
     },
     password: {
       type: String,
-      required: true,
     },
+    token: {
+      type: Object,
+    }
   },
   userInfo: {
     location: String,
     jobType: {
       type: String,
-      enum: ['full-time', 'part-time', 'internship'],
+      enum: ['full-time', 'part-time', 'internship', 'unspecified'],
       default: 'unspecified',
     },
     skillsExperiences: [ String ],
