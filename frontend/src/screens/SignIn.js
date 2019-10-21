@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native';
 import  { Button, SelectableItem } from '../components';
-import { images, colours, fonts } from '../constants'
+import { images, colours, fonts, serverIp } from '../constants'
 import { GoogleSignin, GoogleSignInOptions, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 import axios from 'axios';
 
@@ -34,8 +34,11 @@ export default class SignIn extends Component {
       const userInfo = await GoogleSignin.signIn()
       // this.setState({ userInfo: userInfo })
       // this.props.navigation.navigate('App')
-      const ret = await axios.post('http://3.16.169.130:8080//users/googleLogin/', {idToken: userInfo.idToken}).catch(e => console.log(e));
+      const ret = await axios.post(serverIp+'/users/googleLogin/', {idToken: userInfo.idToken})
     
+      const userId = ret.data
+
+      this.props.navigation.navigate({routeName: 'App', params: { userId: userId }})
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         console.log('sign in cancelled')

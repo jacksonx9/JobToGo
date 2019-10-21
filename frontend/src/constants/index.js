@@ -24,9 +24,11 @@ const colours = {
   lightGray: '#696969',
 }; 
 
+const serverIp = 'http://128.189.26.177:8080'
+
 const fonts = {
   normal: 'sans-serif',
 }; 
 
-export {images, colours, fonts}
+export {images, colours, fonts, serverIp}
   

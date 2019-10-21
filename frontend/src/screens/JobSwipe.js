@@ -6,6 +6,7 @@ import { View } from 'react-native';
 import GestureRecognizer from 'react-native-swipe-gestures';
 import axios from 'axios';
 import { JobImage, JobDetails, Loader, MainHeader } from '../components';
+import { serverIp } from '../constants'
 
 
 export default class JobSwipe extends Component {
@@ -21,10 +22,12 @@ export default class JobSwipe extends Component {
   }
 
   async componentDidMount() {
-    const jobs = await axios.get('http://3.16.169.130:8080/jobs/javascript').catch(e => console.log(e));
+    const userId = this.props.navigation.dangerouslyGetParent().getParam('userId')
+    console.log(userId)
+    const jobs = await axios.get(serverIp+'/jobs/findJobs/'+userId).catch(e => console.log(e));
 
     this.setState({
-      jobs: jobs.data,
+      jobs: jobs.data, 
       loading: 0
     })
   }
@@ -34,18 +37,22 @@ export default class JobSwipe extends Component {
   }
 
   dislikeJob = () => {
+    // await axios.post(serverIp+'/jobs/findJobs/', {
+    //   dsf: this.state.jobs[this.state.jobIndex].companjhkkhkjhjk
+    // }).catch(e => console.log(e));
     this.setState({ myText: 'disliked job' });
     this.setState({ jobIndex: this.state.jobIndex + 1 })
   }
 
   likeJob = () => {
+
     this.setState({ myText: 'liked job' });
     this.setState({ jobIndex: this.state.jobIndex + 1 })
 
   }
 
   onPressSignIn = () => {
-    this.props.navigation.navigate('SendLikedJobs')
+    this.props.navigation.navigate('SendLikedJobs', {userId: userId})
   }
 
   render() {
@@ -61,7 +68,7 @@ export default class JobSwipe extends Component {
         <MainHeader 
           nav={this.props.navigation}
           onPressMenu={() => this.props.navigation.openDrawer()}
-          onPressSend={() => this.props.navigation.navigate('SendLikedJobs')}
+          onPressSend={() => this.props.navigation.navigate('EditSkills', {userId: this.props.navigation.dangerouslyGetParent().getParam('userId')})}
           />
         <GestureRecognizer
           onSwipeUp={this.shareJob}

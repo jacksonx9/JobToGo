@@ -21,6 +21,8 @@ export default class EditSkills extends Component {
   }
 
   onPressUpload = () => {
+    console.log('from resume')
+    console.log(this.props.navigation.state.params.userId)
     FilePickerManager.showFilePicker(null, async (response) => {
       console.log('Response = ', response);
      
@@ -37,21 +39,22 @@ export default class EditSkills extends Component {
           name: response.fileName,
       };
 
-      // const res = await axios.post('http://10.231.110.76:8080/users/resume/upload', 
-      // {
-      //   authToken: 'secret',
-      //   photo,
-      //   title: 'A beautiful photo!'
-      // }).catch(e => console.log(e));
+      const res = await axios.post('http://128.189.26.177:8080/users/resume/upload', 
+      {
+        userId: this.props.navigation.state.params.userId,
+        authToken: 'secret',
+        photo,
+        title: 'A beautiful photo!'
+      }).catch(e => console.log(e));
       
-        var body = new FormData();
-        body.append('authToken', 'secret');
-        body.append('photo', photo);
-        body.append('title', 'A beautiful photo!');
+        // var body = new FormData();
+        // body.append('authToken', 'secret');
+        // body.append('photo', photo);
+        // body.append('title', 'A beautiful photo!');
         
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', 'http://10.231.110.76:8080/users/resume/upload');
-        xhr.send(body);
+        // var xhr = new XMLHttpRequest();
+        // xhr.open('POST', 'http://10.231.110.76:8080/user/resume/upload');
+        // xhr.send(body);
 
         alert("hi")
       }
@@ -78,7 +81,7 @@ export default class EditSkills extends Component {
             textColor={colours.blue}
             backgroundColor='white'
             style={[styles.buttonStyle]}
-            onPress={() => this.onPressUpload()}
+            onPress={ () => this.onPressUpload()}
           />
 
       </View>
