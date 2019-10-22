@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, FlatList, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native';
 import  { Button, SelectableItem, Loader, NavHeader} from '../components';
-import { images, colours, fonts } from '../constants'
+import { images, colours, fonts, serverIp } from '../constants'
 import axios from 'axios';
 
 export default class EditFriends extends Component {
@@ -32,9 +32,20 @@ export default class EditFriends extends Component {
 
     }
 
-    addFriend = () => {
-      console.log(this.state.userId)
+    addFriend = async () => {
+      console.log(this.state.userId) 
       console.log(this.state.addFriendName)
+
+      const friend = await axios.get(serverIp+'/users/'+this.state.addFriendName).catch(e => console.log(e));
+      console.log(friend.data._id)  
+
+      const ret = await axios.post(serverIp+'/users/addFriend/', {
+        userId: this.state.userId, 
+        friendId: friend.data._id
+      }).catch(e => console.log(e));
+
+
+
     }
 
     comfirmFriendRequest = (item, index) => {

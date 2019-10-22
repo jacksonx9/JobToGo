@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     },
     subHeaderStyle: {
         fontSize: 15,
-        color: colours.lightGray,
+        color: colours.gray,
         fontFamily: fonts.normal,
         paddingLeft: 6
     },
