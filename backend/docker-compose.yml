@@ -7,7 +7,7 @@ services:
     hostname: jobtogo_db
     image: mongo:4.2.0
     volumes: 
-      - ./mongodata:/data/db:Z
+      - mongodata:/data/db:Z
     networks:
       jobtogo_net:
         ipv4_address: 171.0.0.3
@@ -32,6 +32,10 @@ services:
         ipv4_address: 171.0.0.2
     depends_on:
       - mongodb
+
+volumes:
+  mongodata:
+    driver: local
 
 networks:
   jobtogo_net:
