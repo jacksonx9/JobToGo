@@ -146,83 +146,110 @@ class User {
 
   // Adds the user making the friend request to the friend's pendingFriend array
   // Returns true if success and false otherwise
-  async addFriend(userId, friendId) {
-    await Users.updateOne({ _id: friendId },
-      { $addToSet: { 'pendingFriends.friendId': userId }})
-      .exec()
-      .catch(e => {
-        console.log(e);
-        return {
-          status: 400,
-          success: false
-        };
-      });
+  async addFriend(userID, friendID) {
+    if (typeof await Users.findById(userID) !== 'undefined' &&
+        typeof await Users.findById(friendID) !== 'undefined') {
+      await Users.updateOne({ _id: friendID },
+        { $addToSet: { 'pendingFriends': userID }})
+        .exec()
+        .catch(e => {
+          console.log(e);
+          return {
+            status: 500,
+            success: false
+          };
+        });
 
-    const messageRes = await this.messenger.requestFriend(userId, friendId);
+      const messageRes = await this.messenger.requestFriend(userId, friendId);
+
+      return {
+        status: messageRes ? 200 : 500,
+        success: messageRes
+      };
+    }
 
     return {
-      status: messageRes ? 200 : 500,
-      success: messageRes
-    }
+      status: 404,
+      success: true
+    };
   }
 
   // Returns true if success and false otherwise
   async removeFriend(userID, friendID) {
-    await Users.updateOne( { _id: userID },
-      { $pull: {'friends.friendId': friendID }})
-      .catch(e => {
-        console.log(e);
-        return {
-          status: 400,
-          success: false
-        };
-      });
-    await Users.updateOne( { _id: friendID },
-      { $pull: {'friends.friendId': userID }})
-      .catch(e => {
-        console.log(e);
-        return {
-          status: 400,
-          success: false
-        };
-      });
+    if (typeof await Users.findById(userID) !== 'undefined' &&
+        typeof await Users.findById(friendID) !== 'undefined' &&
+        await Users.findOne({ _id: userID, friends: friendID }) !== null &&
+        await Users.findOne({ _id: friendID, friends: userID }) !== null
+        ) {
+      await Users.updateOne( { _id: userID },
+        { $pull: {'friends.friendId': friendID }})
+        .catch(e => {
+          console.log(e);
+          return {
+            status: 500,
+            success: false
+          };
+        });
+      await Users.updateOne( { _id: friendID },
+        { $pull: {'friends.friendId': userID }})
+        .catch(e => {
+          console.log(e);
+          return {
+            status: 500,
+            success: false
+          };
+        });
+
+      return {
+        status: 200,
+        success: true
+      };
+    }
 
     return {
-      status: 200,
-      success: true
+      status: 404,
+      success: false
     };
   }
 
   // userId belongs to the user confirming the friend request.
   // Returns true if success and false otherwise.
   async confirmFriend(userID, friendID) {
-    await Users.findOneAndUpdate(
-      { _id: userID, 'pendingFriends.friendId': friendID },
-      { $pull: {'pendingFriends.friendId': friendID }, $addToSet: { 'friends.friendId': friendID }})
-      .catch(e => {
-        console.log(e);
-        return {
-          status: 404,
-          success: false
-        };
-      });
+    if (typeof await Users.findById(userID) !== 'undefined' &&
+        typeof await Users.findById(friendID) !== 'undefined' &&
+        await Users.findOne({ _id: userID, pendingFriends: friendID }) !== null
+        ) {
+      await Users.findOneAndUpdate(
+        { _id: userID, pendingFriends: friendID },
+        { $pull: { pendingFriends: friendID }, $addToSet: { friends: friendID }})
+        .catch(e => {
+          console.log(e);
+          return {
+            status: 500,
+            success: false
+          };
+        });
 
+      await Users.updateOne({ _id: friendID },
+        { $addToSet: { friends: userID }})
+        .catch(e => {
+          console.log(e);
+          return {
+            status: 500,
+            success: false
+          };
+        });
 
-    // Add user's id to friend's friend array
-    await Users.updateOne({ _id: friendID },
-      { $addToSet: { 'friends.friendId': userID }})
-      .catch(e => {
-        console.log(e);
-        return {
-          status: 404,
-          success: false
-        };
-      });
+      return {
+        status: 200,
+        success: true
+      };
+    }
 
     return {
-      status: 200,
-      success: true
-    };
+      status: 404,
+      success: false
+    }
   }
 
   // Array[userId]
@@ -237,8 +264,8 @@ class User {
       });
 
     return {
-      status: friends.length == 1 ? 200 : 400,
-      friends: friends.length == 1 ? friends[0] : null
+      status: friends.length === 1 ? 200 : 400,
+      friends: friends.length === 1 ? friends[0] : null
     };
   }
 

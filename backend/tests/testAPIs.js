@@ -7,9 +7,9 @@ import { Users } from '../src/schema';
 class TestAPIs {
   constructor(app) {
     const jobSearcher = new JobSearcher(app);
-    const jobAnalyzer = new JobAnalyzer();
+    const jobAnalyzer = new JobAnalyzer(app);
     const user = new User(app);
-    const testEmail = 'uniqueUserName';
+    const testEmail = 'uniqueUserName2';
     const testPassword = 'word';
     const testUser = {
       credentials: {
@@ -37,6 +37,8 @@ class TestAPIs {
           jobCount: 30,
           timeStamp: Date.now()
       },
+      friends: [],
+      pendingFriends: [],
       jobShortList: [],
       resumePath: './resume.pdf'
     };
