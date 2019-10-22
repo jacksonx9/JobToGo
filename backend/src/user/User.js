@@ -147,8 +147,12 @@ class User {
   // Adds the user making the friend request to the friend's pendingFriend array
   // Returns true if success and false otherwise
   async addFriend(userID, friendID) {
-    if (typeof await Users.findById(userID) !== 'undefined' &&
-        typeof await Users.findById(friendID) !== 'undefined') {
+    const userPresent = await Users.findById(userID) !== 'undefined';
+    const friendPresent = await Users.findById(friendID) !== 'undefined';
+    const notFriends = await Users.findOne({ _id: friendID, friends: userID }) === null;
+    const notPendingFriends = await Users.findOne({ _id: friendID, pendingFriends: userID }) === null;
+
+    if (userPresent && friendPresent && notFriends && notPendingFriends) {
       await Users.updateOne({ _id: friendID },
         { $addToSet: { 'pendingFriends': userID }})
         .exec()
@@ -160,7 +164,7 @@ class User {
           };
         });
 
-      const messageRes = await this.messenger.requestFriend(userId, friendId);
+      const messageRes = await this.messenger.requestFriend(userID, friendID);
 
       return {
         status: messageRes ? 200 : 500,
@@ -170,17 +174,17 @@ class User {
 
     return {
       status: 404,
-      success: true
+      success: false
     };
   }
 
   // Returns true if success and false otherwise
   async removeFriend(userID, friendID) {
-    if (typeof await Users.findById(userID) !== 'undefined' &&
-        typeof await Users.findById(friendID) !== 'undefined' &&
-        await Users.findOne({ _id: userID, friends: friendID }) !== null &&
-        await Users.findOne({ _id: friendID, friends: userID }) !== null
-        ) {
+    const userPresent = await Users.findById(userID) !== 'undefined';
+    const friendPresent = await Users.findById(friendID) !== 'undefined';
+    const areFriends = await Users.findOne({ _id: friendID, friends: userID }) !== null;
+
+    if (userPresent && friendPresent && areFriends) {
       await Users.updateOne( { _id: userID },
         { $pull: { friends: friendID }})
         .catch(e => {
@@ -215,10 +219,11 @@ class User {
   // userId belongs to the user confirming the friend request.
   // Returns true if success and false otherwise.
   async confirmFriend(userID, friendID) {
-    if (typeof await Users.findById(userID) !== 'undefined' &&
-        typeof await Users.findById(friendID) !== 'undefined' &&
-        await Users.findOne({ _id: userID, pendingFriends: friendID }) !== null
-        ) {
+    const userPresent = await Users.findById(userID) !== 'undefined';
+    const friendPresent = await Users.findById(friendID) !== 'undefined';
+    const arePendingFriends = await Users.findOne({ _id: userID, pendingFriends: friendID }) !== null;
+
+    if (userPresent && friendPresent && arePendingFriends) {
       await Users.findOneAndUpdate(
         { _id: userID, pendingFriends: friendID },
         { $pull: { pendingFriends: friendID }, $addToSet: { friends: friendID }})

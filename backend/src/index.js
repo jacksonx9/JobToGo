@@ -8,6 +8,7 @@ import ResumeParser from './resume_parser';
 import JobAnalyzer from './job_analyzer';
 import JobShortLister from './job_shortlister';
 import Messenger from './messenger';
+import { TestAPIs } from '../tests';
 
 
 const PORT = 8080;
@@ -28,6 +29,7 @@ const user = new User(app, messenger);
 new ResumeParser(app, user);
 const shortlister = new JobShortLister(app);
 new JobAnalyzer(app, user, shortlister);
+new TestAPIs(app);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
