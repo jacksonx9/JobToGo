@@ -27,9 +27,9 @@ export default class JobSwipe extends Component {
     const jobs = await axios.get(serverIp+'/jobs/findJobs/'+userId).catch(e => console.log(e));
 
     this.setState({
-      jobs: jobs.data, 
-      loading: 0
-    })
+       jobs: jobs.data, 
+       loading: 0
+     })
   }
 
   shareJob = () => {
@@ -68,8 +68,8 @@ export default class JobSwipe extends Component {
         <MainHeader 
           nav={this.props.navigation}
           onPressMenu={() => this.props.navigation.openDrawer()}
-          onPressSend={() => this.props.navigation.navigate('EditSkills', {userId: this.props.navigation.dangerouslyGetParent().getParam('userId')})}
-          />
+          onPressSend={() => this.props.navigation.navigate('SendLikedJobs', {userId: this.props.navigation.dangerouslyGetParent().getParam('userId')})}
+        />
         <GestureRecognizer
           onSwipeUp={this.shareJob}
           onSwipeLeft={this.dislikeJob}

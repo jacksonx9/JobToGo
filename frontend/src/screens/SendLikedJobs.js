@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, FlatList, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native';
+import { View, FlatList, TouchableOpacity, Text, TextInput, Image, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import  { Button, SelectableItem, Loader, NavHeader} from '../components';
 import { images, colours, fonts } from '../constants'
 import axios from 'axios';
@@ -28,6 +28,14 @@ export default class SendLikedJobs extends Component {
         })
     }
 
+    sendLikedJobs = () => {
+      alert(this.props.navigation.dangerouslyGetParent().getParam('userId'))
+    }
+ 
+    removeLikedJob = (item, index) => {
+      alert(`${item.company}: ${index}`)
+    }
+
     render() {
         if (this.state.loading) return <Loader/>
 
@@ -37,18 +45,20 @@ export default class SendLikedJobs extends Component {
                     title='Your Liked Jobs'
                     image={images.iconSend}
                     onPressBack={() => this.props.navigation.goBack()}
-                    onPressBtn={() => this.props.navigation.navigate('SendLikedJobs')}
+                    onPressBtn={this.sendLikedJobs}
                 />
                 <FlatList
                     style
                     data={this.state.likedJobs}
                     keyExtractor={(item) => item.url}
-                    renderItem={({item}) => <SelectableItem
-                      key={item.url}
-                      header={item.company}
-                      subHeader={item.title}
-                      onPress={() => this.props.navigation.openDrawer()}
-                    />}
+                    renderItem={({item, index}) =>
+                      <SelectableItem
+                        key={item.url}
+                        header={item.company}
+                        subHeader={item.title}
+                        onPress={() => this.removeLikedJob(item, index)}
+                    />
+                    }
                 />
             </View>
         );

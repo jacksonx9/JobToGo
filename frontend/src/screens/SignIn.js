@@ -22,7 +22,7 @@ export default class SignIn extends Component {
   }
 
   onPressSignIn = async () => {
-    this.props.navigation.navigate('App')
+    this.props.navigation.navigate('App', { userId: 'usddf' })
   }
 
   onPressGoogleSignIn = async () => {

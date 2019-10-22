@@ -13,19 +13,32 @@ export default class EditFriends extends Component {
   constructor(props) {
       super(props);
       this.state = {
-        likedJobs: [],
+        userId: '',
+        userFriends: [],
+        addFriendName: '',
         jobIndex: 0,
         loading: 1
       };
     }
     
     async componentDidMount() {
-        const likedJobs = await axios.get('http://3.16.169.130:8080/jobs/javascript').catch(e => console.log(e));
+        const userFriends = await axios.get('http://3.16.169.130:8080/jobs/javascript').catch(e => console.log(e));
     
         this.setState({
-          likedJobs: likedJobs.data,
+          userId: this.props.navigation.dangerouslyGetParent().getParam('userId'),
+          userFriends: userFriends.data,
           loading: 0
         })
+
+    }
+
+    addFriend = () => {
+      console.log(this.state.userId)
+      console.log(this.state.addFriendName)
+    }
+
+    comfirmFriendRequest = (item, index) => {
+      alert(`${item.company}: ${index}`)
     }
 
     render() {
@@ -34,21 +47,42 @@ export default class EditFriends extends Component {
         return (
             <View style={[styles.containerStyle]}>
                 <NavHeader
-                    title='Friends'
-                    image={images.iconSend}
-                    onPressBack={() => this.props.navigation.goBack()}
-                    onPressBtn={() => this.props.navigation.navigate('SendLikedJobs')}
+                  title='Friends'
+                  image={images.iconSend}
+                  onPressBack={() => this.props.navigation.goBack()}
+                  onPressBtn={this.addFriends}
+                  enableBtn={false}
                 />
+                <View style={[styles.searchBarStyle]}>
+                  <TextInput
+                    style={styles.inputStyle}
+                    placeholder={'Add a friend'}
+                    value={this.state.addFriendName}
+                    placeholderTextColor={colours.Gray}
+                    onChangeText={(text) => this.setState({addFriendName: text})}
+                  />
+                  <Button
+                    backgroundColor={'#E6E6E6'}
+                    textColor={'#1F1E1F'}
+                    title={'Add'}
+                    textColor='white'
+                    backgroundColor={colours.blue}
+                    style={[styles.buttonStyle]}
+                    onPress={this.addFriend}
+                  />
+                </View>
                 <FlatList
                     style
-                    data={this.state.likedJobs}
-                    keyExtractor={(item, index) => item.url}
-                    renderItem={({item}) => <SelectableItem
-                    key={item.url}
-                    header={item.company}
-                    subHeader={item.title}
-                    onPress={() => this.props.navigation.openDrawer()}
-                    />}
+                    data={this.state.userFriends}
+                    keyExtractor={(item) => item.url}
+                    renderItem={({item, index}) =>
+                      <SelectableItem
+                        key={item.url}
+                        header={item.company}
+                        subHeader={item.title}
+                        onPress={() => this.comfirmFriendRequest(item, index)}
+                    />
+                    }
                 />
             </View>
         );
@@ -63,7 +97,14 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colours.blue
+    backgroundColor: 'white'
+  },
+  searchBarStyle: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    height: 65,
+    width: '90%'
+
   },
   formStyle: {
     paddingTop: 100,
@@ -78,17 +119,18 @@ const styles = StyleSheet.create({
   },
   inputStyle: {
     height: 50,
-    width: '100%',
+    width: '70%',
     marginVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 5,
-    color: 'white',
-    backgroundColor: colours.darkBlue,
+    color: colours.darkGray,
+    backgroundColor: colours.lighterGray,
     fontFamily: fonts.normal,
   },
   buttonStyle: {
     marginTop: 5,
-    marginBottom: 20
+    marginBottom: 20,
+    width: '20%'
   },
   linkStyle: {
     alignItems: 'center'

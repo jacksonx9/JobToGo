@@ -21,10 +21,12 @@ const colours = {
   lightBlue: '#82cefa',
   darkBlue: '#2d94cf',
   darkGray: '#3d3d3d',
-  lightGray: '#696969',
+  gray: '#696969',
+  lightGray: '#d9d9d9',
+  lighterGray: '#ededed'
 }; 
 
-const serverIp = 'http://128.189.26.177:8080'
+const serverIp = 'http://128.189.27.79:8080'
 
 const fonts = {
   normal: 'sans-serif',
