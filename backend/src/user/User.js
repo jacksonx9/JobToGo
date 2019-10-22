@@ -307,6 +307,16 @@ class User {
     };
   }
 
+  // Array[String]
+  async getAllSkills() {
+    let keywords = Users.distinct('userInfo.skillsExperiences', {});
+    if (keywords.length < 6)
+      keywords = ['C++', 'javascript', 'java', 'python', 'hmtl', 'css'];
+
+    return keywords;
+  }
+
+  // get UserId
   async _getUser(userEmail) {
     const user = await Users.find(
         { 'credentials.email': userEmail }, '_id'
