@@ -4,7 +4,7 @@ import  { Button, SelectableItem } from '../components';
 import { images, colours, fonts, serverIp } from '../constants'
 import { GoogleSignin, GoogleSignInOptions, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 import axios from 'axios';
-import firebase, { Notification, RemoteMessage } from 'react-native-firebase';
+
 
 export default class SignIn extends Component {
   
@@ -93,12 +93,12 @@ export default class SignIn extends Component {
             <Text style={[styles.textStyle]}>or</Text>
           </View>
 
-          {/* <GoogleSigninButton
+          <GoogleSigninButton
               style={[styles.buttonStyle]}
               size={GoogleSigninButton.Size.Wide}
               color={GoogleSigninButton.Color.Light}
               onPress={this.onPressGoogleSignIn.bind(this)}
-              disabled={false} /> */}
+              disabled={false} />
 
           <TouchableOpacity
             style={[styles.linkStyle]}
