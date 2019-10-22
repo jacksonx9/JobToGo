@@ -87,7 +87,7 @@ class User {
       { 'credentials.email': userEmail, 'credentials.password': userPassword },
       '_id').catch(e => console.log(e));
 
-    return userIdObj == null ? -1 : userIdObj._id;
+    return userIdObj === null ? -1 : userIdObj._id;
   }
 
    // return: userId if succeeds and null otherwise
@@ -182,7 +182,7 @@ class User {
         await Users.findOne({ _id: friendID, friends: userID }) !== null
         ) {
       await Users.updateOne( { _id: userID },
-        { $pull: {'friends.friendId': friendID }})
+        { $pull: { friends: friendID }})
         .catch(e => {
           console.log(e);
           return {
@@ -191,7 +191,7 @@ class User {
           };
         });
       await Users.updateOne( { _id: friendID },
-        { $pull: {'friends.friendId': userID }})
+        { $pull: { friends: userID }})
         .catch(e => {
           console.log(e);
           return {
