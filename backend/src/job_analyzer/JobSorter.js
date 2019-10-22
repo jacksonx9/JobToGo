@@ -35,8 +35,17 @@ for (const keyword of skills) {
 }
 
 // sort the job array using tfidf with highest score first
-let sorted = [...tf_idf].sort((a, b) => {return b-a});
-
+let sorted = [...tf_idf].sort((a, b) => {return b - a});
+for (let i = 0; i < tf_idf.length(); i++) {
+    let documentScore = tf_idf[i];
+    let returnIndex = sorted.indexOf(documentScore);
+    returnList[returnIndex] = jobs[i];
+    tf_idf[returnIndex] = -1;
+}
 
 // increment/decrement the user skills based on which jobs are shortlisted/added
 
+// so i calculated the tf_idf score for each doc based on the keywords of the user,
+// now i want to sort the jobs to have the best jobs in the beginning. I am debaiting 
+// how to sort the job postings to reflect the score. I am thinking of sorting the tf_idf
+// array and then making a new return array based on the values
