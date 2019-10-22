@@ -4,15 +4,15 @@ import credentials from '../../credentials/google';
 
 class User {
   constructor(app) {
+    this.googleAuth = new OAuth2Client(credentials.clientID);
+
     app.post('/users/googleLogin/', async (req, res) => {
       const loginRes = await this.loginGoogle(req.body.idToken);
       res.status(loginRes.status).send(loginRes.id);
     });
 
-    this.googleAuth = new OAuth2Client(credentials.clientID);
-
     app.post('/users/create', async (req, res) => {
-      const result = await user.createUser(req.body.userData);
+      const result = await this.createUser(req.body.userData);
       res.status(result.status).send(result.id);
     });
 
