@@ -7,6 +7,7 @@ import User from './user';
 import ResumeParser from './resume_parser';
 import JobAnalyzer from './job_analyzer';
 import JobShortLister from './job_shortlister';
+import Messenger from './messenger';
 
 
 const PORT = 8080;
@@ -22,7 +23,8 @@ mongoose.connect(MONGO_URL, {
 }).catch(e => console.log(e));
 
 new JobSearcher(app);
-const user = new User(app);
+const messenger = new Messenger();
+const user = new User(app, messenger);
 new ResumeParser(app, user);
 const shortlister = new JobShortLister(app);
 new JobAnalyzer(app, user, shortlister);
