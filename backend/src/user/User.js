@@ -3,17 +3,25 @@ import { OAuth2Client } from 'google-auth-library';
 import credentials from '../../credentials/google';
 
 class User {
-  constructor(app) {
+  constructor(app, messenger) {
     this.googleAuth = new OAuth2Client(credentials.clientID);
+    this.messenger = messenger;
 
     app.post('/users/googleLogin/', async (req, res) => {
-      const loginRes = await this.loginGoogle(req.body.idToken);
+      const idToken = req.body.idToken;
+      const firebaseToken = req.body.firebaseToken;
+      const loginRes = await this.loginGoogle(idToken, firebaseToken);
       res.status(loginRes.status).send(loginRes.id);
     });
 
     app.post('/users/create', async (req, res) => {
       const result = await this.createUser(req.body.userData);
       res.status(result.status).send(result.id);
+    });
+
+    app.get('/users/:userName', async (req, res) => {
+      const userRes = await this.getUser(req.params.userName);
+      res.status(userRes.status).send(userRes.user);
     });
 
     // param: user that contains the user's id and a json object userInfo
@@ -29,17 +37,17 @@ class User {
     });
 
     app.post('/users/addFriend', async (req, res) => {
-      const result = await this.addFriend(req.body.user1Id, req.body.user2Id);
+      const result = await this.addFriend(req.body.userId, req.body.friendId);
       res.status(result.status).send(result.success);
     });
 
     app.delete('/users/removeFriend', async (req, res) => {
-      const result = await this.removeFriend(req.body.user1Id, req.body.user2Id);
+      const result = await this.removeFriend(req.body.userId, req.body.friendId);
       res.status(result.status).send(result.success);
     });
 
     app.post('/users/confirmFriend', async (req, res) => {
-      const result = await this.confirmFriend(req.body.user1Id, req.body.user2Id);
+      const result = await this.confirmFriend(req.body.userId, req.body.friendId);
       res.status(result.status).send(result.success);
     });
 
@@ -83,7 +91,7 @@ class User {
   }
 
    // return: userId if succeeds and null otherwise
-  async loginGoogle(idToken) {
+  async loginGoogle(idToken, firebaseToken) {
     try {
       const ticket = await this.googleAuth.verifyIdToken({
         idToken,
@@ -98,7 +106,8 @@ class User {
           credentials: {
             userName: email,
             email,
-            token: ticket.payload,
+            idToken: ticket.payload,
+            firebaseToken: firebaseToken,
           }
         });
         return {
@@ -137,9 +146,9 @@ class User {
 
   // Adds the user making the friend request to the friend's pendingFriend array
   // Returns true if success and false otherwise
-  async addFriend(userID, friendID) {
-    await Users.updateOne({ _id: friendID },
-      { $addToSet: { 'pendingFriends.friendId': userID }})
+  async addFriend(userId, friendId) {
+    await Users.updateOne({ _id: friendId },
+      { $addToSet: { 'pendingFriends.friendId': userId }})
       .exec()
       .catch(e => {
         console.log(e);
@@ -149,9 +158,11 @@ class User {
         };
       });
 
+    const messageRes = await this.messenger.requestFriend(userId, friendId);
+
     return {
-      status: 200,
-      success: true
+      status: messageRes ? 200 : 500,
+      success: messageRes
     }
   }
 
@@ -246,7 +257,24 @@ class User {
     }
   }
 
-  // get UserId
+  async getUser(userName) {
+    const user = await Users.find(
+        { 'credentials.userName': userName }
+    ).catch(e => console.log(e));
+
+    if (user.length === 0) {
+      return {
+        status: 404,
+        user: null,
+      };
+    }
+
+    return {
+      status: 200,
+      user,
+    };
+  }
+
   async _getUser(userEmail) {
     const user = await Users.find(
         { 'credentials.email': userEmail }, '_id'
