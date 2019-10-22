@@ -37,8 +37,9 @@ export default class SignIn extends Component {
       const firebaseToken = this.props.navigation.dangerouslyGetParent().getScreenProps()
       console.log(firebaseToken)
       const ret = await axios.post(serverIp+'/users/googleLogin/', 
-          {idToken: userInfo.idToken},
-          firebaseToken
+          {idToken: userInfo.idToken,
+          firebaseToken: firebaseToken.firebaseToken
+          }  
         )
     
       const userId = ret.data

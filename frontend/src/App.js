@@ -12,7 +12,6 @@ import SendLikedJobs from './screens/SendLikedJobs';
 import EditFriends from './screens/EditFriends';
 import EditSkills from './screens/EditSkills';
 
-import { AsyncStorage } from 'react-native';
 import firebase from 'react-native-firebase';
 
 
