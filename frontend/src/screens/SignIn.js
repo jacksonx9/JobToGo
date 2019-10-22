@@ -23,8 +23,6 @@ export default class SignIn extends Component {
 
   onPressSignIn = async () => {
     this.props.navigation.navigate('App')
-
-  
   }
 
   onPressGoogleSignIn = async () => {
@@ -35,9 +33,13 @@ export default class SignIn extends Component {
 
       await GoogleSignin.hasPlayServices()
       const userInfo = await GoogleSignin.signIn()
-      // this.setState({ userInfo: userInfo })
-      // this.props.navigation.navigate('App')
-      const ret = await axios.post(serverIp+'/users/googleLogin/', {idToken: userInfo.idToken})
+
+      const firebaseToken = this.props.navigation.dangerouslyGetParent().getScreenProps()
+      console.log(firebaseToken)
+      const ret = await axios.post(serverIp+'/users/googleLogin/', 
+          {idToken: userInfo.idToken},
+          firebaseToken
+        )
     
       const userId = ret.data
 

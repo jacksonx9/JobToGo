@@ -18,6 +18,13 @@ import firebase from 'react-native-firebase';
 
 export default class App extends React.Component {
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      firebaseToken: ''
+    };
+  }
+
   async componentDidMount() {
     if (Platform.OS === 'android') {
       try {
@@ -26,6 +33,7 @@ export default class App extends React.Component {
         const fcmToken = await firebase.messaging().getToken();
         if (fcmToken) {
           console.log('FCM Token: ', fcmToken);
+          this.setState({firebaseToken: fcmToken});
           const enabled = await firebase.messaging().hasPermission();
           if (enabled) {
             console.log('FCM messaging has permission:' + enabled)
@@ -95,45 +103,12 @@ export default class App extends React.Component {
       { cancelable: false },
     );
   }
-  
-
-  // async checkPermission() {
-  //   const enabled = await firebase.messaging().hasPermission();
-  //   if (enabled) {
-  //       this.getToken();
-  //   } else {
-  //       this.requestPermission();
-  //   }
-  // }
-  
-  //   //3
-  // async getToken() {
-  //   let fcmToken = await AsyncStorage.getItem('fcmToken');
-  //   if (!fcmToken) {
-  //       fcmToken = await firebase.messaging().getToken();
-  //       if (fcmToken) {
-  //           // user has a device token
-  //           await AsyncStorage.setItem('fcmToken', fcmToken);
-  //       }
-  //   }
-  //   console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-  //   console.log(fcm)
-  // }
-  
-  //   //2
-  // async requestPermission() {
-  //   try {
-  //       await firebase.messaging().requestPermission();
-  //       // User has authorised
-  //       this.getToken();
-  //   } catch (error) {
-  //       // User has rejected permissions
-  //       console.log('permission rejected');
-  //   }
-  // }
 
   render() {
-    return <AppContainer styles={styles.containerStyle} />;
+    return <AppContainer 
+      styles={styles.containerStyle} 
+      screenProps={{ firebaseToken: this.state.firebaseToken }}
+      />;
   } 
 }
 
