@@ -64,7 +64,8 @@ export default class App extends React.Component {
     * Triggered when a particular notification has been received in foreground
     * */
     this.notificationListener = firebase.notifications().onNotification((notification) => {
-        const { title, body } = notificationOpen.notification;
+        const { title, body } = notification;
+        console.log('first')
         this.showAlert(title, body);
     });
   
@@ -73,7 +74,7 @@ export default class App extends React.Component {
     * */
     this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
         const { title, body } = notificationOpen.notification;
-        this.showAlert(title, body);
+        console.log('second')
     });
   
     /*
@@ -82,7 +83,7 @@ export default class App extends React.Component {
     const notificationOpen = await firebase.notifications().getInitialNotification();
     if (notificationOpen) {
         const { title, body } = notificationOpen.notification;
-        this.showAlert(title, body);
+        console.log('third')
     }
     /*
     * Triggered for data only payload in foreground

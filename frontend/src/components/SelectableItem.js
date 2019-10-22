@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, Image} from 'react-native';
 import { fonts, images, colours } from '../constants'
 
-const SelectableItem = ({ header, subHeader, onPress }) => {
+const SelectableItem = ({ header, subHeader, onPress, actionIcon }) => {
   
     return (
         <View style={[styles.containerStyle]}>
@@ -17,7 +17,7 @@ const SelectableItem = ({ header, subHeader, onPress }) => {
             </View>
 
             <TouchableOpacity onPress={onPress}>
-                <Text style={[styles.subHeaderStyle]}>x</Text>
+                <Text style={[styles.iconStyle]}>{actionIcon}</Text>
             </TouchableOpacity>
         </View>
     );
@@ -55,6 +55,10 @@ const styles = StyleSheet.create({
   },
   subHeaderStyle: {
     fontSize: 12,
+    color: colours.gray
+  },
+  iconStyle: {
+    fontSize: 14,
     color: colours.gray
   },
   infoStyle: {

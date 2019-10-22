@@ -22,7 +22,8 @@ export default class EditFriends extends Component {
     }
     
     async componentDidMount() {
-        const userFriends = await axios.get('http://3.16.169.130:8080/jobs/javascript').catch(e => console.log(e));
+      const userId = this.props.navigation.dangerouslyGetParent().getParam('userId')
+      const userFriends = await axios.get(serverIp+'/jobs/getLikedJobs/'+userId).catch(e => console.log(e));
     
         this.setState({
           userId: this.props.navigation.dangerouslyGetParent().getParam('userId'),
@@ -43,8 +44,6 @@ export default class EditFriends extends Component {
         userId: this.state.userId, 
         friendId: friend.data._id
       }).catch(e => console.log(e));
-
-
 
     }
 
@@ -82,18 +81,35 @@ export default class EditFriends extends Component {
                     onPress={this.addFriend}
                   />
                 </View>
+                <Text>Friend Requests</Text>
                 <FlatList
-                    style
-                    data={this.state.userFriends}
-                    keyExtractor={(item) => item.url}
-                    renderItem={({item, index}) =>
-                      <SelectableItem
-                        key={item.url}
-                        header={item.company}
-                        subHeader={item.title}
-                        onPress={() => this.comfirmFriendRequest(item, index)}
-                    />
-                    }
+                  style
+                  data={this.state.userFriends}
+                  keyExtractor={(item) => item.url}
+                  renderItem={({item, index}) =>
+                    <SelectableItem
+                      key={item.url}
+                      header={item.company}
+                      subHeader={item.title}
+                      onPress={() => this.comfirmFriendRequest(item, index)}
+                      actionIcon='+'
+                  />
+                  }
+                />
+                <Text>Your Friends</Text>
+                <FlatList
+                  style
+                  data={this.state.userFriends}
+                  keyExtractor={(item) => item.url}
+                  renderItem={({item, index}) =>
+                    <SelectableItem
+                      key={item.url}
+                      header={item.company}
+                      subHeader={item.title}
+                      onPress={() => this.comfirmFriendRequest(item, index)}
+                      actionIcon='x'
+                  />
+                  }
                 />
             </View>
         );

@@ -22,7 +22,7 @@ export default class EditSkills extends Component {
 
   onPressUpload = () => {
     console.log('from resume')
-    console.log(this.props.navigation.state.params.userId)
+    //console.log(this.props.navigation.state.params.userId)
     FilePickerManager.showFilePicker(null, async (response) => {
       console.log('Response = ', response);
      
@@ -71,15 +71,14 @@ export default class EditSkills extends Component {
             image={images.iconSend}
             onPressBack={() => this.props.navigation.goBack()}
             onPressBtn={() => this.props.navigation.navigate('SendLikedJobs')}
+            enableBtn={false}
         />
         
           
           <Button
             backgroundColor={'#E6E6E6'}
-            textColor={'#1F1E1F'}
             title={'Upload Resume'}
-            textColor={colours.blue}
-            backgroundColor='white'
+            textColor={'white'}
             style={[styles.buttonStyle]}
             onPress={ () => this.onPressUpload()}
           />
@@ -97,8 +96,7 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colours.blue
+    backgroundColor: 'white'
   },
   formStyle: {
     paddingTop: 100,
@@ -122,10 +120,11 @@ const styles = StyleSheet.create({
     fontFamily: fonts.normal,
   },
   buttonStyle: {
-    marginTop: 5,
+    marginTop: 50,
     marginBottom: 20,
-    width: '100%',
-    height: 50
+    width: '50%',
+    height: 70,
+    backgroundColor: colours.blue
   },
   linkStyle: {
     alignItems: 'center'

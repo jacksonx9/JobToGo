@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, FlatList, TouchableOpacity, Text, TextInput, Image, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import  { Button, SelectableItem, Loader, NavHeader} from '../components';
-import { images, colours, fonts } from '../constants'
+import { images, colours, fonts, serverIp } from '../constants'
 import axios from 'axios';
 
 export default class SendLikedJobs extends Component {
@@ -21,15 +21,26 @@ export default class SendLikedJobs extends Component {
       }
 
     async componentDidMount() {
-        const likedJobs = await axios.get('http://3.16.169.130:8080/jobs/javascript').catch(e => console.log(e));
+        const userId = this.props.navigation.dangerouslyGetParent().getParam('userId')
+        const likedJobs = await axios.get(serverIp+'/jobs/getLikedJobs/'+userId).catch(e => console.log(e));
         this.setState({
           likedJobs: likedJobs.data,
           loading: 0
         })
+        console.log(likedJobs.data)
+        console.log('~~~~~~~~~mount')
     }
 
-    sendLikedJobs = () => {
-      alert(this.props.navigation.dangerouslyGetParent().getParam('userId'))
+    componentWillUnmount() {
+      console.log('~~~~~~~~~unmount')
+    }
+
+    sendLikedJobs = async () => {
+      const userId = this.props.navigation.dangerouslyGetParent().getParam('userId')
+      const ret = await axios.post(serverIp+'/jobs/getLikedJobs/',
+      {
+        userId: userId
+      }).catch(e => console.log(e));
     }
  
     removeLikedJob = (item, index) => {
@@ -50,13 +61,14 @@ export default class SendLikedJobs extends Component {
                 <FlatList
                     style
                     data={this.state.likedJobs}
-                    keyExtractor={(item) => item.url}
+                    keyExtractor={(item) => item._id}
                     renderItem={({item, index}) =>
                       <SelectableItem
-                        key={item.url}
+                        key={item._id}
                         header={item.company}
                         subHeader={item.title}
                         onPress={() => this.removeLikedJob(item, index)}
+                        actionIcon='x'
                     />
                     }
                 />
@@ -73,7 +85,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colours.blue
+    backgroundColor: 'white'
   },
   formStyle: {
     paddingTop: 100,

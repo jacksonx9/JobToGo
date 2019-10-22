@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native';
-import  { Button, SelectableItem } from '../components';
+import  { Button } from '../components';
 import { images, colours, fonts, serverIp } from '../constants'
-import { GoogleSignin, GoogleSignInOptions, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
+import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 import axios from 'axios';
 
 

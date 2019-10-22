@@ -11,8 +11,6 @@ const images = {
   iconJob: require('../../assets/icon-job.png'),
 
   tempBg1: require('../../assets/temp-bg1.png'),
-  
-
 }; 
 
 
@@ -26,7 +24,7 @@ const colours = {
   lighterGray: '#ededed'
 }; 
 
-const serverIp = 'http://128.189.27.79:8080'
+const serverIp = 'http://3.16.169.130:8080'
 
 const fonts = {
   normal: 'sans-serif',

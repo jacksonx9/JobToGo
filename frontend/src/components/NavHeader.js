@@ -1,12 +1,13 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { ImageButton } from '../components'
-import { images } from '../constants'
+import { images, fonts, colours } from '../constants'
 
 const NavHeader = ({ title, image, onPressBack, onPressBtn, enableBtn=true }) => {
     const {
         containerStyle,
-        containerStyle2
+        containerStyle2,
+        textStyle
       } = styles;
   
   if (enableBtn)
@@ -31,12 +32,11 @@ const NavHeader = ({ title, image, onPressBack, onPressBtn, enableBtn=true }) =>
         source = {images.iconChevronLeft}
         onPress={onPressBack} 
         />
-        <Text>{title}</Text>
+        <Text style={[textStyle]}>{title}</Text>
         </View>
       )
 }
-
-  
+ 
 const styles = StyleSheet.create({
   containerStyle: {
     paddingTop: 5,
@@ -65,6 +65,11 @@ const styles = StyleSheet.create({
   logoStyle: {
     width: 170,
     height: 50
+  },
+  textStyle: {
+    fontFamily: fonts.normal,
+    color: colours.darkGray,
+    fontSize: 16
   }
 });
 

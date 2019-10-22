@@ -10,6 +10,10 @@ import { serverIp } from '../constants'
 
 
 export default class JobSwipe extends Component {
+
+  static navigationOptions = {
+    drawerLabel: 'Job Swipe',
+  };
   
   constructor(props) {
     super(props);
@@ -36,19 +40,22 @@ export default class JobSwipe extends Component {
     this.setState({ myText: 'shared job' });
   }
 
-  dislikeJob = () => {
-    // await axios.post(serverIp+'/jobs/findJobs/', {
-    //   dsf: this.state.jobs[this.state.jobIndex].companjhkkhkjhjk
-    // }).catch(e => console.log(e));
-    this.setState({ myText: 'disliked job' });
+  dislikeJob = async () => {
+    await axios.post(serverIp+'/jobs/addDislikedJobs/', {
+      userId: this.props.navigation.dangerouslyGetParent().getParam('userId'),
+      jobId: this.state.jobs[this.state.jobIndex]._id
+    }).catch(e => console.log(e))
+  
     this.setState({ jobIndex: this.state.jobIndex + 1 })
   }
 
-  likeJob = () => {
+  likeJob = async () => {
+    await axios.post(serverIp+'/jobs/addLikedJobs/', {
+      userId: this.props.navigation.dangerouslyGetParent().getParam('userId'),
+      jobId: this.state.jobs[this.state.jobIndex]._id
+    }).catch(e => console.log(e))
 
-    this.setState({ myText: 'liked job' });
     this.setState({ jobIndex: this.state.jobIndex + 1 })
-
   }
 
   onPressSignIn = () => {
