@@ -20,6 +20,12 @@ const jobSchema = new mongoose.Schema({
       unique: true,
     }
   },
+  keywords: [
+    {
+      name: String,
+      tfidf: Number,
+    }
+  ],
   postDate: String,
   salary: String,
 },

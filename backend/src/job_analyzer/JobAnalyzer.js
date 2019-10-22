@@ -12,7 +12,7 @@ class JobAnalyzer {
         console.log(e);
         res.status(500).send(false);
       }
-    })
+    });
   }
 
   async findJobs(keywords) {
@@ -37,12 +37,12 @@ class JobAnalyzer {
 
         const escapedKeyword = keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
         const re = new RegExp(escapedKeyword, 'i');
-  
+
         const jobsMatchingKeyword = await Jobs.find({
           description: { $regex: re },
           title: { $regex: re }
         });
-  
+
         jobsMatchingKeyword.forEach(job => {
           if (jobsUrls.has(job.url)) {
             return;

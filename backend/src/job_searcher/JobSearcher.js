@@ -3,16 +3,14 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 import { Jobs } from '../schema';
 
-class JobSearcher {
-  constructor() {
-    this.updateJobStore().then({});
-  }
+import { MIN_JOBS_IN_DB } from '..';
 
+class JobSearcher {
   async updateJobStore() {
     const count = await Jobs.countDocuments({});
 
     // TODO: Change this arbitrary condition
-    if (count > 100) {
+    if (count > MIN_JOBS_IN_DB) {
       return;
     }
 

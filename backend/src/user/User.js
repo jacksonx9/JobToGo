@@ -309,9 +309,12 @@ class User {
 
   // Array[String]
   async getAllSkills() {
-    let keywords = Users.distinct('userInfo.skillsExperiences', {});
-    if (keywords.length < 6)
-      keywords = ['C++', 'javascript', 'java', 'python', 'hmtl', 'css'];
+    // TODO: don't hard code skills
+    // TRY aggregate instead of distinct
+    let keywords2 = Users.distinct('userInfo.skillsExperience');
+    console.log(typeof(keywords2));
+    // if (keywords.length < 6)
+    let keywords = ['javascript', 'java', 'python', 'hmtl', 'css'];
 
     return keywords;
   }
