@@ -13,6 +13,7 @@
     "body-parser": "^1.19.0",
     "cheerio": "^1.0.0-rc.3",
     "express": "^4.13.3",
+    "firebase-admin": "^8.6.1",
     "google-auth-library": "^5.5.0",
     "indeed-scraper": "^3.0.2",
     "mongoose": "^5.7.5",

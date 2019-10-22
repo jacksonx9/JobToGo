@@ -1,4 +1,4 @@
-import { Users } from '../schema';
+import { Users, Jobs } from '../schema';
 
 class JobShortLister {
   constructor(app) {
@@ -14,6 +14,17 @@ class JobShortLister {
       const jobId = req.body.jobId;
       const addRes = await this.addDislikedJobs(userId, jobId);
       res.status(addRes ? 200 : 400).send(addRes);
+    });
+
+    app.get('/jobs/getLikedJobs/:userId', async (req, res) => {
+      try {
+        const userId = req.params.userId;
+        const jobsData = await this.getLikedJobsData(userId);
+        res.status(200).send(jobsData);
+      } catch(e) {
+        console.log(e);
+        res.status(400).send(null);
+      }
     });
   }
 
@@ -53,6 +64,20 @@ class JobShortLister {
     }
 
     return doc.likedJobs;
+  }
+
+  async getLikedJobsData(userId) {
+    const jobIds = await this.getLikedJobs(userId);
+    const jobsData = [];
+
+    for (const id of jobIds) {
+      const jobData = await Jobs.findById(id);
+      if (jobData) {
+        jobsData.push(jobData);
+      }
+    }
+
+    return jobsData;
   }
 
   async getDislikedJobs(userId) {

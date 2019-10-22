@@ -16,9 +16,8 @@ const userSchema = new mongoose.Schema({
     password: {
       type: String,
     },
-    token: {
-      type: Object,
-    }
+    idToken: Object,
+    firebaseToken: String
   },
   userInfo: {
     location: String,
