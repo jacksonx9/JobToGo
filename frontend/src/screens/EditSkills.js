@@ -31,30 +31,24 @@ export default class EditSkills extends Component {
         console.log('FilePickerManager Error: ', response.error);
       }
       else {
-        var photo = {
-          uri: response.uri,
+        const data = new FormData();
+        data.append('userId', this.props.navigation.dangerouslyGetParent().getParam('userId'));
+        data.append('fileData', {
+          uri : response.uri,
           type: response.type,
-          name: response.fileName,
-        };
+          name: response.fileName
+        });
 
-      const res = await axios.post(serverIp+'/users/resume/upload', 
-      {
-        userId: this.props.navigation.dangerouslyGetParent().getParam('userId'),
-        authToken: 'secret',
-        photo,
-        title: 'A beautiful photo!'
-      }).catch(e => console.log(e));
+        const res = await axios.post(serverIp+'/users/resume/upload', 
+        data, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }).catch(e => console.log(e))
       
-        // var body = new FormData();
-        // body.append('authToken', 'secret');
-        // body.append('photo', photo);
-        // body.append('title', 'A beautiful photo!');
-        
-        // var xhr = new XMLHttpRequest();
-        // xhr.open('POST', 'http://10.231.110.76:8080/user/resume/upload');
-        // xhr.send(body);
+      
 
-        alert("Resume Sent for analysis")
+        alert("Resume Sent for")
       }
     });
   }
