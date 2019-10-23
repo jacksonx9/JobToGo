@@ -23,10 +23,10 @@ mongoose.connect(MONGO_URL, {
 }).catch(e => console.log(e));
 
 new JobSearcher(app);
-const messenger = new Messenger();
+const shortlister = new JobShortLister(app);
+const messenger = new Messenger(app, shortlister);
 const user = new User(app, messenger);
 new ResumeParser(app, user);
-const shortlister = new JobShortLister(app);
 new JobAnalyzer(app, user, shortlister);
 
 app.listen(PORT, () => {
