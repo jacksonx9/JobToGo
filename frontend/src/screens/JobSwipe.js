@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { View } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import GestureRecognizer from 'react-native-swipe-gestures';
 import axios from 'axios';
 import { JobImage, JobDetails, Loader, MainHeader } from '../components';
@@ -88,7 +88,7 @@ export default class JobSwipe extends Component {
     if (this.state.loading) return <Loader/>
 
     return (
-      <View>
+      <View style={[styles.containerStyle]}>
         <MainHeader 
           nav={this.props.navigation}
           onPressMenu={() => this.props.navigation.openDrawer()}
@@ -99,21 +99,25 @@ export default class JobSwipe extends Component {
           onSwipeLeft={this.dislikeJob}
           onSwipeRight={this.likeJob}
           config={config}
-          style={{
-            flex: 1,
-          }}
+
         >
           <JobImage
             companyName={this.state.jobs[this.state.jobIndex].company}
           />
-          <JobDetails
-            company={this.state.jobs[this.state.jobIndex].company}
-            job={this.state.jobs[this.state.jobIndex].title}
-            location={this.state.jobs[this.state.jobIndex].location}
-          />
         </GestureRecognizer>
+        <JobDetails
+            job={this.state.jobs[this.state.jobIndex]}
+        />
       </View>
     );
   };
 };
+
+const styles = StyleSheet.create({
+  containerStyle: {
+    backgroundColor: 'white',
+    height: '100%',
+    width: '100%'
+  }
+});
 

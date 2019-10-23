@@ -1,59 +1,95 @@
-import React from 'react';
-import { StyleSheet, Text, View, Image } from 'react-native';
+import React, {Component} from 'react';
+import { StyleSheet, Text, View, Image, Modal, } from 'react-native';
 import { ImageButton } from '../components';
 import { images, colours, fonts } from '../constants'
+import { ScrollView } from 'react-native-gesture-handler';
 
-const JobDetails = ({ company, job, location }) => {
+class JobDetails extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            modalVisible: false,
+        };
+    }
     
-    const {
-        containerStyle,
-        textContainerStyle,
-        subHeaderContainerStyle,
-        headerStyle,
-        subHeaderStyle,
-        iconStyle,
-    } = styles;
+    setModalVisible = (visible) =>{
+        this.setState({modalVisible: visible});
+    }
 
-
-    onPressExpand = () => {
-        //this.state.expanded
-      }
-
-    return (
-        <View style={[containerStyle]}>
-            <ImageButton
-                source={images.iconChevronUp}
-                onPress={() => console.log('hi')}
-            />
-            <View style={[textContainerStyle]}>
-                <Text style={[headerStyle]}>{company}</Text>
-                <View style={[subHeaderContainerStyle]}>
-                    <Image
-                        source={images.iconJob}
-                        styles={[iconStyle]}
+    render() {
+        return (
+            <View style={[styles.containerStyle]}>
+                <Modal
+                    animationType="slide"
+                    transparent={false}
+                    visible={this.state.modalVisible}
+                >
+                    <View style={[styles.modalContainerStyle]}>
+                        <ImageButton
+                            source={images.iconChevronDown}
+                            onPress={() => {
+                                this.setModalVisible(false);
+                            }}
+                        />
+                        <Text style={[styles.headerStyle]}>{this.props.job.company}</Text>
+                        <View style={[styles.subHeaderContainerStyle]}>
+                            <Image
+                                source={images.iconJob}
+                                styles={[styles.iconStyle]}
+                            /> 
+                            <Text style={[styles.subHeaderStyle]}>{this.props.job.title}</Text>
+                        </View>
+                        <View style={[styles.subHeaderContainerStyle]}>
+                            <Image
+                                source={images.iconLocation}
+                                styles={[styles.iconStyle]}
+                            />
+                            <Text style={[styles.subHeaderStyle]}>{this.props.job.location}</Text>
+                        </View>
+                        <ScrollView style={[{marginTop: 30, height: 500, width: '100%', overflow: 'scroll'}]}>
+                            <Text>{this.props.job.description}</Text>
+                        </ScrollView>
+                    </View>   
+                </Modal>
+                
+                <View style={[styles.textContainerStyle]}>
+                    <ImageButton
+                        source={images.iconChevronUp}
+                        onPress={() => {
+                            this.setModalVisible(true);
+                        }}
                     />
-                    <Text style={[subHeaderStyle]}>{job}</Text>
-                </View>
-                <View style={[subHeaderContainerStyle]}>
-                    <Image
-                        source={images.iconLocation}
-                        styles={[iconStyle]}
-                    />
-                    <Text style={[subHeaderStyle]}>{location}</Text>
+                    <Text style={[styles.headerStyle]}>{this.props.job.company}</Text>
+                    <View style={[styles.subHeaderContainerStyle]}>
+                        <Image
+                            source={images.iconJob}
+                            styles={[styles.iconStyle]}
+                        /> 
+                        <Text style={[styles.subHeaderStyle]}>{this.props.job.title}</Text>
+                    </View>
+                    <View style={[styles.subHeaderContainerStyle]}>
+                        <Image
+                            source={images.iconLocation}
+                            styles={[styles.iconStyle]}
+                        />
+                        <Text style={[styles.subHeaderStyle]}>{this.props.job.location}</Text>
+                    </View>
                 </View>
             </View>
-        </View>
 
-    );
+        );
+    }
 };
 
 const styles = StyleSheet.create({
     containerStyle: {
-        paddingTop: 50,
+        paddingTop: 15,
         justifyContent: 'center',
         height: 100,
         overflow: 'scroll',
-        backgroundColor: 'white'
+        backgroundColor: 'white',
+        zIndex: 10000
     },
     textContainerStyle: {
         paddingVertical: 7,
@@ -67,6 +103,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-start',
+    },
+    modalContainerStyle: {
+        padding: 30,
+        fontFamily: fonts.normal,
+        color: colours.darkGray,
+        height: '100%',
+        fontSize: 12,
+        backgroundColor: 'white',
     },
     headerStyle: {
         fontSize: 20,

@@ -21,7 +21,6 @@ const SelectableItem = ({ header, subHeader, onPress, actionIcon }) => {
             </TouchableOpacity>
         </View>
     );
-    
   }
 
 const styles = StyleSheet.create({
