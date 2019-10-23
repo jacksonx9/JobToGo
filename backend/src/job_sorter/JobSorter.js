@@ -7,7 +7,7 @@ import { JOBS_PER_SEND } from '..';
 class JobSorter {
   constructor(app, user) {
     this.user = user;
-    app.get('/jobSorter/:userId', async (req, res) => {
+    app.get('/jobs/findJobs/:userId', async (req, res) => {
       const result = await this.getRelevantJobs(req.params.userId);
       res.status(result.status).send(result.mostRelevantJobs);
     });
@@ -64,6 +64,15 @@ class JobSorter {
     const userKeywords = user[0].userInfo.skillsExperiences;
     let potentialJobs = new JobSet();
     let mostRelevantJobs = [];
+
+    if (userKeywords.length === 0) {
+      // TODO: Change arbitrary value
+      mostRelevantJobs.push(...await Jobs.find({}).limit(20));
+      return {
+        mostRelevantJobs,
+        status: 200,
+      };
+    }
 
     for (const keyword of userKeywords) {
       // adds the most suitable jobs based on keyword to the Set
