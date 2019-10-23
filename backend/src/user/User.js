@@ -356,37 +356,19 @@ class User {
     };
   }
 
-  // Array[String]
+  /* gets and returns a set containing the collective skills of all the users */
   async getAllSkills() {
-    // TODO: don't hard code skills
-    // TRY aggregate instead of distinct
-    // let arr = [2,5,6];
-    let keywords = new Set([1,2,3]);
-    // const ar = await Users.find({});
+    let keywords = new Set();
     for (const doc of await Users.find({})) {
-      // console.log(doc.userInfo.skillsExperiences);
-      // console.log(keywords);
-      // doc.userinfo.skillsExperiences.forEach(item => keywords.add(item));
-      // const skills = doc.userInfo.skillsExperiences;
-      const skills = [4,45];
+      const skills = doc.userInfo.skillsExperiences;
       if (skills.length > 0){
         skills.forEach(item => keywords.add(item));
-        // keywords.add(...skills);
-        console.log(skills);
       }
-      console.log("ran");
     }
-
-    console.log("\n\n\n\n\n\nran get all skills~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n\n\n\n\n\n\n");
-    console.log(keywords);
-    // console.log("\nbreak\n");
-    // console.log(temp);
-    // console.log("\nend\n");
-
-    // let keywords2 = Users.distinct('userInfo.skillsExperience');
-    // if (keywords.length < 6)
-    // let keywords = ['javascript', 'java', 'python', 'hmtl', 'css', 'c++'];
-
+    if (keywords.length < 6) {
+      const defaultSkills = ['javascript', 'java', 'python', 'html', 'css', 'c++'];
+      defaultSkills.forEach(item => keywords.add(item));
+    }
     return keywords;
   }
 
