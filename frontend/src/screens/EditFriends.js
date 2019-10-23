@@ -15,6 +15,7 @@ export default class EditFriends extends Component {
       this.state = {
         userId: '',
         userFriends: [],
+        userFriendRequests: [],
         addFriendName: '',
         jobIndex: 0,
         loading: 1
@@ -23,14 +24,31 @@ export default class EditFriends extends Component {
     
     async componentDidMount() {
       const userId = this.props.navigation.dangerouslyGetParent().getParam('userId')
-      const userFriends = await axios.get(serverIp+'/jobs/getLikedJobs/'+userId).catch(e => console.log(e));
-    
-        this.setState({
+      const userFriends = await axios.get(serverIp+'/users/getFriends/'+userId).catch(e => console.log(e));
+      const userFriendRequests = await axios.get(serverIp+'/users/getPendingFriends/'+userId).catch(e => console.log(e));
+        
+      this.setState({
           userId: this.props.navigation.dangerouslyGetParent().getParam('userId'),
           userFriends: userFriends.data,
+          userFriendRequests: userFriendRequests.data,
           loading: 0
         })
+    }
 
+    async componentDidUpdate(prevProps, prevState) {
+      if(JSON.stringify(prevProps) != JSON.stringify(this.props)) {
+        const userId = this.props.navigation.dangerouslyGetParent().getParam('userId')
+        const userFriends = await axios.get(serverIp+'/users/getFriends/'+userId).catch(e => console.log(e));
+        const userFriendRequests = await axios.get(serverIp+'/users/getPendingFriends/'+userId).catch(e => console.log(e));
+          
+        this.setState({
+            userId: this.props.navigation.dangerouslyGetParent().getParam('userId'),
+            userFriends: userFriends.data,
+            userFriendRequests: userFriendRequests.data,
+            loading: 0
+          })
+        
+      }
     }
 
     addFriend = async () => {
@@ -47,8 +65,26 @@ export default class EditFriends extends Component {
 
     }
 
-    comfirmFriendRequest = (item, index) => {
-      alert(`${item.company}: ${index}`)
+    comfirmFriendRequest = async (item, index) => {
+      //alert(`${item.company}: ${index}`)
+      const userId = this.props.navigation.dangerouslyGetParent().getParam('userId')
+
+      const ret = await axios.post(serverIp+'/users/confirmFriend/', {
+        userId: userId,
+        friendId: item._id
+      }).catch(e => console.log(e));
+
+      const userFriends = await axios.get(serverIp+'/users/getFriends/'+userId).catch(e => console.log(e));
+      const userFriendRequests = await axios.get(serverIp+'/users/getPendingFriends/'+userId).catch(e => console.log(e));
+        
+      this.setState({
+          userId: this.props.navigation.dangerouslyGetParent().getParam('userId'),
+          userFriends: userFriends.data,
+          userFriendRequests: userFriendRequests.data,
+          loading: 0
+        })
+      
+
     }
 
     render() {
@@ -84,28 +120,30 @@ export default class EditFriends extends Component {
                 <Text>Friend Requests</Text>
                 <FlatList
                   style
-                  data={this.state.userFriends}
+                  data={this.state.userFriendRequests}
                   keyExtractor={(item) => item.url}
                   renderItem={({item, index}) =>
                     <SelectableItem
-                      key={item.url}
-                      header={item.company}
-                      subHeader={item.title}
+                      key={item._id}
+                      header={item.userName}
+                      subHeader={item.email}
                       onPress={() => this.comfirmFriendRequest(item, index)}
                       actionIcon='+'
                   />
                   }
                 />
-                <Text>Your Friends</Text>
+                 <View style={[styles.dividerStyle]}>
+                  <Text>Your Friends</Text>
+                </View>
                 <FlatList
                   style
                   data={this.state.userFriends}
                   keyExtractor={(item) => item.url}
                   renderItem={({item, index}) =>
                     <SelectableItem
-                      key={item.url}
-                      header={item.company}
-                      subHeader={item.title}
+                      key={item._id}
+                      header={item.userName}
+                      subHeader={item.email}
                       onPress={() => this.comfirmFriendRequest(item, index)}
                       actionIcon='x'
                   />
@@ -131,7 +169,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: 65,
     width: '90%'
-
+  },
+  dividerStyle: {
+    height: 40,
+    width: '100%',
+    //backgroundColor: colours.lighterGray,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   formStyle: {
     paddingTop: 100,

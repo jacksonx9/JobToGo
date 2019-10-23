@@ -31,6 +31,17 @@ export default class SendLikedJobs extends Component {
         console.log('~~~~~~~~~mount')
     }
 
+    async componentDidUpdate(prevProps, prevState) {
+      if(prevProps != this.props) {
+        const userId = this.props.navigation.dangerouslyGetParent().getParam('userId')
+        const likedJobs = await axios.get(serverIp+'/jobs/getLikedJobs/'+userId).catch(e => console.log(e));
+        this.setState({
+          likedJobs: likedJobs.data,
+          loading: 0
+        })
+    }
+  }
+
     componentWillUnmount() {
       console.log('~~~~~~~~~unmount')
     }
