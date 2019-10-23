@@ -40,24 +40,19 @@ class JobSorter {
         let tf = keywordCount[postingIdx] / wordCount[postingIdx];
         let idf = docCount != 0 ? Math.log(jobsLen / docCount) : 0;
 
-        // check if keyword exists in database before pushing
-        // .addIfDoesNotExist
-        await Jobs.updateOne({ _id: doc.id },
-          { $addToSet: { 'keywords': { name: keyword, tfidf: (tf * idf) } }})
-          .exec()
-          .catch(e => {
-            console.log(e);
-            return {
-              status: 500,
-              success: false
-            };
+        // add name and tf_idf score to each job's keywords the first time
+        // replace tf_idf score for a keyword for each job
+        const keyword_idx = doc.keywords.findIndex(elem => elem.name === keyword);
+        if (keyword_idx === -1) {
+          doc.keywords.push({
+            name: keyword,
+            tfidf: tf * idf
           });
-        // doc.keywords.push({
-        //   name: keyword,
-        //   tfidf: tf * idf
-        // });
+        } else {
+          doc.keywords[keyword_idx].tfidf = tf * idf;
+        }
 
-        // await doc.save();
+        await doc.save();
         postingIdx++;
       }
     }
@@ -103,7 +98,6 @@ class JobSorter {
       return sum;
     }
 
-    console.log(Array.from(potentialJobs.values()));
     // Get highest overall tfidf scores
     mostRelevantJobs = Array.from(potentialJobs.values())
       .sort((a, b) => {
@@ -119,10 +113,3 @@ class JobSorter {
 }
 
 export default JobSorter;
-
-// increment/decrement the user skills based on which jobs are shortlisted/added
-
-// so i calculated the tf_idf score for each doc based on the keywords of the user,
-// now i want to sort the jobs to have the best jobs in the beginning. I am debaiting
-// how to sort the job postings to reflect the score. I am thinking of sorting the tf_idf
-// array and then making a new return array based on the values
