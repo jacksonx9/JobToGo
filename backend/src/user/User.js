@@ -356,6 +356,23 @@ class User {
     };
   }
 
+  /* gets and returns a set containing the collective skills of all the users */
+  async getAllSkills() {
+    let keywords = new Set();
+    for (const doc of await Users.find({})) {
+      const skills = doc.userInfo.skillsExperiences;
+      if (skills.length > 0){
+        skills.forEach(item => keywords.add(item));
+      }
+    }
+    if (keywords.size < 6) {
+      const defaultSkills = ['javascript', 'java', 'python', 'html', 'css', 'c++'];
+      defaultSkills.forEach(item => keywords.add(item));
+    }
+    return keywords;
+  }
+
+  // get UserId
   async _getUser(userEmail) {
     const user = await Users.find(
         { 'credentials.email': userEmail }, '_id'

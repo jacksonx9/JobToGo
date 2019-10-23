@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+
 const jobSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -21,6 +22,12 @@ const jobSchema = new mongoose.Schema({
     },
     required: true,
   },
+  keywords: [
+    {
+      name: String,
+      tfidf: Number,
+    }
+  ],
   postDate: String,
   salary: String,
 },
