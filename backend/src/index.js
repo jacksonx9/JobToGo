@@ -29,7 +29,7 @@ mongoose.connect(MONGO_URL, {
 const shortlister = new JobShortLister(app);
 const messenger = new Messenger(app, shortlister);
 const user = new User(app, messenger);
-const jobSorter = new JobSorter(app, user);
+const jobSorter = new JobSorter(app, user, shortlister);
 new JobSearcher(jobSorter);
 new ResumeParser(app, user);
 // new JobAnalyzer(app, user, shortlister);

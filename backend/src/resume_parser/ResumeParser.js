@@ -24,6 +24,7 @@ class ResumeParser {
     const upload = multer({ storage: storage })
 
     app.post('/users/resume/upload', upload.single('fileData'), async (req, res) => {
+      console.log("Received: " + req.file.filename);
       const userId = req.body.userId;
       try {
         const resumeKeywords = await this.parse(req.file.filename);
@@ -75,6 +76,8 @@ class ResumeParser {
     // Filter out keywords over length 20 and remove duplicates
     const keywords = res.data.annotations.map(ent => ent.spot).filter(word => word.length < 20);
     const uniqueKeywords = [...new Set(keywords)];
+    console.log("Skills from resume: ");
+    console.log(uniqueKeywords);
     return uniqueKeywords;
   }
 };

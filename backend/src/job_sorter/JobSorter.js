@@ -5,8 +5,10 @@ import { JOBS_PER_SEND } from '..';
 
 
 class JobSorter {
-  constructor(app, user) {
+  constructor(app, user, shortlister) {
     this.user = user;
+    this.shortlister = shortlister;
+
     app.get('/jobs/findJobs/:userId', async (req, res) => {
       const result = await this.getRelevantJobs(req.params.userId);
       res.status(result.status).send(result.mostRelevantJobs);
@@ -64,19 +66,28 @@ class JobSorter {
     const userKeywords = user[0].userInfo.skillsExperiences;
     let potentialJobs = new JobSet();
     let mostRelevantJobs = [];
+    const swipedJobs = [];
+
+    swipedJobs.push(...await this.shortlister.getLikedJobs(userID));
+    swipedJobs.push(...await this.shortlister.getDislikedJobs(userID));
 
     if (userKeywords.length === 0) {
       // TODO: Change arbitrary value
-      mostRelevantJobs.push(...await Jobs.find({}).limit(20));
+      mostRelevantJobs.push(...await Jobs.find({ _id: { $nin: swipedJobs } }).limit(JOBS_PER_SEND));
       return {
         mostRelevantJobs,
         status: 200,
       };
     }
 
+    console.log("Starting job retrieval.");
+
     for (const keyword of userKeywords) {
       // adds the most suitable jobs based on keyword to the Set
-      const relevantJobs = await Jobs.find({keywords: { $elemMatch: { name: keyword }}});
+      const relevantJobs = await Jobs.find({
+        keywords: { $elemMatch: { name: keyword }},
+        _id: { $nin: swipedJobs }
+      });
 
       relevantJobs.sort((job1, job2) => {
         const job1_keyword_idx = job1.keywords.findIndex(elem => elem.name === keyword);
@@ -107,6 +118,7 @@ class JobSorter {
       return sum;
     }
 
+    console.log("Getting most relevant jobs.");
     // Get highest overall tfidf scores
     mostRelevantJobs = Array.from(potentialJobs.values())
       .sort((a, b) => {

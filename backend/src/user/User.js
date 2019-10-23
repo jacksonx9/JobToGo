@@ -106,6 +106,12 @@ class User {
 
       const user = await this._getUser(email);
 
+      console.log("Logging in with google: ");
+      console.log("Google ticket: ");
+      console.log(ticket);
+      console.log("Firebase token: ");
+      console.log(firebaseToken);
+
       if (user === null) {
         const newUserRes = await this.createUser({
           credentials: {
