@@ -23,11 +23,12 @@ class JobSorter {
     const skills = await this.user.getAllSkills();
     console.log(skills);
 
-    for (const keyword of skills) {
+    for (const skill of skills) {
       let docCount = 0;
       let wordCount = [];
       let keywordCount = [];
-      const re = new RegExp(keyword, "g");  // TODO: regular expression for C++
+      const keyword = skill.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      const re = new RegExp(keyword, "g");
 
       for (const posting of jobs) {
         let count = (posting.description.toString().match(re) || []).length;

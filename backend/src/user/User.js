@@ -362,7 +362,7 @@ class User {
     // TRY aggregate instead of distinct
     let keywords2 = Users.distinct('userInfo.skillsExperience');
     // if (keywords.length < 6)
-    let keywords = ['javascript', 'java', 'python', 'hmtl', 'css'];
+    let keywords = ['javascript', 'java', 'python', 'hmtl', 'css', 'c++'];
 
     return keywords;
   }
