@@ -360,9 +360,32 @@ class User {
   async getAllSkills() {
     // TODO: don't hard code skills
     // TRY aggregate instead of distinct
-    let keywords2 = Users.distinct('userInfo.skillsExperience');
+    // let arr = [2,5,6];
+    let keywords = new Set([1,2,3]);
+    // const ar = await Users.find({});
+    for (const doc of await Users.find({})) {
+      // console.log(doc.userInfo.skillsExperiences);
+      // console.log(keywords);
+      // doc.userinfo.skillsExperiences.forEach(item => keywords.add(item));
+      // const skills = doc.userInfo.skillsExperiences;
+      const skills = [4,45];
+      if (skills.length > 0){
+        skills.forEach(item => keywords.add(item));
+        // keywords.add(...skills);
+        console.log(skills);
+      }
+      console.log("ran");
+    }
+
+    console.log("\n\n\n\n\n\nran get all skills~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n\n\n\n\n\n\n");
+    console.log(keywords);
+    // console.log("\nbreak\n");
+    // console.log(temp);
+    // console.log("\nend\n");
+
+    // let keywords2 = Users.distinct('userInfo.skillsExperience');
     // if (keywords.length < 6)
-    let keywords = ['javascript', 'java', 'python', 'hmtl', 'css', 'c++'];
+    // let keywords = ['javascript', 'java', 'python', 'hmtl', 'css', 'c++'];
 
     return keywords;
   }
