@@ -6,12 +6,9 @@ import JobSearcher from './job_searcher';
 import User from './user';
 import ResumeParser from './resume_parser';
 import JobAnalyzer from './job_analyzer';
-<<<<<<< HEAD
 import JobShortLister from './job_shortlister';
 import Messenger from './messenger';
-=======
 import JobSorter from './job_sorter';
->>>>>>> 5e7f9ca... tf_idf rough draft
 
 
 const PORT = 8080;
@@ -28,17 +25,12 @@ mongoose.connect(MONGO_URL, {
   useFindAndModify: false,
 }).catch(e => console.log(e));
 
-const user = new User(app);
+const user = new User(app, messenger);
 const jobSorter = new JobSorter(app, user);
-const jobSearcher = new JobSearcher()
-jobSearcher.updateJobStore().then(function() {
-  console.log('starting to compute job scores');
-  jobSorter.computeJobScores().then(function() {
-    console.log('computed job scores');
-  });
-});
-new ResumeParser(app, user);
+new JobSearcher(jobSorter);
 const shortlister = new JobShortLister(app);
+const messenger = new Messenger(app, shortlister);
+new ResumeParser(app, user);
 new JobAnalyzer(app, user, shortlister);
 
 

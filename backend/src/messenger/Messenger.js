@@ -1,13 +1,28 @@
 import admin from 'firebase-admin';
+import nodemailer from 'nodemailer'
 
 import { Users } from '../schema';
 import firebaseCredentials from '../../credentials/firebase';
+import credentials from '../../credentials/google';
 
 class Messenger {
-  constructor() {
+  constructor(app, shortlister) {
+    this.shortlister = shortlister;
+
     admin.initializeApp({
       credential: admin.credential.cert(firebaseCredentials),
       databaseURL: 'https://jobtogo-103fd.firebaseio.com'
+    });
+
+    app.post('/jobs/emailUser/', async (req, res) => {
+      try {
+        const userId = req.body.userId;
+        const result = await this.emailShortlist(userId);
+        res.status(result.status).send(result.success);
+      } catch(e) {
+        console.log(e);
+        res.status(500).send(null);
+      }
     });
   }
 
@@ -35,6 +50,45 @@ class Messenger {
       console.log(e);
       return false;
     }
+  }
+
+  async emailShortlist(userId) {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      auth: {
+        user: credentials.email,
+        pass: credentials.password,
+      }
+    });
+
+    const docs = await Users.find({ _id: userId }, 'credentials.email');
+    const userEmail = docs[0].credentials.email;
+    const userShortlist = await this.shortlister.getLikedJobsData(userId);
+
+    let message = "";
+    for (const posting of userShortlist) {
+      const { title, company, url } = posting;
+      message +=
+      `${title} @ ${company}
+      ${url}\n\n`;
+    }
+
+    await transporter.sendMail({
+        from: `"${credentials.email}" <${credentials.email}>`,
+        to: userEmail,
+        subject: 'Shortlisted jobs',
+        text: message
+    }).catch(e => {
+      console.log(e);
+      return {status: 400, success: false};
+    });
+    return {
+      status: 200,
+      success: true
+    };
   }
 };
 

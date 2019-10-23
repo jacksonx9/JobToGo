@@ -56,6 +56,11 @@ class User {
       res.status(result.status).send(result.friends);
     });
 
+    app.get('/users/getPendingFriends/:userId', async (req, res) => {
+      const result = await this.getPendingFriends(req.params.userId);
+      res.status(result.status).send(result.friends);
+    });
+
     app.get('/users/getSkills/:userId', async (req, res) => {
       const result = await this.getSkills(req.params.userId);
       res.status(result.status).send(result.skills);
@@ -259,7 +264,7 @@ class User {
 
   // Array[userId]
   async getFriends(userId) {
-    const friends = await Users.find({ _id : userId }, 'friends')
+    const friendObjs = await Users.find({ _id : userId }, 'friends')
       .catch(e => {
         console.log(e);
         return {
@@ -267,10 +272,54 @@ class User {
           success: false
         };
       });
+    const friendIds = friendObjs.map(obj => obj.friends);
+
+    const friends = await Users.find({ _id: { $in: friendIds } }, 'credentials.userName')
+      .catch(e => {
+        console.log(e);
+        return {
+          status: 500,
+          success: false
+        };
+      });
+    const friendsNameId = friends.map(friend => ({
+      userName: friend.credentials.userName,
+      _id: friend._id
+    }));
 
     return {
-      status: friends.length === 1 ? 200 : 400,
-      friends: friends.length === 1 ? friends[0] : null
+      status: 200,
+      friends: friendsNameId
+    };
+  }
+
+  async getPendingFriends(userId) {
+    const friendObjs = await Users.find({ _id : userId }, 'pendingFriends')
+      .catch(e => {
+        console.log(e);
+        return {
+          status: 404,
+          success: false
+        };
+      });
+    const friendIds = friendObjs.map(obj => obj.pendingFriends);
+
+    const friends = await Users.find({ _id: { $in: friendIds } }, 'credentials.userName')
+      .catch(e => {
+        console.log(e);
+        return {
+          status: 500,
+          success: false
+        };
+      });
+    const friendsNameId = friends.map(friend => ({
+      userName: friend.credentials.userName,
+      _id: friend._id
+    }));
+
+    return {
+      status: 200,
+      friends: friendsNameId
     };
   }
 
@@ -312,7 +361,6 @@ class User {
     // TODO: don't hard code skills
     // TRY aggregate instead of distinct
     let keywords2 = Users.distinct('userInfo.skillsExperience');
-    console.log(typeof(keywords2));
     // if (keywords.length < 6)
     let keywords = ['javascript', 'java', 'python', 'hmtl', 'css'];
 
