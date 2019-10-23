@@ -1,5 +1,8 @@
 import mongoose from 'mongoose';
 
+const arrayUniquePlugin = require('mongoose-unique-array');
+
+
 const userSchema = new mongoose.Schema({
   credentials: {
     userName: {
@@ -35,36 +38,8 @@ const userSchema = new mongoose.Schema({
       timeStamp: Date,
     }
   ],
-  friends: { // IMPORTANT: Do not initalize this on create
-    type: [
-      {
-        friendId: {
-          type: mongoose.ObjectId,
-          default: '',
-          index: {
-            unique: true,
-            sparse: true
-          }
-        }
-      }
-    ],
-    default: undefined
-  },
-  pendingFriends: { // IMPORTANT: Do not initalize this on create
-    type: [
-      {
-        friendId: { // TODO: duplicates
-          type: mongoose.ObjectId,
-          default: '',
-          index: {
-            unique: true,
-            sparse: true
-          }
-        }
-      }
-    ],
-    default: undefined
-  },
+  friends: [ String ],
+  pendingFriends: [ String ],
   likedJobs: [ String ],
   dislikedJobs: [ String ],
   resumePath: String
@@ -72,6 +47,7 @@ const userSchema = new mongoose.Schema({
 { versionKey: false }
 );
 
+userSchema.plugin(arrayUniquePlugin);
 const Users = mongoose.model('Users', userSchema);
 
 export default Users;
