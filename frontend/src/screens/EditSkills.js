@@ -48,7 +48,7 @@ export default class EditSkills extends Component {
       
       
 
-        alert("Resume Sent for")
+        alert("Resume Sent for analysis")
       }
     });
   }
