@@ -19,8 +19,7 @@
     "mongoose": "^5.7.5",
     "nodemailer": "^6.3.1",
     "pdf-parse": "^1.1.1",
-    "stopword": "^0.3.3",
-    "mongoose-unique-array": "0.3.3"
+    "stopword": "^0.3.3"
   },
   "devDependencies": {
     "babel-cli": "^6.9.0",

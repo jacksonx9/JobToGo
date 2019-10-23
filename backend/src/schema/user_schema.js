@@ -1,7 +1,5 @@
 import mongoose from 'mongoose';
 
-const arrayUniquePlugin = require('mongoose-unique-array');
-
 
 const userSchema = new mongoose.Schema({
   credentials: {
@@ -47,7 +45,6 @@ const userSchema = new mongoose.Schema({
 { versionKey: false }
 );
 
-userSchema.plugin(arrayUniquePlugin);
 const Users = mongoose.model('Users', userSchema);
 
 export default Users;

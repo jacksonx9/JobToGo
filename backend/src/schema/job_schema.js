@@ -18,7 +18,8 @@ const jobSchema = new mongoose.Schema({
     type: String,
     index: {
       unique: true,
-    }
+    },
+    required: true,
   },
   postDate: String,
   salary: String,

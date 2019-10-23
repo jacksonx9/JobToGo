@@ -32,7 +32,7 @@ class JobShortLister {
     try {
       const res = await Users.updateOne(
         { _id: userId },
-        { $push: { likedJobs: jobId }}
+        { $addToSet: { likedJobs: jobId }}
       );
       return res.nModified === 1;
     } catch(e) {
@@ -45,7 +45,7 @@ class JobShortLister {
     try {
       const res = await Users.updateOne(
         { _id: userId },
-        { $push: { dislikedJobs: jobId }}
+        { $addToSet: { dislikedJobs: jobId }}
       );
       return res.nModified === 1;
     } catch(e) {
