@@ -356,14 +356,19 @@ class User {
     };
   }
 
-  // Array[String]
+  /* gets and returns a set containing the collective skills of all the users */
   async getAllSkills() {
-    // TODO: don't hard code skills
-    // TRY aggregate instead of distinct
-    let keywords2 = Users.distinct('userInfo.skillsExperience');
-    // if (keywords.length < 6)
-    let keywords = ['javascript', 'java', 'python', 'hmtl', 'css', 'c++'];
-
+    let keywords = new Set();
+    for (const doc of await Users.find({})) {
+      const skills = doc.userInfo.skillsExperiences;
+      if (skills.length > 0){
+        skills.forEach(item => keywords.add(item));
+      }
+    }
+    if (keywords.length < 6) {
+      const defaultSkills = ['javascript', 'java', 'python', 'html', 'css', 'c++'];
+      defaultSkills.forEach(item => keywords.add(item));
+    }
     return keywords;
   }
 
