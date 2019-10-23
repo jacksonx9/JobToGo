@@ -1,6 +1,4 @@
 import { Users, Jobs } from '../schema';
-import nodemailer from 'nodemailer'
-import credentials from '../../credentials/google';
 
 class JobShortLister {
   constructor(app) {
@@ -26,17 +24,6 @@ class JobShortLister {
       } catch(e) {
         console.log(e);
         res.status(400).send(null);
-      }
-    });
-
-    app.post('/jobs/emailUser/', async (req, res) => {
-      try {
-        const userId = req.body.userId;
-        const result = await this.emailShortlist(userId);
-        res.status(result.status).send(result.success);
-      } catch(e) {
-        console.log(e);
-        res.status(500).send(null);
       }
     });
   }
@@ -104,46 +91,6 @@ class JobShortLister {
 
     return doc.dislikedJobs;
   }
-
-  async emailShortlist(userId) {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
-      auth: {
-        user: credentials.email,
-        pass: credentials.password,
-      }
-    });
-
-    const docs = await Users.find({ _id: userId }, 'credentials.email');
-    const userEmail = docs[0].credentials.email;
-    const userShortlist = await this.getLikedJobsData(userId);
-
-    let message = "";
-    for (const posting of userShortlist) {
-      const { title, company, url } = posting;
-      message +=
-      `${title} @ ${company}
-      ${url}\n\n`;
-    }
-
-    await transporter.sendMail({
-        from: '"info.jobtogo@gmail.com" <info.jobtogo@gmail.com>',
-        to: userEmail,
-        subject: 'Shortlisted jobs',
-        text: message
-    }).catch(e => {
-      console.log(e);
-      return {status: 400, success: false};
-    });
-    return {
-      status: 200,
-      success: true
-    };
-  }
-
 };
 
 export default JobShortLister;
