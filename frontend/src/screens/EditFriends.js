@@ -83,9 +83,35 @@ export default class EditFriends extends Component {
           userFriendRequests: userFriendRequests.data,
           loading: 0
         })
-      
 
     }
+
+    removeFriend = async (item, index) => {
+      //alert(`${item.company}: ${index}`)
+      const userId = this.props.navigation.dangerouslyGetParent().getParam('userId')
+
+      const ret = await axios.delete(serverIp+'/users/removeFriend/', {
+        data: {
+          userId: userId,
+          friendId: item._id
+        }
+      }).catch(e => console.log(e));
+
+      console.log('!!!!!!!!!!!!')
+      console.log(item._id)
+
+      const userFriends = await axios.get(serverIp+'/users/getFriends/'+userId).catch(e => console.log(e));
+      const userFriendRequests = await axios.get(serverIp+'/users/getPendingFriends/'+userId).catch(e => console.log(e));
+        
+      this.setState({
+          userId: this.props.navigation.dangerouslyGetParent().getParam('userId'),
+          userFriends: userFriends.data,
+          userFriendRequests: userFriendRequests.data,
+          loading: 0
+        })
+
+    }
+
 
     render() {
         if (this.state.loading) return <Loader/>
@@ -144,7 +170,7 @@ export default class EditFriends extends Component {
                       key={item._id}
                       header={item.userName}
                       subHeader={item.email}
-                      onPress={() => this.comfirmFriendRequest(item, index)}
+                      onPress={() => this.removeFriend(item, index)}
                       actionIcon='x'
                   />
                   }
