@@ -2,7 +2,6 @@
 
 import React, { Component } from 'react';
 import { View } from 'react-native';
-
 import GestureRecognizer from 'react-native-swipe-gestures';
 import axios from 'axios';
 import { JobImage, JobDetails, Loader, MainHeader } from '../components';
@@ -46,7 +45,16 @@ export default class JobSwipe extends Component {
       jobId: this.state.jobs[this.state.jobIndex]._id
     }).catch(e => console.log(e))
   
-    this.setState({ jobIndex: this.state.jobIndex + 1 })
+    if(this.state.jobs.length == (this.state.jobIndex + 1)) {
+      const jobs = await axios.get(serverIp+'/jobs/findJobs/'+userId).catch(e => console.log(e));
+      this.setState({ loading: 1 })
+      this.setState({
+        jobs: jobs.data, 
+        loading: 0
+      })
+    } else {  
+      this.setState({ jobIndex: this.state.jobIndex + 1 })
+    }
   }
 
   likeJob = async () => {
@@ -55,7 +63,16 @@ export default class JobSwipe extends Component {
       jobId: this.state.jobs[this.state.jobIndex]._id
     }).catch(e => console.log(e))
 
-    this.setState({ jobIndex: this.state.jobIndex + 1 })
+    if(this.state.jobs.length == (this.state.jobIndex + 1)) {
+      const jobs = await axios.get(serverIp+'/jobs/findJobs/'+userId).catch(e => console.log(e));
+      this.setState({ loading: 1 })
+      this.setState({
+        jobs: jobs.data, 
+        loading: 0
+      })
+    } else {  
+      this.setState({ jobIndex: this.state.jobIndex + 1 })
+    }
   }
 
   onPressSignIn = () => {

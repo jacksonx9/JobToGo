@@ -28,7 +28,6 @@ export default class SendLikedJobs extends Component {
           loading: 0
         })
         console.log(likedJobs.data)
-        console.log('~~~~~~~~~mount')
     }
 
     async componentDidUpdate(prevProps, prevState) {
@@ -42,16 +41,21 @@ export default class SendLikedJobs extends Component {
     }
   }
 
-    componentWillUnmount() {
-      console.log('~~~~~~~~~unmount')
-    }
-
     sendLikedJobs = async () => {
       const userId = this.props.navigation.dangerouslyGetParent().getParam('userId')
-      const ret = await axios.post(serverIp+'/jobs/getLikedJobs/',
+      const ret = await axios.post(serverIp+'/jobs/emailUser/',
       {
         userId: userId
       }).catch(e => console.log(e));
+
+      const likedJobs = await axios.get(serverIp+'/jobs/getLikedJobs/'+userId).catch(e => console.log(e));
+      this.setState({
+        likedJobs: likedJobs.data,
+        loading: 0
+      })
+      
+      alert('Sent liked jobs to your email')
+
     }
  
     removeLikedJob = (item, index) => {
@@ -65,7 +69,7 @@ export default class SendLikedJobs extends Component {
             <View style={[styles.containerStyle]}>
                 <NavHeader
                     title='Your Liked Jobs'
-                    image={images.iconSend}
+                    image={images.iconSendAcc}
                     onPressBack={() => this.props.navigation.goBack()}
                     onPressBtn={this.sendLikedJobs}
                 />

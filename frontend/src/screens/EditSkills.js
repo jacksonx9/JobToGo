@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native';
 import  { Button, NavHeader } from '../components';
-import { images, colours, fonts } from '../constants'
+import { images, colours, fonts, serverIp } from '../constants'
 import FilePickerManager from 'react-native-file-picker';
 import axios from 'axios';
 
@@ -21,8 +21,6 @@ export default class EditSkills extends Component {
   }
 
   onPressUpload = () => {
-    console.log('from resume')
-    //console.log(this.props.navigation.state.params.userId)
     FilePickerManager.showFilePicker(null, async (response) => {
       console.log('Response = ', response);
      
@@ -39,9 +37,9 @@ export default class EditSkills extends Component {
           name: response.fileName,
         };
 
-      const res = await axios.post('http://128.189.26.177:8080/users/resume/upload', 
+      const res = await axios.post(serverIp+'/users/resume/upload', 
       {
-        userId: this.props.navigation.state.params.userId,
+        userId: this.props.navigation.dangerouslyGetParent().getParam('userId'),
         authToken: 'secret',
         photo,
         title: 'A beautiful photo!'
@@ -56,7 +54,7 @@ export default class EditSkills extends Component {
         // xhr.open('POST', 'http://10.231.110.76:8080/user/resume/upload');
         // xhr.send(body);
 
-        alert("hi")
+        alert("Resume Sent for analysis")
       }
     });
   }

@@ -36,7 +36,7 @@ export default class EditFriends extends Component {
     }
 
     async componentDidUpdate(prevProps, prevState) {
-      if(JSON.stringify(prevProps) != JSON.stringify(this.props)) {
+      if(prevState != this.state) {
         const userId = this.props.navigation.dangerouslyGetParent().getParam('userId')
         const userFriends = await axios.get(serverIp+'/users/getFriends/'+userId).catch(e => console.log(e));
         const userFriendRequests = await axios.get(serverIp+'/users/getPendingFriends/'+userId).catch(e => console.log(e));
@@ -47,14 +47,10 @@ export default class EditFriends extends Component {
             userFriendRequests: userFriendRequests.data,
             loading: 0
           })
-        
       }
     }
 
     addFriend = async () => {
-      console.log(this.state.userId) 
-      console.log(this.state.addFriendName)
-
       const friend = await axios.get(serverIp+'/users/'+this.state.addFriendName).catch(e => console.log(e));
       console.log(friend.data._id)  
 
@@ -63,12 +59,11 @@ export default class EditFriends extends Component {
         friendId: friend.data._id
       }).catch(e => console.log(e));
 
+      alert('Sent a friend request to ' + this.state.addFriendName)
     }
 
     comfirmFriendRequest = async (item, index) => {
-      //alert(`${item.company}: ${index}`)
       const userId = this.props.navigation.dangerouslyGetParent().getParam('userId')
-
       const ret = await axios.post(serverIp+'/users/confirmFriend/', {
         userId: userId,
         friendId: item._id
@@ -83,22 +78,18 @@ export default class EditFriends extends Component {
           userFriendRequests: userFriendRequests.data,
           loading: 0
         })
-
+      
+      alert('Confirmed friend request from' + item.userName)
     }
 
     removeFriend = async (item, index) => {
-      //alert(`${item.company}: ${index}`)
       const userId = this.props.navigation.dangerouslyGetParent().getParam('userId')
-
       const ret = await axios.delete(serverIp+'/users/removeFriend/', {
         data: {
           userId: userId,
           friendId: item._id
         }
       }).catch(e => console.log(e));
-
-      console.log('!!!!!!!!!!!!')
-      console.log(item._id)
 
       const userFriends = await axios.get(serverIp+'/users/getFriends/'+userId).catch(e => console.log(e));
       const userFriendRequests = await axios.get(serverIp+'/users/getPendingFriends/'+userId).catch(e => console.log(e));
@@ -110,6 +101,7 @@ export default class EditFriends extends Component {
           loading: 0
         })
 
+      alert('Removed ' + item.userName + ' from your friends')
     }
 
 
@@ -199,7 +191,6 @@ const styles = StyleSheet.create({
   dividerStyle: {
     height: 40,
     width: '100%',
-    //backgroundColor: colours.lighterGray,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center'
