@@ -365,7 +365,7 @@ class User {
         skills.forEach(item => keywords.add(item));
       }
     }
-    if (keywords.length < 6) {
+    if (keywords.size < 6) {
       const defaultSkills = ['javascript', 'java', 'python', 'html', 'css', 'c++'];
       defaultSkills.forEach(item => keywords.add(item));
     }
