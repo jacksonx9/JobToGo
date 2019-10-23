@@ -1,4 +1,3 @@
-
 class JobSet {
   constructor() {
       this.map = new Map();
@@ -17,3 +16,5 @@ class JobSet {
       return this.map.delete(job.id.toString());
   }
 }
+
+export default JobSet;

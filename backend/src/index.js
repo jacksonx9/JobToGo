@@ -9,6 +9,7 @@ import JobAnalyzer from './job_analyzer';
 import JobShortLister from './job_shortlister';
 import Messenger from './messenger';
 import JobSorter from './job_sorter';
+// import { TestAPIs } from '../tests';
 
 
 const PORT = 8080;
@@ -32,6 +33,7 @@ const shortlister = new JobShortLister(app);
 const messenger = new Messenger(app, shortlister);
 new ResumeParser(app, user);
 new JobAnalyzer(app, user, shortlister);
+// new TestAPIs(app);
 
 
 app.listen(PORT, () => {
