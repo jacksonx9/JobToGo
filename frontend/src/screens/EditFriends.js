@@ -139,7 +139,7 @@ export default class EditFriends extends Component {
                 <FlatList
                   style
                   data={this.state.userFriendRequests}
-                  keyExtractor={(item) => item.url}
+                  keyExtractor={(item) => item._id}
                   renderItem={({item, index}) =>
                     <SelectableItem
                       key={item._id}
@@ -156,7 +156,7 @@ export default class EditFriends extends Component {
                 <FlatList
                   style
                   data={this.state.userFriends}
-                  keyExtractor={(item) => item.url}
+                  keyExtractor={(item) => item._id}
                   renderItem={({item, index}) =>
                     <SelectableItem
                       key={item._id}
