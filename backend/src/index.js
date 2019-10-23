@@ -15,7 +15,7 @@ import JobSorter from './job_sorter';
 const PORT = 8080;
 const MONGO_URL = 'mongodb://171.0.0.3:27017/JobToGo';
 export const JOBS_PER_SEND = 20;
-export const MIN_JOBS_IN_DB = 50;
+export const MIN_JOBS_IN_DB = 200;
 
 const app = express();
 app.use(bodyParser.json())
@@ -26,13 +26,13 @@ mongoose.connect(MONGO_URL, {
   useFindAndModify: false,
 }).catch(e => console.log(e));
 
+const shortlister = new JobShortLister(app);
+const messenger = new Messenger(app, shortlister);
 const user = new User(app, messenger);
 const jobSorter = new JobSorter(app, user);
 new JobSearcher(jobSorter);
-const shortlister = new JobShortLister(app);
-const messenger = new Messenger(app, shortlister);
 new ResumeParser(app, user);
-new JobAnalyzer(app, user, shortlister);
+// new JobAnalyzer(app, user, shortlister);
 // new TestAPIs(app);
 
 

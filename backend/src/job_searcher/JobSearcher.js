@@ -23,10 +23,13 @@ class JobSearcher {
       return;
     }
 
-    console.log('Less than 100 jobs, searching...');
+    console.log(`Less than ${MIN_JOBS_IN_DB} jobs, searching...`);
 
     // TODO: Change this to not only software
-    const jobs = await this.searchJobs(['software']);
+    const jobs = await this.searchJobs([
+      'software', 'software intern', 'c++', 'java', 'javascript', 'python', 'android', 'react',
+      'node.js'
+    ]);
 
     console.log(`Search complete! Found ${jobs.length} jobs.`);
 
@@ -42,7 +45,7 @@ class JobSearcher {
         query: keyphrase,
         maxAge: '30',
         sort: 'relevance',
-        limit: 100,
+        limit: 30,
       }).catch(e => console.log(e));
 
       // Add description to each result by scraping the webpage

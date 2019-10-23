@@ -2,6 +2,7 @@ import fs from 'fs';
 import pdfparse from 'pdf-parse';
 import stopword from 'stopword';
 import axios from 'axios';
+import multer from 'multer';
 
 import credentials from '../../credentials/dandelion';
 
@@ -11,10 +12,21 @@ const RESUME_PATH = 'mediafiles/resumes/';
 
 class ResumeParser {
   constructor(app, user) {
-    app.post('/users/resume/upload', async (req, res) => {
+    const storage = multer.diskStorage({
+      destination: (req, file, cb) => {
+        cb(null, 'mediafiles/resumes/');
+      },
+      filename: (req, file, cb) => {
+        cb(null, file.originalname);
+      }
+    });
+    
+    const upload = multer({ storage: storage })
+
+    app.post('/users/resume/upload', upload.single('fileData'), async (req, res) => {
       const userId = req.body.userId;
       try {
-        const resumeKeywords = await this.parse('Vicki');
+        const resumeKeywords = await this.parse(req.file.filename);
         const updateStatus = await user.updateUserInfo(userId, {
           skillsExperiences: resumeKeywords
         });
@@ -32,7 +44,7 @@ class ResumeParser {
    * @returns {Array<String>} list of extracted keywords
    */
   async parse(fileName) {
-    const inputPath = RESUME_PATH + fileName + '.pdf';
+    const inputPath = RESUME_PATH + fileName;
     const outputPath = RESUME_PATH + fileName + '.txt';
     const resume = await pdfparse(fs.readFileSync(inputPath));
 
