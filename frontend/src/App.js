@@ -143,7 +143,6 @@ const AuthStack =
 AppContainer = createAppContainer(
   createSwitchNavigator(
     {
-      //AuthLoading: AuthLoadingScreen,
       App: AppStack,
       Auth: AuthStack,
     },

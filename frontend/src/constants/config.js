@@ -1,0 +1,1 @@
+export const serverIp = 'http://3.16.181.181:8080'

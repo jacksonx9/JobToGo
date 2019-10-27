@@ -5,8 +5,7 @@ import { StyleSheet, TouchableOpacity, Image } from 'react-native';
 const ImageButton = ({ source, onPress }) => {
   
   const {
-    containerStyle,
-    imageStyle
+    containerStyle
   } = styles;
 
   return (

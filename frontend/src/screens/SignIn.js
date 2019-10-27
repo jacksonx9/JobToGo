@@ -13,7 +13,7 @@ export default class SignIn extends Component {
     super(props);
     this.state = {
       email: '',
-      password: '',
+      password: ''
     };
   }
 
