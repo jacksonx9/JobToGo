@@ -1,26 +1,32 @@
 import admin from 'firebase-admin';
-import nodemailer from 'nodemailer'
+import nodemailer from 'nodemailer';
+import Logger from 'js-logger';
 
+import JobShortLister from '../job_shortlister';
 import { Users } from '../schema';
 import firebaseCredentials from '../../credentials/firebase';
 import credentials from '../../credentials/google';
 
+const DATABASE_URL = 'https://jobtogo-103fd.firebaseio.com';
+
 class Messenger {
   constructor(app, shortlister) {
+    this.logger = Logger.get(this.constructor.name);
+
     this.shortlister = shortlister;
 
     admin.initializeApp({
       credential: admin.credential.cert(firebaseCredentials),
-      databaseURL: 'https://jobtogo-103fd.firebaseio.com'
+      databaseURL: DATABASE_URL,
     });
 
     app.post('/jobs/emailUser/', async (req, res) => {
       try {
-        const userId = req.body.userId;
+        const { userId } = req.body;
         const result = await this.emailShortlist(userId);
         res.status(result.status).send(result.success);
-      } catch(e) {
-        console.log(e);
+      } catch (e) {
+        this.logger.error(e);
         res.status(500).send(null);
       }
     });
@@ -29,14 +35,14 @@ class Messenger {
   async requestFriend(userId, friendId) {
     try {
       const user = await Users.findById(userId);
-      const userName = user.credentials.userName;
+      const { userName } = user.credentials;
       const friend = await Users.findById(friendId);
 
       const message = {
         token: friend.credentials.firebaseToken,
         notification: {
           title: 'Friend request!',
-          body: `${userName} wants to add you as a friend.`
+          body: `${userName} wants to add you as a friend.`,
         },
         data: {
           friendName: userName,
@@ -44,16 +50,16 @@ class Messenger {
         },
       };
       const messageRes = await admin.messaging().send(message);
-      console.log('Message sent: ' + messageRes);
+      this.logger.info(`Message sent: ${messageRes}`);
       return true;
-    } catch(e) {
-      console.log(e);
+    } catch (e) {
+      this.logger.error(e);
       return false;
     }
   }
 
   async emailShortlist(userId) {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
       port: 465,
@@ -61,35 +67,35 @@ class Messenger {
       auth: {
         user: credentials.email,
         pass: credentials.password,
-      }
+      },
     });
 
     const docs = await Users.find({ _id: userId }, 'credentials.email');
     const userEmail = docs[0].credentials.email;
-    const userShortlist = await this.shortlister.getLikedJobsData(userId);
+    const userShortlist = await JobShortLister.getLikedJobsData(userId);
 
-    let message = "";
-    for (const posting of userShortlist) {
+    let message = '';
+
+    userShortlist.forEach((posting) => {
       const { title, company, url } = posting;
-      message +=
-      `${title} @ ${company}
-      ${url}\n\n`;
-    }
+      message += `${title} @ ${company}
+                  ${url}\n\n`;
+    });
 
     await transporter.sendMail({
-        from: `"${credentials.email}" <${credentials.email}>`,
-        to: userEmail,
-        subject: 'Shortlisted jobs',
-        text: message
-    }).catch(e => {
-      console.log(e);
-      return {status: 400, success: false};
+      from: `"${credentials.email}" <${credentials.email}>`,
+      to: userEmail,
+      subject: 'Shortlisted jobs',
+      text: message,
+    }).catch((e) => {
+      this.logger.error(e);
+      return { status: 400, success: false };
     });
     return {
       status: 200,
-      success: true
+      success: true,
     };
   }
-};
+}
 
 export default Messenger;

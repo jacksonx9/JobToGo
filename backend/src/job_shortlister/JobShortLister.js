@@ -1,28 +1,32 @@
+import Logger from 'js-logger';
+import { forEachAsync } from 'foreachasync';
+import assert from 'assert';
+
 import { Users, Jobs } from '../schema';
 
 class JobShortLister {
   constructor(app) {
+    this.logger = Logger.get(this.constructor.name);
+
     app.post('/jobs/addLikedJobs/', async (req, res) => {
-      const userId = req.body.userId;
-      const jobId = req.body.jobId;
+      const { userId, jobId } = req.body;
       const addRes = await this.addLikedJobs(userId, jobId);
       res.status(addRes ? 200 : 400).send(addRes);
     });
 
     app.post('/jobs/addDislikedJobs/', async (req, res) => {
-      const userId = req.body.userId;
-      const jobId = req.body.jobId;
+      const { userId, jobId } = req.body;
       const addRes = await this.addDislikedJobs(userId, jobId);
       res.status(addRes ? 200 : 400).send(addRes);
     });
 
     app.get('/jobs/getLikedJobs/:userId', async (req, res) => {
       try {
-        const userId = req.params.userId;
-        const jobsData = await this.getLikedJobsData(userId);
+        const { userId } = req.params;
+        const jobsData = await JobShortLister.getLikedJobsData(userId);
         res.status(200).send(jobsData);
-      } catch(e) {
-        console.log(e);
+      } catch (e) {
+        this.logger.error(e);
         res.status(400).send(null);
       }
     });
@@ -32,11 +36,11 @@ class JobShortLister {
     try {
       const res = await Users.updateOne(
         { _id: userId },
-        { $addToSet: { likedJobs: jobId }}
+        { $addToSet: { likedJobs: jobId } },
       );
       return res.nModified === 1;
-    } catch(e) {
-      console.log(e);
+    } catch (e) {
+      this.logger.error(e);
       return false;
     }
   }
@@ -45,52 +49,48 @@ class JobShortLister {
     try {
       const res = await Users.updateOne(
         { _id: userId },
-        { $addToSet: { dislikedJobs: jobId }}
+        { $addToSet: { dislikedJobs: jobId } },
       );
       return res.nModified === 1;
-    } catch(e) {
-      console.log(e);
+    } catch (e) {
+      this.logger.error(e);
       return false;
     }
   }
 
-  async getLikedJobs(userId) {
+  static async getLikedJobs(userId) {
     const doc = await Users.findById(userId);
     if (doc === null) {
-      throw 'Invalid userId';
+      throw new Error('Invalid userId');
     }
-    if (typeof doc.likedJobs === 'undefined') {
-      throw 'Users doc is malformed';
-    }
+    assert(typeof doc.likedJobs !== 'undefined');
 
     return doc.likedJobs;
   }
 
-  async getLikedJobsData(userId) {
-    const jobIds = await this.getLikedJobs(userId);
+  static async getLikedJobsData(userId) {
+    const jobIds = await JobShortLister.getLikedJobs(userId);
     const jobsData = [];
 
-    for (const id of jobIds) {
+    await forEachAsync(jobIds, async (id) => {
       const jobData = await Jobs.findById(id);
       if (jobData) {
         jobsData.push(jobData);
       }
-    }
+    });
 
     return jobsData;
   }
 
-  async getDislikedJobs(userId) {
+  static async getDislikedJobs(userId) {
     const doc = await Users.findById(userId);
     if (doc === null) {
-      throw 'Invalid userId';
+      throw new Error('Invalid userId');
     }
-    if (typeof doc.dislikedJobs === 'undefined') {
-      throw 'Users doc is malformed';
-    }
+    assert(typeof doc.dislikedJobs !== 'undefined');
 
     return doc.dislikedJobs;
   }
-};
+}
 
 export default JobShortLister;

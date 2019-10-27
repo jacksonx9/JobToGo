@@ -131,7 +131,7 @@ class TestAPIs {
       }
     });
 
-    //purely for testing adding to database
+    // purely for testing adding to database
     app.get('/test/jobs/testAddJobs', async (req, res) => {
       await jobSearcher.updateJobs('javascript');
       await jobSearcher.updateJobs('C');

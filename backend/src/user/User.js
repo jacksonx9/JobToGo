@@ -1,21 +1,26 @@
-import { Users } from '../schema';
 import { OAuth2Client } from 'google-auth-library';
+import Logger from 'js-logger';
+import assert from 'assert';
+import { forEachAsync } from 'foreachasync';
+
+import { Users } from '../schema';
 import credentials from '../../credentials/google';
 
 class User {
   constructor(app, messenger) {
+    this.logger = Logger.get(this.constructor.name);
+
     this.googleAuth = new OAuth2Client(credentials.clientID);
     this.messenger = messenger;
 
     app.post('/users/googleLogin/', async (req, res) => {
-      const idToken = req.body.idToken;
-      const firebaseToken = req.body.firebaseToken;
+      const { idToken, firebaseToken } = req.body;
       const loginRes = await this.loginGoogle(idToken, firebaseToken);
       res.status(loginRes.status).send(loginRes.id);
     });
 
     app.post('/users/create', async (req, res) => {
-      const result = await this.createUser(req.body.userData);
+      const result = await User.createUser(req.body.userData);
       res.status(result.status).send(result.id);
     });
 
@@ -27,13 +32,14 @@ class User {
     // param: user that contains the user's id and a json object userInfo
     app.get('/users/update/:user', async (req, res) => {
       await this.updateUserInfo(req.params.user.id, req.params.user.info);
+      res.send(true);
     });
 
     // param: userEmailPassword that contain the user's email and password
     // return: userId if succeeds and -1 otherwise
     app.get('/users/update/:userEmailPassword', async (req, res) => {
       res.send(await this.login(req.params.userEmailPassword.userEmail,
-                                req.params.userEmailPassword.userPassword));
+        req.params.userEmailPassword.userPassword));
     });
 
     app.post('/users/addFriend', async (req, res) => {
@@ -69,20 +75,20 @@ class User {
 
   // IMPORTANT: DO NOT initialize friends and pendingFriends
   // return: userId if succeeds and null otherwise
-  async createUser(query) {
-    const user = await Users.create(query).catch(e => console.log(e));
+  static async createUser(query) {
+    const user = await Users.create(query).catch((e) => this.logger.error(e));
     return {
       id: typeof user === 'undefined' ? null : user._id,
-      status: typeof user === 'undefined' ? 404 : 200
+      status: typeof user === 'undefined' ? 404 : 200,
     };
   }
 
   // check for existing user in database (via email)
   async _userExists(userEmail) {
     const user = await Users.find(
-        { 'credentials.email': userEmail },
-        { _id: 0 }
-    ).catch(e => console.log(e));
+      { 'credentials.email': userEmail },
+      { _id: 0 },
+    ).catch((e) => this.logger.error(e));
     return !user.length;
   }
 
@@ -90,36 +96,37 @@ class User {
   async login(userEmail, userPassword) {
     const userIdObj = await Users.findOne(
       { 'credentials.email': userEmail, 'credentials.password': userPassword },
-      '_id').catch(e => console.log(e));
+      '_id',
+    ).catch((e) => this.logger.error(e));
 
     return userIdObj === null ? -1 : userIdObj._id;
   }
 
-   // return: userId if succeeds and null otherwise
+  // return: userId if succeeds and null otherwise
   async loginGoogle(idToken, firebaseToken) {
     try {
       const ticket = await this.googleAuth.verifyIdToken({
         idToken,
         audience: credentials.clientID,
       });
-      const email = ticket.payload.email;
+      const { email } = ticket.payload;
 
       const user = await this._getUser(email);
 
-      console.log("Logging in with google: ");
-      console.log("Google ticket: ");
-      console.log(ticket);
-      console.log("Firebase token: ");
-      console.log(firebaseToken);
+      this.logger.info('Logging in with google: ');
+      this.logger.info('Google ticket: ');
+      this.logger.info(ticket);
+      this.logger.info('Firebase token: ');
+      this.logger.info(firebaseToken);
 
       if (user === null) {
-        const newUserRes = await this.createUser({
+        const newUserRes = await User.createUser({
           credentials: {
             userName: email,
             email,
             idToken: ticket.payload,
-            firebaseToken: firebaseToken,
-          }
+            firebaseToken,
+          },
         });
         return {
           id: newUserRes.id,
@@ -132,7 +139,7 @@ class User {
         status: 200,
       };
     } catch (e) {
-      console.log(e);
+      this.logger.error(e);
       return {
         id: null,
         status: 400,
@@ -149,8 +156,8 @@ class User {
       await doc.save();
 
       return true;
-    } catch(e) {
-      console.log(e);
+    } catch (e) {
+      this.logger.error(e);
       return false;
     }
   }
@@ -161,17 +168,19 @@ class User {
     const userPresent = typeof await Users.findById(userId) !== 'undefined';
     const friendPresent = typeof await Users.findById(friendId) !== 'undefined';
     const notFriends = await Users.findOne({ _id: friendId, friends: userId }) === null;
-    const notPendingFriends = await Users.findOne({ _id: friendId, pendingFriends: userId }) === null;
+    const notPendingFriends = await Users.findOne({
+      _id: friendId, pendingFriends: userId,
+    }) === null;
 
     if (userPresent && friendPresent && notFriends && notPendingFriends) {
       await Users.updateOne({ _id: friendId },
-        { $addToSet: { 'pendingFriends': userId }})
+        { $addToSet: { pendingFriends: userId } })
         .exec()
-        .catch(e => {
-          console.log(e);
+        .catch((e) => {
+          this.logger.error(e);
           return {
             status: 500,
-            success: false
+            success: false,
           };
         });
 
@@ -179,13 +188,13 @@ class User {
 
       return {
         status: messageRes ? 200 : 500,
-        success: messageRes
+        success: messageRes,
       };
     }
 
     return {
       status: 404,
-      success: false
+      success: false,
     };
   }
 
@@ -196,34 +205,34 @@ class User {
     const areFriends = await Users.findOne({ _id: friendId, friends: userId }) !== null;
 
     if (userPresent && friendPresent && areFriends) {
-      await Users.updateOne( { _id: userId },
-        { $pull: { friends: friendId }})
-        .catch(e => {
-          console.log(e);
+      await Users.updateOne({ _id: userId },
+        { $pull: { friends: friendId } })
+        .catch((e) => {
+          this.logger.error(e);
           return {
             status: 500,
-            success: false
+            success: false,
           };
         });
-      await Users.updateOne( { _id: friendId },
-        { $pull: { friends: userId }})
-        .catch(e => {
-          console.log(e);
+      await Users.updateOne({ _id: friendId },
+        { $pull: { friends: userId } })
+        .catch((e) => {
+          this.logger.error(e);
           return {
             status: 500,
-            success: false
+            success: false,
           };
         });
 
       return {
         status: 200,
-        success: true
+        success: true,
       };
     }
 
     return {
       status: 404,
-      success: false
+      success: false,
     };
   }
 
@@ -232,100 +241,103 @@ class User {
   async confirmFriend(userId, friendId) {
     const userPresent = typeof await Users.findById(userId) !== 'undefined';
     const friendPresent = typeof await Users.findById(friendId) !== 'undefined';
-    const arePendingFriends = await Users.findOne({ _id: userId, pendingFriends: friendId }) !== null;
+    const arePendingFriends = await Users.findOne({
+      _id: userId, pendingFriends: friendId,
+    }) !== null;
 
     if (userPresent && friendPresent && arePendingFriends) {
       await Users.findOneAndUpdate(
         { _id: userId, pendingFriends: friendId },
-        { $pull: { pendingFriends: friendId }, $addToSet: { friends: friendId }})
-        .catch(e => {
-          console.log(e);
+        { $pull: { pendingFriends: friendId }, $addToSet: { friends: friendId } },
+      )
+        .catch((e) => {
+          this.logger.error(e);
           return {
             status: 500,
-            success: false
+            success: false,
           };
         });
 
       await Users.updateOne({ _id: friendId },
-        { $addToSet: { friends: userId }})
-        .catch(e => {
-          console.log(e);
+        { $addToSet: { friends: userId } })
+        .catch((e) => {
+          this.logger.error(e);
           return {
             status: 500,
-            success: false
+            success: false,
           };
         });
 
       return {
         status: 200,
-        success: true
+        success: true,
       };
     }
 
     return {
       status: 404,
-      success: false
-    }
+      success: false,
+    };
   }
 
   // Array[userId]
   async getFriends(userId) {
-    const friendObjs = await Users.find({ _id : userId }, 'friends')
-      .catch(e => {
-        console.log(e);
+    const friendObjs = await Users.find({ _id: userId }, 'friends')
+      .catch((e) => {
+        this.logger.error(e);
         return {
           status: 404,
-          success: false
+          success: false,
         };
       });
-    const friendIds = friendObjs.map(obj => obj.friends);
+    const friendIds = friendObjs.map((obj) => obj.friends);
 
     const friends = await Users.find({ _id: { $in: friendIds } }, 'credentials.userName')
-      .catch(e => {
-        console.log(e);
+      .catch((e) => {
+        this.logger.error(e);
         return {
           status: 500,
-          success: false
+          success: false,
         };
       });
-    const friendsNameId = friends.map(friend => ({
+    const friendsNameId = friends.map((friend) => ({
       userName: friend.credentials.userName,
-      _id: friend._id
+      _id: friend._id,
     }));
 
     return {
       status: 200,
-      friends: friendsNameId
+      friends: friendsNameId,
     };
   }
 
   async getPendingFriends(userId) {
-    const friendObjs = await Users.find({ _id : userId }, 'pendingFriends')
-      .catch(e => {
-        console.log(e);
+    const friendObjs = await Users.find({ _id: userId }, 'pendingFriends')
+      .catch((e) => {
+        this.logger.error(e);
         return {
           status: 404,
-          success: false
+          success: false,
         };
       });
-    const friendIds = friendObjs.map(obj => obj.pendingFriends);
+    const friendIds = friendObjs.map((obj) => obj.pendingFriends);
 
     const friends = await Users.find({ _id: { $in: friendIds } }, 'credentials.userName')
-      .catch(e => {
-        console.log(e);
+      .catch((e) => {
+        this.logger.error(e);
         return {
           status: 500,
-          success: false
+          success: false,
         };
       });
-    const friendsNameId = friends.map(friend => ({
+    const friendsNameId = friends.map((friend) => ({
       userName: friend.credentials.userName,
-      _id: friend._id
+      _id: friend._id,
     }));
 
     return {
       status: 200,
-      friends: friendsNameId
+      friends: friendsNameId,
     };
   }
 
@@ -333,21 +345,20 @@ class User {
   async getSkills(userId) {
     try {
       const doc = await Users.findById(userId);
-      if (typeof doc.userInfo === 'undefined' ||
-          typeof doc.userInfo.skillsExperiences === 'undefined') {
-        throw "UserInfo document is malformed";
-      }
+      assert((typeof doc.userInfo !== 'undefined'
+              && typeof doc.userInfo.skillsExperiences !== 'undefined'));
+
       return doc.userInfo.skillsExperiences;
-    } catch(e) {
-      console.log(e);
+    } catch (e) {
+      this.logger.error(e);
       return [];
     }
   }
 
   async getUser(userName) {
     const user = await Users.find(
-        { 'credentials.userName': userName }
-    ).catch(e => console.log(e));
+      { 'credentials.userName': userName },
+    ).catch((e) => this.logger.error(e));
 
     if (user.length === 0) {
       return {
@@ -363,11 +374,13 @@ class User {
   }
 
   /* gets and returns a set containing the collective skills of all the users */
-  async getAllSkills() {
+  static async getAllSkills() {
     const keywords = [];
-    for (const doc of await Users.find({})) {
-      keywords.push(...doc.userInfo.skillsExperiences);
-    }
+    const users = await Users.find({});
+
+    await forEachAsync(users, async (user) => {
+      keywords.push(...user.userInfo.skillsExperiences);
+    });
 
     return keywords;
   }
@@ -375,11 +388,11 @@ class User {
   // get UserId
   async _getUser(userEmail) {
     const user = await Users.find(
-        { 'credentials.email': userEmail }, '_id'
-    ).catch(e => console.log(e));
+      { 'credentials.email': userEmail }, '_id',
+    ).catch((e) => this.logger.error(e));
 
     return user.length > 0 ? user[0] : null;
   }
-};
+}
 
 export default User;
