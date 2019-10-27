@@ -37,8 +37,9 @@ class JobSorter {
       let jobsLen = jobs.length;
       // calculate tf_idf each doc and save it
       for (const doc of jobs) {
-        let tf = keywordCount[postingIdx] / wordCount[postingIdx];
-        let idf = docCount != 0 ? Math.log(jobsLen / docCount) : 0;
+        const tf = keywordCount[postingIdx] / wordCount[postingIdx];
+        const idf = docCount != 0 ? Math.log(jobsLen / docCount) : 0;
+        const tf_idf = tf * idf;
 
         // add name and tf_idf score to each job's keywords the first time
         // replace tf_idf score for a keyword for each job
@@ -46,10 +47,10 @@ class JobSorter {
         if (keyword_idx === -1) {
           doc.keywords.push({
             name: keyword,
-            tfidf: tf*idf
+            tfidf: tf_idf
           });
         } else {
-          doc.keywords[keyword_idx].tfidf = tf*idf;
+          doc.keywords[keyword_idx].tfidf = tf_idf;
         }
 
         await doc.save();
@@ -90,6 +91,7 @@ class JobSorter {
           if (userKeywords.includes(keyword.name))
             sum += keyword.tfidf;
         }
+        jobScoreCache.set(job.id, sum);
       }
 
       return sum;
