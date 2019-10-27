@@ -364,7 +364,7 @@ class User {
 
   /* gets and returns a set containing the collective skills of all the users */
   async getAllSkills() {
-    let keywords = [];
+    const keywords = [];
     for (const doc of await Users.find({})) {
       keywords.push(...doc.userInfo.skillsExperiences);
     }
