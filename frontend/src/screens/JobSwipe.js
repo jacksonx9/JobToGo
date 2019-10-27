@@ -25,8 +25,8 @@ export default class JobSwipe extends Component {
   }
 
   async componentDidMount() {
-    const userId = this.props.navigation.dangerouslyGetParent().getParam('userId')
-    console.log(userId)
+    const userId = global.userId
+    console.log(global.userId)
     const jobs = await axios.get(serverIp+'/jobs/findJobs/'+userId).catch(e => console.log(e));
 
     this.setState({
@@ -41,7 +41,7 @@ export default class JobSwipe extends Component {
 
   dislikeJob = async () => {
     await axios.post(serverIp+'/jobs/addDislikedJobs/', {
-      userId: this.props.navigation.dangerouslyGetParent().getParam('userId'),
+      userId: global.userId,
       jobId: this.state.jobs[this.state.jobIndex]._id
     }).catch(e => console.log(e))
   
@@ -59,7 +59,7 @@ export default class JobSwipe extends Component {
 
   likeJob = async () => {
     await axios.post(serverIp+'/jobs/addLikedJobs/', {
-      userId: this.props.navigation.dangerouslyGetParent().getParam('userId'),
+      userId: global.userId,
       jobId: this.state.jobs[this.state.jobIndex]._id
     }).catch(e => console.log(e))
 
@@ -92,7 +92,7 @@ export default class JobSwipe extends Component {
         <MainHeader 
           nav={this.props.navigation}
           onPressMenu={() => this.props.navigation.openDrawer()}
-          onPressSend={() => this.props.navigation.navigate('SendLikedJobs', {userId: this.props.navigation.dangerouslyGetParent().getParam('userId')})}
+          onPressSend={() => this.props.navigation.navigate('SendLikedJobs')}
         />
         <GestureRecognizer
           onSwipeUp={this.shareJob}

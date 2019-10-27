@@ -23,12 +23,12 @@ export default class EditFriends extends Component {
     }
     
     async componentDidMount() {
-      const userId = this.props.navigation.dangerouslyGetParent().getParam('userId')
+      const userId = global.userId
       const userFriends = await axios.get(serverIp+'/users/getFriends/'+userId).catch(e => console.log(e));
       const userFriendRequests = await axios.get(serverIp+'/users/getPendingFriends/'+userId).catch(e => console.log(e));
         
       this.setState({
-          userId: this.props.navigation.dangerouslyGetParent().getParam('userId'),
+          userId: global.userId,
           userFriends: userFriends.data,
           userFriendRequests: userFriendRequests.data,
           loading: 0
@@ -37,12 +37,12 @@ export default class EditFriends extends Component {
 
     async componentDidUpdate(prevProps, prevState) {
       if(prevState != this.state) {
-        const userId = this.props.navigation.dangerouslyGetParent().getParam('userId')
+        const userId = global.userId
         const userFriends = await axios.get(serverIp+'/users/getFriends/'+userId).catch(e => console.log(e));
         const userFriendRequests = await axios.get(serverIp+'/users/getPendingFriends/'+userId).catch(e => console.log(e));
           
         this.setState({
-            userId: this.props.navigation.dangerouslyGetParent().getParam('userId'),
+            userId: global.userId,
             userFriends: userFriends.data,
             userFriendRequests: userFriendRequests.data,
             loading: 0
@@ -63,7 +63,7 @@ export default class EditFriends extends Component {
     }
 
     comfirmFriendRequest = async (item, index) => {
-      const userId = this.props.navigation.dangerouslyGetParent().getParam('userId')
+      const userId = global.userId
       const ret = await axios.post(serverIp+'/users/confirmFriend/', {
         userId: userId,
         friendId: item._id
@@ -73,7 +73,7 @@ export default class EditFriends extends Component {
       const userFriendRequests = await axios.get(serverIp+'/users/getPendingFriends/'+userId).catch(e => console.log(e));
         
       this.setState({
-          userId: this.props.navigation.dangerouslyGetParent().getParam('userId'),
+          userId: global.userId,
           userFriends: userFriends.data,
           userFriendRequests: userFriendRequests.data,
           loading: 0
@@ -83,7 +83,7 @@ export default class EditFriends extends Component {
     }
 
     removeFriend = async (item, index) => {
-      const userId = this.props.navigation.dangerouslyGetParent().getParam('userId')
+      const userId = global.userId
       const ret = await axios.delete(serverIp+'/users/removeFriend/', {
         data: {
           userId: userId,
@@ -95,7 +95,7 @@ export default class EditFriends extends Component {
       const userFriendRequests = await axios.get(serverIp+'/users/getPendingFriends/'+userId).catch(e => console.log(e));
         
       this.setState({
-          userId: this.props.navigation.dangerouslyGetParent().getParam('userId'),
+          userId: global.userId,
           userFriends: userFriends.data,
           userFriendRequests: userFriendRequests.data,
           loading: 0

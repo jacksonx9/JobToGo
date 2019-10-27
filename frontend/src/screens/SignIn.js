@@ -5,7 +5,6 @@ import { images, colours, fonts, serverIp } from '../constants'
 import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 import axios from 'axios';
 
-
 export default class SignIn extends Component {
   
   constructor(props) {
@@ -22,7 +21,8 @@ export default class SignIn extends Component {
   }
 
   onPressSignIn = async () => {
-    this.props.navigation.navigate('App', { userId: 'usddf' })
+    global.userId = 'debug_userId'
+    this.props.navigation.navigate('App')
   }
 
   onPressGoogleSignIn = async () => {
@@ -34,7 +34,7 @@ export default class SignIn extends Component {
       await GoogleSignin.hasPlayServices()
       const userInfo = await GoogleSignin.signIn()
 
-      const firebaseToken = this.props.navigation.dangerouslyGetParent().getScreenProps()
+      const firebaseToken = global.firebaseToken
       console.log(firebaseToken)
       const ret = await axios.post(serverIp+'/users/googleLogin/', 
           {idToken: userInfo.idToken,
@@ -43,8 +43,9 @@ export default class SignIn extends Component {
         )
     
       const userId = ret.data
+      global.userId = userId
 
-      this.props.navigation.navigate({routeName: 'App', params: { userId: userId }})
+      this.props.navigation.navigate('App')
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         console.log('sign in cancelled')

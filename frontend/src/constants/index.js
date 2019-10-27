@@ -26,7 +26,7 @@ const colours = {
 }; 
 
 const serverIp = 'http://3.16.169.130:8080'
-//const serverIp = 'http://128.189.27.79:8080'
+//const serverIp = 'http://128.189.26.35:8080'
 
 const fonts = {
   normal: 'sans-serif',

@@ -32,7 +32,7 @@ export default class EditSkills extends Component {
       }
       else {
         const data = new FormData();
-        data.append('userId', this.props.navigation.dangerouslyGetParent().getParam('userId'));
+        data.append('userId', global.userId);
         data.append('fileData', {
           uri : response.uri,
           type: response.type,

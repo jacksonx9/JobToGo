@@ -28,7 +28,7 @@ class JobDetails extends Component {
                     <View style={[styles.modalContainerStyle]}>
                         <ImageButton
                             source={images.iconChevronDown}
-                            onPress={() => {
+                            onPress={() => { 
                                 this.setModalVisible(false);
                             }}
                         />

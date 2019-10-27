@@ -21,7 +21,7 @@ export default class SendLikedJobs extends Component {
       }
 
     async componentDidMount() {
-        const userId = this.props.navigation.dangerouslyGetParent().getParam('userId')
+        const userId = global.userId
         const likedJobs = await axios.get(serverIp+'/jobs/getLikedJobs/'+userId).catch(e => console.log(e));
         this.setState({
           likedJobs: likedJobs.data,
@@ -32,7 +32,7 @@ export default class SendLikedJobs extends Component {
 
     async componentDidUpdate(prevProps, prevState) {
       if(prevProps != this.props) {
-        const userId = this.props.navigation.dangerouslyGetParent().getParam('userId')
+        const userId = global.userId
         const likedJobs = await axios.get(serverIp+'/jobs/getLikedJobs/'+userId).catch(e => console.log(e));
         this.setState({
           likedJobs: likedJobs.data,
@@ -42,7 +42,7 @@ export default class SendLikedJobs extends Component {
   }
 
     sendLikedJobs = async () => {
-      const userId = this.props.navigation.dangerouslyGetParent().getParam('userId')
+      const userId = global.userId
       const ret = await axios.post(serverIp+'/jobs/emailUser/',
       {
         userId: userId
@@ -53,7 +53,7 @@ export default class SendLikedJobs extends Component {
         likedJobs: likedJobs.data,
         loading: 0
       })
-      
+
       alert('Sent liked jobs to your email')
 
     }

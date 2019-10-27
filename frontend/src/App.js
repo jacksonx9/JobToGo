@@ -27,12 +27,12 @@ export default class App extends React.Component {
   async componentDidMount() {
     if (Platform.OS === 'android') {
       try {
-        console.log("!!!!!!!")
         const res = await firebase.messaging().requestPermission();
         const fcmToken = await firebase.messaging().getToken();
         if (fcmToken) {
           console.log('FCM Token: ', fcmToken);
           this.setState({firebaseToken: fcmToken});
+          global.firebaseToken = fcmToken
           const enabled = await firebase.messaging().hasPermission();
           if (enabled) {
             console.log('FCM messaging has permission:' + enabled)
@@ -108,7 +108,6 @@ export default class App extends React.Component {
     console.disableYellowBox = true; 
     return <AppContainer 
       styles={styles.containerStyle} 
-      screenProps={{ firebaseToken: this.state.firebaseToken }}
       />;
   } 
 }
