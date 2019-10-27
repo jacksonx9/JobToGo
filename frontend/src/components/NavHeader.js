@@ -1,7 +1,9 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
+
 import { ImageButton } from '../components'
 import { images, fonts, colours } from '../constants'
+
 
 const NavHeader = ({ title, image, onPressBack, onPressBtn, enableBtn=true }) => {
     const {

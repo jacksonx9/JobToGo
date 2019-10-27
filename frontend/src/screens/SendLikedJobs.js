@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import { View, FlatList, TouchableOpacity, Text, TextInput, Image, StyleSheet, TouchableWithoutFeedback } from 'react-native';
-import { Button, SelectableItem, Loader, NavHeader } from '../components';
-import { images, colours, fonts, serverIp } from '../constants'
+import { View, FlatList, StyleSheet} from 'react-native';
 import axios from 'axios';
+
+import { SelectableItem, Loader, NavHeader } from '../components';
+import { images, colours, fonts, serverIp } from '../constants'
+
 
 export default class SendLikedJobs extends Component {
 

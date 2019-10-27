@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, Image, View } from 'react-native';
+
 import { images, colours } from '../constants'
 
 const Loader = () => {

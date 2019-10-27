@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native';
 import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 import axios from 'axios';
+
 import { Button } from '../components';
 import { images, colours, fonts, serverIp } from '../constants'
+
 
 export default class SignIn extends Component {
 

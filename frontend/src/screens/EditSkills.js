@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native';
-import { Button, NavHeader } from '../components';
-import { images, colours, fonts, serverIp } from '../constants'
+import { View, StyleSheet } from 'react-native';
 import FilePickerManager from 'react-native-file-picker';
 import axios from 'axios';
+
+import { Button, NavHeader } from '../components';
+import { images, colours, fonts, serverIp } from '../constants'
+
 
 export default class EditSkills extends Component {
 

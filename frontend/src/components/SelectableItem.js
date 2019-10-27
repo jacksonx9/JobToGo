@@ -1,6 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
+
 import { fonts, images, colours } from '../constants'
+
 
 const SelectableItem = ({ header, subHeader, onPress, actionIcon }) => {
 

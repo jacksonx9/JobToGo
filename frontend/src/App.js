@@ -1,9 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import Animated from 'react-native-reanimated';
 import { createDrawerNavigator } from 'react-navigation-drawer';
+import firebase from 'react-native-firebase';
 
 import SignIn from './screens/SignIn';
 import SignUp from './screens/SignUp';
@@ -11,8 +12,6 @@ import JobSwipe from './screens/JobSwipe';
 import SendLikedJobs from './screens/SendLikedJobs';
 import EditFriends from './screens/EditFriends';
 import EditSkills from './screens/EditSkills';
-
-import firebase from 'react-native-firebase';
 
 
 export default class App extends React.Component {
