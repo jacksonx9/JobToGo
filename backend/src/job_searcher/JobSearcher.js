@@ -6,10 +6,10 @@ import { Jobs } from '../schema';
 import { MIN_JOBS_IN_DB } from '..';
 
 class JobSearcher {
-  constructor(jobSorter) {
+  constructor(jobAnalyzer) {
     this.updateJobStore().then(() => {
       console.log('Starting to compute job scores...');
-      jobSorter.computeJobScores().then(() => {
+      jobAnalyzer.computeJobScores().then(() => {
         console.log('Computed job scores!');
       });
     });

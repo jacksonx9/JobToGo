@@ -5,11 +5,9 @@ import bodyParser from 'body-parser';
 import JobSearcher from './job_searcher';
 import User from './user';
 import ResumeParser from './resume_parser';
-import JobAnalyzer from './job_analyzer';
 import JobShortLister from './job_shortlister';
 import Messenger from './messenger';
-import JobSorter from './job_sorter';
-// import { TestAPIs } from '../tests';
+import JobAnalyzer from './job_analyzer';
 
 
 const PORT = 8080;
@@ -29,11 +27,9 @@ mongoose.connect(MONGO_URL, {
 const shortlister = new JobShortLister(app);
 const messenger = new Messenger(app, shortlister);
 const user = new User(app, messenger);
-const jobSorter = new JobSorter(app, user, shortlister);
-new JobSearcher(jobSorter);
+const jobAnalyzer = new JobAnalyzer(app, user, shortlister);
+new JobSearcher(jobAnalyzer);
 new ResumeParser(app, user);
-// new JobAnalyzer(app, user, shortlister);
-// new TestAPIs(app);
 
 
 app.listen(PORT, () => {
