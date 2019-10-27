@@ -25,7 +25,7 @@ export default class App extends React.Component {
   async componentDidMount() {
     if (Platform.OS === 'android') {
       try {
-        const res = await firebase.messaging().requestPermission()
+        await firebase.messaging().requestPermission()
         const fcmToken = await firebase.messaging().getToken()
         if (fcmToken) {
           console.log('FCM Token: ', fcmToken)
