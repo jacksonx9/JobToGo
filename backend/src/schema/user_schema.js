@@ -12,13 +12,13 @@ const userSchema = new mongoose.Schema({
       required: true,
       index: {
         unique: true,
-      }
+      },
     },
     password: {
       type: String,
     },
     idToken: Object,
-    firebaseToken: String
+    firebaseToken: String,
   },
   userInfo: {
     location: String,
@@ -27,23 +27,22 @@ const userSchema = new mongoose.Schema({
       enum: ['full-time', 'part-time', 'internship', 'unspecified'],
       default: 'unspecified',
     },
-    skillsExperiences: [ String ],
+    skillsExperiences: [String],
   },
   keywords: [
     {
       score: Number,
       jobCount: Number,
       timeStamp: Date,
-    }
+    },
   ],
-  friends: [ String ],
-  pendingFriends: [ String ],
-  likedJobs: [ String ],
-  dislikedJobs: [ String ],
-  resumePath: String
+  friends: [String],
+  pendingFriends: [String],
+  likedJobs: [String],
+  dislikedJobs: [String],
+  resumePath: String,
 },
-{ versionKey: false }
-);
+{ versionKey: false });
 
 const Users = mongoose.model('Users', userSchema);
 

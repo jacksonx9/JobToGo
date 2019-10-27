@@ -2,6 +2,7 @@ import indeed from 'indeed-scraper';
 import axios from 'axios';
 import cheerio from 'cheerio';
 import Logger from 'js-logger';
+import { forEachAsync } from 'foreachasync';
 
 import { Jobs } from '../schema';
 
@@ -13,9 +14,9 @@ class JobSearcher {
 
     this.updateJobStore().then(() => {
       jobAnalyzer.computeJobScores()
-      .then({})
-      .catch(e => this.logger.error(e));
-    }).catch(e => this.logger.error(e));
+        .then({})
+        .catch((e) => this.logger.error(e));
+    }).catch((e) => this.logger.error(e));
   }
 
   async updateJobStore() {
@@ -31,39 +32,38 @@ class JobSearcher {
     // TODO: Change this to not only software
     const jobs = await this.searchJobs([
       'software', 'software intern', 'c++', 'java', 'javascript', 'python', 'android', 'react',
-      'node.js'
+      'node.js',
     ]);
 
     this.logger.info(`Search complete! Found ${jobs.length} jobs.`);
 
-    await this.addToJobStore(jobs).catch(e => this.logger.error(e));
+    await this.addToJobStore(jobs).catch((e) => this.logger.error(e));
   }
 
   async searchJobs(keyphrases) {
-    let jobs = [];
+    const jobs = [];
 
-    for (const keyphrase of keyphrases) {
+    await forEachAsync(keyphrases, async (keyphrase) => {
       // TODO: change these hardcoded params
       const results = await indeed.query({
         query: keyphrase,
         maxAge: '30',
         sort: 'relevance',
         limit: 30,
-      }).catch(e => this.logger.error(e));
+      }).catch((e) => this.logger.error(e));
 
       // Add description to each result by scraping the webpage
-      for (let result of results) {
-        const jobPage = await axios.get(result.url).catch(e => this.logger.error(e));
+      await forEachAsync(results, async (result, i) => {
+        const jobPage = await axios.get(result.url).catch((e) => this.logger.error(e));
         const $ = cheerio.load(jobPage.data);
-        result.description = $('#jobDescriptionText').text();
-        result.url = $('#indeed-share-url').attr('content');
-      }
+        results[i].description = $('#jobDescriptionText').text();
+        results[i].url = $('#indeed-share-url').attr('content');
+      });
 
-      const filteredResults = results.filter(res =>
-        typeof res.description === 'string' && res.description.length > 0);
+      const filteredResults = results.filter((res) => typeof res.description === 'string' && res.description.length > 0);
 
       jobs.push(...filteredResults);
-    }
+    });
 
     return jobs;
   }
@@ -71,17 +71,13 @@ class JobSearcher {
   async addToJobStore(jobs) {
     await Jobs.insertMany(jobs, {
       ordered: false,
-    }).catch(e => {
+    }).catch((e) => {
       // Ignore duplicate entry error
       if (e.code !== 11000) {
         this.logger.error(e.errmsg);
       }
     });
   }
-
-  async removeOutdatedJobs() {
-
-  }
-};
+}
 
 export default JobSearcher;

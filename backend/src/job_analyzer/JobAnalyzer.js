@@ -1,15 +1,17 @@
 import Logger from 'js-logger';
+import { forEachAsync } from 'foreachasync';
 
+import User from '../user';
+import JobShortLister from '../job_shortlister';
 import { Jobs, Users } from '../schema';
 import { JOBS_PER_SEND } from '../constants';
 
 
 class JobAnalyzer {
-  constructor(app, user, shortlister) {
+  constructor(app, user) {
     this.logger = Logger.get(this.constructor.name);
 
     this.user = user;
-    this.shortlister = shortlister;
 
     app.get('/jobs/findJobs/:userId', async (req, res) => {
       const result = await this.getRelevantJobs(req.params.userId);
@@ -21,48 +23,48 @@ class JobAnalyzer {
     this.logger.info('Starting to compute job scores...');
 
     const jobs = await Jobs.find({});
-    const skills = await this.user.getAllSkills();
+    const skills = await User.getAllSkills();
 
-    for (const skill of skills) {
+    await forEachAsync(skills, async (skill) => {
       let docCount = 0;
-      let wordCount = [];
-      let keywordCount = [];
-      const keyword = skill.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-      const re = new RegExp(keyword, "g");
+      const wordCount = [];
+      const keywordCount = [];
+      const keyword = skill.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+      const re = new RegExp(keyword, 'g');
 
-      for (const posting of jobs) {
-        let count = (posting.description.toString().match(re) || []).length;
+      jobs.forEach((posting) => {
+        const count = (posting.description.toString().match(re) || []).length;
         wordCount.push(posting.description.split(' ').length);
         keywordCount.push(count);
         if (count > 0) {
-            docCount++;
+          docCount += 1;
         }
-      }
+      });
 
       let postingIdx = 0;
-      let jobsLen = jobs.length;
+      const jobsLen = jobs.length;
       // calculate tf_idf each doc and save it
-      for (const doc of jobs) {
+      await forEachAsync(jobs, async (job, i) => {
         const tf = keywordCount[postingIdx] / wordCount[postingIdx];
-        const idf = docCount != 0 ? Math.log(jobsLen / docCount) : 0;
-        const tf_idf = tf * idf;
+        const idf = docCount !== 0 ? Math.log(jobsLen / docCount) : 0;
+        const tfidf = tf * idf;
 
         // add name and tf_idf score to each job's keywords the first time
         // replace tf_idf score for a keyword for each job
-        const keyword_idx = doc.keywords.findIndex(elem => elem.name === keyword);
-        if (keyword_idx === -1) {
-          doc.keywords.push({
+        const keywordIdx = job.keywords.findIndex((elem) => elem.name === keyword);
+        if (keywordIdx === -1) {
+          job.keywords.push({
             name: keyword,
-            tfidf: tf_idf
+            tfidf,
           });
         } else {
-          doc.keywords[keyword_idx].tfidf = tf_idf;
+          jobs[i].keywords[keywordIdx].tfidf = tfidf;
         }
 
-        await doc.save();
-        postingIdx++;
-      }
-    }
+        await job.save();
+        postingIdx += 1;
+      });
+    });
 
     this.logger.info('Computed job scores!');
   }
@@ -75,8 +77,8 @@ class JobAnalyzer {
     const userKeywords = user.userInfo.skillsExperiences;
 
     // Get jobs the user has already seen
-    swipedJobs.push(...await this.shortlister.getLikedJobs(userID));
-    swipedJobs.push(...await this.shortlister.getDislikedJobs(userID));
+    swipedJobs.push(...await JobShortLister.getLikedJobs(userID));
+    swipedJobs.push(...await JobShortLister.getDislikedJobs(userID));
     const unseenJobs = await Jobs.find({ _id: { $nin: swipedJobs } });
 
     // If the user has not uploaded a resume
@@ -88,7 +90,7 @@ class JobAnalyzer {
       };
     }
 
-    this.logger.info("Starting job retrieval.");
+    this.logger.info('Starting job retrieval.');
     // Compute overall tf_idf score of a job
     const jobScore = (job) => {
       let sum = 0;
@@ -96,27 +98,30 @@ class JobAnalyzer {
       if (jobScoreCache.has(job.id)) {
         sum = jobScoreCache.get(job.id);
       } else {
-        for (const keyword of job.keywords) {
-          if (userKeywords.includes(keyword.name))
+        job.keywords.forEach((keyword) => {
+          if (userKeywords.includes(keyword.name)) {
             sum += keyword.tfidf;
-        }
+          }
+        });
         jobScoreCache.set(job.id, sum);
       }
 
       return sum;
-    }
+    };
 
-    this.logger.info("Getting most relevant jobs.");
+    this.logger.info('Getting most relevant jobs.');
     // Get jobs with overall highest tfidf scores
     mostRelevantJobs.push(...unseenJobs
-      .sort((job_a, job_b) => {
-        const job_a_score = jobScore(job_a);
-        const job_b_score = jobScore(job_b);
+      .sort((jobA, jobB) => {
+        const jobAScore = jobScore(jobA);
+        const jobBScore = jobScore(jobB);
 
-        if (job_a_score > job_b_score)
+        if (jobAScore > jobBScore) {
           return 1;
-        else if (job_b_score < job_a_score)
+        }
+        if (jobBScore < jobAScore) {
           return -1;
+        }
 
         return 0;
       }).slice(0, JOBS_PER_SEND));

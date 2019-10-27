@@ -18,18 +18,18 @@ Logger.useDefaults();
 const logger = Logger.get('Main');
 
 const app = express();
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 
 mongoose.connect(MONGO_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false,
-}).catch(e => logger.error(e));
+}).catch((e) => logger.error(e));
 
 const shortlister = new JobShortLister(app);
 const messenger = new Messenger(app, shortlister);
 const user = new User(app, messenger);
-const jobAnalyzer = new JobAnalyzer(app, user, shortlister);
+const jobAnalyzer = new JobAnalyzer(app, user);
 new JobSearcher(jobAnalyzer);
 new ResumeParser(app, user);
 
