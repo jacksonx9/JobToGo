@@ -1,4 +1,3 @@
-
 const images = {
   logoLight: require('../../assets/logo-light.png'),
   logoDark: require('../../assets/logo-dark.png'),
@@ -25,7 +24,7 @@ const colours = {
   lighterGray: '#ededed'
 }; 
 
-const serverIp = 'http://3.16.169.130:8080'
+const serverIp = 'http://3.16.181.181:8080'
 //const serverIp = 'http://128.189.26.35:8080'
 
 const fonts = {

@@ -73,7 +73,7 @@ export default class SignUp extends Component {
           />
           <TouchableOpacity
             style={[styles.linkStyle]}
-            onPress={this.togglePasswordView.bind(this)}
+            onPress={this.togglePasswordView}
           >
             <Text style={[styles.textStyle]}>{this.state.showPasswordText}</Text>
           </TouchableOpacity>
@@ -85,7 +85,7 @@ export default class SignUp extends Component {
             textColor={colours.blue}
             backgroundColor='white'
             style={[styles.buttonStyle]}
-            onPress={this.onPressSignIn.bind(this)}
+            onPress={this.onPressSignIn}
           />
         </View>
       </View>

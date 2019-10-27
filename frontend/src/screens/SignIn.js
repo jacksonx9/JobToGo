@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native';
-import { Button } from '../components';
-import { images, colours, fonts, serverIp } from '../constants'
 import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 import axios from 'axios';
+import { Button } from '../components';
+import { images, colours, fonts, serverIp } from '../constants'
 
 export default class SignIn extends Component {
 
@@ -12,11 +12,6 @@ export default class SignIn extends Component {
     this.state = {
       email: '',
       password: '',
-      isAuthenticated: false,
-      user: null,
-      token: '',
-      userInfo: []
-
     };
   }
 
@@ -35,7 +30,8 @@ export default class SignIn extends Component {
       const userInfo = await GoogleSignin.signIn()
 
       const firebaseToken = global.firebaseToken
-      console.log(firebaseToken)
+      console.log('Firebase token: ' + global.firebaseToken)
+
       const ret = await axios.post(serverIp + '/users/googleLogin/',
         {
           idToken: userInfo.idToken,
@@ -43,17 +39,16 @@ export default class SignIn extends Component {
         }
       )
 
-      const userId = ret.data
-      global.userId = userId
-
+      global.userId = ret.data
       this.props.navigation.navigate('App')
+
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        console.log('sign in cancelled')
+        console.log('Google sign in cancelled')
       } else if (error.code === statusCodes.IN_PROGRESS) {
-        console.log('in progress already')
+        console.log('Google sign in in progress already')
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        console.log('play service not available')
+        console.log('Googlep Play service not available')
       } else {
         console.log(error)
       }
@@ -92,7 +87,7 @@ export default class SignIn extends Component {
             textColor={colours.blue}
             backgroundColor='white'
             style={[styles.buttonStyle]}
-            onPress={this.onPressSignIn.bind(this)}
+            onPress={this.onPressSignIn}
           />
           <View style={[styles.linkStyle]}>
             <Text style={[styles.textStyle]}>or</Text>
@@ -102,7 +97,7 @@ export default class SignIn extends Component {
             style={[styles.buttonStyle]}
             size={GoogleSigninButton.Size.Wide}
             color={GoogleSigninButton.Color.Light}
-            onPress={this.onPressGoogleSignIn.bind(this)}
+            onPress={this.onPressGoogleSignIn}
             disabled={false} />
 
           <TouchableOpacity
