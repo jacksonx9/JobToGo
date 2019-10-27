@@ -1,18 +1,21 @@
 import indeed from 'indeed-scraper';
 import axios from 'axios';
 import cheerio from 'cheerio';
+import Logger from 'js-logger';
+
 import { Jobs } from '../schema';
 
 import { MIN_JOBS_IN_DB } from '..';
 
 class JobSearcher {
   constructor(jobAnalyzer) {
+    this.logger = Logger.get(this.constructor.name);
+
     this.updateJobStore().then(() => {
-      console.log('Starting to compute job scores...');
-      jobAnalyzer.computeJobScores().then(() => {
-        console.log('Computed job scores!');
-      });
-    });
+      jobAnalyzer.computeJobScores()
+      .then({})
+      .catch(e => this.logger.error(e));
+    }).catch(e => this.logger.error(e));
   }
 
   async updateJobStore() {
@@ -23,7 +26,7 @@ class JobSearcher {
       return;
     }
 
-    console.log(`Less than ${MIN_JOBS_IN_DB} jobs, searching...`);
+    this.logger.info(`Less than ${MIN_JOBS_IN_DB} jobs, searching...`);
 
     // TODO: Change this to not only software
     const jobs = await this.searchJobs([
@@ -31,9 +34,9 @@ class JobSearcher {
       'node.js'
     ]);
 
-    console.log(`Search complete! Found ${jobs.length} jobs.`);
+    this.logger.info(`Search complete! Found ${jobs.length} jobs.`);
 
-    await this.addToJobStore(jobs).catch(e => console.log(e));
+    await this.addToJobStore(jobs).catch(e => this.logger.error(e));
   }
 
   async searchJobs(keyphrases) {
@@ -46,11 +49,11 @@ class JobSearcher {
         maxAge: '30',
         sort: 'relevance',
         limit: 30,
-      }).catch(e => console.log(e));
+      }).catch(e => this.logger.error(e));
 
       // Add description to each result by scraping the webpage
       for (let result of results) {
-        const jobPage = await axios.get(result.url).catch(e => console.log(e));
+        const jobPage = await axios.get(result.url).catch(e => this.logger.error(e));
         const $ = cheerio.load(jobPage.data);
         result.description = $('#jobDescriptionText').text();
         result.url = $('#indeed-share-url').attr('content');
@@ -71,7 +74,7 @@ class JobSearcher {
     }).catch(e => {
       // Ignore duplicate entry error
       if (e.code !== 11000) {
-        console.log(e.errmsg);
+        this.logger.error(e.errmsg);
       }
     });
   }

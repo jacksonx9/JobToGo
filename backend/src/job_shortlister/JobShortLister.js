@@ -1,7 +1,11 @@
+import Logger from 'js-logger';
+
 import { Users, Jobs } from '../schema';
 
 class JobShortLister {
   constructor(app) {
+    this.logger =  Logger.get(this.constructor.name);
+
     app.post('/jobs/addLikedJobs/', async (req, res) => {
       const userId = req.body.userId;
       const jobId = req.body.jobId;
@@ -22,7 +26,7 @@ class JobShortLister {
         const jobsData = await this.getLikedJobsData(userId);
         res.status(200).send(jobsData);
       } catch(e) {
-        console.log(e);
+        this.logger.error(e);
         res.status(400).send(null);
       }
     });
@@ -36,7 +40,7 @@ class JobShortLister {
       );
       return res.nModified === 1;
     } catch(e) {
-      console.log(e);
+      this.logger.error(e);
       return false;
     }
   }
@@ -49,7 +53,7 @@ class JobShortLister {
       );
       return res.nModified === 1;
     } catch(e) {
-      console.log(e);
+      this.logger.error(e);
       return false;
     }
   }

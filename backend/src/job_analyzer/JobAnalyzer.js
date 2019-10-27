@@ -1,9 +1,13 @@
+import Logger from 'js-logger';
+
 import { Jobs, Users } from '../schema';
 import { JOBS_PER_SEND } from '..';
 
 
 class JobAnalyzer {
   constructor(app, user, shortlister) {
+    this.logger = Logger.get(this.constructor.name);
+
     this.user = user;
     this.shortlister = shortlister;
 
@@ -14,6 +18,8 @@ class JobAnalyzer {
   }
 
   async computeJobScores() {
+    this.logger.info('Starting to compute job scores...');
+
     const jobs = await Jobs.find({});
     const skills = await this.user.getAllSkills();
 
@@ -57,6 +63,8 @@ class JobAnalyzer {
         postingIdx++;
       }
     }
+
+    this.logger.info('Computed job scores!');
   }
 
   async getRelevantJobs(userID) {
@@ -80,6 +88,7 @@ class JobAnalyzer {
       };
     }
 
+    this.logger.info("Starting job retrieval.");
     // Compute overall tf_idf score of a job
     const jobScore = (job) => {
       let sum = 0;
@@ -97,6 +106,7 @@ class JobAnalyzer {
       return sum;
     }
 
+    this.logger.info("Getting most relevant jobs.");
     // Get jobs with overall highest tfidf scores
     mostRelevantJobs.push(...unseenJobs
       .sort((job_a, job_b) => {

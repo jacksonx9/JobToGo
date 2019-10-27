@@ -1,5 +1,6 @@
 import admin from 'firebase-admin';
 import nodemailer from 'nodemailer'
+import Logger from 'js-logger';
 
 import { Users } from '../schema';
 import firebaseCredentials from '../../credentials/firebase';
@@ -7,6 +8,8 @@ import credentials from '../../credentials/google';
 
 class Messenger {
   constructor(app, shortlister) {
+    this.logger =  Logger.get(this.constructor.name);
+
     this.shortlister = shortlister;
 
     admin.initializeApp({
@@ -20,7 +23,7 @@ class Messenger {
         const result = await this.emailShortlist(userId);
         res.status(result.status).send(result.success);
       } catch(e) {
-        console.log(e);
+        this.logger.error(e);;
         res.status(500).send(null);
       }
     });
@@ -44,10 +47,10 @@ class Messenger {
         },
       };
       const messageRes = await admin.messaging().send(message);
-      console.log('Message sent: ' + messageRes);
+      this.logger.info('Message sent: ' + messageRes);
       return true;
     } catch(e) {
-      console.log(e);
+      this.logger.error(e);
       return false;
     }
   }
@@ -82,7 +85,7 @@ class Messenger {
         subject: 'Shortlisted jobs',
         text: message
     }).catch(e => {
-      console.log(e);
+      this.logger.error(e);
       return {status: 400, success: false};
     });
     return {

@@ -3,6 +3,7 @@ import pdfparse from 'pdf-parse';
 import stopword from 'stopword';
 import axios from 'axios';
 import multer from 'multer';
+import Logger from 'js-logger';
 
 import credentials from '../../credentials/dandelion';
 
@@ -12,6 +13,8 @@ const RESUME_PATH = 'mediafiles/resumes/';
 
 class ResumeParser {
   constructor(app, user) {
+    this.logger = Logger.get(this.constructor.name);
+
     const storage = multer.diskStorage({
       destination: (req, file, cb) => {
         cb(null, 'mediafiles/resumes/');
@@ -24,7 +27,8 @@ class ResumeParser {
     const upload = multer({ storage: storage })
 
     app.post('/users/resume/upload', upload.single('fileData'), async (req, res) => {
-      console.log("Received: " + req.file.filename);
+      this.logger.info("Received: " + req.file.filename);
+
       const userId = req.body.userId;
       try {
         const resumeKeywords = await this.parse(req.file.filename);
@@ -33,7 +37,7 @@ class ResumeParser {
         });
         res.status(updateStatus ? 200 : 400).send(updateStatus);
       } catch(e) {
-        console.log(e);
+        this.logger.error(e);
         res.status(500).send(false);
       }
     });
@@ -61,7 +65,7 @@ class ResumeParser {
     // Write the standardized text into a file
     fs.writeFile(outputPath, text, (err) => {
       if (err) {
-        console.log(err);
+        this.logger.error(e);
       }
     });
 
@@ -71,13 +75,13 @@ class ResumeParser {
       `min_confidence=${String(MIN_CONFIDENCE)}&` +
       `text=${encodeURIComponent(text)}&` +
       `token=${credentials.token}`
-    ).catch(e => console.log(e));
+    ).catch(e => this.logger.error(e));
 
     // Filter out keywords over length 20 and remove duplicates
     const keywords = res.data.annotations.map(ent => ent.spot).filter(word => word.length < 20);
     const uniqueKeywords = [...new Set(keywords)];
-    console.log("Skills from resume: ");
-    console.log(uniqueKeywords);
+    this.logger.info("Skills from resume: ");
+    this.logger.info(uniqueKeywords);
     return uniqueKeywords;
   }
 };
