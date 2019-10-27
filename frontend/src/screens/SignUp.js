@@ -4,12 +4,12 @@ import { Button } from '../components';
 import { images, colours, fonts } from '../constants'
 
 export default class SignUp extends Component {
-  
+
   text = {
     showPassword: 'Show Password',
     hidePassword: 'Hide Password'
   }
-  
+
   constructor(props) {
     super(props);
     this.state = {
@@ -29,7 +29,7 @@ export default class SignUp extends Component {
   togglePasswordView = () => {
     this.setState({
       showPassword: !this.state.showPassword,
-      showPasswordText: this.state.showPassword ? 
+      showPasswordText: this.state.showPassword ?
         this.text.hidePassword : this.text.showPassword
     })
   }
@@ -38,7 +38,7 @@ export default class SignUp extends Component {
     return (
       <View style={[styles.containerStyle]}>
         <View style={[styles.formStyle]}>
-          <Image 
+          <Image
             source={images.logoDark}
             style={[styles.imageStyle]}
           />
@@ -47,21 +47,21 @@ export default class SignUp extends Component {
             placeholder={'First Name'}
             value={this.state.firstName}
             placeholderTextColor={colours.lightBlue}
-            onChangeText={(text) => this.setState({lastName: text})}
+            onChangeText={(text) => this.setState({ lastName: text })}
           />
           <TextInput
             style={styles.inputStyle}
             placeholder={'Last Name'}
             value={this.state.lastName}
             placeholderTextColor={colours.lightBlue}
-            onChangeText={(text) => this.setState({lastName: text})}
+            onChangeText={(text) => this.setState({ lastName: text })}
           />
           <TextInput
             style={styles.inputStyle}
             placeholder={'Email'}
             value={this.state.email}
             placeholderTextColor={colours.lightBlue}
-            onChangeText={(text) => this.setState({email: text})}
+            onChangeText={(text) => this.setState({ email: text })}
           />
           <TextInput
             style={styles.inputStyle}
@@ -69,7 +69,7 @@ export default class SignUp extends Component {
             value={this.state.password}
             secureTextEntry={this.state.showPassword}
             placeholderTextColor={colours.lightBlue}
-            onChangeText={(text) => this.setState({password: text})}
+            onChangeText={(text) => this.setState({ password: text })}
           />
           <TouchableOpacity
             style={[styles.linkStyle]}
@@ -77,7 +77,7 @@ export default class SignUp extends Component {
           >
             <Text style={[styles.textStyle]}>{this.state.showPasswordText}</Text>
           </TouchableOpacity>
-          
+
           <Button
             backgroundColor={'#E6E6E6'}
             textColor={'#1F1E1F'}
@@ -136,4 +136,3 @@ const styles = StyleSheet.create({
     textDecorationColor: 'white'
   }
 });
- 

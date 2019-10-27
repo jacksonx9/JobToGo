@@ -1,19 +1,19 @@
 import React, { Component } from 'react';
 import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native';
-import  { Button } from '../components';
+import { Button } from '../components';
 import { images, colours, fonts, serverIp } from '../constants'
 import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 import axios from 'axios';
 
 export default class SignIn extends Component {
-  
+
   constructor(props) {
     super(props);
     this.state = {
       email: '',
       password: '',
-      isAuthenticated: false, 
-      user: null, 
+      isAuthenticated: false,
+      user: null,
       token: '',
       userInfo: []
 
@@ -36,12 +36,13 @@ export default class SignIn extends Component {
 
       const firebaseToken = global.firebaseToken
       console.log(firebaseToken)
-      const ret = await axios.post(serverIp+'/users/googleLogin/', 
-          {idToken: userInfo.idToken,
+      const ret = await axios.post(serverIp + '/users/googleLogin/',
+        {
+          idToken: userInfo.idToken,
           firebaseToken: firebaseToken.firebaseToken
-          }  
-        )
-    
+        }
+      )
+
       const userId = ret.data
       global.userId = userId
 
@@ -64,7 +65,7 @@ export default class SignIn extends Component {
     return (
       <View style={[styles.containerStyle]}>
         <View style={[styles.formStyle]}>
-          <Image 
+          <Image
             source={images.logoDark}
             style={[styles.imageStyle]}
           />
@@ -73,7 +74,7 @@ export default class SignIn extends Component {
             placeholder={'Email'}
             value={this.state.email}
             placeholderTextColor={colours.lightBlue}
-            onChangeText={(text) => this.setState({email: text})}
+            onChangeText={(text) => this.setState({ email: text })}
           />
           <TextInput
             style={styles.inputStyle}
@@ -81,9 +82,9 @@ export default class SignIn extends Component {
             value={this.state.password}
             secureTextEntry={true}
             placeholderTextColor={colours.lightBlue}
-            onChangeText={(text) => this.setState({password: text})}
+            onChangeText={(text) => this.setState({ password: text })}
           />
-          
+
           <Button
             backgroundColor={'#E6E6E6'}
             textColor={'#1F1E1F'}
@@ -98,21 +99,21 @@ export default class SignIn extends Component {
           </View>
 
           <GoogleSigninButton
-              style={[styles.buttonStyle]}
-              size={GoogleSigninButton.Size.Wide}
-              color={GoogleSigninButton.Color.Light}
-              onPress={this.onPressGoogleSignIn.bind(this)}
-              disabled={false} />
+            style={[styles.buttonStyle]}
+            size={GoogleSigninButton.Size.Wide}
+            color={GoogleSigninButton.Color.Light}
+            onPress={this.onPressGoogleSignIn.bind(this)}
+            disabled={false} />
 
           <TouchableOpacity
             style={[styles.linkStyle]}
-            onPress={() => {this.props.navigation.navigate('SignUp')}}
+            onPress={() => { this.props.navigation.navigate('SignUp') }}
           >
             <Text style={[styles.textStyle]}>Sign Up</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.linkStyle]}
-            onPress={() => {this.props.navigation.navigate('SignUp')}}
+            onPress={() => { this.props.navigation.navigate('SignUp') }}
           >
             <Text style={[styles.textStyle]}>Forgot Password</Text>
           </TouchableOpacity>
@@ -168,4 +169,3 @@ const styles = StyleSheet.create({
     textDecorationColor: 'white'
   }
 });
- 

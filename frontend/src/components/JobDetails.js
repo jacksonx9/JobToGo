@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import { StyleSheet, Text, View, Image, Modal, } from 'react-native';
 import { ImageButton } from '../components';
 import { images, colours, fonts } from '../constants'
@@ -9,12 +9,12 @@ class JobDetails extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        modalVisible: false,
+      modalVisible: false,
     };
   }
 
   setModalVisible = (visible) => {
-    this.setState({modalVisible: visible});
+    this.setState({ modalVisible: visible });
   }
 
   render() {
@@ -47,7 +47,7 @@ class JobDetails extends Component {
               />
               <Text style={[styles.subHeaderStyle]}>{this.props.job.location}</Text>
             </View>
-            <ScrollView style={[{marginTop: 30, height: 500, width: '100%', overflow: 'scroll'}]}>
+            <ScrollView style={[{ marginTop: 30, height: 500, width: '100%', overflow: 'scroll' }]}>
               <Text>{this.props.job.description}</Text>
             </ScrollView>
           </View>
@@ -55,10 +55,10 @@ class JobDetails extends Component {
 
         <View style={[styles.textContainerStyle]}>
           <ImageButton
-              source={images.iconChevronUp}
-              onPress={() => {
-                  this.setModalVisible(true);
-              }}
+            source={images.iconChevronUp}
+            onPress={() => {
+              this.setModalVisible(true);
+            }}
           />
           <Text style={[styles.headerStyle]}>{this.props.job.company}</Text>
           <View style={[styles.subHeaderContainerStyle]}>

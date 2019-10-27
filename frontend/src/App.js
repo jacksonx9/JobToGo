@@ -31,7 +31,7 @@ export default class App extends React.Component {
         const fcmToken = await firebase.messaging().getToken();
         if (fcmToken) {
           console.log('FCM Token: ', fcmToken);
-          this.setState({firebaseToken: fcmToken});
+          this.setState({ firebaseToken: fcmToken });
           global.firebaseToken = fcmToken
           const enabled = await firebase.messaging().hasPermission();
           if (enabled) {
@@ -44,7 +44,7 @@ export default class App extends React.Component {
               console.log('FCM Permission Error', error);
             }
           }
-        this.createNotificationListeners();
+          this.createNotificationListeners();
         } else {
           console.log('FCM Token not available');
         }
@@ -64,26 +64,26 @@ export default class App extends React.Component {
     * Triggered when a particular notification has been received in foreground
     * */
     this.notificationListener = firebase.notifications().onNotification((notification) => {
-        const { title, body } = notification;
-        console.log('first')
-        this.showAlert(title, body);
+      const { title, body } = notification;
+      console.log('first')
+      this.showAlert(title, body);
     });
-  
+
     /*
     * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
     * */
     this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
-        const { title, body } = notificationOpen.notification;
-        console.log('second')
+      const { title, body } = notificationOpen.notification;
+      console.log('second')
     });
-  
+
     /*
     * If your app is closed, you can check if it was opened by a notification being clicked / tapped / opened as follows:
     * */
     const notificationOpen = await firebase.notifications().getInitialNotification();
     if (notificationOpen) {
-        const { title, body } = notificationOpen.notification;
-        console.log('third')
+      const { title, body } = notificationOpen.notification;
+      console.log('third')
     }
     /*
     * Triggered for data only payload in foreground
@@ -93,23 +93,23 @@ export default class App extends React.Component {
       console.log(JSON.stringify(message));
     });
   }
-  
+
   showAlert(title, body) {
     alert(
       title, body,
       [
-          { text: 'OK', onPress: () => console.log('OK Pressed') },
+        { text: 'OK', onPress: () => console.log('OK Pressed') },
       ],
       { cancelable: false },
     );
   }
 
   render() {
-    console.disableYellowBox = true; 
-    return <AppContainer 
-      styles={styles.containerStyle} 
-      />;
-  } 
+    console.disableYellowBox = true;
+    return <AppContainer
+      styles={styles.containerStyle}
+    />;
+  }
 }
 
 const navConfig = {
@@ -126,22 +126,22 @@ const drawerNavConfig = {
   }
 }
 
-const AppStack = 
-createDrawerNavigator(
-    { 
-      JobSwipe: JobSwipe, 
+const AppStack =
+  createDrawerNavigator(
+    {
+      JobSwipe: JobSwipe,
       SendLikedJobs: SendLikedJobs,
       EditFriends: EditFriends,
       EditSkills: EditSkills
-    }, 
+    },
     drawerNavConfig
   );
-const AuthStack = 
+const AuthStack =
   createStackNavigator(
-    { 
-      SignIn: SignIn, 
-      SignUp: SignUp 
-    }, 
+    {
+      SignIn: SignIn,
+      SignUp: SignUp
+    },
     navConfig
   );
 

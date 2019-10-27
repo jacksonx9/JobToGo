@@ -1,175 +1,176 @@
 import React, { Component } from 'react';
-import { View, FlatList, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native';
-import  { Button, SelectableItem, Loader, NavHeader} from '../components';
-import { images, colours, fonts, serverIp } from '../constants'
+import { View, FlatList, Text, TextInput, StyleSheet } from 'react-native';
 import axios from 'axios';
+import { Button, SelectableItem, Loader, NavHeader } from '../components';
+import { images, colours, fonts, serverIp } from '../constants'
+
 
 export default class EditFriends extends Component {
-  
+
   static navigationOptions = {
     drawerLabel: 'Friends',
   };
-  
+
   constructor(props) {
-      super(props);
-      this.state = {
-        userId: '',
-        userFriends: [],
-        userFriendRequests: [],
-        addFriendName: '',
-        jobIndex: 0,
-        loading: 1
-      };
-    }
-    
-    async componentDidMount() {
+    super(props);
+    this.state = {
+      userId: '',
+      userFriends: [],
+      userFriendRequests: [],
+      addFriendName: '',
+      jobIndex: 0,
+      loading: 1
+    };
+  }
+
+  async componentDidMount() {
+    const userId = global.userId
+    const userFriends = await axios.get(serverIp + '/users/getFriends/' + userId).catch(e => console.log(e));
+    const userFriendRequests = await axios.get(serverIp + '/users/getPendingFriends/' + userId).catch(e => console.log(e));
+
+    this.setState({
+      userId: global.userId,
+      userFriends: userFriends.data,
+      userFriendRequests: userFriendRequests.data,
+      loading: 0
+    })
+  }
+
+  async componentDidUpdate(prevProps, prevState) {
+    if (prevState != this.state) {
       const userId = global.userId
-      const userFriends = await axios.get(serverIp+'/users/getFriends/'+userId).catch(e => console.log(e));
-      const userFriendRequests = await axios.get(serverIp+'/users/getPendingFriends/'+userId).catch(e => console.log(e));
-        
+      const userFriends = await axios.get(serverIp + '/users/getFriends/' + userId).catch(e => console.log(e));
+      const userFriendRequests = await axios.get(serverIp + '/users/getPendingFriends/' + userId).catch(e => console.log(e));
+
       this.setState({
-          userId: global.userId,
-          userFriends: userFriends.data,
-          userFriendRequests: userFriendRequests.data,
-          loading: 0
-        })
+        userId: global.userId,
+        userFriends: userFriends.data,
+        userFriendRequests: userFriendRequests.data,
+        loading: 0
+      })
     }
+  }
 
-    async componentDidUpdate(prevProps, prevState) {
-      if(prevState != this.state) {
-        const userId = global.userId
-        const userFriends = await axios.get(serverIp+'/users/getFriends/'+userId).catch(e => console.log(e));
-        const userFriendRequests = await axios.get(serverIp+'/users/getPendingFriends/'+userId).catch(e => console.log(e));
-          
-        this.setState({
-            userId: global.userId,
-            userFriends: userFriends.data,
-            userFriendRequests: userFriendRequests.data,
-            loading: 0
-          })
-      }
-    }
+  addFriend = async () => {
+    const friend = await axios.get(serverIp + '/users/' + this.state.addFriendName).catch(e => console.log(e));
+    console.log(friend.data._id)
 
-    addFriend = async () => {
-      const friend = await axios.get(serverIp+'/users/'+this.state.addFriendName).catch(e => console.log(e));
-      console.log(friend.data._id)  
+    const ret = await axios.post(serverIp + '/users/addFriend/', {
+      userId: this.state.userId,
+      friendId: friend.data._id
+    }).catch(e => console.log(e));
 
-      const ret = await axios.post(serverIp+'/users/addFriend/', {
-        userId: this.state.userId, 
-        friendId: friend.data._id
-      }).catch(e => console.log(e));
+    alert('Sent a friend request to ' + this.state.addFriendName)
+  }
 
-      alert('Sent a friend request to ' + this.state.addFriendName)
-    }
+  comfirmFriendRequest = async (item, index) => {
+    const userId = global.userId
+    const ret = await axios.post(serverIp + '/users/confirmFriend/', {
+      userId: userId,
+      friendId: item._id
+    }).catch(e => console.log(e));
 
-    comfirmFriendRequest = async (item, index) => {
-      const userId = global.userId
-      const ret = await axios.post(serverIp+'/users/confirmFriend/', {
+    const userFriends = await axios.get(serverIp + '/users/getFriends/' + userId).catch(e => console.log(e));
+    const userFriendRequests = await axios.get(serverIp + '/users/getPendingFriends/' + userId).catch(e => console.log(e));
+
+    this.setState({
+      userId: global.userId,
+      userFriends: userFriends.data,
+      userFriendRequests: userFriendRequests.data,
+      loading: 0
+    })
+
+    alert('Confirmed friend request from' + item.userName)
+  }
+
+  removeFriend = async (item, index) => {
+    const userId = global.userId
+    const ret = await axios.delete(serverIp + '/users/removeFriend/', {
+      data: {
         userId: userId,
         friendId: item._id
-      }).catch(e => console.log(e));
+      }
+    }).catch(e => console.log(e));
 
-      const userFriends = await axios.get(serverIp+'/users/getFriends/'+userId).catch(e => console.log(e));
-      const userFriendRequests = await axios.get(serverIp+'/users/getPendingFriends/'+userId).catch(e => console.log(e));
-        
-      this.setState({
-          userId: global.userId,
-          userFriends: userFriends.data,
-          userFriendRequests: userFriendRequests.data,
-          loading: 0
-        })
-      
-      alert('Confirmed friend request from' + item.userName)
-    }
+    const userFriends = await axios.get(serverIp + '/users/getFriends/' + userId).catch(e => console.log(e));
+    const userFriendRequests = await axios.get(serverIp + '/users/getPendingFriends/' + userId).catch(e => console.log(e));
 
-    removeFriend = async (item, index) => {
-      const userId = global.userId
-      const ret = await axios.delete(serverIp+'/users/removeFriend/', {
-        data: {
-          userId: userId,
-          friendId: item._id
-        }
-      }).catch(e => console.log(e));
+    this.setState({
+      userId: global.userId,
+      userFriends: userFriends.data,
+      userFriendRequests: userFriendRequests.data,
+      loading: 0
+    })
 
-      const userFriends = await axios.get(serverIp+'/users/getFriends/'+userId).catch(e => console.log(e));
-      const userFriendRequests = await axios.get(serverIp+'/users/getPendingFriends/'+userId).catch(e => console.log(e));
-        
-      this.setState({
-          userId: global.userId,
-          userFriends: userFriends.data,
-          userFriendRequests: userFriendRequests.data,
-          loading: 0
-        })
-
-      alert('Removed ' + item.userName + ' from your friends')
-    }
+    alert('Removed ' + item.userName + ' from your friends')
+  }
 
 
-    render() {
-        if (this.state.loading) return <Loader/>
+  render() {
+    if (this.state.loading) return <Loader />
 
-        return (
-            <View style={[styles.containerStyle]}>
-                <NavHeader
-                  title='Friends'
-                  image={images.iconSend}
-                  onPressBack={() => this.props.navigation.goBack()}
-                  onPressBtn={this.addFriends}
-                  enableBtn={false}
-                />
-                <View style={[styles.searchBarStyle]}>
-                  <TextInput
-                    style={styles.inputStyle}
-                    placeholder={'Add a friend'}
-                    value={this.state.addFriendName}
-                    placeholderTextColor={colours.Gray}
-                    onChangeText={(text) => this.setState({addFriendName: text})}
-                  />
-                  <Button
-                    backgroundColor={'#E6E6E6'}
-                    textColor={'#1F1E1F'}
-                    title={'Add'}
-                    textColor='white'
-                    backgroundColor={colours.blue}
-                    style={[styles.buttonStyle]}
-                    onPress={this.addFriend}
-                  />
-                </View>
-                <Text>Friend Requests</Text>
-                <FlatList
-                  style
-                  data={this.state.userFriendRequests}
-                  keyExtractor={(item) => item._id}
-                  renderItem={({item, index}) =>
-                    <SelectableItem
-                      key={item._id}
-                      header={item.userName}
-                      subHeader={item.email}
-                      onPress={() => this.comfirmFriendRequest(item, index)}
-                      actionIcon='+'
-                  />
-                  }
-                />
-                 <View style={[styles.dividerStyle]}>
-                  <Text>Your Friends</Text>
-                </View>
-                <FlatList
-                  style
-                  data={this.state.userFriends}
-                  keyExtractor={(item) => item._id}
-                  renderItem={({item, index}) =>
-                    <SelectableItem
-                      key={item._id}
-                      header={item.userName}
-                      subHeader={item.email}
-                      onPress={() => this.removeFriend(item, index)}
-                      actionIcon='x'
-                  />
-                  }
-                />
-            </View>
-        );
-    };
+    return (
+      <View style={[styles.containerStyle]}>
+        <NavHeader
+          title='Friends'
+          image={images.iconSend}
+          onPressBack={() => this.props.navigation.goBack()}
+          onPressBtn={this.addFriends}
+          enableBtn={false}
+        />
+        <View style={[styles.searchBarStyle]}>
+          <TextInput
+            style={styles.inputStyle}
+            placeholder={'Add a friend'}
+            value={this.state.addFriendName}
+            placeholderTextColor={colours.Gray}
+            onChangeText={(text) => this.setState({ addFriendName: text })}
+          />
+          <Button
+            backgroundColor={'#E6E6E6'}
+            textColor={'#1F1E1F'}
+            title={'Add'}
+            textColor='white'
+            backgroundColor={colours.blue}
+            style={[styles.buttonStyle]}
+            onPress={this.addFriend}
+          />
+        </View>
+        <Text>Friend Requests</Text>
+        <FlatList
+          style
+          data={this.state.userFriendRequests}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item, index }) =>
+            <SelectableItem
+              key={item._id}
+              header={item.userName}
+              subHeader={item.email}
+              onPress={() => this.comfirmFriendRequest(item, index)}
+              actionIcon='+'
+            />
+          }
+        />
+        <View style={[styles.dividerStyle]}>
+          <Text>Your Friends</Text>
+        </View>
+        <FlatList
+          style
+          data={this.state.userFriends}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item, index }) =>
+            <SelectableItem
+              key={item._id}
+              header={item.userName}
+              subHeader={item.email}
+              onPress={() => this.removeFriend(item, index)}
+              actionIcon='x'
+            />
+          }
+        />
+      </View>
+    );
+  };
 };
 
 
@@ -229,4 +230,3 @@ const styles = StyleSheet.create({
     textDecorationColor: 'white'
   }
 });
- 

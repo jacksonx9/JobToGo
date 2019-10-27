@@ -9,12 +9,12 @@ const Button = ({ style, backgroundColor, textColor, title, enable = true, onPre
 
   return (
     <TouchableOpacity
-        style={[{
-          opacity: enable ? 1 : 0.3,
-          backgroundColor
-        }, containerStyle, style]}
-        disabled={!enable}
-        onPress={onPress}
+      style={[{
+        opacity: enable ? 1 : 0.3,
+        backgroundColor
+      }, containerStyle, style]}
+      disabled={!enable}
+      onPress={onPress}
     >
       <Text style={[{ color: textColor }, textStyle]}>
         {title}

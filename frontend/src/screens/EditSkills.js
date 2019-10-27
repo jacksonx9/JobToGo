@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native';
-import  { Button, NavHeader } from '../components';
+import { Button, NavHeader } from '../components';
 import { images, colours, fonts, serverIp } from '../constants'
 import FilePickerManager from 'react-native-file-picker';
 import axios from 'axios';
 
 export default class EditSkills extends Component {
-  
+
   static navigationOptions = {
-      drawerLabel: 'Edit Skills',
+    drawerLabel: 'Edit Skills',
   };
 
   constructor(props) {
@@ -23,7 +23,7 @@ export default class EditSkills extends Component {
   onPressUpload = () => {
     FilePickerManager.showFilePicker(null, async (response) => {
       console.log('Response = ', response);
-     
+
       if (response.didCancel) {
         console.log('User cancelled file picker');
       }
@@ -34,19 +34,19 @@ export default class EditSkills extends Component {
         const data = new FormData();
         data.append('userId', global.userId);
         data.append('fileData', {
-          uri : response.uri,
+          uri: response.uri,
           type: response.type,
           name: response.fileName
         });
 
-        const res = await axios.post(serverIp+'/users/resume/upload', 
-        data, {
+        const res = await axios.post(serverIp + '/users/resume/upload',
+          data, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
         }).catch(e => console.log(e))
-      
-      
+
+
 
         alert("Resume Sent for analysis")
       }
@@ -59,21 +59,21 @@ export default class EditSkills extends Component {
     return (
       <View style={[styles.containerStyle]}>
         <NavHeader
-            title='Edit Skills'
-            image={images.iconSend}
-            onPressBack={() => this.props.navigation.goBack()}
-            onPressBtn={() => this.props.navigation.navigate('SendLikedJobs')}
-            enableBtn={false}
+          title='Edit Skills'
+          image={images.iconSend}
+          onPressBack={() => this.props.navigation.goBack()}
+          onPressBtn={() => this.props.navigation.navigate('SendLikedJobs')}
+          enableBtn={false}
         />
-        
-          
-          <Button
-            backgroundColor={'#E6E6E6'}
-            title={'Upload Resume'}
-            textColor={'white'}
-            style={[styles.buttonStyle]}
-            onPress={ () => this.onPressUpload()}
-          />
+
+
+        <Button
+          backgroundColor={'#E6E6E6'}
+          title={'Upload Resume'}
+          textColor={'white'}
+          style={[styles.buttonStyle]}
+          onPress={() => this.onPressUpload()}
+        />
 
       </View>
 
@@ -130,4 +130,3 @@ const styles = StyleSheet.create({
 
 
 
- 

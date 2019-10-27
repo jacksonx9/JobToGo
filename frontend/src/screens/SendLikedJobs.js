@@ -1,95 +1,95 @@
 import React, { Component } from 'react';
 import { View, FlatList, TouchableOpacity, Text, TextInput, Image, StyleSheet, TouchableWithoutFeedback } from 'react-native';
-import  { Button, SelectableItem, Loader, NavHeader} from '../components';
+import { Button, SelectableItem, Loader, NavHeader } from '../components';
 import { images, colours, fonts, serverIp } from '../constants'
 import axios from 'axios';
 
 export default class SendLikedJobs extends Component {
 
-    static navigationOptions = {
-        drawerLabel: 'Liked Jobs',
+  static navigationOptions = {
+    drawerLabel: 'Liked Jobs',
+  };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      likedJobs: [],
+      ids: [],
+      jobIndex: 0,
+      loading: 1
     };
-
-    constructor(props) {
-        super(props);
-        this.state = {
-          likedJobs: [],
-          ids: [],
-          jobIndex: 0,
-          loading: 1
-        };
-      }
-
-    async componentDidMount() {
-        const userId = global.userId
-        const likedJobs = await axios.get(serverIp+'/jobs/getLikedJobs/'+userId).catch(e => console.log(e));
-        this.setState({
-          likedJobs: likedJobs.data,
-          loading: 0
-        })
-        console.log(likedJobs.data)
-    }
-
-    async componentDidUpdate(prevProps, prevState) {
-      if(prevProps != this.props) {
-        const userId = global.userId
-        const likedJobs = await axios.get(serverIp+'/jobs/getLikedJobs/'+userId).catch(e => console.log(e));
-        this.setState({
-          likedJobs: likedJobs.data,
-          loading: 0
-        })
-    }
   }
 
-    sendLikedJobs = async () => {
-      const userId = global.userId
-      const ret = await axios.post(serverIp+'/jobs/emailUser/',
-      {
-        userId: userId
-      }).catch(e => console.log(e));
+  async componentDidMount() {
+    const userId = global.userId
+    const likedJobs = await axios.get(serverIp + '/jobs/getLikedJobs/' + userId).catch(e => console.log(e));
+    this.setState({
+      likedJobs: likedJobs.data,
+      loading: 0
+    })
+    console.log(likedJobs.data)
+  }
 
-      const likedJobs = await axios.get(serverIp+'/jobs/getLikedJobs/'+userId).catch(e => console.log(e));
+  async componentDidUpdate(prevProps, prevState) {
+    if (prevProps != this.props) {
+      const userId = global.userId
+      const likedJobs = await axios.get(serverIp + '/jobs/getLikedJobs/' + userId).catch(e => console.log(e));
       this.setState({
         likedJobs: likedJobs.data,
         loading: 0
       })
-
-      alert('Sent liked jobs to your email')
-
     }
- 
-    removeLikedJob = (item, index) => {
-      alert(`${item.company}: ${index}`)
-    }
+  }
 
-    render() {
-        if (this.state.loading) return <Loader/>
+  sendLikedJobs = async () => {
+    const userId = global.userId
+    const ret = await axios.post(serverIp + '/jobs/emailUser/',
+      {
+        userId: userId
+      }).catch(e => console.log(e));
 
-        return (
-            <View style={[styles.containerStyle]}>
-                <NavHeader
-                    title='Your Liked Jobs'
-                    image={images.iconSendAcc}
-                    onPressBack={() => this.props.navigation.goBack()}
-                    onPressBtn={this.sendLikedJobs}
-                />
-                <FlatList
-                    style
-                    data={this.state.likedJobs}
-                    keyExtractor={(item) => item._id}
-                    renderItem={({item, index}) =>
-                      <SelectableItem
-                        key={item._id}
-                        header={item.company}
-                        subHeader={item.title}
-                        onPress={() => this.removeLikedJob(item, index)}
-                        actionIcon='x'
-                    />
-                    }
-                />
-            </View>
-        );
-    };
+    const likedJobs = await axios.get(serverIp + '/jobs/getLikedJobs/' + userId).catch(e => console.log(e));
+    this.setState({
+      likedJobs: likedJobs.data,
+      loading: 0
+    })
+
+    alert('Sent liked jobs to your email')
+
+  }
+
+  removeLikedJob = (item, index) => {
+    alert(`${item.company}: ${index}`)
+  }
+
+  render() {
+    if (this.state.loading) return <Loader />
+
+    return (
+      <View style={[styles.containerStyle]}>
+        <NavHeader
+          title='Your Liked Jobs'
+          image={images.iconSendAcc}
+          onPressBack={() => this.props.navigation.goBack()}
+          onPressBtn={this.sendLikedJobs}
+        />
+        <FlatList
+          style
+          data={this.state.likedJobs}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item, index }) =>
+            <SelectableItem
+              key={item._id}
+              header={item.company}
+              subHeader={item.title}
+              onPress={() => this.removeLikedJob(item, index)}
+              actionIcon='x'
+            />
+          }
+        />
+      </View>
+    );
+  };
 };
 
 

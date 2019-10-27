@@ -10,13 +10,13 @@ const ImageButton = ({ source, onPress }) => {
 
   return (
     <TouchableOpacity
-        style={[containerStyle]}
-        onPress={onPress}
+      style={[containerStyle]}
+      onPress={onPress}
     >
-        <Image 
-          source={source} 
-          style={[imageStyle]} 
-        />
+      <Image
+        source={source}
+        style={[imageStyle]}
+      />
     </TouchableOpacity>
   );
 };
