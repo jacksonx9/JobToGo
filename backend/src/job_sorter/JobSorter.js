@@ -4,7 +4,6 @@ import { JOBS_PER_SEND } from '..';
 
 class JobSorter {
   constructor(app, user) {
-    this.timepoint = Date.now();
     this.user = user;
     app.get('/jobSorter/:userId', async (req, res) => {
       const result = await this.getRelevantJobs(req.params.userId);
