@@ -37,7 +37,7 @@ export default class SignIn extends Component {
       const ret = await axios.post(serverIp + '/users/googleLogin/',
         {
           idToken: userInfo.idToken,
-          firebaseToken: firebaseToken.firebaseToken
+          firebaseToken: firebaseToken
         }
       )
 
