@@ -1,7 +1,7 @@
 import Logger from 'js-logger';
 
 import { Jobs, Users } from '../schema';
-import { JOBS_PER_SEND } from '..';
+import { JOBS_PER_SEND } from '../constants';
 
 
 class JobAnalyzer {

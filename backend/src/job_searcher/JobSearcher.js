@@ -5,7 +5,7 @@ import Logger from 'js-logger';
 
 import { Jobs } from '../schema';
 
-import { MIN_JOBS_IN_DB } from '..';
+import { MIN_JOBS_IN_DB } from '../constants';
 
 class JobSearcher {
   constructor(jobAnalyzer) {

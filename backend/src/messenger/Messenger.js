@@ -6,6 +6,8 @@ import { Users } from '../schema';
 import firebaseCredentials from '../../credentials/firebase';
 import credentials from '../../credentials/google';
 
+const DATABASE_URL = 'https://jobtogo-103fd.firebaseio.com';
+
 class Messenger {
   constructor(app, shortlister) {
     this.logger =  Logger.get(this.constructor.name);
@@ -14,7 +16,7 @@ class Messenger {
 
     admin.initializeApp({
       credential: admin.credential.cert(firebaseCredentials),
-      databaseURL: 'https://jobtogo-103fd.firebaseio.com'
+      databaseURL: DATABASE_URL,
     });
 
     app.post('/jobs/emailUser/', async (req, res) => {

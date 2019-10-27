@@ -13,8 +13,6 @@ import JobAnalyzer from './job_analyzer';
 
 const PORT = 8080;
 const MONGO_URL = 'mongodb://171.0.0.3:27017/JobToGo';
-export const JOBS_PER_SEND = 20;
-export const MIN_JOBS_IN_DB = 200;
 
 Logger.useDefaults();
 const logger = Logger.get('Main');

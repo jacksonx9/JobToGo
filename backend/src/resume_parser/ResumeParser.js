@@ -17,7 +17,7 @@ class ResumeParser {
 
     const storage = multer.diskStorage({
       destination: (req, file, cb) => {
-        cb(null, 'mediafiles/resumes/');
+        cb(null, RESUME_PATH);
       },
       filename: (req, file, cb) => {
         cb(null, file.originalname);
