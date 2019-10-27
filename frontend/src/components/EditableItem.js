@@ -5,6 +5,7 @@ import { fonts } from '../constants'
 
 
 class SelectableItem extends Component {
+  
   constructor(props) {
     super(props);
     this.state = {

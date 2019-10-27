@@ -41,21 +41,17 @@ export default class EditSkills extends Component {
           name: response.fileName
         });
 
-        const res = await axios.post(serverIp + '/users/resume/upload',
+        await axios.post(serverIp + '/users/resume/upload',
           data, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
         }).catch(e => console.log(e))
 
-
-
         alert("Resume Sent for analysis")
       }
     });
   }
-
-
 
   render() {
     return (
@@ -67,8 +63,6 @@ export default class EditSkills extends Component {
           onPressBtn={() => this.props.navigation.navigate('SendLikedJobs')}
           enableBtn={false}
         />
-
-
         <Button
           backgroundColor={'#E6E6E6'}
           title={'Upload Resume'}
@@ -76,13 +70,10 @@ export default class EditSkills extends Component {
           style={[styles.buttonStyle]}
           onPress={() => this.onPressUpload()}
         />
-
       </View>
-
     );
   };
 };
-
 
 const styles = StyleSheet.create({
   containerStyle: {

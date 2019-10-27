@@ -2,7 +2,6 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
-import Animated from 'react-native-reanimated';
 import { createDrawerNavigator } from 'react-navigation-drawer';
 import firebase from 'react-native-firebase';
 
@@ -64,7 +63,6 @@ export default class App extends React.Component {
     * */
     this.notificationListener = firebase.notifications().onNotification((notification) => {
       const { title, body } = notification;
-      console.log('first')
       this.showAlert(title, body);
     });
 
@@ -73,7 +71,6 @@ export default class App extends React.Component {
     * */
     this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
       const { title, body } = notificationOpen.notification;
-      console.log('second')
     });
 
     /*
@@ -82,7 +79,6 @@ export default class App extends React.Component {
     const notificationOpen = await firebase.notifications().getInitialNotification();
     if (notificationOpen) {
       const { title, body } = notificationOpen.notification;
-      console.log('third')
     }
     /*
     * Triggered for data only payload in foreground
@@ -104,7 +100,6 @@ export default class App extends React.Component {
   }
 
   render() {
-    console.disableYellowBox = true;
     return <AppContainer
       styles={styles.containerStyle}
     />;
@@ -134,7 +129,8 @@ const AppStack =
       EditSkills: EditSkills
     },
     drawerNavConfig
-  );
+  )
+
 const AuthStack =
   createStackNavigator(
     {
@@ -142,7 +138,7 @@ const AuthStack =
       SignUp: SignUp
     },
     navConfig
-  );
+  )
 
 AppContainer = createAppContainer(
   createSwitchNavigator(
@@ -155,7 +151,7 @@ AppContainer = createAppContainer(
       initialRouteName: 'Auth',
     }
   )
-);
+)
 
 const styles = StyleSheet.create({
   containerStyle: {

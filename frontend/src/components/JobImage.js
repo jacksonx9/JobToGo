@@ -5,6 +5,7 @@ import { images } from '../constants'
 
 
 const JobImage = ({ companyName }) => {
+  
   const {
     containerStyle,
     textStyle,
@@ -14,7 +15,6 @@ const JobImage = ({ companyName }) => {
     <ImageBackground source={images.tempBg1} style={[containerStyle]}>
       <Text style={[textStyle]}>{companyName}</Text>
     </ImageBackground>
-
   );
 };
 

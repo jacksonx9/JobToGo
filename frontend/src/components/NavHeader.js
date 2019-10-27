@@ -5,40 +5,40 @@ import { ImageButton } from '../components'
 import { images, fonts, colours } from '../constants'
 
 
-const NavHeader = ({ title, image, onPressBack, onPressBtn, enableBtn=true }) => {
-    const {
-        containerStyle,
-        containerStyle2,
-        textStyle
-      } = styles;
+const NavHeader = ({ title, image, onPressBack, onPressBtn, enableBtn = true }) => {
   
+  const {
+    containerStyle,
+    containerStyle2,
+    textStyle
+  } = styles;
+
   if (enableBtn)
     return (
-  
-      <View style = {[containerStyle]}>
-          <ImageButton
-          source = {images.iconChevronLeft}
-          onPress={onPressBack} 
-          />
-          <Text>{title}</Text>
-          <ImageButton
-          source = {image}
-          onPress = {onPressBtn} 
-          />
-      </View>
-    ); 
-    else 
-      return (     
-      <View style = {[containerStyle2]}>
+      <View style={[containerStyle]}>
         <ImageButton
-        source = {images.iconChevronLeft}
-        onPress={onPressBack} 
+          source={images.iconChevronLeft}
+          onPress={onPressBack}
+        />
+        <Text>{title}</Text>
+        <ImageButton
+          source={image}
+          onPress={onPressBtn}
+        />
+      </View>
+    )
+  else
+    return (
+      <View style={[containerStyle2]}>
+        <ImageButton
+          source={images.iconChevronLeft}
+          onPress={onPressBack}
         />
         <Text style={[textStyle]}>{title}</Text>
-        </View>
-      )
+      </View>
+    )
 }
- 
+
 const styles = StyleSheet.create({
   containerStyle: {
     paddingTop: 5,

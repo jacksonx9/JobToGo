@@ -6,27 +6,27 @@ import { images } from '../constants'
 
 
 const MainHeader = ({ onPressMenu, onPressSend }) => {
-    const {
-        containerStyle,
-        logoStyle
-      } = styles;
+  
+  const {
+    containerStyle,
+    logoStyle
+  } = styles;
 
   return (
-    <View style = {[containerStyle]}>
-        <ImageButton
-        source = {images.iconMenu}
-        onPress={onPressMenu} 
-        />
-        <Image source = {images.logoLight} style = {[logoStyle]} />
-        <ImageButton
-        source = {images.iconSend}
-        onPress = {onPressSend} 
-        />
+    <View style={[containerStyle]}>
+      <ImageButton
+        source={images.iconMenu}
+        onPress={onPressMenu}
+      />
+      <Image source={images.logoLight} style={[logoStyle]} />
+      <ImageButton
+        source={images.iconSend}
+        onPress={onPressSend}
+      />
     </View>
   );
 }
 
-  
 const styles = StyleSheet.create({
   containerStyle: {
     paddingTop: 5,

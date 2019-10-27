@@ -16,26 +16,25 @@ export default class SendLikedJobs extends Component {
     super(props);
     this.state = {
       likedJobs: [],
-      ids: [],
       jobIndex: 0,
       loading: 1
     };
   }
 
   async componentDidMount() {
-    const userId = global.userId
-    const likedJobs = await axios.get(serverIp + '/jobs/getLikedJobs/' + userId).catch(e => console.log(e));
+    const likedJobs = await axios.get(serverIp + '/jobs/getLikedJobs/' + global.userId)
+      .catch(e => console.log(e));
+    
     this.setState({
       likedJobs: likedJobs.data,
       loading: 0
     })
-    console.log(likedJobs.data)
   }
 
   async componentDidUpdate(prevProps, prevState) {
     if (prevProps != this.props) {
-      const userId = global.userId
-      const likedJobs = await axios.get(serverIp + '/jobs/getLikedJobs/' + userId).catch(e => console.log(e));
+      const likedJobs = await axios.get(serverIp + '/jobs/getLikedJobs/' + global.userId)
+        .catch(e => console.log(e));
       this.setState({
         likedJobs: likedJobs.data,
         loading: 0
@@ -45,19 +44,20 @@ export default class SendLikedJobs extends Component {
 
   sendLikedJobs = async () => {
     const userId = global.userId
-    const ret = await axios.post(serverIp + '/jobs/emailUser/',
+    await axios.post(serverIp + '/jobs/emailUser/',
       {
         userId: userId
       }).catch(e => console.log(e));
 
-    const likedJobs = await axios.get(serverIp + '/jobs/getLikedJobs/' + userId).catch(e => console.log(e));
+    const likedJobs = await axios.get(serverIp + '/jobs/getLikedJobs/' + userId)
+      .catch(e => console.log(e));
+    
     this.setState({
       likedJobs: likedJobs.data,
       loading: 0
     })
 
     alert('Sent liked jobs to your email')
-
   }
 
   removeLikedJob = (item, index) => {
@@ -93,7 +93,6 @@ export default class SendLikedJobs extends Component {
     );
   };
 };
-
 
 const styles = StyleSheet.create({
   containerStyle: {

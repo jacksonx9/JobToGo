@@ -15,9 +15,8 @@ export default class EditFriends extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      userId: '',
-      userFriends: [],
-      userFriendRequests: [],
+      friends: [],
+      friendRequests: [],
       addFriendName: '',
       jobIndex: 0,
       loading: 1
@@ -26,13 +25,14 @@ export default class EditFriends extends Component {
 
   async componentDidMount() {
     const userId = global.userId
-    const userFriends = await axios.get(serverIp + '/users/getFriends/' + userId).catch(e => console.log(e));
-    const userFriendRequests = await axios.get(serverIp + '/users/getPendingFriends/' + userId).catch(e => console.log(e));
+    const friends = await axios.get(serverIp + '/users/getFriends/' + userId)
+      .catch(e => console.log(e));
+    const friendRequests = await axios.get(serverIp + '/users/getPendingFriends/' + userId)
+      .catch(e => console.log(e));
 
     this.setState({
-      userId: global.userId,
-      userFriends: userFriends.data,
-      userFriendRequests: userFriendRequests.data,
+      friends: friends.data,
+      friendRequests: friendRequests.data,
       loading: 0
     })
   }
@@ -40,72 +40,74 @@ export default class EditFriends extends Component {
   async componentDidUpdate(prevProps, prevState) {
     if (prevState != this.state) {
       const userId = global.userId
-      const userFriends = await axios.get(serverIp + '/users/getFriends/' + userId).catch(e => console.log(e));
-      const userFriendRequests = await axios.get(serverIp + '/users/getPendingFriends/' + userId).catch(e => console.log(e));
+      const friends = await axios.get(serverIp + '/users/getFriends/' + userId)
+        .catch(e => console.log(e));
+      const friendRequests = await axios.get(serverIp + '/users/getPendingFriends/' + userId)
+        .catch(e => console.log(e));
 
       this.setState({
-        userId: global.userId,
-        userFriends: userFriends.data,
-        userFriendRequests: userFriendRequests.data,
+        friends: friends.data,
+        friendRequests: friendRequests.data,
         loading: 0
       })
     }
   }
 
   addFriend = async () => {
-    const friend = await axios.get(serverIp + '/users/' + this.state.addFriendName).catch(e => console.log(e));
-    console.log(friend.data._id)
+    const friend = await axios.get(serverIp + '/users/' + this.state.addFriendName)
+      .catch(e => console.log(e));
 
-    const ret = await axios.post(serverIp + '/users/addFriend/', {
-      userId: this.state.userId,
+    await axios.post(serverIp + '/users/addFriend/', {
+      userId: global.userId,
       friendId: friend.data._id
     }).catch(e => console.log(e));
 
-    alert('Sent a friend request to ' + this.state.addFriendName)
+    alert(`Sent a friend request to ${this.state.addFriendName}`)
   }
 
   comfirmFriendRequest = async (item, index) => {
     const userId = global.userId
-    const ret = await axios.post(serverIp + '/users/confirmFriend/', {
+    await axios.post(serverIp + '/users/confirmFriend/', {
       userId: userId,
       friendId: item._id
     }).catch(e => console.log(e));
 
-    const userFriends = await axios.get(serverIp + '/users/getFriends/' + userId).catch(e => console.log(e));
-    const userFriendRequests = await axios.get(serverIp + '/users/getPendingFriends/' + userId).catch(e => console.log(e));
+    const friends = await axios.get(serverIp + '/users/getFriends/' + userId)
+      .catch(e => console.log(e));
+    const friendRequests = await axios.get(serverIp + '/users/getPendingFriends/' + userId)
+      .catch(e => console.log(e));
 
     this.setState({
-      userId: global.userId,
-      userFriends: userFriends.data,
-      userFriendRequests: userFriendRequests.data,
+      friends: friends.data,
+      friendRequests: friendRequests.data,
       loading: 0
     })
 
-    alert('Confirmed friend request from' + item.userName)
+    alert(`Confirmed friend request from ${item.userName}`)
   }
 
   removeFriend = async (item, index) => {
     const userId = global.userId
-    const ret = await axios.delete(serverIp + '/users/removeFriend/', {
+    await axios.delete(serverIp + '/users/removeFriend/', {
       data: {
         userId: userId,
         friendId: item._id
       }
     }).catch(e => console.log(e));
 
-    const userFriends = await axios.get(serverIp + '/users/getFriends/' + userId).catch(e => console.log(e));
-    const userFriendRequests = await axios.get(serverIp + '/users/getPendingFriends/' + userId).catch(e => console.log(e));
+    const friends = await axios.get(serverIp + '/users/getFriends/' + userId)
+      .catch(e => console.log(e));
+    const friendRequests = await axios.get(serverIp + '/users/getPendingFriends/' + userId)
+      .catch(e => console.log(e));
 
     this.setState({
-      userId: global.userId,
-      userFriends: userFriends.data,
-      userFriendRequests: userFriendRequests.data,
+      friends: friends.data,
+      friendRequests: friendRequests.data,
       loading: 0
     })
 
-    alert('Removed ' + item.userName + ' from your friends')
+    alert(`Removed ${item.userName} from your friends`)
   }
-
 
   render() {
     if (this.state.loading) return <Loader />
@@ -140,7 +142,7 @@ export default class EditFriends extends Component {
         <Text>Friend Requests</Text>
         <FlatList
           style
-          data={this.state.userFriendRequests}
+          data={this.state.friendRequests}
           keyExtractor={(item) => item._id}
           renderItem={({ item, index }) =>
             <SelectableItem
@@ -157,7 +159,7 @@ export default class EditFriends extends Component {
         </View>
         <FlatList
           style
-          data={this.state.userFriends}
+          data={this.state.friends}
           keyExtractor={(item) => item._id}
           renderItem={({ item, index }) =>
             <SelectableItem
@@ -173,7 +175,6 @@ export default class EditFriends extends Component {
     );
   };
 };
-
 
 const styles = StyleSheet.create({
   containerStyle: {

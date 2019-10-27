@@ -32,7 +32,7 @@ export default class SignIn extends Component {
       const userInfo = await GoogleSignin.signIn()
 
       const firebaseToken = global.firebaseToken
-      console.log('Firebase token: ' + global.firebaseToken)
+      console.log(`Firebase token: ${global.firebaseToken}`)
 
       const ret = await axios.post(serverIp + '/users/googleLogin/',
         {
@@ -56,7 +56,6 @@ export default class SignIn extends Component {
       }
     }
   };
-
 
   render() {
     return (
@@ -120,7 +119,6 @@ export default class SignIn extends Component {
     );
   };
 };
-
 
 const styles = StyleSheet.create({
   containerStyle: {

@@ -26,8 +26,9 @@ export default class JobSwipe extends Component {
 
   async componentDidMount() {
     const userId = global.userId
-    console.log(global.userId)
-    const jobs = await axios.get(serverIp + '/jobs/findJobs/' + userId).catch(e => console.log(e));
+    console.log(`User id is: ${global.userId}`)
+    const jobs = await axios.get(serverIp + '/jobs/findJobs/' + userId)
+      .catch(e => console.log(e));
 
     this.setState({
       jobs: jobs.data,
@@ -36,17 +37,20 @@ export default class JobSwipe extends Component {
   }
 
   shareJob = () => {
-    console.log("shared job");
+    console.log("Shared job");
   }
 
   dislikeJob = async () => {
+    const userId = global.userId
     await axios.post(serverIp + '/jobs/addDislikedJobs/', {
-      userId: global.userId,
+      userId: userId,
       jobId: this.state.jobs[this.state.jobIndex]._id
     }).catch(e => console.log(e))
 
     if (this.state.jobs.length == (this.state.jobIndex + 1)) {
-      const jobs = await axios.get(serverIp + '/jobs/findJobs/' + userId).catch(e => console.log(e));
+      const jobs = await axios.get(serverIp + '/jobs/findJobs/' + userId)
+        .catch(e => console.log(e));
+
       this.setState({ loading: 1 })
       this.setState({
         jobs: jobs.data,
@@ -58,13 +62,16 @@ export default class JobSwipe extends Component {
   }
 
   likeJob = async () => {
+    const userId = global.userId
     await axios.post(serverIp + '/jobs/addLikedJobs/', {
-      userId: global.userId,
+      userId: userId,
       jobId: this.state.jobs[this.state.jobIndex]._id
     }).catch(e => console.log(e))
 
     if (this.state.jobs.length == (this.state.jobIndex + 1)) {
-      const jobs = await axios.get(serverIp + '/jobs/findJobs/' + userId).catch(e => console.log(e));
+      const jobs = await axios.get(serverIp + '/jobs/findJobs/' + userId)
+        .catch(e => console.log(e));
+
       this.setState({ loading: 1 })
       this.setState({
         jobs: jobs.data,

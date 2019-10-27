@@ -3,6 +3,7 @@ import { StyleSheet, TouchableOpacity, Image } from 'react-native';
 
 
 const ImageButton = ({ source, onPress }) => {
+  
   const {
     containerStyle,
     imageStyle
@@ -15,7 +16,6 @@ const ImageButton = ({ source, onPress }) => {
     >
       <Image
         source={source}
-        style={[imageStyle]}
       />
     </TouchableOpacity>
   );
@@ -25,9 +25,6 @@ const styles = StyleSheet.create({
   containerStyle: {
     alignItems: 'center',
     justifyContent: 'center'
-  },
-  imageStyle: {
-
   }
 });
 

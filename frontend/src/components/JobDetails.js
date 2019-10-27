@@ -31,7 +31,7 @@ class JobDetails extends Component {
             <ImageButton
               source={images.iconChevronDown}
               onPress={() => {
-                this.setModalVisible(false);
+                this.setModalVisible(false)
               }}
             />
             <Text style={[styles.headerStyle]}>{this.props.job.company}</Text>
@@ -49,7 +49,7 @@ class JobDetails extends Component {
               />
               <Text style={[styles.subHeaderStyle]}>{this.props.job.location}</Text>
             </View>
-            <ScrollView style={[{ marginTop: 30, height: 500, width: '100%', overflow: 'scroll' }]}>
+            <ScrollView style={[styles.scrollStyle]}>
               <Text>{this.props.job.description}</Text>
             </ScrollView>
           </View>
@@ -59,7 +59,7 @@ class JobDetails extends Component {
           <ImageButton
             source={images.iconChevronUp}
             onPress={() => {
-              this.setModalVisible(true);
+              this.setModalVisible(true)
             }}
           />
           <Text style={[styles.headerStyle]}>{this.props.job.company}</Text>
@@ -112,6 +112,12 @@ const styles = StyleSheet.create({
     height: '100%',
     fontSize: 12,
     backgroundColor: 'white',
+  },
+  scrollStyle: {
+    marginTop: 30,
+    height: 500,
+    width: '100%',
+    overflow: 'scroll'
   },
   headerStyle: {
     fontSize: 20,
