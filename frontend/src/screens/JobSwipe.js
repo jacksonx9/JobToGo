@@ -13,11 +13,10 @@ export default class JobSwipe extends Component {
   static navigationOptions = {
     drawerLabel: 'Job Swipe',
   };
-  
+
   constructor(props) {
     super(props);
     this.state = {
-      myText: 'I\'m ready to get swiped!',
       jobs: [],
       jobIndex: 0,
       loading: 1
@@ -30,13 +29,13 @@ export default class JobSwipe extends Component {
     const jobs = await axios.get(serverIp+'/jobs/findJobs/'+userId).catch(e => console.log(e));
 
     this.setState({
-       jobs: jobs.data, 
+       jobs: jobs.data,
        loading: 0
      })
   }
 
   shareJob = () => {
-    this.setState({ myText: 'shared job' });
+    console.log("shared job");
   }
 
   dislikeJob = async () => {
@@ -44,15 +43,15 @@ export default class JobSwipe extends Component {
       userId: global.userId,
       jobId: this.state.jobs[this.state.jobIndex]._id
     }).catch(e => console.log(e))
-  
+
     if(this.state.jobs.length == (this.state.jobIndex + 1)) {
       const jobs = await axios.get(serverIp+'/jobs/findJobs/'+userId).catch(e => console.log(e));
       this.setState({ loading: 1 })
       this.setState({
-        jobs: jobs.data, 
+        jobs: jobs.data,
         loading: 0
       })
-    } else {  
+    } else {
       this.setState({ jobIndex: this.state.jobIndex + 1 })
     }
   }
@@ -67,16 +66,12 @@ export default class JobSwipe extends Component {
       const jobs = await axios.get(serverIp+'/jobs/findJobs/'+userId).catch(e => console.log(e));
       this.setState({ loading: 1 })
       this.setState({
-        jobs: jobs.data, 
+        jobs: jobs.data,
         loading: 0
       })
-    } else {  
+    } else {
       this.setState({ jobIndex: this.state.jobIndex + 1 })
     }
-  }
-
-  onPressSignIn = () => {
-    this.props.navigation.navigate('SendLikedJobs', {userId: userId})
   }
 
   render() {
@@ -89,24 +84,25 @@ export default class JobSwipe extends Component {
 
     return (
       <View style={[styles.containerStyle]}>
-        <MainHeader 
+        <MainHeader
           nav={this.props.navigation}
           onPressMenu={() => this.props.navigation.openDrawer()}
           onPressSend={() => this.props.navigation.navigate('SendLikedJobs')}
         />
+
         <GestureRecognizer
           onSwipeUp={this.shareJob}
           onSwipeLeft={this.dislikeJob}
           onSwipeRight={this.likeJob}
           config={config}
-
         >
           <JobImage
             companyName={this.state.jobs[this.state.jobIndex].company}
           />
         </GestureRecognizer>
+
         <JobDetails
-            job={this.state.jobs[this.state.jobIndex]}
+          job={this.state.jobs[this.state.jobIndex]}
         />
       </View>
     );
