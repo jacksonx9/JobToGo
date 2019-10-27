@@ -1,11 +1,10 @@
 import { Jobs, Users } from '../schema';
-import JobSet from './JobSet';
-
 import { JOBS_PER_SEND } from '..';
 
 
 class JobSorter {
   constructor(app, user) {
+    this.timepoint = Date.now();
     this.user = user;
     app.get('/jobSorter/:userId', async (req, res) => {
       const result = await this.getRelevantJobs(req.params.userId);
@@ -46,10 +45,10 @@ class JobSorter {
         if (keyword_idx === -1) {
           doc.keywords.push({
             name: keyword,
-            tfidf: tf * idf
+            tfidf: tf*idf
           });
         } else {
-          doc.keywords[keyword_idx].tfidf = tf * idf;
+          doc.keywords[keyword_idx].tfidf = tf*idf;
         }
 
         await doc.save();
@@ -59,50 +58,39 @@ class JobSorter {
   }
 
   async getRelevantJobs(userID) {
-    // sort the job array using tfidf with highest score first
-    const user = await Users.find({_id: userID}, 'userInfo.skillsExperiences');
-    const userKeywords = user[0].userInfo.skillsExperiences;
-    let potentialJobs = new JobSet();
     let mostRelevantJobs = [];
-
-    for (const keyword of userKeywords) {
-      // adds the most suitable jobs based on keyword to the Set
-      const relevantJobs = await Jobs.find({keywords: { $elemMatch: { name: keyword }}});
-
-      relevantJobs.sort((job1, job2) => {
-        const job1_keyword_idx = job1.keywords.findIndex(elem => elem.name === keyword);
-        const job2_keyword_idx = job2.keywords.findIndex(elem => elem.name === keyword);
-
-        if (job1.keywords[job1_keyword_idx].tfidf > job2.keywords[job2_keyword_idx].tfidf)
-          return 1;
-        if (job1.keywords[job1_keyword_idx].tfidf < job2.keywords[job2_keyword_idx].tfidf)
-          return -1;
-
-        return 0;
-      })
-      .slice(0, JOBS_PER_SEND);
-
-      for (const job of relevantJobs) {
-        potentialJobs.add(job);
-      }
-    }
+    const jobScoreCache = new Map();
+    const user = await Users.findById(userID);
+    const userKeywords = user.userInfo.skillsExperiences;
+    const jobs = Array.from(await Jobs.find({}));
 
     const jobScore = (job) => {
       let sum = 0;
 
-      let valid_keywords = job.keywords.filter(keyword => userKeywords.includes(keyword.name));
-      for (const k of valid_keywords) {
-        sum += k.tfidf;
+      if (jobScoreCache.has(job.id)) {
+        sum = jobScoreCache.get(job.id);
+      } else {
+        for (const keyword of job.keywords) {
+          if (userKeywords.includes(keyword.name))
+            sum += keyword.tfidf;
+        }
       }
 
       return sum;
     }
 
-    // Get highest overall tfidf scores
-    mostRelevantJobs = Array.from(potentialJobs.values())
-      .sort((a, b) => {
-        (jobScore(a) > jobScore(b)) ? 1
-      : ((jobScore(b) > jobScore(a)) ? -1 : 0)
+    // Get jobs with overall highest tfidf scores
+    mostRelevantJobs = jobs
+      .sort((job_a, job_b) => {
+        const job_a_score = jobScore(job_a);
+        const job_b_score = jobScore(job_b);
+
+        if (job_a_score > job_b_score)
+          return 1;
+        else if (job_b_score < job_a_score)
+          return -1;
+
+        return 0;
       }).slice(0, JOBS_PER_SEND);
 
     return {
