@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, View, Image } from 'react-native';
+import React from 'react'
+import { StyleSheet, View, Image } from 'react-native'
 
 import { ImageButton } from '../components'
 import { images } from '../constants'
@@ -10,7 +10,7 @@ const MainHeader = ({ onPressMenu, onPressSend }) => {
   const {
     containerStyle,
     logoStyle
-  } = styles;
+  } = styles
 
   return (
     <View style={[containerStyle]}>
@@ -45,4 +45,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export { MainHeader };
+export { MainHeader }

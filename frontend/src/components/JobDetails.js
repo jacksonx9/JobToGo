@@ -1,22 +1,22 @@
-import React, { Component } from 'react';
-import { StyleSheet, Text, View, Image, Modal, } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import React, { Component } from 'react'
+import { StyleSheet, Text, View, Image, Modal, } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
 
-import { ImageButton } from '../components';
+import { ImageButton } from '../components'
 import { images, colours, fonts } from '../constants'
 
 
 class JobDetails extends Component {
 
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
-      modalVisible: false,
-    };
+      modalVisible: false
+    }
   }
 
   setModalVisible = (visible) => {
-    this.setState({ modalVisible: visible });
+    this.setState({ modalVisible: visible })
   }
 
   render() {
@@ -79,9 +79,9 @@ class JobDetails extends Component {
           </View>
         </View>
       </View>
-    );
+    )
   }
-};
+}
 
 const styles = StyleSheet.create({
   containerStyle: {
@@ -135,6 +135,6 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
   }
-});
+})
 
-export { JobDetails };
+export { JobDetails }

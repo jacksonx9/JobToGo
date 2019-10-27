@@ -6,4 +6,4 @@ export const colours = {
     gray: '#696969',
     lightGray: '#d9d9d9',
     lighterGray: '#ededed'
-  }; 
+  }

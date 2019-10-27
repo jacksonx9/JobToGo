@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
+import React from 'react'
+import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native'
 
 import { fonts, images, colours } from '../constants'
 
@@ -68,4 +68,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export { SelectableItem };
+export { SelectableItem }

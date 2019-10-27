@@ -1,34 +1,34 @@
-'use strict';
+'use strict'
 
-import React, { Component } from 'react';
-import { View, StyleSheet } from 'react-native';
-import GestureRecognizer from 'react-native-swipe-gestures';
-import axios from 'axios';
+import React, { Component } from 'react'
+import { View, StyleSheet } from 'react-native'
+import GestureRecognizer from 'react-native-swipe-gestures'
+import axios from 'axios'
 
-import { JobImage, JobDetails, Loader, MainHeader } from '../components';
+import { JobImage, JobDetails, Loader, MainHeader } from '../components'
 import { serverIp } from '../constants'
 
 
 export default class JobSwipe extends Component {
 
   static navigationOptions = {
-    drawerLabel: 'Job Swipe',
-  };
+    drawerLabel: 'Job Swipe'
+  }
 
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       jobs: [],
       jobIndex: 0,
       loading: 1
-    };
+    }
   }
 
   async componentDidMount() {
     const userId = global.userId
     console.log(`User id is: ${global.userId}`)
     const jobs = await axios.get(serverIp + '/jobs/findJobs/' + userId)
-      .catch(e => console.log(e));
+      .catch(e => console.log(e))
 
     this.setState({
       jobs: jobs.data,
@@ -37,7 +37,7 @@ export default class JobSwipe extends Component {
   }
 
   shareJob = () => {
-    console.log("Shared job");
+    console.log("Shared job")
   }
 
   dislikeJob = async () => {
@@ -49,7 +49,7 @@ export default class JobSwipe extends Component {
 
     if (this.state.jobs.length == (this.state.jobIndex + 1)) {
       const jobs = await axios.get(serverIp + '/jobs/findJobs/' + userId)
-        .catch(e => console.log(e));
+        .catch(e => console.log(e))
 
       this.setState({ loading: 1 })
       this.setState({
@@ -70,7 +70,7 @@ export default class JobSwipe extends Component {
 
     if (this.state.jobs.length == (this.state.jobIndex + 1)) {
       const jobs = await axios.get(serverIp + '/jobs/findJobs/' + userId)
-        .catch(e => console.log(e));
+        .catch(e => console.log(e))
 
       this.setState({ loading: 1 })
       this.setState({
@@ -86,7 +86,7 @@ export default class JobSwipe extends Component {
     const config = {
       velocityThreshold: 0.3,
       directionalOffsetThreshold: 80
-    };
+    }
 
     if (this.state.loading) return <Loader />
 
@@ -113,9 +113,9 @@ export default class JobSwipe extends Component {
           job={this.state.jobs[this.state.jobIndex]}
         />
       </View>
-    );
-  };
-};
+    )
+  }
+}
 
 const styles = StyleSheet.create({
   containerStyle: {
@@ -123,5 +123,5 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '100%'
   }
-});
+})
 

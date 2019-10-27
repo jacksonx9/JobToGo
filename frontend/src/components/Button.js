@@ -1,12 +1,12 @@
-import React from 'react';
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import React from 'react'
+import { StyleSheet, Text, TouchableOpacity } from 'react-native'
 
 
 const Button = ({ style, backgroundColor, textColor, title, enable = true, onPress }) => {
   const {
     containerStyle,
     textStyle
-  } = styles;
+  } = styles
 
   return (
     <TouchableOpacity
@@ -34,6 +34,6 @@ const styles = StyleSheet.create({
   textStyle: {
     fontSize: 16,
   }
-});
+})
 
-export { Button };
+export { Button }

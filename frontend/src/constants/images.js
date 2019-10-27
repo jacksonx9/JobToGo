@@ -11,4 +11,4 @@ export const images = {
     iconChevronLeft: require('../../assets/icon-chevron-left.png'),
     iconJob: require('../../assets/icon-job.png'),
     tempBg1: require('../../assets/temp-bg1.png'),
-  }; 
+  }

@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native';
-import { Button } from '../components';
+import React, { Component } from 'react'
+import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native'
+import { Button } from '../components'
 import { images, colours, fonts } from '../constants'
 
 export default class SignUp extends Component {
@@ -11,7 +11,7 @@ export default class SignUp extends Component {
   }
 
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       firstName: '',
       lastName: '',
@@ -19,7 +19,7 @@ export default class SignUp extends Component {
       password: '',
       showPassword: true,
       showPasswordText: this.text.showPassword
-    };
+    }
   }
 
   onPressSignIn = () => {
@@ -89,9 +89,9 @@ export default class SignUp extends Component {
           />
         </View>
       </View>
-    );
-  };
-};
+    )
+  }
+}
 
 
 const styles = StyleSheet.create({
@@ -135,4 +135,4 @@ const styles = StyleSheet.create({
     color: 'white',
     textDecorationColor: 'white'
   }
-});
+})

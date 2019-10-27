@@ -1,7 +1,7 @@
-import React from 'react';
-import { StyleSheet, Image, View } from 'react-native';
+import React from 'react'
+import { StyleSheet, Image, View } from 'react-native'
 
-import { images, colours } from '../constants';
+import { images, colours } from '../constants'
 
 
 const Loader = () => {
@@ -32,6 +32,6 @@ const styles = StyleSheet.create({
     height: 140,
     width: 80,
   }
-});
+})
 
-export { Loader };
+export { Loader }

@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
-import { View, FlatList, Text, TextInput, StyleSheet } from 'react-native';
-import axios from 'axios';
+import React, { Component } from 'react'
+import { View, FlatList, Text, TextInput, StyleSheet } from 'react-native'
+import axios from 'axios'
 
-import { Button, SelectableItem, Loader, NavHeader } from '../components';
+import { Button, SelectableItem, Loader, NavHeader } from '../components'
 import { images, colours, fonts, serverIp } from '../constants'
 
 
@@ -10,25 +10,25 @@ export default class EditFriends extends Component {
 
   static navigationOptions = {
     drawerLabel: 'Friends',
-  };
+  }
 
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       friends: [],
       friendRequests: [],
       addFriendName: '',
       jobIndex: 0,
       loading: 1
-    };
+    }
   }
 
   async componentDidMount() {
     const userId = global.userId
     const friends = await axios.get(serverIp + '/users/getFriends/' + userId)
-      .catch(e => console.log(e));
+      .catch(e => console.log(e))
     const friendRequests = await axios.get(serverIp + '/users/getPendingFriends/' + userId)
-      .catch(e => console.log(e));
+      .catch(e => console.log(e))
 
     this.setState({
       friends: friends.data,
@@ -41,9 +41,9 @@ export default class EditFriends extends Component {
     if (prevState != this.state) {
       const userId = global.userId
       const friends = await axios.get(serverIp + '/users/getFriends/' + userId)
-        .catch(e => console.log(e));
+        .catch(e => console.log(e))
       const friendRequests = await axios.get(serverIp + '/users/getPendingFriends/' + userId)
-        .catch(e => console.log(e));
+        .catch(e => console.log(e))
 
       this.setState({
         friends: friends.data,
@@ -55,12 +55,12 @@ export default class EditFriends extends Component {
 
   addFriend = async () => {
     const friend = await axios.get(serverIp + '/users/' + this.state.addFriendName)
-      .catch(e => console.log(e));
+      .catch(e => console.log(e))
 
     await axios.post(serverIp + '/users/addFriend/', {
       userId: global.userId,
       friendId: friend.data._id
-    }).catch(e => console.log(e));
+    }).catch(e => console.log(e))
 
     alert(`Sent a friend request to ${this.state.addFriendName}`)
   }
@@ -70,12 +70,12 @@ export default class EditFriends extends Component {
     await axios.post(serverIp + '/users/confirmFriend/', {
       userId: userId,
       friendId: item._id
-    }).catch(e => console.log(e));
+    }).catch(e => console.log(e))
 
     const friends = await axios.get(serverIp + '/users/getFriends/' + userId)
-      .catch(e => console.log(e));
+      .catch(e => console.log(e))
     const friendRequests = await axios.get(serverIp + '/users/getPendingFriends/' + userId)
-      .catch(e => console.log(e));
+      .catch(e => console.log(e))
 
     this.setState({
       friends: friends.data,
@@ -93,12 +93,12 @@ export default class EditFriends extends Component {
         userId: userId,
         friendId: item._id
       }
-    }).catch(e => console.log(e));
+    }).catch(e => console.log(e))
 
     const friends = await axios.get(serverIp + '/users/getFriends/' + userId)
-      .catch(e => console.log(e));
+      .catch(e => console.log(e))
     const friendRequests = await axios.get(serverIp + '/users/getPendingFriends/' + userId)
-      .catch(e => console.log(e));
+      .catch(e => console.log(e))
 
     this.setState({
       friends: friends.data,
@@ -172,9 +172,9 @@ export default class EditFriends extends Component {
           }
         />
       </View>
-    );
-  };
-};
+    )
+  }
+}
 
 const styles = StyleSheet.create({
   containerStyle: {
@@ -231,4 +231,4 @@ const styles = StyleSheet.create({
     color: 'white',
     textDecorationColor: 'white'
   }
-});
+})

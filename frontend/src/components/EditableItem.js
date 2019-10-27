@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { StyleSheet, Modal, Text, TouchableHighlight, View } from 'react-native';
+import React, { Component } from 'react'
+import { StyleSheet, Modal, Text, TouchableHighlight, View } from 'react-native'
 
 import { fonts } from '../constants'
 
@@ -9,8 +9,8 @@ class SelectableItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      modalVisible: false,
-    };
+      modalVisible: false
+    }
   }
 
   setModalVisible = (visible) => {

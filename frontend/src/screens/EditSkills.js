@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
-import { View, StyleSheet } from 'react-native';
-import FilePickerManager from 'react-native-file-picker';
-import axios from 'axios';
+import React, { Component } from 'react'
+import { View, StyleSheet } from 'react-native'
+import FilePickerManager from 'react-native-file-picker'
+import axios from 'axios'
 
-import { Button, NavHeader } from '../components';
+import { Button, NavHeader } from '../components'
 import { images, colours, fonts, serverIp } from '../constants'
 
 
@@ -11,35 +11,35 @@ export default class EditSkills extends Component {
 
   static navigationOptions = {
     drawerLabel: 'Edit Skills',
-  };
+  }
 
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       likedJobs: [],
       resumeFile: '',
       uploaded: false
-    };
+    }
   }
 
   onPressUpload = () => {
     FilePickerManager.showFilePicker(null, async (response) => {
-      console.log('Response = ', response);
+      console.log('Response = ', response)
 
       if (response.didCancel) {
-        console.log('User cancelled file picker');
+        console.log('User cancelled file picker')
       }
       else if (response.error) {
-        console.log('FilePickerManager Error: ', response.error);
+        console.log('FilePickerManager Error: ', response.error)
       }
       else {
-        const data = new FormData();
-        data.append('userId', global.userId);
+        const data = new FormData()
+        data.append('userId', global.userId)
         data.append('fileData', {
           uri: response.uri,
           type: response.type,
           name: response.fileName
-        });
+        })
 
         await axios.post(serverIp + '/users/resume/upload',
           data, {
@@ -50,7 +50,7 @@ export default class EditSkills extends Component {
 
         alert("Resume Sent for analysis")
       }
-    });
+    })
   }
 
   render() {
@@ -71,9 +71,9 @@ export default class EditSkills extends Component {
           onPress={() => this.onPressUpload()}
         />
       </View>
-    );
-  };
-};
+    )
+  }
+}
 
 const styles = StyleSheet.create({
   containerStyle: {
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     color: 'white',
     textDecorationColor: 'white'
   }
-});
+})
 
 
 

@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
-import { View, FlatList, StyleSheet} from 'react-native';
-import axios from 'axios';
+import React, { Component } from 'react'
+import { View, FlatList, StyleSheet} from 'react-native'
+import axios from 'axios'
 
-import { SelectableItem, Loader, NavHeader } from '../components';
+import { SelectableItem, Loader, NavHeader } from '../components'
 import { images, colours, fonts, serverIp } from '../constants'
 
 
@@ -10,20 +10,20 @@ export default class SendLikedJobs extends Component {
 
   static navigationOptions = {
     drawerLabel: 'Liked Jobs',
-  };
+  }
 
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       likedJobs: [],
       jobIndex: 0,
       loading: 1
-    };
+    }
   }
 
   async componentDidMount() {
     const likedJobs = await axios.get(serverIp + '/jobs/getLikedJobs/' + global.userId)
-      .catch(e => console.log(e));
+      .catch(e => console.log(e))
     
     this.setState({
       likedJobs: likedJobs.data,
@@ -34,7 +34,7 @@ export default class SendLikedJobs extends Component {
   async componentDidUpdate(prevProps, prevState) {
     if (prevProps != this.props) {
       const likedJobs = await axios.get(serverIp + '/jobs/getLikedJobs/' + global.userId)
-        .catch(e => console.log(e));
+        .catch(e => console.log(e))
       this.setState({
         likedJobs: likedJobs.data,
         loading: 0
@@ -47,10 +47,10 @@ export default class SendLikedJobs extends Component {
     await axios.post(serverIp + '/jobs/emailUser/',
       {
         userId: userId
-      }).catch(e => console.log(e));
+      }).catch(e => console.log(e))
 
     const likedJobs = await axios.get(serverIp + '/jobs/getLikedJobs/' + userId)
-      .catch(e => console.log(e));
+      .catch(e => console.log(e))
     
     this.setState({
       likedJobs: likedJobs.data,
@@ -90,9 +90,9 @@ export default class SendLikedJobs extends Component {
           }
         />
       </View>
-    );
-  };
-};
+    )
+  }
+}
 
 const styles = StyleSheet.create({
   containerStyle: {
@@ -135,4 +135,4 @@ const styles = StyleSheet.create({
     color: 'white',
     textDecorationColor: 'white'
   }
-});
+})

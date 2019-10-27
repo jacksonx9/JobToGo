@@ -1,20 +1,20 @@
-import React, { Component } from 'react';
-import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native';
-import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
-import axios from 'axios';
+import React, { Component } from 'react'
+import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native'
+import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin'
+import axios from 'axios'
 
-import { Button } from '../components';
-import { images, colours, fonts, serverIp } from '../constants'
+import { Button } from '../components'
+import { images, colours, fonts, serverIp, webClientId } from '../constants'
 
 
 export default class SignIn extends Component {
 
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       email: '',
       password: ''
-    };
+    }
   }
 
   onPressSignIn = async () => {
@@ -25,8 +25,8 @@ export default class SignIn extends Component {
   onPressGoogleSignIn = async () => {
     try {
       await GoogleSignin.configure({
-        webClientId: '617405875578-f23h0uql1ol1qhk64qd16mcubqludhah.apps.googleusercontent.com'
-      });
+        webClientId: webClientId
+      })
 
       await GoogleSignin.hasPlayServices()
       const userInfo = await GoogleSignin.signIn()
@@ -55,7 +55,7 @@ export default class SignIn extends Component {
         console.log(error)
       }
     }
-  };
+  }
 
   render() {
     return (
@@ -116,9 +116,9 @@ export default class SignIn extends Component {
         </View>
       </View>
 
-    );
-  };
-};
+    )
+  }
+}
 
 const styles = StyleSheet.create({
   containerStyle: {
@@ -163,4 +163,4 @@ const styles = StyleSheet.create({
     color: 'white',
     textDecorationColor: 'white'
   }
-});
+})
