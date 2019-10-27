@@ -364,17 +364,11 @@ class User {
 
   /* gets and returns a set containing the collective skills of all the users */
   async getAllSkills() {
-    let keywords = new Set();
+    let keywords = [];
     for (const doc of await Users.find({})) {
-      const skills = doc.userInfo.skillsExperiences;
-      if (skills.length > 0){
-        skills.forEach(item => keywords.add(item));
-      }
+      keywords.push(...doc.userInfo.skillsExperiences);
     }
-    if (keywords.size < 6) {
-      const defaultSkills = ['javascript', 'java', 'python', 'html', 'css', 'c++'];
-      defaultSkills.forEach(item => keywords.add(item));
-    }
+
     return keywords;
   }
 
