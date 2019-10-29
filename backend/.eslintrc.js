@@ -17,5 +17,6 @@ module.exports = {
   rules: {
     'no-underscore-dangle': 0,
     'no-new': 0,
+    'class-methods-use-this': 0,
   },
 };

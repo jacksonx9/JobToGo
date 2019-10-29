@@ -8,88 +8,141 @@ class JobShortLister {
   constructor(app) {
     this.logger = Logger.get(this.constructor.name);
 
-    app.post('/jobs/addLikedJobs/', async (req, res) => {
+    app.post('/jobs/like/', async (req, res) => {
       const { userId, jobId } = req.body;
-      const addRes = await this.addLikedJobs(userId, jobId);
-      res.status(addRes ? 200 : 400).send(addRes);
+      const result = await this.addLikedJobs(userId, jobId);
+      res.status(result.status).send(result);
     });
 
-    app.post('/jobs/addDislikedJobs/', async (req, res) => {
+    app.post('/jobs/dislike/', async (req, res) => {
       const { userId, jobId } = req.body;
-      const addRes = await this.addDislikedJobs(userId, jobId);
-      res.status(addRes ? 200 : 400).send(addRes);
+      const result = await this.addDislikedJobs(userId, jobId);
+      res.status(result.status).send(result);
     });
 
-    app.get('/jobs/getLikedJobs/:userId', async (req, res) => {
-      try {
-        const { userId } = req.params;
-        const jobsData = await JobShortLister.getLikedJobsData(userId);
-        res.status(200).send(jobsData);
-      } catch (e) {
-        this.logger.error(e);
-        res.status(400).send(null);
+    app.get('/jobs/like/:userId', async (req, res) => {
+      const result = await this.getLikedJobsData(req.params.userId);
+      res.status(result.status).send(result);
+    });
+  }
+
+  async _addLikedDislikedJobs(userId, jobId, type) {
+    assert(type === 'likedJobs' || type === 'dislikedJobs');
+
+    if (!userId || !jobId) {
+      return {
+        result: false,
+        message: 'Invalid userId or jobId',
+        status: 400,
+      };
+    }
+
+    try {
+      // Make sure job is valid
+      await Jobs.findById(jobId).orFail();
+
+      // Check if already swiped
+      const user = await Users.findOne({
+        _id: userId,
+        $or: [
+          { likedJobs: jobId },
+          { dislikedJobs: jobId },
+        ],
+      });
+
+      if (user !== null) {
+        return {
+          result: false,
+          message: 'Job already selected once',
+          status: 400,
+        };
       }
-    });
+
+      await Users.findByIdAndUpdate(userId, { $addToSet: { [type]: jobId } }).orFail();
+
+      return {
+        result: true,
+        message: '',
+        status: 200,
+      };
+    } catch (e) {
+      return {
+        result: false,
+        message: 'Invalid userId or jobId',
+        status: 400,
+      };
+    }
   }
 
   async addLikedJobs(userId, jobId) {
-    try {
-      const res = await Users.updateOne(
-        { _id: userId },
-        { $addToSet: { likedJobs: jobId } },
-      );
-      return res.nModified === 1;
-    } catch (e) {
-      this.logger.error(e);
-      return false;
-    }
+    return this._addLikedDislikedJobs(userId, jobId, 'likedJobs');
   }
 
   async addDislikedJobs(userId, jobId) {
+    return this._addLikedDislikedJobs(userId, jobId, 'dislikedJobs');
+  }
+
+  async _getLikedDislikedJobs(userId, type) {
+    assert(type === 'likedJobs' || type === 'dislikedJobs');
+
+    // Throws if userId is invalid
+    const doc = await Users.findById(userId, type).orFail();
+    return doc[type];
+  }
+
+  async getLikedJobs(userId) {
+    return this._getLikedDislikedJobs(userId, 'likedJobs');
+  }
+
+  async getDislikedJobs(userId) {
+    return this._getLikedDislikedJobs(userId, 'dislikedJobs');
+  }
+
+  async getLikedJobsData(userId) {
+    let jobIds;
+
+    if (!userId) {
+      return {
+        result: null,
+        message: 'Invalid userId',
+        status: 400,
+      };
+    }
+
     try {
-      const res = await Users.updateOne(
-        { _id: userId },
-        { $addToSet: { dislikedJobs: jobId } },
-      );
-      return res.nModified === 1;
+      jobIds = await this.getLikedJobs(userId);
     } catch (e) {
-      this.logger.error(e);
-      return false;
+      return {
+        result: null,
+        message: 'Invalid userId',
+        status: 400,
+      };
     }
-  }
 
-  static async getLikedJobs(userId) {
-    const doc = await Users.findById(userId);
-    if (doc === null) {
-      throw new Error('Invalid userId');
-    }
-    assert(typeof doc.likedJobs !== 'undefined');
-
-    return doc.likedJobs;
-  }
-
-  static async getLikedJobsData(userId) {
-    const jobIds = await JobShortLister.getLikedJobs(userId);
     const jobsData = [];
 
     await forEachAsync(jobIds, async (id) => {
+      // If id is not a valid ObjectId, this will throw
+      // But at that point we might as well crash since means our db is malformed
       const jobData = await Jobs.findById(id);
+
       if (jobData) {
-        jobsData.push(jobData);
+        // Users don't need keywords
+        const keywordlessJobData = jobData.toObject();
+        delete keywordlessJobData.keywords;
+        jobsData.push(keywordlessJobData);
+      } else {
+        this.logger.warn(
+          `Job ${id} was present in ${userId}'s likedJobs, but no longer exists`,
+        );
       }
     });
 
-    return jobsData;
-  }
-
-  static async getDislikedJobs(userId) {
-    const doc = await Users.findById(userId);
-    if (doc === null) {
-      throw new Error('Invalid userId');
-    }
-    assert(typeof doc.dislikedJobs !== 'undefined');
-
-    return doc.dislikedJobs;
+    return {
+      result: jobsData,
+      message: '',
+      status: 200,
+    };
   }
 }
 

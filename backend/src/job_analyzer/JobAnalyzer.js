@@ -2,20 +2,18 @@ import Logger from 'js-logger';
 import { forEachAsync } from 'foreachasync';
 
 import User from '../user';
-import JobShortLister from '../job_shortlister';
 import { Jobs, Users } from '../schema';
 import { JOBS_PER_SEND } from '../constants';
 
 
 class JobAnalyzer {
-  constructor(app, user) {
+  constructor(app, shortlister) {
     this.logger = Logger.get(this.constructor.name);
+    this.shortlister = shortlister;
 
-    this.user = user;
-
-    app.get('/jobs/findJobs/:userId', async (req, res) => {
+    app.get('/jobs/find/:userId', async (req, res) => {
       const result = await this.getRelevantJobs(req.params.userId);
-      res.status(result.status).send(result.mostRelevantJobs);
+      res.status(result.status).send(result);
     });
   }
 
@@ -23,7 +21,7 @@ class JobAnalyzer {
     this.logger.info('Starting to compute job scores...');
 
     const jobs = await Jobs.find({});
-    const skills = await User.getAllSkills();
+    const skills = await User._getAllSkills();
 
     await forEachAsync(skills, async (skill) => {
       let docCount = 0;
@@ -69,28 +67,63 @@ class JobAnalyzer {
     this.logger.info('Computed job scores!');
   }
 
-  async getRelevantJobs(userID) {
+  async getRelevantJobs(userId) {
+    this.logger.info('Getting most relevant jobs.');
+
     const swipedJobs = [];
     const mostRelevantJobs = [];
     const jobScoreCache = new Map();
-    const user = await Users.findById(userID);
+    let user;
+
+    if (!userId) {
+      return {
+        result: null,
+        message: 'Invalid userId',
+        status: 400,
+      };
+    }
+
+    try {
+      user = await Users.findById(userId).orFail();
+    } catch (e) {
+      return {
+        result: null,
+        message: 'Invalid userId',
+        status: 400,
+      };
+    }
+
+    if (user === null) {
+      return {
+        result: null,
+        message: 'Invalid userId',
+        status: 400,
+      };
+    }
+
     const userKeywords = user.userInfo.skillsExperiences;
 
     // Get jobs the user has already seen
-    swipedJobs.push(...await JobShortLister.getLikedJobs(userID));
-    swipedJobs.push(...await JobShortLister.getDislikedJobs(userID));
-    const unseenJobs = await Jobs.find({ _id: { $nin: swipedJobs } });
+    swipedJobs.push(...await this.shortlister.getLikedJobs(userId));
+    swipedJobs.push(...await this.shortlister.getDislikedJobs(userId));
 
     // If the user has not uploaded a resume
     if (userKeywords.length === 0) {
-      mostRelevantJobs.push(...unseenJobs.limit(JOBS_PER_SEND));
+      mostRelevantJobs.push(
+        ...await Jobs.find({ _id: { $nin: swipedJobs } }).limit(JOBS_PER_SEND).lean(),
+      );
+      // Users don't need keywords
+      mostRelevantJobs.forEach((_, i) => delete mostRelevantJobs[i].keywords);
+
       return {
-        mostRelevantJobs,
+        result: mostRelevantJobs,
+        message: '',
         status: 200,
       };
     }
 
-    this.logger.info('Starting job retrieval.');
+    const unseenJobs = await Jobs.find({ _id: { $nin: swipedJobs } }).lean();
+
     // Compute overall tf_idf score of a job
     const jobScore = (job) => {
       let sum = 0;
@@ -109,7 +142,6 @@ class JobAnalyzer {
       return sum;
     };
 
-    this.logger.info('Getting most relevant jobs.');
     // Get jobs with overall highest tfidf scores
     mostRelevantJobs.push(...unseenJobs
       .sort((jobA, jobB) => {
@@ -126,8 +158,12 @@ class JobAnalyzer {
         return 0;
       }).slice(0, JOBS_PER_SEND));
 
+    // Users don't need keywords
+    mostRelevantJobs.forEach((_, i) => delete mostRelevantJobs[i].keywords);
+
     return {
-      mostRelevantJobs,
+      result: mostRelevantJobs,
+      message: '',
       status: 200,
     };
   }

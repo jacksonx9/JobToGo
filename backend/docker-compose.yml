@@ -11,6 +11,8 @@ services:
     networks:
       jobtogo_net:
         ipv4_address: 171.0.0.3
+    logging:
+      driver: none
 
   node:
     container_name: jobtogo_backend
