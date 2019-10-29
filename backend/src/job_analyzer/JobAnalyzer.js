@@ -21,7 +21,7 @@ class JobAnalyzer {
     this.logger.info('Starting to compute job scores...');
 
     const jobs = await Jobs.find({});
-    const skills = await User.getAllSkills();
+    const skills = await User._getAllSkills();
 
     await forEachAsync(skills, async (skill) => {
       let docCount = 0;
