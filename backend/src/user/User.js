@@ -227,7 +227,7 @@ class User {
   }
 
   /* gets and returns a set containing the collective skills of all the users */
-  static async getAllSkills() {
+  static async _getAllSkills() {
     const keywords = [];
     const users = await Users.find({});
 
