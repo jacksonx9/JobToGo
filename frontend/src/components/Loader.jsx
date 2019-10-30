@@ -5,7 +5,6 @@ import images from '../constants/images'
 import colours from '../constants/colours'
 
 
-
 const Loader = () => {
   
   const {

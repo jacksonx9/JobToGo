@@ -3,7 +3,10 @@ import { View, FlatList, Text, TextInput, StyleSheet } from 'react-native'
 import axios from 'axios'
 
 import { Button, SelectableItem, Loader, NavHeader } from '../components'
-import { images, colours, fonts, serverIp } from '../constants'
+import images from '../constants/images'
+import colours from '../constants/colours'
+import fonts from '../constants/fonts'
+import config from '../constants/config'
 
 
 export default class EditFriends extends Component {
@@ -25,9 +28,9 @@ export default class EditFriends extends Component {
 
   async componentDidMount() {
     const userId = global.userId
-    const friends = await axios.get(serverIp + '/users/getFriends/' + userId)
+    const friends = await axios.get(config.serverIp + '/users/getFriends/' + userId)
       .catch(e => console.log(e))
-    const friendRequests = await axios.get(serverIp + '/users/getPendingFriends/' + userId)
+    const friendRequests = await axios.get(config.serverIp + '/users/getPendingFriends/' + userId)
       .catch(e => console.log(e))
 
     this.setState({
@@ -40,9 +43,9 @@ export default class EditFriends extends Component {
   async componentDidUpdate(prevProps, prevState) {
     if (prevState != this.state) {
       const userId = global.userId
-      const friends = await axios.get(serverIp + '/users/getFriends/' + userId)
+      const friends = await axios.get(config.serverIp + '/users/getFriends/' + userId)
         .catch(e => console.log(e))
-      const friendRequests = await axios.get(serverIp + '/users/getPendingFriends/' + userId)
+      const friendRequests = await axios.get(config.serverIp + '/users/getPendingFriends/' + userId)
         .catch(e => console.log(e))
 
       this.setState({
@@ -54,10 +57,10 @@ export default class EditFriends extends Component {
   }
 
   addFriend = async () => {
-    const friend = await axios.get(serverIp + '/users/' + this.state.addFriendName)
+    const friend = await axios.get(config.serverIp + '/users/' + this.state.addFriendName)
       .catch(e => console.log(e))
 
-    await axios.post(serverIp + '/users/addFriend/', {
+    await axios.post(config.serverIp + '/users/addFriend/', {
       userId: global.userId,
       friendId: friend.data._id
     }).catch(e => console.log(e))
@@ -67,14 +70,14 @@ export default class EditFriends extends Component {
 
   comfirmFriendRequest = async (item, index) => {
     const userId = global.userId
-    await axios.post(serverIp + '/users/confirmFriend/', {
+    await axios.post(config.serverIp + '/users/confirmFriend/', {
       userId: userId,
       friendId: item._id
     }).catch(e => console.log(e))
 
-    const friends = await axios.get(serverIp + '/users/getFriends/' + userId)
+    const friends = await axios.get(config.serverIp + '/users/getFriends/' + userId)
       .catch(e => console.log(e))
-    const friendRequests = await axios.get(serverIp + '/users/getPendingFriends/' + userId)
+    const friendRequests = await axios.get(config.serverIp + '/users/getPendingFriends/' + userId)
       .catch(e => console.log(e))
 
     this.setState({
@@ -88,16 +91,16 @@ export default class EditFriends extends Component {
 
   removeFriend = async (item, index) => {
     const userId = global.userId
-    await axios.delete(serverIp + '/users/removeFriend/', {
+    await axios.delete(config.serverIp + '/users/removeFriend/', {
       data: {
         userId: userId,
         friendId: item._id
       }
     }).catch(e => console.log(e))
 
-    const friends = await axios.get(serverIp + '/users/getFriends/' + userId)
+    const friends = await axios.get(config.serverIp + '/users/getFriends/' + userId)
       .catch(e => console.log(e))
-    const friendRequests = await axios.get(serverIp + '/users/getPendingFriends/' + userId)
+    const friendRequests = await axios.get(config.serverIp + '/users/getPendingFriends/' + userId)
       .catch(e => console.log(e))
 
     this.setState({

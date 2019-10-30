@@ -3,7 +3,10 @@ import { View, FlatList, StyleSheet} from 'react-native'
 import axios from 'axios'
 
 import { SelectableItem, Loader, NavHeader } from '../components'
-import { images, colours, fonts, serverIp } from '../constants'
+import images from '../constants/images'
+import colours from '../constants/colours'
+import fonts from '../constants/fonts'
+import config from '../constants/config'
 
 
 export default class SendLikedJobs extends Component {
@@ -22,7 +25,7 @@ export default class SendLikedJobs extends Component {
   }
 
   async componentDidMount() {
-    const likedJobs = await axios.get(serverIp + '/jobs/getLikedJobs/' + global.userId)
+    const likedJobs = await axios.get(config.serverIp + '/jobs/getLikedJobs/' + global.userId)
       .catch(e => console.log(e))
     
     this.setState({
@@ -33,7 +36,7 @@ export default class SendLikedJobs extends Component {
 
   async componentDidUpdate(prevProps, prevState) {
     if (prevProps != this.props) {
-      const likedJobs = await axios.get(serverIp + '/jobs/getLikedJobs/' + global.userId)
+      const likedJobs = await axios.get(config.serverIp + '/jobs/getLikedJobs/' + global.userId)
         .catch(e => console.log(e))
       this.setState({
         likedJobs: likedJobs.data,
@@ -44,12 +47,12 @@ export default class SendLikedJobs extends Component {
 
   sendLikedJobs = async () => {
     const userId = global.userId
-    await axios.post(serverIp + '/jobs/emailUser/',
+    await axios.post(config.serverIp + '/jobs/emailUser/',
       {
         userId: userId
       }).catch(e => console.log(e))
 
-    const likedJobs = await axios.get(serverIp + '/jobs/getLikedJobs/' + userId)
+    const likedJobs = await axios.get(config.serverIp + '/jobs/getLikedJobs/' + userId)
       .catch(e => console.log(e))
     
     this.setState({

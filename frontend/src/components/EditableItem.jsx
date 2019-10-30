@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import { StyleSheet, Modal, Text, TouchableHighlight, View } from 'react-native'
 
-import { fonts } from '../constants'
+
+import fonts from '../constants/fonts'
+
 
 
 class SelectableItem extends Component {

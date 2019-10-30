@@ -6,11 +6,12 @@ import GestureRecognizer from 'react-native-swipe-gestures'
 import axios from 'axios'
 
 import { JobImage, JobDetails, Loader, MainHeader } from '../components'
-import { serverIp } from '../constants'
+
+import config from '../constants/config'
 
 
 export default class JobSwipe extends Component {
-
+  
   static navigationOptions = {
     drawerLabel: 'Job Swipe'
   }
@@ -27,7 +28,7 @@ export default class JobSwipe extends Component {
   async componentDidMount() {
     const userId = global.userId
     console.log(`User id is: ${global.userId}`)
-    const jobs = await axios.get(serverIp + '/jobs/findJobs/' + userId)
+    const jobs = await axios.get(config.serverIp + '/jobs/findJobs/' + userId)
       .catch(e => console.log(e))
 
     this.setState({
@@ -42,13 +43,13 @@ export default class JobSwipe extends Component {
 
   dislikeJob = async () => {
     const userId = global.userId
-    await axios.post(serverIp + '/jobs/addDislikedJobs/', {
+    await axios.post(config.serverIp + '/jobs/addDislikedJobs/', {
       userId: userId,
       jobId: this.state.jobs[this.state.jobIndex]._id
     }).catch(e => console.log(e))
 
     if (this.state.jobs.length == (this.state.jobIndex + 1)) {
-      const jobs = await axios.get(serverIp + '/jobs/findJobs/' + userId)
+      const jobs = await axios.get(config.serverIp + '/jobs/findJobs/' + userId)
         .catch(e => console.log(e))
 
       this.setState({ loading: 1 })
@@ -63,13 +64,13 @@ export default class JobSwipe extends Component {
 
   likeJob = async () => {
     const userId = global.userId
-    await axios.post(serverIp + '/jobs/addLikedJobs/', {
+    await axios.post(config.serverIp + '/jobs/addLikedJobs/', {
       userId: userId,
       jobId: this.state.jobs[this.state.jobIndex]._id
     }).catch(e => console.log(e))
 
     if (this.state.jobs.length == (this.state.jobIndex + 1)) {
-      const jobs = await axios.get(serverIp + '/jobs/findJobs/' + userId)
+      const jobs = await axios.get(config.serverIp + '/jobs/findJobs/' + userId)
         .catch(e => console.log(e))
 
       this.setState({ loading: 1 })

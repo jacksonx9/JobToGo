@@ -4,7 +4,10 @@ import FilePickerManager from 'react-native-file-picker'
 import axios from 'axios'
 
 import { Button, NavHeader } from '../components'
-import { images, colours, fonts, serverIp } from '../constants'
+import images from '../constants/images'
+import colours from '../constants/colours'
+import fonts from '../constants/fonts'
+import config from '../constants/config'
 
 
 export default class EditSkills extends Component {
@@ -41,7 +44,7 @@ export default class EditSkills extends Component {
           name: response.fileName
         })
 
-        await axios.post(serverIp + '/users/resume/upload',
+        await axios.post(config.serverIp + '/users/resume/upload',
           data, {
           headers: {
             'Content-Type': 'multipart/form-data'

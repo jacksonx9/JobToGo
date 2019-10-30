@@ -4,7 +4,10 @@ import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-goog
 import axios from 'axios'
 
 import { Button } from '../components'
-import { images, colours, fonts, serverIp, webClientId } from '../constants'
+import images from '../constants/images'
+import colours from '../constants/colours'
+import fonts from '../constants/fonts'
+import config from '../constants/config'
 
 
 export default class SignIn extends Component {
@@ -25,7 +28,7 @@ export default class SignIn extends Component {
   onPressGoogleSignIn = async () => {
     try {
       await GoogleSignin.configure({
-        webClientId: webClientId
+        webClientId: config.webClientId
       })
 
       await GoogleSignin.hasPlayServices()
@@ -34,7 +37,7 @@ export default class SignIn extends Component {
       const firebaseToken = global.firebaseToken
       console.log(`Firebase token: ${global.firebaseToken}`)
 
-      const ret = await axios.post(serverIp + '/users/googleLogin/',
+      const ret = await axios.post(config.serverIp + '/users/googleLogin/',
         {
           idToken: userInfo.idToken,
           firebaseToken: firebaseToken

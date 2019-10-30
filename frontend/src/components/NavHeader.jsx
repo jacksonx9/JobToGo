@@ -2,7 +2,10 @@ import React from 'react'
 import { StyleSheet, View, Text } from 'react-native'
 
 import { ImageButton } from '../components'
-import { images, fonts, colours } from '../constants'
+import images from '../constants/images'
+import colours from '../constants/colours'
+import fonts from '../constants/fonts'
+
 
 
 const NavHeader = ({ title, image, onPressBack, onPressBtn, enableBtn = true }) => {

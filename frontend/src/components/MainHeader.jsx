@@ -2,7 +2,8 @@ import React from 'react'
 import { StyleSheet, View, Image } from 'react-native'
 
 import { ImageButton } from '../components'
-import { images } from '../constants'
+import images from '../constants/images'
+
 
 
 const MainHeader = ({ onPressMenu, onPressSend }) => {

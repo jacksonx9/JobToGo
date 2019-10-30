@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native'
 import { Button } from '../components'
-import { images, colours, fonts } from '../constants'
+import images from '../constants/images'
+import colours from '../constants/colours'
+import fonts from '../constants/fonts'
 
 export default class SignUp extends Component {
 

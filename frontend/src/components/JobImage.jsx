@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet, Text, ImageBackground } from 'react-native'
 
-import { images } from '../constants'
+import images from '../constants/images'
 
 
 const JobImage = ({ companyName }) => {
