@@ -1,128 +1,129 @@
-import React, { Component } from 'react'
-import { View, FlatList, Text, TextInput, StyleSheet } from 'react-native'
-import axios from 'axios'
+import React, { Component } from 'react';
+import {
+  View, FlatList, Text, TextInput,
+} from 'react-native';
+import axios from 'axios';
 
-import Button from '../components/Button'
-import SelectableItem from '../components/SelectableItem'
-import Loader from '../components/Loader'
-import NavHeader from '../components/NavHeader'
+import Button from '../components/Button';
+import SelectableItem from '../components/SelectableItem';
+import Loader from '../components/Loader';
+import NavHeader from '../components/NavHeader';
 
-import images from '../constants/images'
-import colours from '../constants/colours'
-import fonts from '../constants/fonts'
-import config from '../constants/config'
+import images from '../constants/images';
+import colours from '../constants/colours';
+import config from '../constants/config';
+import { editFriendsStyles } from '../styles';
 
 
+const styles = editFriendsStyles;
 export default class EditFriends extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      friends: [],
+      friendRequests: [],
+      addFriendName: '',
+      loading: 1,
+    };
+  }
+
+  async componentDidMount() {
+    const { userId } = global;
+    const friends = await axios.get(`${config.serverIp}/users/getFriends/${userId}`)
+      .catch((e) => console.log(e));
+    const friendRequests = await axios.get(`${config.serverIp}/users/getPendingFriends/${userId}`)
+      .catch((e) => console.log(e));
+
+    this.setState({
+      friends: friends.data,
+      friendRequests: friendRequests.data,
+      loading: 0,
+    });
+  }
+
+  async componentDidUpdate(prevProps, prevState) {
+    if (prevState != this.state) {
+      const { userId } = global;
+      const friends = await axios.get(`${config.serverIp}/users/getFriends/${userId}`)
+        .catch((e) => console.log(e));
+      const friendRequests = await axios.get(`${config.serverIp}/users/getPendingFriends/${userId}`)
+        .catch((e) => console.log(e));
+
+      this.setState({
+        friends: friends.data,
+        friendRequests: friendRequests.data,
+        loading: 0,
+      });
+    }
+  }
+
+  addFriend = async () => {
+    const friend = await axios.get(`${config.serverIp}/users/${this.state.addFriendName}`)
+      .catch((e) => console.log(e));
+
+    await axios.post(`${config.serverIp}/users/addFriend/`, {
+      userId: global.userId,
+      friendId: friend.data._id,
+    }).catch((e) => console.log(e));
+
+    alert(`Sent a friend request to ${this.state.addFriendName}`);
+  }
+
+  comfirmFriendRequest = async (item, index) => {
+    const { userId } = global;
+    await axios.post(`${config.serverIp}/users/confirmFriend/`, {
+      userId,
+      friendId: item._id,
+    }).catch((e) => console.log(e));
+
+    const friends = await axios.get(`${config.serverIp}/users/getFriends/${userId}`)
+      .catch((e) => console.log(e));
+    const friendRequests = await axios.get(`${config.serverIp}/users/getPendingFriends/${userId}`)
+      .catch((e) => console.log(e));
+
+    this.setState({
+      friends: friends.data,
+      friendRequests: friendRequests.data,
+      loading: 0,
+    });
+
+    alert(`Confirmed friend request from ${item.userName}`);
+  }
+
+  removeFriend = async (item) => {
+    const { userId } = global;
+    await axios.delete(`${config.serverIp}/users/removeFriend/`, {
+      data: {
+        userId,
+        friendId: item._id,
+      },
+    }).catch((e) => console.log(e));
+
+    const friends = await axios.get(`${config.serverIp}/users/getFriends/${userId}`)
+      .catch((e) => console.log(e));
+    const friendRequests = await axios.get(`${config.serverIp}/users/getPendingFriends/${userId}`)
+      .catch((e) => console.log(e));
+
+    this.setState({
+      friends: friends.data,
+      friendRequests: friendRequests.data,
+      loading: 0,
+    });
+
+    alert(`Removed ${item.userName} from your friends`);
+  }
 
   static navigationOptions = {
     drawerLabel: 'Friends',
   }
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      friends: [],
-      friendRequests: [],
-      addFriendName: '',
-      jobIndex: 0,
-      loading: 1
-    }
-  }
-
-  async componentDidMount() {
-    const userId = global.userId
-    const friends = await axios.get(config.serverIp + '/users/getFriends/' + userId)
-      .catch(e => console.log(e))
-    const friendRequests = await axios.get(config.serverIp + '/users/getPendingFriends/' + userId)
-      .catch(e => console.log(e))
-
-    this.setState({
-      friends: friends.data,
-      friendRequests: friendRequests.data,
-      loading: 0
-    })
-  }
-
-  async componentDidUpdate(prevProps, prevState) {
-    if (prevState != this.state) {
-      const userId = global.userId
-      const friends = await axios.get(config.serverIp + '/users/getFriends/' + userId)
-        .catch(e => console.log(e))
-      const friendRequests = await axios.get(config.serverIp + '/users/getPendingFriends/' + userId)
-        .catch(e => console.log(e))
-
-      this.setState({
-        friends: friends.data,
-        friendRequests: friendRequests.data,
-        loading: 0
-      })
-    }
-  }
-
-  addFriend = async () => {
-    const friend = await axios.get(config.serverIp + '/users/' + this.state.addFriendName)
-      .catch(e => console.log(e))
-
-    await axios.post(config.serverIp + '/users/addFriend/', {
-      userId: global.userId,
-      friendId: friend.data._id
-    }).catch(e => console.log(e))
-
-    alert(`Sent a friend request to ${this.state.addFriendName}`)
-  }
-
-  comfirmFriendRequest = async (item, index) => {
-    const userId = global.userId
-    await axios.post(config.serverIp + '/users/confirmFriend/', {
-      userId: userId,
-      friendId: item._id
-    }).catch(e => console.log(e))
-
-    const friends = await axios.get(config.serverIp + '/users/getFriends/' + userId)
-      .catch(e => console.log(e))
-    const friendRequests = await axios.get(config.serverIp + '/users/getPendingFriends/' + userId)
-      .catch(e => console.log(e))
-
-    this.setState({
-      friends: friends.data,
-      friendRequests: friendRequests.data,
-      loading: 0
-    })
-
-    alert(`Confirmed friend request from ${item.userName}`)
-  }
-
-  removeFriend = async (item, index) => {
-    const userId = global.userId
-    await axios.delete(config.serverIp + '/users/removeFriend/', {
-      data: {
-        userId: userId,
-        friendId: item._id
-      }
-    }).catch(e => console.log(e))
-
-    const friends = await axios.get(config.serverIp + '/users/getFriends/' + userId)
-      .catch(e => console.log(e))
-    const friendRequests = await axios.get(config.serverIp + '/users/getPendingFriends/' + userId)
-      .catch(e => console.log(e))
-
-    this.setState({
-      friends: friends.data,
-      friendRequests: friendRequests.data,
-      loading: 0
-    })
-
-    alert(`Removed ${item.userName} from your friends`)
-  }
-
   render() {
-    if (this.state.loading) return <Loader />
+    if (this.state.loading) return <Loader />;
 
     return (
       <View style={[styles.containerStyle]}>
         <NavHeader
-          title='Friends'
+          title="Friends"
           image={images.iconSend}
           onPressBack={() => this.props.navigation.goBack()}
           onPressBtn={this.addFriends}
@@ -131,16 +132,16 @@ export default class EditFriends extends Component {
         <View style={[styles.searchBarStyle]}>
           <TextInput
             style={styles.inputStyle}
-            placeholder={'Add a friend'}
+            placeholder="Add a friend"
             value={this.state.addFriendName}
             placeholderTextColor={colours.Gray}
             onChangeText={(text) => this.setState({ addFriendName: text })}
           />
           <Button
-            backgroundColor={'#E6E6E6'}
-            textColor={'#1F1E1F'}
-            title={'Add'}
-            textColor='white'
+            backgroundColor="#E6E6E6"
+            textColor="#1F1E1F"
+            title="Add"
+            textColor="white"
             backgroundColor={colours.blue}
             style={[styles.buttonStyle]}
             onPress={this.addFriend}
@@ -151,15 +152,15 @@ export default class EditFriends extends Component {
           style
           data={this.state.friendRequests}
           keyExtractor={(item) => item._id}
-          renderItem={({ item, index }) =>
+          renderItem={({ item, index }) => (
             <SelectableItem
               key={item._id}
               header={item.userName}
               subHeader={item.email}
               onPress={() => this.comfirmFriendRequest(item, index)}
-              actionIcon='+'
+              actionIcon="+"
             />
-          }
+          )}
         />
         <View style={[styles.dividerStyle]}>
           <Text>Your Friends</Text>
@@ -168,74 +169,17 @@ export default class EditFriends extends Component {
           style
           data={this.state.friends}
           keyExtractor={(item) => item._id}
-          renderItem={({ item, index }) =>
+          renderItem={({ item, index }) => (
             <SelectableItem
               key={item._id}
               header={item.userName}
               subHeader={item.email}
               onPress={() => this.removeFriend(item, index)}
-              actionIcon='x'
+              actionIcon="x"
             />
-          }
+          )}
         />
       </View>
-    )
+    );
   }
 }
-
-const styles = StyleSheet.create({
-  containerStyle: {
-    height: '100%',
-    width: '100%',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'white'
-  },
-  searchBarStyle: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    height: 65,
-    width: '90%'
-  },
-  dividerStyle: {
-    height: 40,
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  formStyle: {
-    paddingTop: 100,
-    height: '100%',
-    width: '80%',
-    position: 'absolute'
-  },
-  imageStyle: {
-    height: 100,
-    width: '100%',
-    marginBottom: 40
-  },
-  inputStyle: {
-    height: 50,
-    width: '70%',
-    marginVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    color: colours.darkGray,
-    backgroundColor: colours.lighterGray,
-    fontFamily: fonts.normal,
-  },
-  buttonStyle: {
-    marginTop: 5,
-    marginBottom: 20,
-    width: '20%'
-  },
-  linkStyle: {
-    alignItems: 'center'
-  },
-  textStyle: {
-    color: 'white',
-    textDecorationColor: 'white'
-  }
-})

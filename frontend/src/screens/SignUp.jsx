@@ -1,41 +1,44 @@
-import React, { Component } from 'react'
-import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native'
+import React, { Component } from 'react';
+import {
+  View, TouchableOpacity, Text, TextInput, Image,
+} from 'react-native';
 
-import Button from '../components/Button'
+import Button from '../components/Button';
 
-import images from '../constants/images'
-import colours from '../constants/colours'
-import fonts from '../constants/fonts'
+import images from '../constants/images';
+import colours from '../constants/colours';
+import { signInStyles } from '../styles';
 
+
+const styles = signInStyles;
 export default class SignUp extends Component {
-
   text = {
     showPassword: 'Show Password',
-    hidePassword: 'Hide Password'
+    hidePassword: 'Hide Password',
   }
 
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       firstName: '',
       lastName: '',
       email: '',
       password: '',
       showPassword: true,
-      showPasswordText: this.text.showPassword
-    }
+      showPasswordText: this.text.showPassword,
+    };
   }
 
   onPressSignIn = () => {
-    this.props.navigation.navigate('SignIn')
+    this.props.navigation.navigate('SignIn');
   }
 
   togglePasswordView = () => {
     this.setState({
       showPassword: !this.state.showPassword,
-      showPasswordText: this.state.showPassword ?
-        this.text.hidePassword : this.text.showPassword
-    })
+      showPasswordText: this.state.showPassword
+        ? this.text.hidePassword : this.text.showPassword,
+    });
   }
 
   render() {
@@ -48,28 +51,28 @@ export default class SignUp extends Component {
           />
           <TextInput
             style={styles.inputStyle}
-            placeholder={'First Name'}
+            placeholder="First Name"
             value={this.state.firstName}
             placeholderTextColor={colours.lightBlue}
             onChangeText={(text) => this.setState({ lastName: text })}
           />
           <TextInput
             style={styles.inputStyle}
-            placeholder={'Last Name'}
+            placeholder="Last Name"
             value={this.state.lastName}
             placeholderTextColor={colours.lightBlue}
             onChangeText={(text) => this.setState({ lastName: text })}
           />
           <TextInput
             style={styles.inputStyle}
-            placeholder={'Email'}
+            placeholder="Email"
             value={this.state.email}
             placeholderTextColor={colours.lightBlue}
             onChangeText={(text) => this.setState({ email: text })}
           />
           <TextInput
             style={styles.inputStyle}
-            placeholder={'Password'}
+            placeholder="Password"
             value={this.state.password}
             secureTextEntry={this.state.showPassword}
             placeholderTextColor={colours.lightBlue}
@@ -83,60 +86,16 @@ export default class SignUp extends Component {
           </TouchableOpacity>
 
           <Button
-            backgroundColor={'#E6E6E6'}
-            textColor={'#1F1E1F'}
-            title={'Sign Up'}
+            backgroundColor="#E6E6E6"
+            textColor="#1F1E1F"
+            title="Sign Up"
             textColor={colours.blue}
-            backgroundColor='white'
+            backgroundColor="white"
             style={[styles.buttonStyle]}
             onPress={this.onPressSignIn}
           />
         </View>
       </View>
-    )
+    );
   }
 }
-
-
-const styles = StyleSheet.create({
-  containerStyle: {
-    height: '100%',
-    width: '100%',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colours.blue
-  },
-  formStyle: {
-    paddingTop: 100,
-    height: '100%',
-    width: '80%',
-  },
-  imageStyle: {
-    height: 100,
-    width: '100%',
-    marginBottom: 40
-  },
-  inputStyle: {
-    height: 50,
-    width: '100%',
-    marginVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    color: 'white',
-    backgroundColor: colours.darkBlue,
-    fontFamily: fonts.normal,
-  },
-  buttonStyle: {
-    marginTop: 5,
-    marginBottom: 20
-  },
-  linkStyle: {
-    alignItems: 'flex-start',
-    marginBottom: 10
-  },
-  textStyle: {
-    color: 'white',
-    textDecorationColor: 'white'
-  }
-})

@@ -1,29 +1,19 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { TouchableOpacity, Image } from 'react-native';
+
+import { imageButtonStyles } from '../styles';
 
 
-const ImageButton = ({ source, onPress }) => {
-  const {
-    containerStyle,
-  } = styles;
-
-  return (
-    <TouchableOpacity
-      style={[containerStyle]}
-      onPress={onPress}
-    >
-      <Image
-        source={source}
-      />
-    </TouchableOpacity>
-  );
-};
-
-const styles = StyleSheet.create({
-  containerStyle: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const styles = imageButtonStyles;
+const ImageButton = ({ source, onPress }) => (
+  <TouchableOpacity
+    style={[styles.containerStyle]}
+    onPress={onPress}
+  >
+    <Image
+      source={source}
+    />
+  </TouchableOpacity>
+);
 
 export default ImageButton;

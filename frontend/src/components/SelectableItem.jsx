@@ -1,13 +1,13 @@
 import React from 'react';
 import {
-  StyleSheet, Text, TouchableOpacity, View, Image,
+  Text, TouchableOpacity, View, Image,
 } from 'react-native';
 
 import images from '../constants/images';
-import colours from '../constants/colours';
-import fonts from '../constants/fonts';
+import { selectableItemStyles } from '../styles';
 
 
+const styles = selectableItemStyles;
 const SelectableItem = ({
   header, subHeader, onPress, actionIcon,
 }) => (
@@ -35,48 +35,5 @@ const SelectableItem = ({
     </TouchableOpacity>
   </View>
 );
-
-const styles = StyleSheet.create({
-  containerStyle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-evenly',
-    height: 80,
-    width: '100%',
-    paddingHorizontal: 20,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderColor: colours.lightGray,
-    backgroundColor: 'white',
-  },
-  infoContainerStyle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  thumbnailStyle: {
-    height: 50,
-    width: 50,
-    borderRadius: 50,
-    marginRight: 15,
-  },
-  textStyle: {
-    fontFamily: fonts.normal,
-  },
-  headerStyle: {
-    fontSize: 14,
-    color: colours.darkGray,
-  },
-  subHeaderStyle: {
-    fontSize: 12,
-    color: colours.gray,
-  },
-  iconStyle: {
-    fontSize: 14,
-    color: colours.gray,
-  },
-  infoStyle: {
-    flexDirection: 'column',
-    flex: 1,
-  },
-});
 
 export default SelectableItem;

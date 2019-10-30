@@ -1,62 +1,62 @@
-import React, { Component } from 'react'
-import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native'
-import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin'
-import axios from 'axios'
+import React, { Component } from 'react';
+import {
+  View, TouchableOpacity, Text, TextInput, Image,
+} from 'react-native';
+import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
+import axios from 'axios';
 
-import Button from '../components/Button'
+import Button from '../components/Button';
 
-import images from '../constants/images'
-import colours from '../constants/colours'
-import fonts from '../constants/fonts'
-import config from '../constants/config'
+import images from '../constants/images';
+import colours from '../constants/colours';
+import config from '../constants/config';
+import { signUpStyles } from '../styles';
 
 
+const styles = signUpStyles;
 export default class SignIn extends Component {
-
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       email: '',
-      password: ''
-    }
+      password: '',
+    };
   }
 
   onPressSignIn = async () => {
-    global.userId = 'debug_userId'
-    this.props.navigation.navigate('App')
+    global.userId = 'debug_userId';
+    this.props.navigation.navigate('App');
   }
 
   onPressGoogleSignIn = async () => {
     try {
       await GoogleSignin.configure({
-        webClientId: config.webClientId
-      })
+        webClientId: config.webClientId,
+      });
 
-      await GoogleSignin.hasPlayServices()
-      const userInfo = await GoogleSignin.signIn()
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
 
-      const firebaseToken = global.firebaseToken
-      console.log(`Firebase token: ${global.firebaseToken}`)
+      const { firebaseToken } = global;
+      console.log(`Firebase token: ${global.firebaseToken}`);
 
-      const ret = await axios.post(config.serverIp + '/users/googleLogin/',
+      const ret = await axios.post(`${config.serverIp}/users/googleLogin/`,
         {
           idToken: userInfo.idToken,
-          firebaseToken: firebaseToken
-        }
-      )
+          firebaseToken,
+        });
 
-      global.userId = ret.data
-      this.props.navigation.navigate('App')
-
+      global.userId = ret.data;
+      this.props.navigation.navigate('App');
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        console.log('Google sign in cancelled')
+        console.log('Google sign in cancelled');
       } else if (error.code === statusCodes.IN_PROGRESS) {
-        console.log('Google sign in in progress already')
+        console.log('Google sign in in progress already');
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        console.log('Googlep Play service not available')
+        console.log('Googlep Play service not available');
       } else {
-        console.log(error)
+        console.log(error);
       }
     }
   }
@@ -71,26 +71,26 @@ export default class SignIn extends Component {
           />
           <TextInput
             style={styles.inputStyle}
-            placeholder={'Email'}
+            placeholder="Email"
             value={this.state.email}
             placeholderTextColor={colours.lightBlue}
             onChangeText={(text) => this.setState({ email: text })}
           />
           <TextInput
             style={styles.inputStyle}
-            placeholder={'Password'}
+            placeholder="Password"
             value={this.state.password}
-            secureTextEntry={true}
+            secureTextEntry
             placeholderTextColor={colours.lightBlue}
             onChangeText={(text) => this.setState({ password: text })}
           />
 
           <Button
-            backgroundColor={'#E6E6E6'}
-            textColor={'#1F1E1F'}
-            title={'Sign In'}
+            backgroundColor="#E6E6E6"
+            textColor="#1F1E1F"
+            title="Sign In"
             textColor={colours.blue}
-            backgroundColor='white'
+            backgroundColor="white"
             style={[styles.buttonStyle]}
             onPress={this.onPressSignIn}
           />
@@ -103,68 +103,24 @@ export default class SignIn extends Component {
             size={GoogleSigninButton.Size.Wide}
             color={GoogleSigninButton.Color.Light}
             onPress={this.onPressGoogleSignIn}
-            disabled={false} />
+            disabled={false}
+          />
 
           <TouchableOpacity
             style={[styles.linkStyle]}
-            onPress={() => { this.props.navigation.navigate('SignUp') }}
+            onPress={() => { this.props.navigation.navigate('SignUp'); }}
           >
             <Text style={[styles.textStyle]}>Sign Up</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.linkStyle]}
-            onPress={() => { this.props.navigation.navigate('SignUp') }}
+            onPress={() => { this.props.navigation.navigate('SignUp'); }}
           >
             <Text style={[styles.textStyle]}>Forgot Password</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-    )
+    );
   }
 }
-
-const styles = StyleSheet.create({
-  containerStyle: {
-    height: '100%',
-    width: '100%',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colours.blue
-  },
-  formStyle: {
-    paddingTop: 100,
-    height: '100%',
-    width: '80%',
-    position: 'absolute'
-  },
-  imageStyle: {
-    height: 100,
-    width: '100%',
-    marginBottom: 40
-  },
-  inputStyle: {
-    height: 50,
-    width: '100%',
-    marginVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    color: 'white',
-    backgroundColor: colours.darkBlue,
-    fontFamily: fonts.normal,
-  },
-  buttonStyle: {
-    marginTop: 5,
-    marginBottom: 20,
-    width: '100%',
-    height: 50
-  },
-  linkStyle: {
-    alignItems: 'center'
-  },
-  textStyle: {
-    color: 'white',
-    textDecorationColor: 'white'
-  }
-})

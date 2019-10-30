@@ -1,37 +1,19 @@
 import React from 'react';
-import { StyleSheet, Image, View } from 'react-native';
+import { Image, View } from 'react-native';
 
 import images from '../constants/images';
-import colours from '../constants/colours';
+
+import { loaderStyles } from '../styles';
 
 
-const Loader = () => {
-  const {
-    containerStyle,
-    imageStyle,
-  } = styles;
-
-  return (
-    <View style={[containerStyle]}>
-      <Image
-        source={images.iconLogo}
-        style={[imageStyle]}
-      />
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  containerStyle: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: `${100 }%`,
-    backgroundColor: colours.blue,
-  },
-  imageStyle: {
-    height: 140,
-    width: 80,
-  },
-});
+const styles = loaderStyles;
+const Loader = () => (
+  <View style={[styles.containerStyle]}>
+    <Image
+      source={images.iconLogo}
+      style={[styles.imageStyle]}
+    />
+  </View>
+);
 
 export default Loader;

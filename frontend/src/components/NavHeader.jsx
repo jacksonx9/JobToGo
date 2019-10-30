@@ -1,25 +1,19 @@
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { View, Text } from 'react-native';
 
 import ImageButton from './ImageButton';
 
 import images from '../constants/images';
-import colours from '../constants/colours';
-import fonts from '../constants/fonts';
+import { navHeaderStyles } from '../styles';
 
 
+const styles = navHeaderStyles;
 const NavHeader = ({
   title, image, onPressBack, onPressBtn, enableBtn = true,
 }) => {
-  const {
-    containerStyle,
-    containerStyle2,
-    textStyle,
-  } = styles;
-
   if (enableBtn) {
     return (
-      <View style={[containerStyle]}>
+      <View style={[styles.containerStyle]}>
         <ImageButton
           source={images.iconChevronLeft}
           onPress={onPressBack}
@@ -33,50 +27,14 @@ const NavHeader = ({
     );
   }
   return (
-    <View style={[containerStyle2]}>
+    <View style={[styles.containerStyle2]}>
       <ImageButton
         source={images.iconChevronLeft}
         onPress={onPressBack}
       />
-      <Text style={[textStyle]}>{title}</Text>
+      <Text style={[styles.textStyle]}>{title}</Text>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  containerStyle: {
-    paddingTop: 5,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 15,
-    height: 80,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    backgroundColor: 'white',
-    width: '100%',
-  },
-
-  containerStyle2: {
-    paddingTop: 5,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingLeft: 15,
-    paddingRight: '45%',
-    height: 80,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    backgroundColor: 'white',
-    width: '100%',
-  },
-  logoStyle: {
-    width: 170,
-    height: 50,
-  },
-  textStyle: {
-    fontFamily: fonts.normal,
-    color: colours.darkGray,
-    fontSize: 16,
-  },
-});
 
 export default NavHeader;

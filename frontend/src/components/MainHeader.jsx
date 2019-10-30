@@ -1,47 +1,23 @@
 import React from 'react';
-import { StyleSheet, View, Image } from 'react-native';
+import { View, Image } from 'react-native';
 
 import ImageButton from './ImageButton';
 import images from '../constants/images';
+import { mainHeaderStyles } from '../styles';
 
-
-const MainHeader = ({ onPressMenu, onPressSend }) => {
-  const {
-    containerStyle,
-    logoStyle,
-  } = styles;
-
-  return (
-    <View style={[containerStyle]}>
-      <ImageButton
-        source={images.iconMenu}
-        onPress={onPressMenu}
-      />
-      <Image source={images.logoLight} style={[logoStyle]} />
-      <ImageButton
-        source={images.iconSend}
-        onPress={onPressSend}
-      />
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  containerStyle: {
-    paddingTop: 5,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 15,
-    height: 80,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    backgroundColor: 'white',
-    width: '100%',
-  },
-  logoStyle: {
-    width: 170,
-    height: 50,
-  },
-});
+const styles = mainHeaderStyles;
+const MainHeader = ({ onPressMenu, onPressSend }) => (
+  <View style={[styles.containerStyle]}>
+    <ImageButton
+      source={images.iconMenu}
+      onPress={onPressMenu}
+    />
+    <Image source={images.logoLight} style={[styles.logoStyle]} />
+    <ImageButton
+      source={images.iconSend}
+      onPress={onPressSend}
+    />
+  </View>
+);
 
 export default MainHeader;
