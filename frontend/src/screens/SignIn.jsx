@@ -3,7 +3,8 @@ import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'reac
 import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin'
 import axios from 'axios'
 
-import { Button } from '../components'
+import Button from '../components/Button'
+
 import images from '../constants/images'
 import colours from '../constants/colours'
 import fonts from '../constants/fonts'

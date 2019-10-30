@@ -2,11 +2,10 @@ import React, { Component } from 'react'
 import { StyleSheet, Text, View, Image, Modal, } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 
-import { ImageButton } from '../components'
+import ImageButton from './ImageButton'
 import images from '../constants/images'
 import colours from '../constants/colours'
 import fonts from '../constants/fonts'
-
 
 
 class JobDetails extends Component {
@@ -140,4 +139,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export { JobDetails }
+export default JobDetails;

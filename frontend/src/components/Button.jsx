@@ -1,18 +1,20 @@
-import React from 'react'
-import { StyleSheet, Text, TouchableOpacity } from 'react-native'
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 
-const Button = ({ style, backgroundColor, textColor, title, enable = true, onPress }) => {
+const Button = ({
+  style, backgroundColor, textColor, title, enable = true, onPress,
+}) => {
   const {
     containerStyle,
-    textStyle
-  } = styles
+    textStyle,
+  } = styles;
 
   return (
     <TouchableOpacity
       style={[{
         opacity: enable ? 1 : 0.3,
-        backgroundColor
+        backgroundColor,
       }, containerStyle, style]}
       disabled={!enable}
       onPress={onPress}
@@ -29,11 +31,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 5,
-    height: 50
+    height: 50,
   },
   textStyle: {
     fontSize: 16,
-  }
-})
+  },
+});
 
-export { Button }
+export default Button;

@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { View, TouchableOpacity, Text, TextInput, Image, StyleSheet } from 'react-native'
-import { Button } from '../components'
+
+import Button from '../components/Button'
+
 import images from '../constants/images'
 import colours from '../constants/colours'
 import fonts from '../constants/fonts'

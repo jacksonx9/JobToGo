@@ -1,32 +1,40 @@
-import React from 'react'
-import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native'
+import React from 'react';
+import {
+  StyleSheet, Text, TouchableOpacity, View, Image,
+} from 'react-native';
 
-import images from '../constants/images'
-import colours from '../constants/colours'
-import fonts from '../constants/fonts'
+import images from '../constants/images';
+import colours from '../constants/colours';
+import fonts from '../constants/fonts';
 
 
+const SelectableItem = ({
+  header, subHeader, onPress, actionIcon,
+}) => (
+  <View style={[styles.containerStyle]}>
+    <View style={styles.infoContainerStyle}>
+      <Image source={images.tempBg1} style={[styles.thumbnailStyle]} />
+      <View style={[styles.infoStyle]}>
+        <Text
+          style={[styles.textStyle, styles.headerStyle]}
+        >
+          {header}
 
-const SelectableItem = ({ header, subHeader, onPress, actionIcon }) => {
+        </Text>
+        <Text
+          style={[styles.textStyle, styles.subHeaderStyle]}
+        >
+          {subHeader}
 
-  return (
-    <View style={[styles.containerStyle]}>
-      <View style={styles.infoContainerStyle}>
-        <Image source={images.tempBg1} style={[styles.thumbnailStyle]} />
-        <View style={[styles.infoStyle]}>
-          <Text
-            style={[styles.textStyle, styles.headerStyle]}>{header}</Text>
-          <Text
-            style={[styles.textStyle, styles.subHeaderStyle]}>{subHeader}</Text>
-        </View>
+        </Text>
       </View>
-
-      <TouchableOpacity onPress={onPress}>
-        <Text style={[styles.iconStyle]}>{actionIcon}</Text>
-      </TouchableOpacity>
     </View>
-  );
-}
+
+    <TouchableOpacity onPress={onPress}>
+      <Text style={[styles.iconStyle]}>{actionIcon}</Text>
+    </TouchableOpacity>
+  </View>
+);
 
 const styles = StyleSheet.create({
   containerStyle: {
@@ -38,37 +46,37 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderColor: colours.lightGray,
-    backgroundColor: 'white'
+    backgroundColor: 'white',
   },
   infoContainerStyle: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   thumbnailStyle: {
     height: 50,
     width: 50,
     borderRadius: 50,
-    marginRight: 15
+    marginRight: 15,
   },
   textStyle: {
     fontFamily: fonts.normal,
   },
   headerStyle: {
     fontSize: 14,
-    color: colours.darkGray
+    color: colours.darkGray,
   },
   subHeaderStyle: {
     fontSize: 12,
-    color: colours.gray
+    color: colours.gray,
   },
   iconStyle: {
     fontSize: 14,
-    color: colours.gray
+    color: colours.gray,
   },
   infoStyle: {
     flexDirection: 'column',
-    flex: 1
-  }
+    flex: 1,
+  },
 });
 
-export { SelectableItem }
+export default SelectableItem;

@@ -1,17 +1,15 @@
-import React from 'react'
-import { StyleSheet, View, Image } from 'react-native'
+import React from 'react';
+import { StyleSheet, View, Image } from 'react-native';
 
-import { ImageButton } from '../components'
-import images from '../constants/images'
-
+import ImageButton from './ImageButton';
+import images from '../constants/images';
 
 
 const MainHeader = ({ onPressMenu, onPressSend }) => {
-  
   const {
     containerStyle,
-    logoStyle
-  } = styles
+    logoStyle,
+  } = styles;
 
   return (
     <View style={[containerStyle]}>
@@ -26,7 +24,7 @@ const MainHeader = ({ onPressMenu, onPressSend }) => {
       />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   containerStyle: {
@@ -38,12 +36,12 @@ const styles = StyleSheet.create({
     height: 80,
     borderBottomWidth: StyleSheet.hairlineWidth,
     backgroundColor: 'white',
-    width: '100%'
+    width: '100%',
   },
   logoStyle: {
     width: 170,
-    height: 50
-  }
+    height: 50,
+  },
 });
 
-export { MainHeader }
+export default MainHeader;

@@ -3,7 +3,9 @@ import { View, StyleSheet } from 'react-native'
 import FilePickerManager from 'react-native-file-picker'
 import axios from 'axios'
 
-import { Button, NavHeader } from '../components'
+import Button from '../components/Button'
+import NavHeader from '../components/NavHeader'
+
 import images from '../constants/images'
 import colours from '../constants/colours'
 import fonts from '../constants/fonts'

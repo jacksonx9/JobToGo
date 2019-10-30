@@ -2,7 +2,11 @@ import React, { Component } from 'react'
 import { View, FlatList, Text, TextInput, StyleSheet } from 'react-native'
 import axios from 'axios'
 
-import { Button, SelectableItem, Loader, NavHeader } from '../components'
+import Button from '../components/Button'
+import SelectableItem from '../components/SelectableItem'
+import Loader from '../components/Loader'
+import NavHeader from '../components/NavHeader'
+
 import images from '../constants/images'
 import colours from '../constants/colours'
 import fonts from '../constants/fonts'

@@ -1,22 +1,23 @@
-import React from 'react'
-import { StyleSheet, View, Text } from 'react-native'
+import React from 'react';
+import { StyleSheet, View, Text } from 'react-native';
 
-import { ImageButton } from '../components'
-import images from '../constants/images'
-import colours from '../constants/colours'
-import fonts from '../constants/fonts'
+import ImageButton from './ImageButton';
+
+import images from '../constants/images';
+import colours from '../constants/colours';
+import fonts from '../constants/fonts';
 
 
-
-const NavHeader = ({ title, image, onPressBack, onPressBtn, enableBtn = true }) => {
-  
+const NavHeader = ({
+  title, image, onPressBack, onPressBtn, enableBtn = true,
+}) => {
   const {
     containerStyle,
     containerStyle2,
-    textStyle
-  } = styles
+    textStyle,
+  } = styles;
 
-  if (enableBtn)
+  if (enableBtn) {
     return (
       <View style={[containerStyle]}>
         <ImageButton
@@ -29,18 +30,18 @@ const NavHeader = ({ title, image, onPressBack, onPressBtn, enableBtn = true }) 
           onPress={onPressBtn}
         />
       </View>
-    )
-  else
-    return (
-      <View style={[containerStyle2]}>
-        <ImageButton
-          source={images.iconChevronLeft}
-          onPress={onPressBack}
-        />
-        <Text style={[textStyle]}>{title}</Text>
-      </View>
-    )
-}
+    );
+  }
+  return (
+    <View style={[containerStyle2]}>
+      <ImageButton
+        source={images.iconChevronLeft}
+        onPress={onPressBack}
+      />
+      <Text style={[textStyle]}>{title}</Text>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   containerStyle: {
@@ -52,7 +53,7 @@ const styles = StyleSheet.create({
     height: 80,
     borderBottomWidth: StyleSheet.hairlineWidth,
     backgroundColor: 'white',
-    width: '100%'
+    width: '100%',
   },
 
   containerStyle2: {
@@ -65,17 +66,17 @@ const styles = StyleSheet.create({
     height: 80,
     borderBottomWidth: StyleSheet.hairlineWidth,
     backgroundColor: 'white',
-    width: '100%'
+    width: '100%',
   },
   logoStyle: {
     width: 170,
-    height: 50
+    height: 50,
   },
   textStyle: {
     fontFamily: fonts.normal,
     color: colours.darkGray,
-    fontSize: 16
-  }
+    fontSize: 16,
+  },
 });
 
-export { NavHeader }
+export default NavHeader;

@@ -5,13 +5,16 @@ import { View, StyleSheet } from 'react-native'
 import GestureRecognizer from 'react-native-swipe-gestures'
 import axios from 'axios'
 
-import { JobImage, JobDetails, Loader, MainHeader } from '../components'
+import JobImage from '../components/JobImage'
+import JobDetails from '../components/JobDetails'
+import Loader from '../components/Loader'
+import MainHeader from '../components/MainHeader'
 
 import config from '../constants/config'
 
 
 export default class JobSwipe extends Component {
-  
+
   static navigationOptions = {
     drawerLabel: 'Job Swipe'
   }

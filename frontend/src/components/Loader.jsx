@@ -1,15 +1,14 @@
-import React from 'react'
-import { StyleSheet, Image, View } from 'react-native'
+import React from 'react';
+import { StyleSheet, Image, View } from 'react-native';
 
-import images from '../constants/images'
-import colours from '../constants/colours'
+import images from '../constants/images';
+import colours from '../constants/colours';
 
 
 const Loader = () => {
-  
   const {
     containerStyle,
-    imageStyle
+    imageStyle,
   } = styles;
 
   return (
@@ -26,13 +25,13 @@ const styles = StyleSheet.create({
   containerStyle: {
     alignItems: 'center',
     justifyContent: 'center',
-    height: 100 + '%',
+    height: `${100 }%`,
     backgroundColor: colours.blue,
   },
   imageStyle: {
     height: 140,
     width: 80,
-  }
-})
+  },
+});
 
-export { Loader }
+export default Loader;

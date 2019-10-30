@@ -131,7 +131,7 @@ const AuthStack = createStackNavigator(
   navConfig,
 );
 
-AppContainer = createAppContainer(
+const AppContainer = createAppContainer(
   createSwitchNavigator(
     {
       App: AppStack,
