@@ -47,13 +47,14 @@ export default class EditSkills extends Component {
   }
 
   render() {
+    const { navigation } = this.props;
     return (
       <View style={[styles.containerStyle]}>
         <NavHeader
           title="Edit Skills"
           image={images.iconSend}
-          onPressBack={() => this.props.navigation.goBack()}
-          onPressBtn={() => this.props.navigation.navigate('SendLikedJobs')}
+          onPressBack={() => navigation.goBack()}
+          onPressBtn={() => navigation.navigate('SendLikedJobs')}
           enableBtn={false}
         />
         <Button
@@ -67,4 +68,3 @@ export default class EditSkills extends Component {
     );
   }
 }
-

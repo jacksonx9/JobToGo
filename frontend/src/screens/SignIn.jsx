@@ -24,11 +24,13 @@ export default class SignIn extends Component {
   }
 
   onPressSignIn = async () => {
+    const { navigation } = this.props;
     global.userId = 'debug_userId';
-    this.props.navigation.navigate('App');
+    navigation.navigate('App');
   }
 
   onPressGoogleSignIn = async () => {
+    const { navigation } = this.props;
     try {
       await GoogleSignin.configure({
         webClientId: config.webClientId,
@@ -47,7 +49,7 @@ export default class SignIn extends Component {
         });
 
       global.userId = ret.data;
-      this.props.navigation.navigate('App');
+      navigation.navigate('App');
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         console.log('Google sign in cancelled');
@@ -62,6 +64,8 @@ export default class SignIn extends Component {
   }
 
   render() {
+    const { email, password } = this.state;
+    const { navigation } = this.props;
     return (
       <View style={[styles.containerStyle]}>
         <View style={[styles.formStyle]}>
@@ -72,22 +76,20 @@ export default class SignIn extends Component {
           <TextInput
             style={styles.inputStyle}
             placeholder="Email"
-            value={this.state.email}
+            value={email}
             placeholderTextColor={colours.lightBlue}
             onChangeText={(text) => this.setState({ email: text })}
           />
           <TextInput
             style={styles.inputStyle}
             placeholder="Password"
-            value={this.state.password}
+            value={password}
             secureTextEntry
             placeholderTextColor={colours.lightBlue}
             onChangeText={(text) => this.setState({ password: text })}
           />
 
           <Button
-            backgroundColor="#E6E6E6"
-            textColor="#1F1E1F"
             title="Sign In"
             textColor={colours.blue}
             backgroundColor="white"
@@ -108,19 +110,18 @@ export default class SignIn extends Component {
 
           <TouchableOpacity
             style={[styles.linkStyle]}
-            onPress={() => { this.props.navigation.navigate('SignUp'); }}
+            onPress={() => { navigation.navigate('SignUp'); }}
           >
             <Text style={[styles.textStyle]}>Sign Up</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.linkStyle]}
-            onPress={() => { this.props.navigation.navigate('SignUp'); }}
+            onPress={() => { navigation.navigate('SignUp'); }}
           >
             <Text style={[styles.textStyle]}>Forgot Password</Text>
           </TouchableOpacity>
         </View>
       </View>
-
     );
   }
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Image } from 'react-native';
+import PropTypes from 'prop-types';
 
 import ImageButton from './ImageButton';
 import images from '../constants/images';
@@ -19,5 +20,10 @@ const MainHeader = ({ onPressMenu, onPressSend }) => (
     />
   </View>
 );
+
+MainHeader.propTypes = {
+  onPressMenu: PropTypes.func.isRequired,
+  onPressSend: PropTypes.func.isRequired,
+};
 
 export default MainHeader;

@@ -7,7 +7,7 @@ import { buttonStyles } from '../styles';
 
 const styles = buttonStyles;
 const Button = ({
-  style, backgroundColor, textColor, title, enable = true, onPress,
+  style, backgroundColor, textColor, title, enable, onPress,
 }) => (
   <TouchableOpacity
     style={[{

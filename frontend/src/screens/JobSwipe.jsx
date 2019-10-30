@@ -15,6 +15,7 @@ import { jobSwipeStyles } from '../styles';
 
 const styles = jobSwipeStyles;
 export default class JobSwipe extends Component {
+
   constructor(props) {
     super(props);
     this.state = {
@@ -26,7 +27,7 @@ export default class JobSwipe extends Component {
 
   async componentDidMount() {
     const { userId } = global;
-    console.log(`User id is: ${global.userId}`);
+    console.log(`User id is: ${userId}`);
     const jobs = await axios.get(`${config.serverIp}/jobs/findJobs/${userId}`)
       .catch((e) => console.log(e));
 
@@ -42,43 +43,45 @@ export default class JobSwipe extends Component {
 
   dislikeJob = async () => {
     const { userId } = global;
+    const { jobs, jobIndex } = this.state;
     await axios.post(`${config.serverIp}/jobs/addDislikedJobs/`, {
       userId,
-      jobId: this.state.jobs[this.state.jobIndex]._id,
+      jobId: jobs[jobIndex]._id,
     }).catch((e) => console.log(e));
 
-    if (this.state.jobs.length == (this.state.jobIndex + 1)) {
-      const jobs = await axios.get(`${config.serverIp}/jobs/findJobs/${userId}`)
+    if (jobs.length == (jobIndex + 1)) {
+      const userJobs = await axios.get(`${config.serverIp}/jobs/findJobs/${userId}`)
         .catch((e) => console.log(e));
 
       this.setState({ loading: 1 });
       this.setState({
-        jobs: jobs.data,
+        jobs: userJobs.data,
         loading: 0,
       });
     } else {
-      this.setState({ jobIndex: this.state.jobIndex + 1 });
+      this.setState({ jobIndex: jobIndex + 1 });
     }
   }
 
   likeJob = async () => {
     const { userId } = global;
+    const { jobs, jobIndex } = this.state;
     await axios.post(`${config.serverIp}/jobs/addLikedJobs/`, {
       userId,
-      jobId: this.state.jobs[this.state.jobIndex]._id,
+      jobId: jobs[jobIndex]._id,
     }).catch((e) => console.log(e));
 
-    if (this.state.jobs.length == (this.state.jobIndex + 1)) {
-      const jobs = await axios.get(`${config.serverIp}/jobs/findJobs/${userId}`)
+    if (jobs.length === (jobIndex + 1)) {
+      const userJobs = await axios.get(`${config.serverIp}/jobs/findJobs/${userId}`)
         .catch((e) => console.log(e));
 
       this.setState({ loading: 1 });
       this.setState({
-        jobs: jobs.data,
+        jobs: userJobs.data,
         loading: 0,
       });
     } else {
-      this.setState({ jobIndex: this.state.jobIndex + 1 });
+      this.setState({ jobIndex: jobIndex + 1 });
     }
   }
 
@@ -87,34 +90,36 @@ export default class JobSwipe extends Component {
   }
 
   render() {
-    const config = {
+    const { loading, jobs, jobIndex } = this.state;
+    const { navigation } = this.props;
+    const job = jobs[jobIndex];
+    const gestureConfig = {
       velocityThreshold: 0.3,
       directionalOffsetThreshold: 80,
     };
 
-    if (this.state.loading) return <Loader />;
+    if (loading) return <Loader />;
 
     return (
       <View style={[styles.containerStyle]}>
         <MainHeader
-          nav={this.props.navigation}
-          onPressMenu={() => this.props.navigation.openDrawer()}
-          onPressSend={() => this.props.navigation.navigate('SendLikedJobs')}
+          onPressMenu={() => navigation.openDrawer()}
+          onPressSend={() => navigation.navigate('SendLikedJobs')}
         />
 
         <GestureRecognizer
           onSwipeUp={this.shareJob}
           onSwipeLeft={this.dislikeJob}
           onSwipeRight={this.likeJob}
-          config={config}
+          config={gestureConfig}
         >
           <JobImage
-            companyName={this.state.jobs[this.state.jobIndex].company}
+            company={job.company}
           />
         </GestureRecognizer>
 
         <JobDetails
-          job={this.state.jobs[this.state.jobIndex]}
+          job={job}
         />
       </View>
     );

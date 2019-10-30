@@ -22,7 +22,8 @@ export default class SendLikedJobs extends Component {
   }
 
   async componentDidMount() {
-    const likedJobs = await axios.get(`${config.serverIp}/jobs/getLikedJobs/${global.userId}`)
+    const { userId } = global;
+    const likedJobs = await axios.get(`${config.serverIp}/jobs/getLikedJobs/${userId}`)
       .catch((e) => console.log(e));
 
     this.setState({
@@ -31,9 +32,10 @@ export default class SendLikedJobs extends Component {
     });
   }
 
-  async componentDidUpdate(prevProps, prevState) {
-    if (prevProps != this.props) {
-      const likedJobs = await axios.get(`${config.serverIp}/jobs/getLikedJobs/${global.userId}`)
+  async componentDidUpdate(prevProps) {
+    const { userId } = global;
+    if (prevProps !== this.props) {
+      const likedJobs = await axios.get(`${config.serverIp}/jobs/getLikedJobs/${userId}`)
         .catch((e) => console.log(e));
       this.setState({
         likedJobs: likedJobs.data,
@@ -69,19 +71,21 @@ export default class SendLikedJobs extends Component {
   }
 
   render() {
-    if (this.state.loading) return <Loader />;
+    const { loading, likedJobs } = this.state;
+    const { navigation } = this.props;
+    if (loading) return <Loader />;
 
     return (
       <View style={[styles.containerStyle]}>
         <NavHeader
           title="Your Liked Jobs"
           image={images.iconSendAcc}
-          onPressBack={() => this.props.navigation.goBack()}
+          onPressBack={() => navigation.goBack()}
           onPressBtn={this.sendLikedJobs}
         />
         <FlatList
           style
-          data={this.state.likedJobs}
+          data={likedJobs}
           keyExtractor={(item) => item._id}
           renderItem={({ item, index }) => (
             <SelectableItem

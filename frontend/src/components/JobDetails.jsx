@@ -3,13 +3,13 @@ import {
   Text, View, Image, Modal,
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import PropTypes from 'prop-types';
 
 import ImageButton from './ImageButton';
 import images from '../constants/images';
 import { jobDetailsStyles } from '../styles';
 
 
-const styles = jobDetailsStyles;
 class JobDetails extends Component {
   constructor(props) {
     super(props);
@@ -23,12 +23,15 @@ class JobDetails extends Component {
   }
 
   render() {
+    const styles = jobDetailsStyles;
+    const { modalVisible } = this.state;
+    const { job } = this.props;
     return (
       <View style={[styles.containerStyle]}>
         <Modal
           animationType="slide"
           transparent={false}
-          visible={this.state.modalVisible}
+          visible={modalVisible}
         >
           <View style={[styles.modalContainerStyle]}>
             <ImageButton
@@ -37,23 +40,23 @@ class JobDetails extends Component {
                 this.setModalVisible(false);
               }}
             />
-            <Text style={[styles.headerStyle]}>{this.props.job.company}</Text>
+            <Text style={[styles.headerStyle]}>{job.company}</Text>
             <View style={[styles.subHeaderContainerStyle]}>
               <Image
                 source={images.iconJob}
                 styles={[styles.iconStyle]}
               />
-              <Text style={[styles.subHeaderStyle]}>{this.props.job.title}</Text>
+              <Text style={[styles.subHeaderStyle]}>{job.title}</Text>
             </View>
             <View style={[styles.subHeaderContainerStyle]}>
               <Image
                 source={images.iconLocation}
                 styles={[styles.iconStyle]}
               />
-              <Text style={[styles.subHeaderStyle]}>{this.props.job.location}</Text>
+              <Text style={[styles.subHeaderStyle]}>{job.location}</Text>
             </View>
             <ScrollView style={[styles.scrollStyle]}>
-              <Text>{this.props.job.description}</Text>
+              <Text>{job.description}</Text>
             </ScrollView>
           </View>
         </Modal>
@@ -65,25 +68,29 @@ class JobDetails extends Component {
               this.setModalVisible(true);
             }}
           />
-          <Text style={[styles.headerStyle]}>{this.props.job.company}</Text>
+          <Text style={[styles.headerStyle]}>{job.company}</Text>
           <View style={[styles.subHeaderContainerStyle]}>
             <Image
               source={images.iconJob}
               styles={[styles.iconStyle]}
             />
-            <Text style={[styles.subHeaderStyle]}>{this.props.job.title}</Text>
+            <Text style={[styles.subHeaderStyle]}>{job.title}</Text>
           </View>
           <View style={[styles.subHeaderContainerStyle]}>
             <Image
               source={images.iconLocation}
               styles={[styles.iconStyle]}
             />
-            <Text style={[styles.subHeaderStyle]}>{this.props.job.location}</Text>
+            <Text style={[styles.subHeaderStyle]}>{job.location}</Text>
           </View>
         </View>
       </View>
     );
   }
 }
+
+JobDetails.propTypes = {
+  job: PropTypes.element.isRequired,
+};
 
 export default JobDetails;

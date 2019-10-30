@@ -1,5 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Image } from 'react-native';
+import PropTypes from 'prop-types';
 
 import { imageButtonStyles } from '../styles';
 
@@ -15,5 +16,10 @@ const ImageButton = ({ source, onPress }) => (
     />
   </TouchableOpacity>
 );
+
+ImageButton.propTypes = {
+  source: PropTypes.element.isRequired,
+  onPress: PropTypes.func.isRequired,
+};
 
 export default ImageButton;

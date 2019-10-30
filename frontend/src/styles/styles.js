@@ -415,4 +415,3 @@ export const navHeaderStyles = StyleSheet.create({
     fontSize: 16,
   },
 });
-

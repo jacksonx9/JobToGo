@@ -30,7 +30,8 @@ export default class SignUp extends Component {
   }
 
   onPressSignIn = () => {
-    this.props.navigation.navigate('SignIn');
+    const { navigation } = this.props;
+    navigation.navigate('SignIn');
   }
 
   togglePasswordView = () => {

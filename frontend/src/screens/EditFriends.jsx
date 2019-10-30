@@ -41,9 +41,9 @@ export default class EditFriends extends Component {
     });
   }
 
-  async componentDidUpdate(prevProps, prevState) {
-    if (prevState != this.state) {
-      const { userId } = global;
+  async componentDidUpdate(prevState) {
+    const { userId } = global;
+    if (prevState !== this.state) {
       const friends = await axios.get(`${config.serverIp}/users/getFriends/${userId}`)
         .catch((e) => console.log(e));
       const friendRequests = await axios.get(`${config.serverIp}/users/getPendingFriends/${userId}`)
@@ -58,18 +58,20 @@ export default class EditFriends extends Component {
   }
 
   addFriend = async () => {
-    const friend = await axios.get(`${config.serverIp}/users/${this.state.addFriendName}`)
+    const { addFriendName } = this.state;
+    const { userId } = global;
+    const friend = await axios.get(`${config.serverIp}/users/${addFriendName}`)
       .catch((e) => console.log(e));
 
     await axios.post(`${config.serverIp}/users/addFriend/`, {
-      userId: global.userId,
+      userId,
       friendId: friend.data._id,
     }).catch((e) => console.log(e));
 
     alert(`Sent a friend request to ${this.state.addFriendName}`);
   }
 
-  comfirmFriendRequest = async (item, index) => {
+  comfirmFriendRequest = async (item) => {
     const { userId } = global;
     await axios.post(`${config.serverIp}/users/confirmFriend/`, {
       userId,
@@ -118,14 +120,19 @@ export default class EditFriends extends Component {
   }
 
   render() {
-    if (this.state.loading) return <Loader />;
+    const {
+      loading, addFriendName, friendRequests, friends,
+    } = this.state;
+    const { navigation } = this.props;
+
+    if (loading) return <Loader />;
 
     return (
       <View style={[styles.containerStyle]}>
         <NavHeader
           title="Friends"
           image={images.iconSend}
-          onPressBack={() => this.props.navigation.goBack()}
+          onPressBack={() => navigation.goBack()}
           onPressBtn={this.addFriends}
           enableBtn={false}
         />
@@ -133,13 +140,11 @@ export default class EditFriends extends Component {
           <TextInput
             style={styles.inputStyle}
             placeholder="Add a friend"
-            value={this.state.addFriendName}
+            value={addFriendName}
             placeholderTextColor={colours.Gray}
             onChangeText={(text) => this.setState({ addFriendName: text })}
           />
           <Button
-            backgroundColor="#E6E6E6"
-            textColor="#1F1E1F"
             title="Add"
             textColor="white"
             backgroundColor={colours.blue}
@@ -150,7 +155,7 @@ export default class EditFriends extends Component {
         <Text>Friend Requests</Text>
         <FlatList
           style
-          data={this.state.friendRequests}
+          data={friendRequests}
           keyExtractor={(item) => item._id}
           renderItem={({ item, index }) => (
             <SelectableItem
@@ -167,7 +172,7 @@ export default class EditFriends extends Component {
         </View>
         <FlatList
           style
-          data={this.state.friends}
+          data={friends}
           keyExtractor={(item) => item._id}
           renderItem={({ item, index }) => (
             <SelectableItem
