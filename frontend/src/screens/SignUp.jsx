@@ -34,14 +34,18 @@ export default class SignUp extends Component {
   }
 
   togglePasswordView = () => {
+    const { showPassword } = this.state;
     this.setState({
-      showPassword: !this.state.showPassword,
-      showPasswordText: this.state.showPassword
+      showPassword: !showPassword,
+      showPasswordText: showPassword
         ? this.text.hidePassword : this.text.showPassword,
     });
   }
 
   render() {
+    const {
+      firstName, lastName, email, password, showPassword, showPasswordText,
+    } = this.state;
     return (
       <View style={[styles.containerStyle]}>
         <View style={[styles.formStyle]}>
@@ -52,29 +56,29 @@ export default class SignUp extends Component {
           <TextInput
             style={styles.inputStyle}
             placeholder="First Name"
-            value={this.state.firstName}
+            value={firstName}
             placeholderTextColor={colours.lightBlue}
             onChangeText={(text) => this.setState({ lastName: text })}
           />
           <TextInput
             style={styles.inputStyle}
             placeholder="Last Name"
-            value={this.state.lastName}
+            value={lastName}
             placeholderTextColor={colours.lightBlue}
             onChangeText={(text) => this.setState({ lastName: text })}
           />
           <TextInput
             style={styles.inputStyle}
             placeholder="Email"
-            value={this.state.email}
+            value={email}
             placeholderTextColor={colours.lightBlue}
             onChangeText={(text) => this.setState({ email: text })}
           />
           <TextInput
             style={styles.inputStyle}
             placeholder="Password"
-            value={this.state.password}
-            secureTextEntry={this.state.showPassword}
+            value={password}
+            secureTextEntry={showPassword}
             placeholderTextColor={colours.lightBlue}
             onChangeText={(text) => this.setState({ password: text })}
           />
@@ -82,12 +86,10 @@ export default class SignUp extends Component {
             style={[styles.linkStyle]}
             onPress={this.togglePasswordView}
           >
-            <Text style={[styles.textStyle]}>{this.state.showPasswordText}</Text>
+            <Text style={[styles.textStyle]}>{showPasswordText}</Text>
           </TouchableOpacity>
 
           <Button
-            backgroundColor="#E6E6E6"
-            textColor="#1F1E1F"
             title="Sign Up"
             textColor={colours.blue}
             backgroundColor="white"

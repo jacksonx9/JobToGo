@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
+import PropTypes from 'prop-types';
 
 import ImageButton from './ImageButton';
 
@@ -9,7 +10,7 @@ import { navHeaderStyles } from '../styles';
 
 const styles = navHeaderStyles;
 const NavHeader = ({
-  title, image, onPressBack, onPressBtn, enableBtn = true,
+  title, image, onPressBack, onPressBtn, enableBtn,
 }) => {
   if (enableBtn) {
     return (
@@ -35,6 +36,19 @@ const NavHeader = ({
       <Text style={[styles.textStyle]}>{title}</Text>
     </View>
   );
+};
+
+NavHeader.defaultProps = {
+  onPressBtn: () => null,
+  enableBtn: true,
+};
+
+NavHeader.propTypes = {
+  title: PropTypes.string.isRequired,
+  image: PropTypes.element.isRequired,
+  onPressBack: PropTypes.func.isRequired,
+  onPressBtn: PropTypes.func,
+  enableBtn: PropTypes.bool,
 };
 
 export default NavHeader;
