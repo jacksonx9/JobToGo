@@ -1,4 +1,5 @@
 module.exports = {
+  parser: "babel-eslint",
   env: {
     browser: true,
     es6: true,
@@ -15,7 +16,7 @@ module.exports = {
       jsx: true,
     },
     ecmaVersion: 2018,
-    sourceType: 'module',
+    sourceType: 'module'
   },
   plugins: [
     'react',
