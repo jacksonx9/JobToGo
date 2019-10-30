@@ -21,7 +21,7 @@ class JobAnalyzer {
     this.logger.info('Starting to compute job scores...');
 
     const jobs = await Jobs.find({});
-    const skills = await User._getAllSkills();
+    const skills = await User.getAllSkills();
 
     await forEachAsync(skills, async (skill) => {
       let docCount = 0;
@@ -78,7 +78,7 @@ class JobAnalyzer {
     if (!userId) {
       return {
         result: null,
-        message: 'Invalid userId',
+        errorMessage: 'Invalid userId',
         status: 400,
       };
     }
@@ -88,7 +88,7 @@ class JobAnalyzer {
     } catch (e) {
       return {
         result: null,
-        message: 'Invalid userId',
+        errorMessage: 'Invalid userId',
         status: 400,
       };
     }
@@ -96,7 +96,7 @@ class JobAnalyzer {
     if (user === null) {
       return {
         result: null,
-        message: 'Invalid userId',
+        errorMessage: 'Invalid userId',
         status: 400,
       };
     }
@@ -117,7 +117,7 @@ class JobAnalyzer {
 
       return {
         result: mostRelevantJobs,
-        message: '',
+        errorMessage: '',
         status: 200,
       };
     }
@@ -128,15 +128,15 @@ class JobAnalyzer {
     const jobScore = (job) => {
       let sum = 0;
 
-      if (jobScoreCache.has(job.id)) {
-        sum = jobScoreCache.get(job.id);
+      if (jobScoreCache.has(job._id)) {
+        sum = jobScoreCache.get(job._id);
       } else {
         job.keywords.forEach((keyword) => {
           if (userKeywords.includes(keyword.name)) {
             sum += keyword.tfidf;
           }
         });
-        jobScoreCache.set(job.id, sum);
+        jobScoreCache.set(job._id, sum);
       }
 
       return sum;
@@ -163,7 +163,7 @@ class JobAnalyzer {
 
     return {
       result: mostRelevantJobs,
-      message: '',
+      errorMessage: '',
       status: 200,
     };
   }

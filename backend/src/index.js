@@ -12,7 +12,6 @@ import JobSearcher from './job_searcher';
 import JobShortLister from './job_shortlister';
 import JobAnalyzer from './job_analyzer';
 import Messenger from './messenger';
-
 import firebaseCredentials from '../credentials/firebase';
 
 

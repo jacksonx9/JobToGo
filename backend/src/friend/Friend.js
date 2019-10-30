@@ -9,12 +9,12 @@ class Friend {
 
     this.messenger = messenger;
 
-    app.post('/friends/', async (req, res) => {
+    app.post('/friends', async (req, res) => {
       const result = await this.addFriend(req.body.userId, req.body.friendId);
       res.status(result.status).send(result);
     });
 
-    app.delete('/friends/', async (req, res) => {
+    app.delete('/friends', async (req, res) => {
       const result = await this.removeFriend(req.body.userId, req.body.friendId);
       res.status(result.status).send(result);
     });
@@ -50,7 +50,6 @@ class Friend {
       // Verify userId is valid
       await Users.findById(userId).orFail();
 
-      // Verify friend has not already been added
       const friend = await Users.findOne({
         _id: friendId,
         $or: [
@@ -59,6 +58,7 @@ class Friend {
         ],
       });
 
+      // Verify friend has not already been added
       if (friend !== null) {
         return {
           result: false,
@@ -199,6 +199,13 @@ class Friend {
     }
   }
 
+  async getFriends(userId) {
+    return this._getFriendsPendingFriends(userId, 'friends');
+  }
+
+  async getPendingFriends(userId) {
+    return this._getFriendsPendingFriends(userId, 'pendingFriends');
+  }
 
   async _getFriendsPendingFriends(userId, type) {
     assert(type === 'pendingFriends' || type === 'friends');
@@ -213,9 +220,9 @@ class Friend {
 
     try {
       // Get friends
-      const friendDocs = await Users.findById(userId, type).orFail();
+      const user = await Users.findById(userId, type).orFail();
       // Get friendIds
-      const friendIds = friendDocs[type];
+      const friendIds = user[type];
       // Search friend data based on ids
       const friendsData = await Users.find({ _id: { $in: friendIds } }, 'credentials.userName');
 
@@ -237,14 +244,6 @@ class Friend {
         status: 400,
       };
     }
-  }
-
-  async getFriends(userId) {
-    return this._getFriendsPendingFriends(userId, 'friends');
-  }
-
-  async getPendingFriends(userId) {
-    return this._getFriendsPendingFriends(userId, 'pendingFriends');
   }
 }
 

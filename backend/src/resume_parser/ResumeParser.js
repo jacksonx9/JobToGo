@@ -22,7 +22,7 @@ class ResumeParser {
 
     // Upload resume as multipart form data
     const upload = multer();
-    app.post('/resume/', upload.single('resume'), async (req, res) => {
+    app.post('/resume', upload.single('resume'), async (req, res) => {
       const result = await this.handleResume(req.body.userId, req.file);
       res.status(result.status).send(result);
     });
@@ -32,7 +32,7 @@ class ResumeParser {
     if (!userId || !resume) {
       return {
         result: false,
-        message: 'Invalid userId or resume',
+        errorMessage: 'Invalid userId or resume',
         status: 400,
       };
     }
@@ -43,7 +43,7 @@ class ResumeParser {
     if (mimetype !== 'application/pdf') {
       return {
         result: false,
-        message: 'Invalid PDF',
+        errorMessage: 'Invalid PDF',
         status: 400,
       };
     }
@@ -75,7 +75,7 @@ class ResumeParser {
     } catch (e) {
       return {
         result: null,
-        message: 'Invalid PDF',
+        errorMessage: 'Invalid PDF',
         status: 400,
       };
     }
@@ -98,7 +98,7 @@ class ResumeParser {
 
     return {
       result: text,
-      message: '',
+      errorMessage: '',
       status: 200,
     };
   }
@@ -137,7 +137,7 @@ class ResumeParser {
     if (textData === null) {
       return {
         result: null,
-        message: 'Internal Server Error',
+        errorMessage: 'Internal server error',
         status: 500,
       };
     }
@@ -147,12 +147,11 @@ class ResumeParser {
       .map((ent) => ent.spot)
       .filter((word) => word.length <= MAX_KEYWORD_LENGTH);
     const uniqueKeywords = [...new Set(keywords)];
-    this.logger.info('Skills from resume: ');
-    this.logger.info(uniqueKeywords);
+    this.logger.info('Skills from resume: ', uniqueKeywords);
 
     return {
       result: uniqueKeywords,
-      message: '',
+      errorMessage: '',
       status: 200,
     };
   }

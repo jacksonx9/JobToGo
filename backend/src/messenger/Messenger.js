@@ -24,7 +24,7 @@ class Messenger {
       },
     });
 
-    app.post('/messenger/email/', async (req, res) => {
+    app.post('/messenger/email', async (req, res) => {
       const result = await this.emailLikedJobs(req.body.userId);
       res.status(result.status).send(result);
     });
@@ -37,7 +37,7 @@ class Messenger {
     if (!userId || !friendId) {
       return {
         result: false,
-        message: 'Invalid userId or friendId',
+        errorMessage: 'Invalid userId or friendId',
         status: 400,
       };
     }
@@ -48,7 +48,7 @@ class Messenger {
     } catch (e) {
       return {
         result: false,
-        message: 'Invalid userId or friendId',
+        errorMessage: 'Invalid userId or friendId',
         status: 400,
       };
     }
@@ -72,14 +72,14 @@ class Messenger {
       this.logger.info(`Message sent: ${messageRes}`);
       return {
         result: true,
-        message: '',
+        errorMessage: '',
         status: 200,
       };
     } catch (e) {
       this.logger.error(e);
       return {
         result: false,
-        message: 'Internal Server Error',
+        errorMessage: 'Internal server error',
         status: 500,
       };
     }
@@ -87,12 +87,12 @@ class Messenger {
 
   async emailLikedJobs(userId) {
     let user;
-    let message = '';
+    let emailText = '';
 
     if (!userId) {
       return {
         result: false,
-        message: 'Invalid userId',
+        errorMessage: 'Invalid userId',
         status: 400,
       };
     }
@@ -108,13 +108,13 @@ class Messenger {
       // Construct email message
       jobsResult.result.forEach((posting) => {
         const { title, company, url } = posting;
-        message += `${title} @ ${company}
+        emailText += `${title} @ ${company}
                     ${url}\n\n`;
       });
     } catch (e) {
       return {
         result: false,
-        message: 'Invalid userId',
+        errorMessage: 'Invalid userId',
         status: 400,
       };
     }
@@ -126,20 +126,20 @@ class Messenger {
         from: `"JobToGo" <${credentials.email}>`,
         to: user.credentials.email,
         subject: 'Shortlisted jobs',
-        text: message,
+        text: emailText,
       });
     } catch (e) {
       this.logger.error(e);
       return {
         result: false,
-        message: 'Internal Server Error',
+        errorMessage: 'Internal server error',
         status: 500,
       };
     }
 
     return {
       result: true,
-      message: '',
+      errorMessage: '',
       status: 200,
     };
   }

@@ -8,7 +8,7 @@ class User {
   constructor(app) {
     this.logger = Logger.get(this.constructor.name);
 
-    this.googleAuth = new OAuth2Client(credentials.clientID);
+    this.googleAuth = new OAuth2Client(credentials.clientId);
 
     app.post('/users/googleLogin/', async (req, res) => {
       const { idToken, firebaseToken } = req.body;
@@ -50,7 +50,7 @@ class User {
     if (!userData) {
       return {
         result: null,
-        message: 'Invalid userData',
+        errorMessage: 'Invalid userData',
         status: 400,
       };
     }
@@ -59,13 +59,13 @@ class User {
       const user = await Users.create(userData);
       return {
         result: user._id,
-        message: '',
+        errorMessage: '',
         status: 200,
       };
     } catch (e) {
       return {
         result: null,
-        message: 'Malformed userData or user already exists',
+        errorMessage: 'Malformed userData or user already exists',
         status: 400,
       };
     }
@@ -88,7 +88,7 @@ class User {
     if (!email || !password) {
       return {
         result: null,
-        message: 'Invalid email or password',
+        errorMessage: 'Invalid email or password',
         status: 400,
       };
     }
@@ -100,13 +100,13 @@ class User {
       }).orFail();
       return {
         result: user._id,
-        message: '',
+        errorMessage: '',
         status: 200,
       };
     } catch (e) {
       return {
         result: null,
-        message: 'Invalid email or password',
+        errorMessage: 'Invalid email or password',
         status: 400,
       };
     }
@@ -117,7 +117,7 @@ class User {
     if (!idToken || !firebaseToken) {
       return {
         result: null,
-        message: 'Invalid idToken or firebaseToken',
+        errorMessage: 'Invalid idToken or firebaseToken',
         status: 400,
       };
     }
@@ -129,18 +129,16 @@ class User {
       // Verify google token
       ticket = await this.googleAuth.verifyIdToken({
         idToken,
-        audience: credentials.clientID,
+        audience: credentials.clientId,
       });
 
       this.logger.info('Logging in with google: ');
-      this.logger.info('Google ticket: ');
-      this.logger.info(ticket);
-      this.logger.info('Firebase token: ');
-      this.logger.info(firebaseToken);
+      this.logger.info('Google ticket: ', ticket);
+      this.logger.info('Firebase token: ', firebaseToken);
     } catch (e) {
       return {
         result: null,
-        message: 'Invalid idToken or firebaseToken',
+        errorMessage: 'Invalid idToken or firebaseToken',
         status: 400,
       };
     }
@@ -162,8 +160,8 @@ class User {
     }
 
     return {
-      result: user.id,
-      message: '',
+      result: user._id,
+      errorMessage: '',
       status: 200,
     };
   }
@@ -174,7 +172,7 @@ class User {
     if (!userId || !userInfo) {
       return {
         result: false,
-        message: 'Invalid userId or userInfo',
+        errorMessage: 'Invalid userId or userInfo',
         status: 400,
       };
     }
@@ -186,13 +184,13 @@ class User {
 
       return {
         result: true,
-        message: '',
+        errorMessage: '',
         status: 200,
       };
     } catch (e) {
       return {
         result: false,
-        message: 'Invalid userId or userInfo',
+        errorMessage: 'Invalid userId or userInfo',
         status: 400,
       };
     }
@@ -216,20 +214,20 @@ class User {
       };
       return {
         result: userData,
-        message: '',
+        errorMessage: '',
         status: 200,
       };
     } catch (e) {
       return {
         result: null,
-        message: 'User not found',
+        errorMessage: 'User not found',
         status: 404,
       };
     }
   }
 
   /* gets and returns a set containing the collective skills of all the users */
-  static async _getAllSkills() {
+  static async getAllSkills() {
     const keywords = [];
     const users = await Users.find({});
 
@@ -245,7 +243,7 @@ class User {
     if (!userId) {
       return {
         result: null,
-        message: 'Invalid userId',
+        errorMessage: 'Invalid userId',
         status: 400,
       };
     }
@@ -254,13 +252,13 @@ class User {
       const user = await Users.findById(userId).orFail();
       return {
         result: user.userInfo.skillsExperiences,
-        message: '',
+        errorMessage: '',
         status: 200,
       };
     } catch (e) {
       return {
         result: null,
-        message: 'Invalid userId',
+        errorMessage: 'Invalid userId',
         status: 400,
       };
     }

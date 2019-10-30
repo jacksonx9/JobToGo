@@ -8,13 +8,13 @@ class JobShortLister {
   constructor(app) {
     this.logger = Logger.get(this.constructor.name);
 
-    app.post('/jobs/like/', async (req, res) => {
+    app.post('/jobs/like', async (req, res) => {
       const { userId, jobId } = req.body;
       const result = await this.addLikedJobs(userId, jobId);
       res.status(result.status).send(result);
     });
 
-    app.post('/jobs/dislike/', async (req, res) => {
+    app.post('/jobs/dislike', async (req, res) => {
       const { userId, jobId } = req.body;
       const result = await this.addDislikedJobs(userId, jobId);
       res.status(result.status).send(result);
@@ -26,68 +26,12 @@ class JobShortLister {
     });
   }
 
-  async _addLikedDislikedJobs(userId, jobId, type) {
-    assert(type === 'likedJobs' || type === 'dislikedJobs');
-
-    if (!userId || !jobId) {
-      return {
-        result: false,
-        message: 'Invalid userId or jobId',
-        status: 400,
-      };
-    }
-
-    try {
-      // Make sure job is valid
-      await Jobs.findById(jobId).orFail();
-
-      // Check if already swiped
-      const user = await Users.findOne({
-        _id: userId,
-        $or: [
-          { likedJobs: jobId },
-          { dislikedJobs: jobId },
-        ],
-      });
-
-      if (user !== null) {
-        return {
-          result: false,
-          message: 'Job already selected once',
-          status: 400,
-        };
-      }
-
-      await Users.findByIdAndUpdate(userId, { $addToSet: { [type]: jobId } }).orFail();
-
-      return {
-        result: true,
-        message: '',
-        status: 200,
-      };
-    } catch (e) {
-      return {
-        result: false,
-        message: 'Invalid userId or jobId',
-        status: 400,
-      };
-    }
-  }
-
   async addLikedJobs(userId, jobId) {
     return this._addLikedDislikedJobs(userId, jobId, 'likedJobs');
   }
 
   async addDislikedJobs(userId, jobId) {
     return this._addLikedDislikedJobs(userId, jobId, 'dislikedJobs');
-  }
-
-  async _getLikedDislikedJobs(userId, type) {
-    assert(type === 'likedJobs' || type === 'dislikedJobs');
-
-    // Throws if userId is invalid
-    const doc = await Users.findById(userId, type).orFail();
-    return doc[type];
   }
 
   async getLikedJobs(userId) {
@@ -104,7 +48,7 @@ class JobShortLister {
     if (!userId) {
       return {
         result: null,
-        message: 'Invalid userId',
+        errorMessage: 'Invalid userId',
         status: 400,
       };
     }
@@ -114,7 +58,7 @@ class JobShortLister {
     } catch (e) {
       return {
         result: null,
-        message: 'Invalid userId',
+        errorMessage: 'Invalid userId',
         status: 400,
       };
     }
@@ -140,9 +84,65 @@ class JobShortLister {
 
     return {
       result: jobsData,
-      message: '',
+      errorMessage: '',
       status: 200,
     };
+  }
+
+  async _addLikedDislikedJobs(userId, jobId, type) {
+    assert(type === 'likedJobs' || type === 'dislikedJobs');
+
+    if (!userId || !jobId) {
+      return {
+        result: false,
+        errorMessage: 'Invalid userId or jobId',
+        status: 400,
+      };
+    }
+
+    try {
+      // Make sure job is valid
+      await Jobs.findById(jobId).orFail();
+
+      // Check if already swiped
+      const user = await Users.findOne({
+        _id: userId,
+        $or: [
+          { likedJobs: jobId },
+          { dislikedJobs: jobId },
+        ],
+      });
+
+      if (user !== null) {
+        return {
+          result: false,
+          errorMessage: 'Job already selected once',
+          status: 400,
+        };
+      }
+
+      await Users.findByIdAndUpdate(userId, { $addToSet: { [type]: jobId } }).orFail();
+
+      return {
+        result: true,
+        errorMessage: '',
+        status: 200,
+      };
+    } catch (e) {
+      return {
+        result: false,
+        errorMessage: 'Invalid userId or jobId',
+        status: 400,
+      };
+    }
+  }
+
+  async _getLikedDislikedJobs(userId, type) {
+    assert(type === 'likedJobs' || type === 'dislikedJobs');
+
+    // Throws if userId is invalid
+    const doc = await Users.findById(userId, type).orFail();
+    return doc[type];
   }
 }
 

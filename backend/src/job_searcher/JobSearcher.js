@@ -55,7 +55,7 @@ class JobSearcher {
 
         // Add description, unique url to each result by scraping the webpage
         await forEachAsync(results, async (result, i) => {
-          const jobPage = await axios.get(result.url).catch((e) => this.logger.error(e));
+          const jobPage = await axios.get(result.url);
           const $ = cheerio.load(jobPage.data);
           results[i].description = $('#jobDescriptionText').text();
           results[i].url = $('#indeed-share-url').attr('content');
