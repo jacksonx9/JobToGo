@@ -2,65 +2,16 @@ import admin from 'firebase-admin';
 import nodemailer from 'nodemailer';
 import Logger from 'js-logger';
 
-import JobShortLister from '../job_shortlister';
 import { Users } from '../schema';
-import firebaseCredentials from '../../credentials/firebase';
 import credentials from '../../credentials/google';
 
-const DATABASE_URL = 'https://jobtogo-103fd.firebaseio.com';
 
 class Messenger {
   constructor(app, shortlister) {
     this.logger = Logger.get(this.constructor.name);
 
     this.shortlister = shortlister;
-
-    admin.initializeApp({
-      credential: admin.credential.cert(firebaseCredentials),
-      databaseURL: DATABASE_URL,
-    });
-
-    app.post('/jobs/emailUser/', async (req, res) => {
-      try {
-        const { userId } = req.body;
-        const result = await this.emailShortlist(userId);
-        res.status(result.status).send(result.success);
-      } catch (e) {
-        this.logger.error(e);
-        res.status(500).send(null);
-      }
-    });
-  }
-
-  async requestFriend(userId, friendId) {
-    try {
-      const user = await Users.findById(userId);
-      const { userName } = user.credentials;
-      const friend = await Users.findById(friendId);
-
-      const message = {
-        token: friend.credentials.firebaseToken,
-        notification: {
-          title: 'Friend request!',
-          body: `${userName} wants to add you as a friend.`,
-        },
-        data: {
-          friendName: userName,
-          friendId: userId,
-        },
-      };
-      const messageRes = await admin.messaging().send(message);
-      this.logger.info(`Message sent: ${messageRes}`);
-      return true;
-    } catch (e) {
-      this.logger.error(e);
-      return false;
-    }
-  }
-
-  async emailShortlist(userId) {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-    const transporter = nodemailer.createTransport({
+    this.mailer = nodemailer.createTransport({
       host: 'smtp.gmail.com',
       port: 465,
       secure: true,
@@ -68,32 +19,128 @@ class Messenger {
         user: credentials.email,
         pass: credentials.password,
       },
+      tls: {
+        rejectUnauthorized: false,
+      },
     });
 
-    const docs = await Users.find({ _id: userId }, 'credentials.email');
-    const userEmail = docs[0].credentials.email;
-    const userShortlist = await JobShortLister.getLikedJobsData(userId);
-
-    let message = '';
-
-    userShortlist.forEach((posting) => {
-      const { title, company, url } = posting;
-      message += `${title} @ ${company}
-                  ${url}\n\n`;
+    app.post('/messenger/email', async (req, res) => {
+      const result = await this.emailLikedJobs(req.body.userId);
+      res.status(result.status).send(result);
     });
+  }
 
-    await transporter.sendMail({
-      from: `"${credentials.email}" <${credentials.email}>`,
-      to: userEmail,
-      subject: 'Shortlisted jobs',
-      text: message,
-    }).catch((e) => {
+  async requestFriend(userId, friendId) {
+    let user;
+    let friend;
+
+    if (!userId || !friendId) {
+      return {
+        result: false,
+        errorMessage: 'Invalid userId or friendId',
+        status: 400,
+      };
+    }
+
+    try {
+      user = await Users.findById(userId).orFail();
+      friend = await Users.findById(friendId).orFail();
+    } catch (e) {
+      return {
+        result: false,
+        errorMessage: 'Invalid userId or friendId',
+        status: 400,
+      };
+    }
+
+    const { userName } = user.credentials;
+    const message = {
+      token: friend.credentials.firebaseToken,
+      notification: {
+        title: 'Friend request!',
+        body: `${userName} wants to add you as a friend.`,
+      },
+      data: {
+        friendName: userName,
+        friendId: userId,
+      },
+    };
+
+    try {
+      // Send push notification
+      const messageRes = await admin.messaging().send(message);
+      this.logger.info(`Message sent: ${messageRes}`);
+      return {
+        result: true,
+        errorMessage: '',
+        status: 200,
+      };
+    } catch (e) {
       this.logger.error(e);
-      return { status: 400, success: false };
-    });
+      return {
+        result: false,
+        errorMessage: 'Internal server error',
+        status: 500,
+      };
+    }
+  }
+
+  async emailLikedJobs(userId) {
+    let user;
+    let emailText = '';
+
+    if (!userId) {
+      return {
+        result: false,
+        errorMessage: 'Invalid userId',
+        status: 400,
+      };
+    }
+
+    try {
+      user = await Users.findById(userId, 'credentials.email').orFail();
+      const jobsResult = await this.shortlister.getLikedJobsData(userId);
+
+      if (jobsResult.status !== 200) {
+        return jobsResult;
+      }
+
+      // Construct email message
+      jobsResult.result.forEach((posting) => {
+        const { title, company, url } = posting;
+        emailText += `${title} @ ${company}
+                    ${url}\n\n`;
+      });
+    } catch (e) {
+      return {
+        result: false,
+        errorMessage: 'Invalid userId',
+        status: 400,
+      };
+    }
+
+    try {
+      // TODO: Does not verify email is sent correctly
+      // Will usually always succeed no matter what
+      await this.mailer.sendMail({
+        from: `"JobToGo" <${credentials.email}>`,
+        to: user.credentials.email,
+        subject: 'Shortlisted jobs',
+        text: emailText,
+      });
+    } catch (e) {
+      this.logger.error(e);
+      return {
+        result: false,
+        errorMessage: 'Internal server error',
+        status: 500,
+      };
+    }
+
     return {
+      result: true,
+      errorMessage: '',
       status: 200,
-      success: true,
     };
   }
 }

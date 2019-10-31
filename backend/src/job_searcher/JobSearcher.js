@@ -5,13 +5,13 @@ import Logger from 'js-logger';
 import { forEachAsync } from 'foreachasync';
 
 import { Jobs } from '../schema';
-
 import { MIN_JOBS_IN_DB } from '../constants';
 
 class JobSearcher {
   constructor(jobAnalyzer) {
     this.logger = Logger.get(this.constructor.name);
 
+    // TODO: Change this to run periodically instead of on startup
     this.updateJobStore().then(() => {
       jobAnalyzer.computeJobScores()
         .then({})
@@ -37,7 +37,7 @@ class JobSearcher {
 
     this.logger.info(`Search complete! Found ${jobs.length} jobs.`);
 
-    await this.addToJobStore(jobs).catch((e) => this.logger.error(e));
+    await this.addToJobStore(jobs);
   }
 
   async searchJobs(keyphrases) {
@@ -45,24 +45,26 @@ class JobSearcher {
 
     await forEachAsync(keyphrases, async (keyphrase) => {
       // TODO: change these hardcoded params
-      const results = await indeed.query({
-        query: keyphrase,
-        maxAge: '30',
-        sort: 'relevance',
-        limit: 30,
-      }).catch((e) => this.logger.error(e));
+      try {
+        const results = await indeed.query({
+          query: keyphrase,
+          maxAge: '30',
+          sort: 'relevance',
+          limit: 30,
+        });
 
-      // Add description to each result by scraping the webpage
-      await forEachAsync(results, async (result, i) => {
-        const jobPage = await axios.get(result.url).catch((e) => this.logger.error(e));
-        const $ = cheerio.load(jobPage.data);
-        results[i].description = $('#jobDescriptionText').text();
-        results[i].url = $('#indeed-share-url').attr('content');
-      });
+        // Add description, unique url to each result by scraping the webpage
+        await forEachAsync(results, async (result, i) => {
+          const jobPage = await axios.get(result.url);
+          const $ = cheerio.load(jobPage.data);
+          results[i].description = $('#jobDescriptionText').text();
+          results[i].url = $('#indeed-share-url').attr('content');
+        });
 
-      const filteredResults = results.filter((res) => typeof res.description === 'string' && res.description.length > 0);
-
-      jobs.push(...filteredResults);
+        jobs.push(...results);
+      } catch (e) {
+        this.logger.error(e);
+      }
     });
 
     return jobs;
