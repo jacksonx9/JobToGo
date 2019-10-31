@@ -15,32 +15,32 @@ class TestAPIs {
       credentials: {
         userName: 'name',
         email: testEmail,
-        password: testPassword
+        password: testPassword,
       },
       userInfo: {
         location: 'Vancouver, BC',
         jobType: 'full-time',
-        skillsExperiences: [ 'javascript', 'C', 'java' ]
+        skillsExperiences: ['javascript', 'C', 'java'],
       },
       keywords: [{
         score: 1,
         jobCount: 2,
-        timeStamp: Date.now()
+        timeStamp: Date.now(),
       },
       {
         score: 0,
         jobCount: 21,
-        timeStamp: Date.now()
+        timeStamp: Date.now(),
       }],
       keywordStatistic: {
-          score: 10,
-          jobCount: 30,
-          timeStamp: Date.now()
+        score: 10,
+        jobCount: 30,
+        timeStamp: Date.now(),
       },
       friends: [],
       pendingFriends: [],
       jobShortList: [],
-      resumePath: './resume.pdf'
+      resumePath: './resume.pdf',
     };
 
     app.get('/test/users/updateUserInfo', async (req, res) => {
@@ -60,20 +60,20 @@ class TestAPIs {
         keywords: [{
           score: 1,
           jobCount: 2,
-          timeStamp: Date.now()
+          timeStamp: Date.now(),
         },
         {
           score: 0,
           jobCount: 21,
-          timeStamp: Date.now()
+          timeStamp: Date.now(),
         }],
         keywordStatistic: {
-            score: 10,
-            jobCount: 30,
-            timeStamp: Date.now()
+          score: 10,
+          jobCount: 30,
+          timeStamp: Date.now(),
         },
         jobShortList: [],
-        resumePath: './resume.pdf'
+        resumePath: './resume.pdf',
       };
 
       if (await user.updateUserInfo(userId, userUpdateInfo)) {

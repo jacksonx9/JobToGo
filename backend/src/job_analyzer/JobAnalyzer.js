@@ -21,27 +21,19 @@ class JobAnalyzer {
     this.logger.info('Starting to compute job scores...');
 
     const jobs = await Jobs.find({});
-    const skills = await User.getAllSkills();
+    const skills = await User._getAllSkills();
 
-    await forEachAsync(skills, async (skill) => {
-      let docCount = 0;
-      const keywordCount = [];
+    await forEachAsync(skills, async (skill, skillIdx) => {
       const keyword = skill.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-      const re = new RegExp(keyword, 'g');
-
-      jobs.forEach((posting) => {
-        const count = (posting.description.toLowerCase().match(re) || []).length;
-        keywordCount.push(count);
-        if (count > 0) {
-          docCount += 1;
-        }
-      });
+      const docCount = jobs.reduce((sum, posting) => sum
+        + Number(posting.keywords[skillIdx].count > 0), 0);
 
       const jobsLen = jobs.length;
       // calculate tf_idf each doc and save it
       await forEachAsync(jobs, async (job, i) => {
+        const keywordOccurrences = job.keywords[skillIdx].count; // TODO: what if new keyword?
         const wordCount = job.description.split(' ').length;
-        const tf = keywordCount[i] / wordCount;
+        const tf = keywordOccurrences / wordCount;
         const idf = docCount !== 0 ? Math.log(jobsLen / docCount) : 0;
         const tfidf = tf * idf;
 
