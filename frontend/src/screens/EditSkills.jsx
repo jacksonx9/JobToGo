@@ -23,13 +23,13 @@ export default class EditSkills extends Component {
       } else {
         const data = new FormData();
         data.append('userId', global.userId);
-        data.append('fileData', {
+        data.append('resume', {
           uri: response.uri,
           type: response.type,
           name: response.fileName,
         });
 
-        await axios.post(`${config.ENDP_UPLOAD}`,
+        await axios.post(`${config.ENDP_RESUME}`,
           data, {
             headers: {
               'Content-Type': 'multipart/form-data',
