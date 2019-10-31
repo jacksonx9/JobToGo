@@ -28,6 +28,16 @@ export default class EditFriends extends Component {
   }
 
   async componentDidMount() {
+    this.fetchFriends();
+  }
+
+  async componentDidUpdate(prevState) {
+    if (prevState !== this.state) {
+      this.fetchFriends();
+    }
+  }
+
+  fetchFriends = async () => {
     const { userId } = global;
     const friends = await axios.get(`${config.serverIp}/users/getFriends/${userId}`)
       .catch((e) => console.log(e));
@@ -39,22 +49,6 @@ export default class EditFriends extends Component {
       friendRequests: friendRequests.data,
       loading: 0,
     });
-  }
-
-  async componentDidUpdate(prevState) {
-    const { userId } = global;
-    if (prevState !== this.state) {
-      const friends = await axios.get(`${config.serverIp}/users/getFriends/${userId}`)
-        .catch((e) => console.log(e));
-      const friendRequests = await axios.get(`${config.serverIp}/users/getPendingFriends/${userId}`)
-        .catch((e) => console.log(e));
-
-      this.setState({
-        friends: friends.data,
-        friendRequests: friendRequests.data,
-        loading: 0,
-      });
-    }
   }
 
   addFriend = async () => {

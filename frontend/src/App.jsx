@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform } from 'react-native';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createDrawerNavigator } from 'react-navigation-drawer';
@@ -11,6 +11,8 @@ import JobSwipe from './screens/JobSwipe';
 import SendLikedJobs from './screens/SendLikedJobs';
 import EditFriends from './screens/EditFriends';
 import EditSkills from './screens/EditSkills';
+
+import { appStyles } from './styles';
 
 
 export default class App extends React.Component {
@@ -48,7 +50,17 @@ export default class App extends React.Component {
     this.notificationOpenedListener();
   }
 
-  async createNotificationListeners() {
+  showAlert = (title, body) => {
+    alert(
+      title, body,
+      [
+        { text: 'OK', onPress: () => console.log('OK Pressed') },
+      ],
+      { cancelable: false },
+    );
+  }
+
+  createNotificationListeners = async () => {
     /*
     * Triggered when a particular notification has been received in foreground
     * */
@@ -58,14 +70,17 @@ export default class App extends React.Component {
     });
 
     /*
-    * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
+    * If your app is in background, you can listen for when a notification
+    * is clicked / tapped / opened as follows:
     * */
-    this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
-      const { title, body } = notificationOpen.notification;
-    });
+    this.notificationOpenedListener = firebase.notifications()
+      .onNotificationOpened((notificationOpen) => {
+        const { title, body } = notificationOpen.notification;
+      });
 
     /*
-    * If your app is closed, you can check if it was opened by a notification being clicked / tapped / opened as follows:
+    * If your app is closed, you can check if it was opened by a notification
+    * being clicked / tapped / opened as follows:
     * */
     const notificationOpen = await firebase.notifications().getInitialNotification();
     if (notificationOpen) {
@@ -80,20 +95,10 @@ export default class App extends React.Component {
     });
   }
 
-  showAlert(title, body) {
-    alert(
-      title, body,
-      [
-        { text: 'OK', onPress: () => console.log('OK Pressed') },
-      ],
-      { cancelable: false },
-    );
-  }
-
   render() {
     return (
       <AppContainer
-        styles={styles.containerStyle}
+        styles={appStyles.containerStyle}
       />
     );
   }
@@ -142,12 +147,3 @@ const AppContainer = createAppContainer(
     },
   ),
 );
-
-const styles = StyleSheet.create({
-  containerStyle: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

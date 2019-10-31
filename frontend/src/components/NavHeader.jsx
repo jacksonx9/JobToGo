@@ -45,7 +45,7 @@ NavHeader.defaultProps = {
 
 NavHeader.propTypes = {
   title: PropTypes.string.isRequired,
-  image: PropTypes.element.isRequired,
+  image: PropTypes.number.isRequired,
   onPressBack: PropTypes.func.isRequired,
   onPressBtn: PropTypes.func,
   enableBtn: PropTypes.bool,

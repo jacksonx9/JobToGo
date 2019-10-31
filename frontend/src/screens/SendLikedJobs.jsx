@@ -22,27 +22,25 @@ export default class SendLikedJobs extends Component {
   }
 
   async componentDidMount() {
+    this.fetchLikedJobs();
+  }
+
+  async componentDidUpdate(prevProps) {
+    if (prevProps !== this.props) {
+      this.fetchLikedJobs();
+    }
+  }
+
+  fetchLikedJobs = async () => {
     const { userId } = global;
     const likedJobs = await axios.get(`${config.serverIp}/jobs/getLikedJobs/${userId}`)
       .catch((e) => console.log(e));
-
     this.setState({
       likedJobs: likedJobs.data,
       loading: 0,
     });
   }
 
-  async componentDidUpdate(prevProps) {
-    const { userId } = global;
-    if (prevProps !== this.props) {
-      const likedJobs = await axios.get(`${config.serverIp}/jobs/getLikedJobs/${userId}`)
-        .catch((e) => console.log(e));
-      this.setState({
-        likedJobs: likedJobs.data,
-        loading: 0,
-      });
-    }
-  }
 
   sendLikedJobs = async () => {
     const { userId } = global;

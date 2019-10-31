@@ -15,7 +15,6 @@ import { jobSwipeStyles } from '../styles';
 
 const styles = jobSwipeStyles;
 export default class JobSwipe extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -28,6 +27,15 @@ export default class JobSwipe extends Component {
   async componentDidMount() {
     const { userId } = global;
     console.log(`User id is: ${userId}`);
+    this.fetchJobs();
+  }
+
+  fetchJobs = async () => {
+    this.setState({
+      loading: 1,
+    });
+
+    const { userId } = global;
     const jobs = await axios.get(`${config.serverIp}/jobs/findJobs/${userId}`)
       .catch((e) => console.log(e));
 
@@ -49,15 +57,8 @@ export default class JobSwipe extends Component {
       jobId: jobs[jobIndex]._id,
     }).catch((e) => console.log(e));
 
-    if (jobs.length == (jobIndex + 1)) {
-      const userJobs = await axios.get(`${config.serverIp}/jobs/findJobs/${userId}`)
-        .catch((e) => console.log(e));
-
-      this.setState({ loading: 1 });
-      this.setState({
-        jobs: userJobs.data,
-        loading: 0,
-      });
+    if (jobs.length === (jobIndex + 1)) {
+      this.fetchJobs();
     } else {
       this.setState({ jobIndex: jobIndex + 1 });
     }
@@ -72,14 +73,7 @@ export default class JobSwipe extends Component {
     }).catch((e) => console.log(e));
 
     if (jobs.length === (jobIndex + 1)) {
-      const userJobs = await axios.get(`${config.serverIp}/jobs/findJobs/${userId}`)
-        .catch((e) => console.log(e));
-
-      this.setState({ loading: 1 });
-      this.setState({
-        jobs: userJobs.data,
-        loading: 0,
-      });
+      this.fetchJobs();
     } else {
       this.setState({ jobIndex: jobIndex + 1 });
     }
@@ -119,7 +113,10 @@ export default class JobSwipe extends Component {
         </GestureRecognizer>
 
         <JobDetails
-          job={job}
+          company={job.company}
+          title={job.title}
+          location={job.location}
+          description={job.description}
         />
       </View>
     );

@@ -415,3 +415,12 @@ export const navHeaderStyles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
+export const appStyles = StyleSheet.create({
+  containerStyle: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});

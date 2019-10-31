@@ -49,6 +49,7 @@ export default class SignIn extends Component {
         });
 
       global.userId = ret.data;
+      console.log(`User: ${global.userId} signing in`);
       navigation.navigate('App');
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {

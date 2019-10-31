@@ -25,7 +25,9 @@ class JobDetails extends Component {
   render() {
     const styles = jobDetailsStyles;
     const { modalVisible } = this.state;
-    const { job } = this.props;
+    const {
+      company, title, location, description,
+    } = this.props;
     return (
       <View style={[styles.containerStyle]}>
         <Modal
@@ -40,23 +42,23 @@ class JobDetails extends Component {
                 this.setModalVisible(false);
               }}
             />
-            <Text style={[styles.headerStyle]}>{job.company}</Text>
+            <Text style={[styles.headerStyle]}>{company}</Text>
             <View style={[styles.subHeaderContainerStyle]}>
               <Image
                 source={images.iconJob}
                 styles={[styles.iconStyle]}
               />
-              <Text style={[styles.subHeaderStyle]}>{job.title}</Text>
+              <Text style={[styles.subHeaderStyle]}>{title}</Text>
             </View>
             <View style={[styles.subHeaderContainerStyle]}>
               <Image
                 source={images.iconLocation}
                 styles={[styles.iconStyle]}
               />
-              <Text style={[styles.subHeaderStyle]}>{job.location}</Text>
+              <Text style={[styles.subHeaderStyle]}>{location}</Text>
             </View>
             <ScrollView style={[styles.scrollStyle]}>
-              <Text>{job.description}</Text>
+              <Text>{description}</Text>
             </ScrollView>
           </View>
         </Modal>
@@ -68,20 +70,20 @@ class JobDetails extends Component {
               this.setModalVisible(true);
             }}
           />
-          <Text style={[styles.headerStyle]}>{job.company}</Text>
+          <Text style={[styles.headerStyle]}>{company}</Text>
           <View style={[styles.subHeaderContainerStyle]}>
             <Image
               source={images.iconJob}
               styles={[styles.iconStyle]}
             />
-            <Text style={[styles.subHeaderStyle]}>{job.title}</Text>
+            <Text style={[styles.subHeaderStyle]}>{title}</Text>
           </View>
           <View style={[styles.subHeaderContainerStyle]}>
             <Image
               source={images.iconLocation}
               styles={[styles.iconStyle]}
             />
-            <Text style={[styles.subHeaderStyle]}>{job.location}</Text>
+            <Text style={[styles.subHeaderStyle]}>{location}</Text>
           </View>
         </View>
       </View>
@@ -90,7 +92,10 @@ class JobDetails extends Component {
 }
 
 JobDetails.propTypes = {
-  job: PropTypes.element.isRequired,
+  company: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  location: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
 };
 
 export default JobDetails;

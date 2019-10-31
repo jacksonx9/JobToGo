@@ -18,7 +18,7 @@ const ImageButton = ({ source, onPress }) => (
 );
 
 ImageButton.propTypes = {
-  source: PropTypes.element.isRequired,
+  source: PropTypes.number.isRequired,
   onPress: PropTypes.func.isRequired,
 };
 

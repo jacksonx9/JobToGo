@@ -43,7 +43,7 @@ SelectableItem.propTypes = {
   header: PropTypes.string.isRequired,
   subHeader: PropTypes.string,
   onPress: PropTypes.func.isRequired,
-  actionIcon: PropTypes.element.isRequired,
+  actionIcon: PropTypes.string.isRequired,
 };
 
 export default SelectableItem;
