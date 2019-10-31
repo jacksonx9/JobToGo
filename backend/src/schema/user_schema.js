@@ -27,10 +27,10 @@ const userSchema = new mongoose.Schema({
       enum: ['full-time', 'part-time', 'internship', 'unspecified'],
       default: 'unspecified',
     },
-    skillsExperiences: [String],
   },
   keywords: [
     {
+      name: String,
       score: Number,
       jobCount: Number,
       timeStamp: Date,

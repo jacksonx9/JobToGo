@@ -101,7 +101,7 @@ class JobAnalyzer {
       };
     }
 
-    const userKeywords = user.userInfo.skillsExperiences;
+    const userKeywords = user.keywords.map((keyword) => keyword.name);
 
     // Get jobs the user has already seen
     swipedJobs.push(...await this.shortlister.getLikedJobs(userId));
