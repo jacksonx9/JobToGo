@@ -64,11 +64,14 @@ class JobSearcher {
           results[i].description = $('#jobDescriptionText').text();
           results[i].url = $('#indeed-share-url').attr('content');
 
+          results[i].keywords = [];
           // Add the number of occurance of all keywords of the result
-          keywords.forEach((keyword, keywordIdx) => {
-            const re = new RegExp(keyword, 'g');
-            results[i].keywords[keywordIdx].count = (results[i].description
-              .toLowerCase().match(re) || []).length;
+          keywords.forEach((keyword) => {
+            const re = new RegExp(`/s${keyword}/s`, 'g');
+            results[i].keywords.push({
+              name: keyword,
+              count: (results[i].description.toLowerCase().match(re) || []).length,
+            });
           });
         }));
 
