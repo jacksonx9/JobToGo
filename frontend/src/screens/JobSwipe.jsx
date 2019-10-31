@@ -27,15 +27,14 @@ export default class JobSwipe extends Component {
   async componentDidMount() {
     const { userId } = global;
     console.log(`User id is: ${userId}`);
-    this.fetchJobs();
+    this.fetchJobs(userId);
   }
 
-  fetchJobs = async () => {
+  fetchJobs = async (userId) => {
     this.setState({
       loading: 1,
     });
 
-    const { userId } = global;
     const jobs = await axios.get(`${config.serverIp}/jobs/findJobs/${userId}`)
       .catch((e) => console.log(e));
 
@@ -49,34 +48,32 @@ export default class JobSwipe extends Component {
     console.log('Shared job');
   }
 
-  dislikeJob = async () => {
-    const { userId } = global;
-    const { jobs, jobIndex } = this.state;
-    await axios.post(`${config.serverIp}/jobs/addDislikedJobs/`, {
-      userId,
-      jobId: jobs[jobIndex]._id,
-    }).catch((e) => console.log(e));
-
-    if (jobs.length === (jobIndex + 1)) {
-      this.fetchJobs();
+  getNextJob = (jobNum, jobIndex, userId) => {
+    if (jobNum === (jobIndex + 1)) {
+      this.fetchJobs(userId);
     } else {
       this.setState({ jobIndex: jobIndex + 1 });
     }
   }
 
-  likeJob = async () => {
+  dislikeJob = async (jobs, jobIndex) => {
     const { userId } = global;
-    const { jobs, jobIndex } = this.state;
+    await axios.post(`${config.serverIp}/jobs/addDislikedJobs/`, {
+      userId,
+      jobId: jobs[jobIndex]._id,
+    }).catch((e) => console.log(e));
+
+    this.getNextJob(jobs.length, jobIndex, userId);
+  }
+
+  likeJob = async (jobs, jobIndex) => {
+    const { userId } = global;
     await axios.post(`${config.serverIp}/jobs/addLikedJobs/`, {
       userId,
       jobId: jobs[jobIndex]._id,
     }).catch((e) => console.log(e));
 
-    if (jobs.length === (jobIndex + 1)) {
-      this.fetchJobs();
-    } else {
-      this.setState({ jobIndex: jobIndex + 1 });
-    }
+    this.getNextJob(jobs.length, jobIndex, userId);
   }
 
   static navigationOptions = {
@@ -103,8 +100,8 @@ export default class JobSwipe extends Component {
 
         <GestureRecognizer
           onSwipeUp={this.shareJob}
-          onSwipeLeft={this.dislikeJob}
-          onSwipeRight={this.likeJob}
+          onSwipeLeft={() => this.dislikeJob(jobs, jobIndex)}
+          onSwipeRight={() => this.likeJob(jobs, jobIndex)}
           config={gestureConfig}
         >
           <JobImage
