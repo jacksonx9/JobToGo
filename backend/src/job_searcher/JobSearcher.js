@@ -64,8 +64,8 @@ class JobSearcher {
           results[i].description = $('#jobDescriptionText').text();
           results[i].url = $('#indeed-share-url').attr('content');
 
-          results[i].keywords = [];
           // Add the number of occurance of all keywords of the result
+          results[i].keywords = [];
           keywords.forEach((keyword) => {
             // TODO: matches "java" with "javascript" from description
             // NOTE: if you map with spaces around it, problems such as "java," arise

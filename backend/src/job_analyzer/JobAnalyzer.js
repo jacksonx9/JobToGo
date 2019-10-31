@@ -37,9 +37,9 @@ class JobAnalyzer {
       const jobsLen = jobs.length;
       // calculate tf_idf each doc and save it
       await forEachAsync(jobs, async (job, i) => {
-        const keywordOccurance = job.keywords[skillIdx].count; // TODO: what if new keyword?
+        const keywordOccurances = job.keywords[skillIdx].count; // TODO: what if new keyword?
         const wordCount = job.description.split(' ').length;
-        const tf = keywordOccurance / wordCount;
+        const tf = keywordOccurances / wordCount;
         const idf = docCount !== 0 ? Math.log(jobsLen / docCount) : 0;
         const tfidf = tf * idf;
 
