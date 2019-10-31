@@ -23,15 +23,14 @@ class JobAnalyzer {
     const jobs = await Jobs.find({});
     const skills = await User._getAllSkills();
 
-    await forEachAsync(skills, async (skill) => {
+    await forEachAsync(skills, async (skill, skillIdx) => {
       let docCount = 0;
       const wordCount = [];
       const keywordCount = [];
       const keyword = skill.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-      const re = new RegExp(keyword, 'g');
 
       jobs.forEach((posting) => {
-        const count = (posting.description.toString().match(re) || []).length;
+        const { count } = posting.keywords[skillIdx];
         wordCount.push(posting.description.split(' ').length);
         keywordCount.push(count);
         if (count > 0) {
