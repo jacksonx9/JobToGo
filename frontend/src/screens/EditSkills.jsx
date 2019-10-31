@@ -10,7 +10,6 @@ import images from '../constants/images';
 import config from '../constants/config';
 import { editSkillsStyles } from '../styles';
 
-
 const styles = editSkillsStyles;
 export default class EditSkills extends Component {
   onPressUpload = () => {
@@ -30,7 +29,7 @@ export default class EditSkills extends Component {
           name: response.fileName,
         });
 
-        await axios.post(`${config.serverIp}/users/resume/upload`,
+        await axios.post(`${config.ENDP_UPLOAD}`,
           data, {
             headers: {
               'Content-Type': 'multipart/form-data',

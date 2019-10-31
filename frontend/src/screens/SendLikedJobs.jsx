@@ -33,27 +33,26 @@ export default class SendLikedJobs extends Component {
 
   fetchLikedJobs = async () => {
     const { userId } = global;
-    const likedJobs = await axios.get(`${config.serverIp}/jobs/getLikedJobs/${userId}`)
+    const likedJobs = await axios.get(`${config.ENDP_LIKE}${userId}`)
       .catch((e) => console.log(e));
     this.setState({
-      likedJobs: likedJobs.data,
+      likedJobs: likedJobs.data.result,
       loading: 0,
     });
   }
 
-
   sendLikedJobs = async () => {
     const { userId } = global;
-    await axios.post(`${config.serverIp}/jobs/emailUser/`,
+    await axios.post(`${config.ENDP_EMAIL}`,
       {
         userId,
       }).catch((e) => console.log(e));
 
-    const likedJobs = await axios.get(`${config.serverIp}/jobs/getLikedJobs/${userId}`)
+    const likedJobs = await axios.get(`${config.ENDP_LIKE}${userId}`)
       .catch((e) => console.log(e));
 
     this.setState({
-      likedJobs: likedJobs.data,
+      likedJobs: likedJobs.data.result,
       loading: 0,
     });
 

@@ -39,14 +39,14 @@ export default class EditFriends extends Component {
 
   fetchFriends = async () => {
     const { userId } = global;
-    const friends = await axios.get(`${config.serverIp}/users/getFriends/${userId}`)
+    const friends = await axios.get(`${config.ENDP_FRIENDS}${userId}`)
       .catch((e) => console.log(e));
-    const friendRequests = await axios.get(`${config.serverIp}/users/getPendingFriends/${userId}`)
+    const friendRequests = await axios.get(`${config.ENDP_PENDING_FRIENDS}${userId}`)
       .catch((e) => console.log(e));
 
     this.setState({
-      friends: friends.data,
-      friendRequests: friendRequests.data,
+      friends: friends.data.result,
+      friendRequests: friendRequests.data.result,
       loading: 0,
     });
   }
@@ -54,51 +54,51 @@ export default class EditFriends extends Component {
   addFriend = async () => {
     const { addFriendName } = this.state;
     const { userId } = global;
-    const friend = await axios.get(`${config.serverIp}/users/${addFriendName}`)
+    const friend = await axios.get(`${config.ENDP_USERS}${addFriendName}`)
       .catch((e) => console.log(e));
 
-    await axios.post(`${config.serverIp}/users/addFriend/`, {
+    await axios.post(config.ENDP_ADD_FRIENDS, {
       userId,
-      friendId: friend.data._id,
+      friendId: friend.data.result._id,
     }).catch((e) => console.log(e));
   }
 
   comfirmFriendRequest = async (item) => {
     const { userId } = global;
-    await axios.post(`${config.serverIp}/users/confirmFriend/`, {
+    await axios.post(config.ENDP_CONFIRM_FRIENDS, {
       userId,
       friendId: item._id,
     }).catch((e) => console.log(e));
 
-    const friends = await axios.get(`${config.serverIp}/users/getFriends/${userId}`)
+    const friends = await axios.get(`${config.ENDP_FRIENDS}${userId}`)
       .catch((e) => console.log(e));
-    const friendRequests = await axios.get(`${config.serverIp}/users/getPendingFriends/${userId}`)
+    const friendRequests = await axios.get(`${config.ENDP_PENDING_FRIENDS}${userId}`)
       .catch((e) => console.log(e));
 
     this.setState({
-      friends: friends.data,
-      friendRequests: friendRequests.data,
+      friends: friends.data.result,
+      friendRequests: friendRequests.data.result,
       loading: 0,
     });
   }
 
   removeFriend = async (item) => {
     const { userId } = global;
-    await axios.delete(`${config.serverIp}/users/removeFriend/`, {
+    await axios.delete(config.ENDP_FRIENDS, {
       data: {
         userId,
         friendId: item._id,
       },
     }).catch((e) => console.log(e));
 
-    const friends = await axios.get(`${config.serverIp}/users/getFriends/${userId}`)
+    const friends = await axios.get(`${config.ENDP_FRIENDS}${userId}`)
       .catch((e) => console.log(e));
-    const friendRequests = await axios.get(`${config.serverIp}/users/getPendingFriends/${userId}`)
+    const friendRequests = await axios.get(`${config.ENDP_PENDING_FRIENDS}${userId}`)
       .catch((e) => console.log(e));
 
     this.setState({
-      friends: friends.data,
-      friendRequests: friendRequests.data,
+      friends: friends.data.result,
+      friendRequests: friendRequests.data.result,
       loading: 0,
     });
   }

@@ -42,14 +42,13 @@ export default class SignIn extends Component {
       const { firebaseToken } = global;
       console.log(`Firebase token: ${global.firebaseToken}`);
 
-      const ret = await axios.post(`${config.serverIp}/users/googleLogin/`,
+      const ret = await axios.post(`${config.ENDP_GOOGLE}`,
         {
           idToken: userInfo.idToken,
           firebaseToken,
         });
 
-      global.userId = ret.data;
-      console.log(`User: ${global.userId} signing in`);
+      global.userId = ret.data.result;
       navigation.navigate('App');
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
