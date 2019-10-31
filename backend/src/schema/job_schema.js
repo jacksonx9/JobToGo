@@ -26,6 +26,7 @@ const jobSchema = new mongoose.Schema({
     {
       name: String,
       tfidf: Number,
+      count: Number,
     },
   ],
   postDate: String,

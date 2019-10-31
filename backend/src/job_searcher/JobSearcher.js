@@ -3,6 +3,7 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 import Logger from 'js-logger';
 
+import User from '../user';
 import { Jobs } from '../schema';
 import { MIN_JOBS_IN_DB } from '../constants';
 
@@ -44,6 +45,7 @@ class JobSearcher {
 
   async searchJobs(keyphrases) {
     const jobs = [];
+    const keywords = await User._getAllSkills();
 
     await Promise.all(keyphrases.map(async (keyphrase) => {
       // TODO: change these hardcoded params
@@ -61,6 +63,13 @@ class JobSearcher {
           const $ = cheerio.load(jobPage.data);
           results[i].description = $('#jobDescriptionText').text();
           results[i].url = $('#indeed-share-url').attr('content');
+
+          // Add the number of occurance of all keywords of the result
+          keywords.forEach((keyword, keywordIdx) => {
+            const re = new RegExp(keyword, 'g');
+            results[i].keywords[keywordIdx].count = (results[i].description
+              .toLowerCase().match(re) || []).length;
+          });
         }));
 
         jobs.push(...results);
