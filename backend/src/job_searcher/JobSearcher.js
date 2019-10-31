@@ -65,6 +65,7 @@ class JobSearcher {
           results[i].url = $('#indeed-share-url').attr('content');
 
           // Add the number of occurance of all keywords of the result
+          const jobDescriptionLower = results[i].description.toLowerCase();
           results[i].keywords = [];
           keywords.forEach((keyword) => {
             // TODO: matches "java" with "javascript" from description
@@ -72,9 +73,7 @@ class JobSearcher {
             const re = new RegExp(keyword, 'g');
             results[i].keywords.push({
               name: keyword,
-              count: (results[i].description
-                .toLowerCase()
-                .match(re) || []).length,
+              count: (jobDescriptionLower.match(re) || []).length,
             });
           });
         }));
