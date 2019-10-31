@@ -10,19 +10,19 @@ class User {
 
     this.googleAuth = new OAuth2Client(credentials.clientId);
 
-    app.post('/users/googleLogin/', async (req, res) => {
+    app.post('/users/googleLogin', async (req, res) => {
       const { idToken, firebaseToken } = req.body;
       const result = await this.loginGoogle(idToken, firebaseToken);
       res.status(result.status).send(result);
     });
 
-    app.post('/users/login/', async (req, res) => {
+    app.post('/users/login', async (req, res) => {
       const { email, password } = req.body;
       const result = await this.login(email, password);
       res.status(result.status).send(result);
     });
 
-    app.post('/users/', async (req, res) => {
+    app.post('/users', async (req, res) => {
       const result = await User.createUser(req.body.userData);
       res.status(result.status).send(result);
     });

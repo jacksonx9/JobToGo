@@ -67,10 +67,14 @@ class JobSearcher {
           results[i].keywords = [];
           // Add the number of occurance of all keywords of the result
           keywords.forEach((keyword) => {
-            const re = new RegExp(`/s${keyword}/s`, 'g');
+            // TODO: matches "java" with "javascript" from description
+            // NOTE: if you map with spaces around it, problems such as "java," arise
+            const re = new RegExp(keyword, 'g');
             results[i].keywords.push({
               name: keyword,
-              count: (results[i].description.toLowerCase().match(re) || []).length,
+              count: (results[i].description
+                .toLowerCase()
+                .match(re) || []).length,
             });
           });
         }));
