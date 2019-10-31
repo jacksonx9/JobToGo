@@ -232,10 +232,52 @@ class User {
     const users = await Users.find({});
 
     users.forEach((user) => {
-      keywords.push(...user.userInfo.skillsExperiences);
+      const skills = user.keywords.map((keyword) => keyword.name);
+      keywords.push(...skills);
     });
 
     return keywords;
+  }
+
+  async updateSkills(userId, skills) {
+    if (!userId || !skills) {
+      return {
+        result: false,
+        errorMessage: 'Invalid userId or skills',
+        status: 400,
+      };
+    }
+
+    try {
+      const user = await Users.findById(userId).orFail();
+      const { keywords } = user;
+      const oldSkills = new Set(keywords.map((keyword) => keyword.name));
+
+      skills.forEach((skill) => {
+        if (!oldSkills.has(skill)) {
+          keywords.push({
+            name: skill,
+            score: 0,
+            jobCount: 0,
+            timestamp: Date.now(),
+          });
+        }
+      });
+
+      await user.save();
+
+      return {
+        result: true,
+        errorMessage: '',
+        status: 200,
+      };
+    } catch (e) {
+      return {
+        result: false,
+        errorMessage: 'Invalid userId or skills',
+        status: 400,
+      };
+    }
   }
 
   // Array[strings]
@@ -250,8 +292,9 @@ class User {
 
     try {
       const user = await Users.findById(userId).orFail();
+      const skills = user.keywords.map((keyword) => keyword.name);
       return {
-        result: user.userInfo.skillsExperiences,
+        result: skills,
         errorMessage: '',
         status: 200,
       };

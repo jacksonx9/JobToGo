@@ -61,9 +61,7 @@ class ResumeParser {
     }
 
     // Update user skills with keywords
-    const updateResult = await this.user.updateUserInfo(userId, {
-      skillsExperiences: extractedResult.result,
-    });
+    const updateResult = await this.user.updateSkills(userId, extractedResult.result);
     return updateResult;
   }
 
