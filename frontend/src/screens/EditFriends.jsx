@@ -61,8 +61,6 @@ export default class EditFriends extends Component {
       userId,
       friendId: friend.data._id,
     }).catch((e) => console.log(e));
-
-    alert(`Sent a friend request to ${this.state.addFriendName}`);
   }
 
   comfirmFriendRequest = async (item) => {
@@ -82,8 +80,6 @@ export default class EditFriends extends Component {
       friendRequests: friendRequests.data,
       loading: 0,
     });
-
-    alert(`Confirmed friend request from ${item.userName}`);
   }
 
   removeFriend = async (item) => {
@@ -105,8 +101,6 @@ export default class EditFriends extends Component {
       friendRequests: friendRequests.data,
       loading: 0,
     });
-
-    alert(`Removed ${item.userName} from your friends`);
   }
 
   static navigationOptions = {
@@ -151,12 +145,12 @@ export default class EditFriends extends Component {
           style
           data={friendRequests}
           keyExtractor={(item) => item._id}
-          renderItem={({ item, index }) => (
+          renderItem={({ item }) => (
             <SelectableItem
               key={item._id}
               header={item.userName}
               subHeader={item.email}
-              onPress={() => this.comfirmFriendRequest(item, index)}
+              onPress={() => this.comfirmFriendRequest(item)}
               actionIcon="+"
             />
           )}
@@ -168,12 +162,12 @@ export default class EditFriends extends Component {
           style
           data={friends}
           keyExtractor={(item) => item._id}
-          renderItem={({ item, index }) => (
+          renderItem={({ item }) => (
             <SelectableItem
               key={item._id}
               header={item.userName}
               subHeader={item.email}
-              onPress={() => this.removeFriend(item, index)}
+              onPress={() => this.removeFriend(item)}
               actionIcon="x"
             />
           )}

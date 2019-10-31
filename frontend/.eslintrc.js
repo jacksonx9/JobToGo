@@ -23,6 +23,7 @@ module.exports = {
     'react',
   ],
   rules: {
-    "react/prop-types": ["error", { "ignore": ["navigation"] }]
+    "react/prop-types": ["error", { "ignore": ["navigation"] }],
+    "no-underscore-dangle": [2, { "allow": ["_id"] }]
   },
 };
