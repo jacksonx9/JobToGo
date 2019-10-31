@@ -2,7 +2,6 @@ import indeed from 'indeed-scraper';
 import axios from 'axios';
 import cheerio from 'cheerio';
 import Logger from 'js-logger';
-import { forEachAsync } from 'foreachasync';
 
 import { Jobs } from '../schema';
 import { MIN_JOBS_IN_DB } from '../constants';
@@ -31,8 +30,11 @@ class JobSearcher {
 
     // TODO: Change this to not only software
     const jobs = await this.searchJobs([
-      'software', 'software intern', 'c++', 'java', 'javascript', 'python', 'android', 'react',
-      'node.js',
+      'software', 'software intern', 'c++', 'java',
+      'javascript', 'python', 'android', 'react',
+      'node.js', 'nodejs', 'mongo', 'ios', 'gpu', 'verilog',
+      'linux', 'opengl', 'machine learning', 'neural networks',
+      'pytorch', 'tensorflow',
     ]);
 
     this.logger.info(`Search complete! Found ${jobs.length} jobs.`);
@@ -43,7 +45,7 @@ class JobSearcher {
   async searchJobs(keyphrases) {
     const jobs = [];
 
-    await forEachAsync(keyphrases, async (keyphrase) => {
+    await Promise.all(keyphrases.map(async (keyphrase) => {
       // TODO: change these hardcoded params
       try {
         const results = await indeed.query({
@@ -54,18 +56,18 @@ class JobSearcher {
         });
 
         // Add description, unique url to each result by scraping the webpage
-        await forEachAsync(results, async (result, i) => {
+        await Promise.all(results.map(async (result, i) => {
           const jobPage = await axios.get(result.url);
           const $ = cheerio.load(jobPage.data);
           results[i].description = $('#jobDescriptionText').text();
           results[i].url = $('#indeed-share-url').attr('content');
-        });
+        }));
 
         jobs.push(...results);
       } catch (e) {
         this.logger.error(e);
       }
-    });
+    }));
 
     return jobs;
   }

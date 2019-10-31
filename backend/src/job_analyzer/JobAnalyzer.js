@@ -25,25 +25,23 @@ class JobAnalyzer {
 
     await forEachAsync(skills, async (skill) => {
       let docCount = 0;
-      const wordCount = [];
       const keywordCount = [];
       const keyword = skill.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
       const re = new RegExp(keyword, 'g');
 
       jobs.forEach((posting) => {
-        const count = (posting.description.toString().match(re) || []).length;
-        wordCount.push(posting.description.split(' ').length);
+        const count = (posting.description.toLowerCase().match(re) || []).length;
         keywordCount.push(count);
         if (count > 0) {
           docCount += 1;
         }
       });
 
-      let postingIdx = 0;
       const jobsLen = jobs.length;
       // calculate tf_idf each doc and save it
       await forEachAsync(jobs, async (job, i) => {
-        const tf = keywordCount[postingIdx] / wordCount[postingIdx];
+        const wordCount = job.description.split(' ').length;
+        const tf = keywordCount[i] / wordCount;
         const idf = docCount !== 0 ? Math.log(jobsLen / docCount) : 0;
         const tfidf = tf * idf;
 
@@ -60,7 +58,6 @@ class JobAnalyzer {
         }
 
         await job.save();
-        postingIdx += 1;
       });
     });
 
