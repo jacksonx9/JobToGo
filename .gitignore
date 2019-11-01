@@ -43,6 +43,8 @@ buck-out/
 \.buckd/
 *.keystore
 !debug.keystore
+*/keys.js
+*/google-services.json
 
 # fastlane
 #
