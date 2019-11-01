@@ -57,12 +57,18 @@ class JobSearcher {
           limit: 30,
         });
 
-        // Add description, unique url to each result by scraping the webpage
         await Promise.all(results.map(async (result, i) => {
+          // Add description, unique url to each result by scraping the webpage
           const jobPage = await axios.get(result.url);
           const $ = cheerio.load(jobPage.data);
           results[i].description = $('#jobDescriptionText').text();
           results[i].url = $('#indeed-share-url').attr('content');
+
+          const jobExists = await Jobs.findOne({ url: result[i].url });
+          // Check if job exists in the database already
+          if (jobExists !== null) {
+            return;
+          }
 
           // Add the number of occurance of all keywords of the result
           const jobDescriptionLower = results[i].description.toLowerCase();
