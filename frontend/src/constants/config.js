@@ -1,17 +1,17 @@
-import keys from './keys';
+import { serverIp, webClientId } from '../../credentials/credentials';
 
 const config = {
-  webClientId: keys.webClientId,
-  ENDP_FRIENDS: `${keys.serverIp}/friends/`,
-  ENDP_PENDING_FRIENDS: `${keys.serverIp}/friends/pending/`,
-  ENDP_CONFIRM_FRIENDS: `${keys.serverIp}/friends/confirm/`,
-  ENDP_RESUME: `${keys.serverIp}/resume/`,
-  ENDP_JOBS: `${keys.serverIp}/jobs/find/`,
-  ENDP_DISLIKE: `${keys.serverIp}/jobs/dislike/`,
-  ENDP_LIKE: `${keys.serverIp}/jobs/like/`,
-  ENDP_EMAIL: `${keys.serverIp}/messenger/email/`,
-  ENDP_GOOGLE: `${keys.serverIp}/users/googleLogin/`,
-  ENDP_USERS: `${keys.serverIp}/users/`,
+  webClientId,
+  ENDP_FRIENDS: `${serverIp}/friends/`,
+  ENDP_PENDING_FRIENDS: `${serverIp}/friends/pending/`,
+  ENDP_CONFIRM_FRIENDS: `${serverIp}/friends/confirm/`,
+  ENDP_RESUME: `${serverIp}/resume/`,
+  ENDP_JOBS: `${serverIp}/jobs/find/`,
+  ENDP_DISLIKE: `${serverIp}/jobs/dislike/`,
+  ENDP_LIKE: `${serverIp}/jobs/like/`,
+  ENDP_EMAIL: `${serverIp}/messenger/email/`,
+  ENDP_GOOGLE: `${serverIp}/users/googleLogin/`,
+  ENDP_USERS: `${serverIp}/users/`,
 };
 
 export default config;
