@@ -3,6 +3,7 @@ import {
   View, FlatList, Text, TextInput,
 } from 'react-native';
 import axios from 'axios';
+import { logger } from 'react-native-logger';
 
 import Button from '../components/Button';
 import SelectableItem from '../components/SelectableItem';
@@ -16,6 +17,10 @@ import { containerStyles, editFriendsStyles } from '../styles';
 
 const styles = { ...containerStyles, ...editFriendsStyles };
 export default class EditFriends extends Component {
+  static navigationOptions = {
+    drawerLabel: 'Friends',
+  }
+
   constructor(props) {
     super(props);
     this.state = {
@@ -39,9 +44,9 @@ export default class EditFriends extends Component {
   fetchFriends = async () => {
     const { userId } = global;
     const friends = await axios.get(`${config.ENDP_FRIENDS}${userId}`)
-      .catch((e) => console.log(e));
+      .catch((e) => { logger.log(e); });
     const friendRequests = await axios.get(`${config.ENDP_PENDING_FRIENDS}${userId}`)
-      .catch((e) => console.log(e));
+      .catch((e) => { logger.log(e); });
 
     this.setState({
       friends: friends.data.result,
@@ -54,12 +59,12 @@ export default class EditFriends extends Component {
     const { addFriendName } = this.state;
     const { userId } = global;
     const friend = await axios.get(`${config.ENDP_USERS}${addFriendName}`)
-      .catch((e) => console.log(e));
+      .catch((e) => { logger.log(e); });
 
     await axios.post(config.ENDP_FRIENDS, {
       userId,
       friendId: friend.data.result._id,
-    }).catch((e) => console.log(e));
+    }).catch((e) => { logger.log(e); });
   }
 
   comfirmFriendRequest = async (item) => {
@@ -67,12 +72,12 @@ export default class EditFriends extends Component {
     await axios.post(config.ENDP_CONFIRM_FRIENDS, {
       userId,
       friendId: item._id,
-    }).catch((e) => console.log(e));
+    }).catch((e) => { logger.log(e); });
 
     const friends = await axios.get(`${config.ENDP_FRIENDS}${userId}`)
-      .catch((e) => console.log(e));
+      .catch((e) => { logger.log(e); });
     const friendRequests = await axios.get(`${config.ENDP_PENDING_FRIENDS}${userId}`)
-      .catch((e) => console.log(e));
+      .catch((e) => { logger.log(e); });
 
     this.setState({
       friends: friends.data.result,
@@ -88,22 +93,18 @@ export default class EditFriends extends Component {
         userId,
         friendId: item._id,
       },
-    }).catch((e) => console.log(e));
+    }).catch((e) => { logger.log(e); });
 
     const friends = await axios.get(`${config.ENDP_FRIENDS}${userId}`)
-      .catch((e) => console.log(e));
+      .catch((e) => { logger.log(e); });
     const friendRequests = await axios.get(`${config.ENDP_PENDING_FRIENDS}${userId}`)
-      .catch((e) => console.log(e));
+      .catch((e) => { logger.log(e); });
 
     this.setState({
       friends: friends.data.result,
       friendRequests: friendRequests.data.result,
       loading: 0,
     });
-  }
-
-  static navigationOptions = {
-    drawerLabel: 'Friends',
   }
 
   render() {
@@ -129,7 +130,7 @@ export default class EditFriends extends Component {
             placeholder="Add a friend"
             value={addFriendName}
             placeholderTextColor={colours.Gray}
-            onChangeText={(text) => this.setState({ addFriendName: text })}
+            onChangeText={(text) => { this.setState({ addFriendName: text }); }}
           />
           <Button
             title="Add"
@@ -160,7 +161,7 @@ export default class EditFriends extends Component {
         <FlatList
           style
           data={friends}
-          keyExtractor={(item) => item._id}
+          keyExtractor={(item) => (item._id)}
           renderItem={({ item }) => (
             <SelectableItem
               key={item._id}

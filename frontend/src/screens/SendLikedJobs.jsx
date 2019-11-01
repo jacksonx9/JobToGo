@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, FlatList } from 'react-native';
 import axios from 'axios';
+import { logger } from 'react-native-logger';
 
 import SelectableItem from '../components/SelectableItem';
 import Loader from '../components/Loader';
@@ -12,6 +13,10 @@ import { containerStyles } from '../styles';
 
 const styles = containerStyles;
 export default class SendLikedJobs extends Component {
+  static navigationOptions = {
+    drawerLabel: 'Liked Jobs',
+  }
+
   constructor(props) {
     super(props);
     this.state = {
@@ -33,7 +38,7 @@ export default class SendLikedJobs extends Component {
   fetchLikedJobs = async () => {
     const { userId } = global;
     const likedJobs = await axios.get(`${config.ENDP_LIKE}${userId}`)
-      .catch((e) => console.log(e));
+      .catch((e) => { logger.log(e); });
     this.setState({
       likedJobs: likedJobs.data.result,
       loading: 0,
@@ -45,25 +50,21 @@ export default class SendLikedJobs extends Component {
     await axios.post(`${config.ENDP_EMAIL}`,
       {
         userId,
-      }).catch((e) => console.log(e));
+      }).catch((e) => { logger.log(e); });
 
     const likedJobs = await axios.get(`${config.ENDP_LIKE}${userId}`)
-      .catch((e) => console.log(e));
+      .catch((e) => { logger.log(e); });
 
     this.setState({
       likedJobs: likedJobs.data.result,
       loading: 0,
     });
 
-    alert('Sent liked jobs to your email');
+    logger.log('Sent liked jobs to your email');
   }
 
   removeLikedJob = (item, index) => {
-    alert(`${item.company}: ${index}`);
-  }
-
-  static navigationOptions = {
-    drawerLabel: 'Liked Jobs',
+    logger.log(`${item.company}: ${index}`);
   }
 
   render() {
@@ -82,7 +83,7 @@ export default class SendLikedJobs extends Component {
         <FlatList
           style
           data={likedJobs}
-          keyExtractor={(item) => item._id}
+          keyExtractor={(item) => (item._id)}
           renderItem={({ item, index }) => (
             <SelectableItem
               key={item._id}

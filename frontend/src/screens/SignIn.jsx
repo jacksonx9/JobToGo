@@ -23,13 +23,14 @@ export default class SignIn extends Component {
     };
   }
 
-  onPressSignIn = async () => {
+  signIn = async () => {
     const { navigation } = this.props;
-    global.userId = 'debug_userId';
+    global.userId = '5dbb7694ec463f002c5be3d5';
+    // global.userId = 'debug_userId';
     navigation.navigate('App');
   }
 
-  onPressGoogleSignIn = async () => {
+  googleSignIn = async () => {
     const { navigation } = this.props;
     try {
       await GoogleSignin.configure({
@@ -56,7 +57,7 @@ export default class SignIn extends Component {
       } else if (error.code === statusCodes.IN_PROGRESS) {
         logger.log('Google sign in in progress already');
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        logger.log('Googlep Play service not available');
+        logger.log('Google Play service not available');
       } else {
         logger.log(error);
       }
@@ -93,8 +94,13 @@ export default class SignIn extends Component {
             title="Sign In"
             textColor={colours.blue}
             backgroundColor="white"
+<<<<<<< HEAD
             style={[styles.button]}
             onPress={this.onPressSignIn}
+=======
+            style={[styles.buttonStyle]}
+            onPress={this.signIn}
+>>>>>>> a56ad76... fix codacy errors
           />
           <View style={[styles.alignCenter]}>
             <Text style={[styles.lightText]}>or</Text>
@@ -104,7 +110,7 @@ export default class SignIn extends Component {
             style={[styles.button]}
             size={GoogleSigninButton.Size.Wide}
             color={GoogleSigninButton.Color.Light}
-            onPress={this.onPressGoogleSignIn}
+            onPress={this.googleSignIn}
             disabled={false}
           />
 
