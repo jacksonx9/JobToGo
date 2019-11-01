@@ -39,7 +39,7 @@ class JobAnalyzer {
 
         // add name and tf_idf score to each job's keywords the first time
         // replace tf_idf score for a keyword for each job
-        const keywordIdx = job.keywords.findIndex((elem) => elem.name === keyword);
+        const keywordIdx = job.keywords.findIndex(elem => elem.name === keyword);
         if (keywordIdx === -1) {
           job.keywords.push({
             name: keyword,
@@ -111,7 +111,7 @@ class JobAnalyzer {
         score = jobScoreCache.get(job._id);
       } else {
         job.keywords.forEach((jobKeywordData) => {
-          const userKeywordIdx = user.keywords.findIndex((userKeywordData) => (
+          const userKeywordIdx = user.keywords.findIndex(userKeywordData => (
             jobKeywordData.name === userKeywordData.name
           ));
 

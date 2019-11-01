@@ -14,9 +14,8 @@ class JobSearcher {
     // TODO: Change this to run periodically instead of on startup
     this.updateJobStore().then(() => {
       jobAnalyzer.computeJobScores()
-        .then({})
-        .catch((e) => this.logger.error(e));
-    }).catch((e) => this.logger.error(e));
+        .then({});
+    }).catch(e => this.logger.error(e));
   }
 
   async updateJobStore() {

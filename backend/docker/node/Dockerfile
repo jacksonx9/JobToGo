@@ -2,10 +2,12 @@ FROM node:10.16.3
 
 # Make sure base image is updated
 RUN apt-get -qq update
-RUN apt-get -qq -y install \
-    apt-utils \
-    apt-transport-https \
-    xpdf
+RUN apt-get -qq -y install --no-install-recommends \
+    apt-utils=1.4.9 \
+    apt-transport-https=1.4.9 \
+    xpdf=3.04-4
+RUN apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create work dir
 RUN mkdir -p /jobtogo/backend

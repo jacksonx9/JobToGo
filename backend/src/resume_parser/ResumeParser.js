@@ -142,8 +142,8 @@ class ResumeParser {
 
     // Filter out keywords over length 20 and remove duplicates
     const keywords = textData.annotations
-      .map((ent) => ent.spot)
-      .filter((word) => word.length <= MAX_KEYWORD_LENGTH);
+      .map(ent => ent.spot)
+      .filter(word => word.length <= MAX_KEYWORD_LENGTH);
     const uniqueKeywords = [...new Set(keywords)];
     this.logger.info('Skills from resume: ', uniqueKeywords);
 
