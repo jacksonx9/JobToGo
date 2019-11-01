@@ -25,8 +25,7 @@ export default class SignIn extends Component {
 
   signIn = async () => {
     const { navigation } = this.props;
-    global.userId = '5dbb7694ec463f002c5be3d5';
-    // global.userId = 'debug_userId';
+    global.userId = 'debug_userId';
     navigation.navigate('App');
   }
 
