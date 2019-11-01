@@ -2,6 +2,7 @@ import Logger from 'js-logger';
 import { forEachAsync } from 'foreachasync';
 
 import User from '../user';
+import Response from '../types';
 import { Jobs, Users } from '../schema';
 import { JOBS_PER_SEND } from '../constants';
 
@@ -12,8 +13,8 @@ class JobAnalyzer {
     this.shortlister = shortlister;
 
     app.get('/jobs/find/:userId', async (req, res) => {
-      const result = await this.getRelevantJobs(req.params.userId);
-      res.status(result.status).send(result);
+      const response = await this.getRelevantJobs(req.params.userId);
+      res.status(response.status).send(response);
     });
   }
 
@@ -65,21 +66,13 @@ class JobAnalyzer {
     let user;
 
     if (!userId) {
-      return {
-        result: null,
-        errorMessage: 'Invalid userId',
-        status: 400,
-      };
+      return new Response(null, 'Invalid userId', 400);
     }
 
     try {
       user = await Users.findById(userId).orFail();
     } catch (e) {
-      return {
-        result: null,
-        errorMessage: 'Invalid userId',
-        status: 400,
-      };
+      return new Response(null, 'Invalid userId', 400);
     }
 
     // Get jobs the user has already seen
@@ -94,11 +87,7 @@ class JobAnalyzer {
       // Users don't need keywords
       mostRelevantJobs.forEach((_, i) => delete mostRelevantJobs[i].keywords);
 
-      return {
-        result: mostRelevantJobs,
-        errorMessage: '',
-        status: 200,
-      };
+      return new Response(mostRelevantJobs, '', 200);
     }
 
     const unseenJobs = await Jobs.find({ _id: { $nin: swipedJobs } }).lean();
@@ -137,11 +126,7 @@ class JobAnalyzer {
     // Users don't need keywords
     mostRelevantJobs.forEach((_, i) => delete mostRelevantJobs[i].keywords);
 
-    return {
-      result: mostRelevantJobs,
-      errorMessage: '',
-      status: 200,
-    };
+    return new Response(mostRelevantJobs, '', 200);
   }
 }
 

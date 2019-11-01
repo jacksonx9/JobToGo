@@ -2,6 +2,7 @@ import admin from 'firebase-admin';
 import nodemailer from 'nodemailer';
 import Logger from 'js-logger';
 
+import Response from '../types';
 import { Users } from '../schema';
 import credentials from '../../credentials/google';
 
@@ -25,8 +26,8 @@ class Messenger {
     });
 
     app.post('/messenger/email', async (req, res) => {
-      const result = await this.emailLikedJobs(req.body.userId);
-      res.status(result.status).send(result);
+      const response = await this.emailLikedJobs(req.body.userId);
+      res.status(response.status).send(response);
     });
   }
 
@@ -35,22 +36,14 @@ class Messenger {
     let friend;
 
     if (!userId || !friendId) {
-      return {
-        result: false,
-        errorMessage: 'Invalid userId or friendId',
-        status: 400,
-      };
+      return new Response(false, 'Invalid userId or friendId', 400);
     }
 
     try {
       user = await Users.findById(userId).orFail();
       friend = await Users.findById(friendId).orFail();
     } catch (e) {
-      return {
-        result: false,
-        errorMessage: 'Invalid userId or friendId',
-        status: 400,
-      };
+      return new Response(false, 'Invalid userId or friendId', 400);
     }
 
     const { userName } = user.credentials;
@@ -70,18 +63,10 @@ class Messenger {
       // Send push notification
       const messageRes = await admin.messaging().send(message);
       this.logger.info(`Message sent: ${messageRes}`);
-      return {
-        result: true,
-        errorMessage: '',
-        status: 200,
-      };
+      return new Response(true, '', 200);
     } catch (e) {
       this.logger.error(e);
-      return {
-        result: false,
-        errorMessage: 'Internal server error',
-        status: 500,
-      };
+      return new Response(false, 'Internal server error', 500);
     }
   }
 
@@ -90,11 +75,7 @@ class Messenger {
     let emailText = '';
 
     if (!userId) {
-      return {
-        result: false,
-        errorMessage: 'Invalid userId',
-        status: 400,
-      };
+      return new Response(false, 'Invalid userId', 400);
     }
 
     try {
@@ -112,11 +93,7 @@ class Messenger {
                     ${url}\n\n`;
       });
     } catch (e) {
-      return {
-        result: false,
-        errorMessage: 'Invalid userId',
-        status: 400,
-      };
+      return new Response(false, 'Invalid userId', 400);
     }
 
     try {
@@ -130,18 +107,10 @@ class Messenger {
       });
     } catch (e) {
       this.logger.error(e);
-      return {
-        result: false,
-        errorMessage: 'Internal server error',
-        status: 500,
-      };
+      return new Response(false, 'Internal server error', 500);
     }
 
-    return {
-      result: true,
-      errorMessage: '',
-      status: 200,
-    };
+    return new Response(true, '', 200);
   }
 }
 

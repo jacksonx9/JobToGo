@@ -2,6 +2,7 @@ import Logger from 'js-logger';
 import { forEachAsync } from 'foreachasync';
 import assert from 'assert';
 
+import Response from '../types';
 import { Users, Jobs } from '../schema';
 
 class JobShortLister {
@@ -10,19 +11,19 @@ class JobShortLister {
 
     app.post('/jobs/like', async (req, res) => {
       const { userId, jobId } = req.body;
-      const result = await this.addLikedJobs(userId, jobId);
-      res.status(result.status).send(result);
+      const response = await this.addLikedJobs(userId, jobId);
+      res.status(response.status).send(response);
     });
 
     app.post('/jobs/dislike', async (req, res) => {
       const { userId, jobId } = req.body;
-      const result = await this.addDislikedJobs(userId, jobId);
-      res.status(result.status).send(result);
+      const response = await this.addDislikedJobs(userId, jobId);
+      res.status(response.status).send(response);
     });
 
     app.get('/jobs/like/:userId', async (req, res) => {
-      const result = await this.getLikedJobsData(req.params.userId);
-      res.status(result.status).send(result);
+      const response = await this.getLikedJobsData(req.params.userId);
+      res.status(response.status).send(response);
     });
   }
 
@@ -46,21 +47,13 @@ class JobShortLister {
     let jobIds;
 
     if (!userId) {
-      return {
-        result: null,
-        errorMessage: 'Invalid userId',
-        status: 400,
-      };
+      return new Response(null, 'Invalid userId', 400);
     }
 
     try {
       jobIds = await this.getLikedJobs(userId);
     } catch (e) {
-      return {
-        result: null,
-        errorMessage: 'Invalid userId',
-        status: 400,
-      };
+      return new Response(null, 'Invalid userId', 400);
     }
 
     const jobsData = [];
@@ -82,22 +75,14 @@ class JobShortLister {
       }
     });
 
-    return {
-      result: jobsData,
-      errorMessage: '',
-      status: 200,
-    };
+    return new Response(jobsData, '', 200);
   }
 
   async _addLikedDislikedJobs(userId, jobId, type) {
     assert(type === 'likedJobs' || type === 'dislikedJobs');
 
     if (!userId || !jobId) {
-      return {
-        result: false,
-        errorMessage: 'Invalid userId or jobId',
-        status: 400,
-      };
+      return new Response(false, 'Invalid userId or jobId', 400);
     }
 
     try {
@@ -114,11 +99,7 @@ class JobShortLister {
       });
 
       if (userSeenJob !== null) {
-        return {
-          result: false,
-          errorMessage: 'Job already selected once',
-          status: 400,
-        };
+        return new Response(false, 'Job already selected once', 400);
       }
 
       const user = await Users.findByIdAndUpdate(userId, { $addToSet: { [type]: jobId } }).orFail();
@@ -145,17 +126,9 @@ class JobShortLister {
 
       await user.save();
 
-      return {
-        result: true,
-        errorMessage: '',
-        status: 200,
-      };
+      return new Response(true, '', 200);
     } catch (e) {
-      return {
-        result: false,
-        errorMessage: 'Invalid userId or jobId',
-        status: 400,
-      };
+      return new Response(false, 'Invalid userId or jobId', 400);
     }
   }
 

@@ -1,6 +1,7 @@
 import Logger from 'js-logger';
 import assert from 'assert';
 
+import Response from '../types';
 import { Users } from '../schema';
 
 class Friend {
@@ -10,28 +11,28 @@ class Friend {
     this.messenger = messenger;
 
     app.post('/friends', async (req, res) => {
-      const result = await this.addFriend(req.body.userId, req.body.friendId);
-      res.status(result.status).send(result);
+      const response = await this.addFriend(req.body.userId, req.body.friendId);
+      res.status(response.status).send(response);
     });
 
     app.delete('/friends', async (req, res) => {
-      const result = await this.removeFriend(req.body.userId, req.body.friendId);
-      res.status(result.status).send(result);
+      const response = await this.removeFriend(req.body.userId, req.body.friendId);
+      res.status(response.status).send(response);
     });
 
     app.post('/friends/confirm', async (req, res) => {
-      const result = await this.confirmFriend(req.body.userId, req.body.friendId);
-      res.status(result.status).send(result);
+      const response = await this.confirmFriend(req.body.userId, req.body.friendId);
+      res.status(response.status).send(response);
     });
 
     app.get('/friends/:userId', async (req, res) => {
-      const result = await this.getFriends(req.params.userId);
-      res.status(result.status).send(result);
+      const response = await this.getFriends(req.params.userId);
+      res.status(response.status).send(response);
     });
 
     app.get('/friends/pending/:userId', async (req, res) => {
-      const result = await this.getPendingFriends(req.params.userId);
-      res.status(result.status).send(result);
+      const response = await this.getPendingFriends(req.params.userId);
+      res.status(response.status).send(response);
     });
   }
 
@@ -39,11 +40,7 @@ class Friend {
   // Returns true if success and false otherwise
   async addFriend(userId, friendId) {
     if (!userId || !friendId) {
-      return {
-        result: false,
-        message: 'Invalid userId or friendId',
-        status: 400,
-      };
+      return new Response(false, 'Invalid userId or friendId', 400);
     }
 
     try {
@@ -60,11 +57,7 @@ class Friend {
 
       // Verify friend has not already been added
       if (friend !== null) {
-        return {
-          result: false,
-          message: 'Friend has already been added',
-          status: 400,
-        };
+        return new Response(false, 'Friend has already been added', 400);
       }
 
       await Users.findByIdAndUpdate(friendId, {
@@ -74,25 +67,17 @@ class Friend {
       }).orFail();
 
       // Send push notification
-      const messageResult = await this.messenger.requestFriend(userId, friendId);
-      return messageResult;
+      const messageResponse = await this.messenger.requestFriend(userId, friendId);
+      return messageResponse;
     } catch (e) {
-      return {
-        result: false,
-        message: 'Invalid userId or friendId',
-        status: 400,
-      };
+      return new Response(false, 'Invalid userId or friendId', 400);
     }
   }
 
   // Returns true if success and false otherwise
   async removeFriend(userId, friendId) {
     if (!userId || !friendId) {
-      return {
-        result: false,
-        message: 'Invalid userId or friendId',
-        status: 400,
-      };
+      return new Response(false, 'Invalid userId or friendId', 400);
     }
 
     try {
@@ -107,11 +92,7 @@ class Friend {
       });
 
       if (friend === null) {
-        return {
-          result: false,
-          message: 'Not a friend',
-          status: 400,
-        };
+        return new Response(false, 'Not a friend', 400);
       }
 
       // Remove friends from each other
@@ -126,17 +107,9 @@ class Friend {
         },
       }).orFail();
 
-      return {
-        result: true,
-        message: '',
-        status: 200,
-      };
+      return new Response(true, '', 200);
     } catch (e) {
-      return {
-        result: false,
-        message: 'Invalid userId or friendId',
-        status: 400,
-      };
+      return new Response(false, 'Invalid userId or friendId', 400);
     }
   }
 
@@ -144,11 +117,7 @@ class Friend {
   // Returns true if success and false otherwise.
   async confirmFriend(userId, friendId) {
     if (!userId || !friendId) {
-      return {
-        result: false,
-        message: 'Invalid userId or friendId',
-        status: 400,
-      };
+      return new Response(false, 'Invalid userId or friendId', 400);
     }
 
     try {
@@ -163,11 +132,7 @@ class Friend {
       });
 
       if (friend === null) {
-        return {
-          result: false,
-          message: 'Not a pending friend',
-          status: 400,
-        };
+        return new Response(false, 'Not a pending friend', 400);
       }
 
       // Add each other as friends and remove friend from pending friends list
@@ -185,17 +150,9 @@ class Friend {
         },
       }).orFail();
 
-      return {
-        result: true,
-        message: '',
-        status: 200,
-      };
+      return new Response(true, '', 200);
     } catch (e) {
-      return {
-        result: false,
-        message: 'Invalid userId or friendId',
-        status: 400,
-      };
+      return new Response(false, 'Invalid userId or friendId', 400);
     }
   }
 
@@ -211,11 +168,7 @@ class Friend {
     assert(type === 'pendingFriends' || type === 'friends');
 
     if (!userId) {
-      return {
-        result: null,
-        message: 'Invalid userId',
-        status: 400,
-      };
+      return new Response(null, 'Invalid userId', 400);
     }
 
     try {
@@ -232,17 +185,9 @@ class Friend {
         userName: friend.credentials.userName,
       }));
 
-      return {
-        result: friendsNameId,
-        message: '',
-        status: 200,
-      };
+      return new Response(friendsNameId, '', 200);
     } catch (e) {
-      return {
-        result: null,
-        message: 'Invalid userId',
-        status: 400,
-      };
+      return new Response(null, 'Invalid userId', 400);
     }
   }
 }
