@@ -46,7 +46,7 @@ class JobSearcher {
     const jobs = [];
     const keywords = await User._getAllSkills();
 
-    await Promise.all(keyphrases.map(async keyphrase => {
+    await Promise.all(keyphrases.map(async (keyphrase) => {
       // TODO: change these hardcoded params
       try {
         const results = await indeed.query({

@@ -111,7 +111,7 @@ class JobAnalyzer {
         score = jobScoreCache.get(job._id);
       } else {
         job.keywords.forEach((jobKeywordData) => {
-          const userKeywordIdx = user.keywords.findIndex((userKeywordData) => (
+          const userKeywordIdx = user.keywords.findIndex(userKeywordData => (
             jobKeywordData.name === userKeywordData.name
           ));
 

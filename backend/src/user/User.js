@@ -253,7 +253,7 @@ class User {
       const { keywords } = user;
       const oldSkills = new Set(keywords.map(keyword => keyword.name));
 
-      skills.forEach(skill => {
+      skills.forEach((skill) => {
         if (!oldSkills.has(skill)) {
           keywords.push({
             name: skill,
