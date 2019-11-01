@@ -118,7 +118,7 @@ class ResumeParser {
     const textData = await tryExtract(text, 0);
 
     if (textData === null) {
-      return new Response(false, 'Internal server error', 500);
+      return new Response(null, 'Internal server error', 500);
     }
 
     // Filter out keywords over length 20 and remove duplicates
