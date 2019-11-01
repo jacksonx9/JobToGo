@@ -126,7 +126,7 @@ class JobShortLister {
       // Increment and decrement the user's keywords' score
       job.keywords.forEach((jobKeywordData) => {
         try {
-          const userKeywordIdx = user.keywords.findIndex((userKeywordData) => (
+          const userKeywordIdx = user.keywords.findIndex(userKeywordData => (
             jobKeywordData.name === userKeywordData.name
           ));
 

@@ -14,9 +14,8 @@ class JobSearcher {
     // TODO: Change this to run periodically instead of on startup
     this.updateJobStore().then(() => {
       jobAnalyzer.computeJobScores()
-        .then({})
-        .catch((e) => this.logger.error(e));
-    }).catch((e) => this.logger.error(e));
+        .then({});
+    }).catch(e => this.logger.error(e));
   }
 
   async updateJobStore() {
@@ -47,7 +46,7 @@ class JobSearcher {
     const jobs = [];
     const keywords = await User._getAllSkills();
 
-    await Promise.all(keyphrases.map(async (keyphrase) => {
+    await Promise.all(keyphrases.map(async keyphrase => {
       // TODO: change these hardcoded params
       try {
         const results = await indeed.query({

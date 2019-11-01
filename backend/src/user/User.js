@@ -232,7 +232,7 @@ class User {
     const users = await Users.find({});
 
     users.forEach((user) => {
-      const skills = user.keywords.map((keyword) => keyword.name);
+      const skills = user.keywords.map(keyword => keyword.name);
       keywords.push(...skills);
     });
 
@@ -251,9 +251,9 @@ class User {
     try {
       const user = await Users.findById(userId).orFail();
       const { keywords } = user;
-      const oldSkills = new Set(keywords.map((keyword) => keyword.name));
+      const oldSkills = new Set(keywords.map(keyword => keyword.name));
 
-      skills.forEach((skill) => {
+      skills.forEach(skill => {
         if (!oldSkills.has(skill)) {
           keywords.push({
             name: skill,
@@ -292,7 +292,7 @@ class User {
 
     try {
       const user = await Users.findById(userId).orFail();
-      const skills = user.keywords.map((keyword) => keyword.name);
+      const skills = user.keywords.map(keyword => keyword.name);
       return {
         result: skills,
         errorMessage: '',

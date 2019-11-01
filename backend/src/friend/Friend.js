@@ -227,7 +227,7 @@ class Friend {
       const friendsData = await Users.find({ _id: { $in: friendIds } }, 'credentials.userName');
 
       // Expose only id and userName to user
-      const friendsNameId = friendsData.map((friend) => ({
+      const friendsNameId = friendsData.map(friend => ({
         _id: friend._id,
         userName: friend.credentials.userName,
       }));
