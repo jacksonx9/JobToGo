@@ -57,7 +57,7 @@ export default class EditFriends extends Component {
     const friend = await axios.get(`${config.ENDP_USERS}${addFriendName}`)
       .catch((e) => console.log(e));
 
-    await axios.post(config.ENDP_ADD_FRIENDS, {
+    await axios.post(config.ENDP_FRIENDS, {
       userId,
       friendId: friend.data.result._id,
     }).catch((e) => console.log(e));
