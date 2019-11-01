@@ -1,3 +1,10 @@
 rootProject.name = 'JobToGo'
 apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
 include ':app'
+
+include ':react-native-google-signin', ':app'
+project(':react-native-google-signin').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-google-signin/android')
+include ':react-native-file-picker'
+project(':react-native-file-picker').projectDir = new File(settingsDir, '../node_modules/react-native-file-picker/android')
+include ':react-native-firebase'
+project(':react-native-firebase').projectDir = new File(settingsDir, '../node_modules/react-native-firebase/android')
