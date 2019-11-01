@@ -67,7 +67,7 @@ class Friend {
       }).orFail();
 
       // Send push notification
-      const messageconst response = await this.messenger.requestFriend(userId, friendId);
+      const messageResponse = await this.messenger.requestFriend(userId, friendId);
       return messageResponse;
     } catch (e) {
       return new Response(false, 'Invalid userId or friendId', 400);
