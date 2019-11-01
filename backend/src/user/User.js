@@ -1,6 +1,7 @@
 import { OAuth2Client } from 'google-auth-library';
 import Logger from 'js-logger';
 
+import Response from '../types';
 import { Users } from '../schema';
 import credentials from '../../credentials/google';
 
@@ -48,26 +49,14 @@ class User {
   // return: userId if succeeds and null otherwise
   static async createUser(userData) {
     if (!userData) {
-      return {
-        result: null,
-        errorMessage: 'Invalid userData',
-        status: 400,
-      };
+      return new Response(null, 'Invalid userData', 400);
     }
 
     try {
       const user = await Users.create(userData);
-      return {
-        result: user._id,
-        errorMessage: '',
-        status: 200,
-      };
+      return new Response(user._id, '', 200);
     } catch (e) {
-      return {
-        result: null,
-        errorMessage: 'Malformed userData or user already exists',
-        status: 400,
-      };
+      return new Response(null, 'Malformed userData or user already exists', 400);
     }
   }
 
@@ -86,11 +75,7 @@ class User {
   // Returns userId if succeeds, -1 otherwise
   async login(email, password) {
     if (!email || !password) {
-      return {
-        result: null,
-        errorMessage: 'Invalid email or password',
-        status: 400,
-      };
+      return new Response(null, 'Invalid email or password', 400);
     }
 
     try {
@@ -98,28 +83,16 @@ class User {
         'credentials.email': email,
         'credentials.password': password,
       }).orFail();
-      return {
-        result: user._id,
-        errorMessage: '',
-        status: 200,
-      };
+      return new Response(user._id, '', 200);
     } catch (e) {
-      return {
-        result: null,
-        errorMessage: 'Invalid email or password',
-        status: 400,
-      };
+      return new Response(null, 'Invalid email or password', 400);
     }
   }
 
   // return: userId if succeeds and null otherwise
   async loginGoogle(idToken, firebaseToken) {
     if (!idToken || !firebaseToken) {
-      return {
-        result: null,
-        errorMessage: 'Invalid idToken or firebaseToken',
-        status: 400,
-      };
+      return new Response(null, 'Invalid idToken or firebaseToken', 400);
     }
 
     let ticket;
@@ -136,11 +109,7 @@ class User {
       this.logger.info('Google ticket: ', ticket);
       this.logger.info('Firebase token: ', firebaseToken);
     } catch (e) {
-      return {
-        result: null,
-        errorMessage: 'Invalid idToken or firebaseToken',
-        status: 400,
-      };
+      return new Response(null, 'Invalid idToken or firebaseToken', 400);
     }
 
     const { email } = ticket.payload;
@@ -159,22 +128,14 @@ class User {
       return userResult;
     }
 
-    return {
-      result: user._id,
-      errorMessage: '',
-      status: 200,
-    };
+    return new Response(user._id, '', 200);
   }
 
   // Can pass in only fields that need to be updated
   // Returns true if success and false otherwise
   async updateUserInfo(userId, userInfo) {
     if (!userId || !userInfo) {
-      return {
-        result: false,
-        errorMessage: 'Invalid userId or userInfo',
-        status: 400,
-      };
+      return new Response(false, 'Invalid userId or userInfo', 400);
     }
 
     try {
@@ -182,17 +143,9 @@ class User {
       Object.assign(user.userInfo, userInfo);
       await user.save();
 
-      return {
-        result: true,
-        errorMessage: '',
-        status: 200,
-      };
+      return new Response(true, '', 200);
     } catch (e) {
-      return {
-        result: false,
-        errorMessage: 'Invalid userId or userInfo',
-        status: 400,
-      };
+      return new Response(false, 'Invalid userId or userInfo', 400);
     }
   }
 
@@ -212,17 +165,10 @@ class User {
         userName,
         email: user.credentials.email,
       };
-      return {
-        result: userData,
-        errorMessage: '',
-        status: 200,
-      };
+
+      return new Response(userData, '', 200);
     } catch (e) {
-      return {
-        result: null,
-        errorMessage: 'User not found',
-        status: 404,
-      };
+      return new Response(null, 'User not found', 404);
     }
   }
 
@@ -241,11 +187,7 @@ class User {
 
   async updateSkills(userId, skills) {
     if (!userId || !skills) {
-      return {
-        result: false,
-        errorMessage: 'Invalid userId or skills',
-        status: 400,
-      };
+      return new Response(false, 'Invalid userId or skills', 400);
     }
 
     try {
@@ -266,44 +208,25 @@ class User {
 
       await user.save();
 
-      return {
-        result: true,
-        errorMessage: '',
-        status: 200,
-      };
+      return new Response(true, '', 200);
     } catch (e) {
-      return {
-        result: false,
-        errorMessage: 'Invalid userId or skills',
-        status: 400,
-      };
+      return new Response(false, 'Invalid userId or skills', 400);
     }
   }
 
   // Array[strings]
   async getSkills(userId) {
     if (!userId) {
-      return {
-        result: null,
-        errorMessage: 'Invalid userId',
-        status: 400,
-      };
+      return new Response(null, 'Invalid userId', 400);
     }
 
     try {
       const user = await Users.findById(userId).orFail();
       const skills = user.keywords.map(keyword => keyword.name);
-      return {
-        result: skills,
-        errorMessage: '',
-        status: 200,
-      };
+
+      return new Response(skills, '', 200);
     } catch (e) {
-      return {
-        result: null,
-        errorMessage: 'Invalid userId',
-        status: 400,
-      };
+      return new Response(null, 'Invalid userId', 400);
     }
   }
 }

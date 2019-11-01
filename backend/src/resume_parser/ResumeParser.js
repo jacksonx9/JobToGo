@@ -5,6 +5,7 @@ import axios from 'axios';
 import multer from 'multer';
 import Logger from 'js-logger';
 
+import Response from '../types';
 import { MEDIA_ROOT } from '../constants';
 import credentials from '../../credentials/dandelion';
 
@@ -30,22 +31,14 @@ class ResumeParser {
 
   async handleResume(userId, resume) {
     if (!userId || !resume) {
-      return {
-        result: false,
-        errorMessage: 'Invalid userId or resume',
-        status: 400,
-      };
+      return new Response(false, 'Invalid userId or resume', 400);
     }
 
     const { originalname, buffer, mimetype } = resume;
     this.logger.info(`Received: ${originalname}`);
 
     if (mimetype !== 'application/pdf') {
-      return {
-        result: false,
-        errorMessage: 'Invalid PDF',
-        status: 400,
-      };
+      return new Response(false, 'Invalid PDF', 400);
     }
 
     // Parse text out of resume
@@ -71,11 +64,7 @@ class ResumeParser {
     try {
       resume = await pdfparse(buffer);
     } catch (e) {
-      return {
-        result: null,
-        errorMessage: 'Invalid PDF',
-        status: 400,
-      };
+      return new Response(false, 'Invalid PDF', 400);
     }
 
     // TODO: Dandelion API request has a maximum length of 4096 characters
@@ -94,11 +83,7 @@ class ResumeParser {
       }
     });
 
-    return {
-      result: text,
-      errorMessage: '',
-      status: 200,
-    };
+    return new Response(text, '', 200);
   }
 
   async extract(text) {
@@ -133,11 +118,7 @@ class ResumeParser {
     const textData = await tryExtract(text, 0);
 
     if (textData === null) {
-      return {
-        result: null,
-        errorMessage: 'Internal server error',
-        status: 500,
-      };
+      return new Response(false, 'Internal server error', 500);
     }
 
     // Filter out keywords over length 20 and remove duplicates
@@ -147,11 +128,7 @@ class ResumeParser {
     const uniqueKeywords = [...new Set(keywords)];
     this.logger.info('Skills from resume: ', uniqueKeywords);
 
-    return {
-      result: uniqueKeywords,
-      errorMessage: '',
-      status: 200,
-    };
+    return new Response(uniqueKeywords, '', 200);
   }
 }
 
