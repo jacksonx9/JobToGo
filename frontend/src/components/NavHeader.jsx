@@ -5,16 +5,16 @@ import PropTypes from 'prop-types';
 import ImageButton from './ImageButton';
 
 import images from '../constants/images';
-import { navHeaderStyles } from '../styles';
+import { containerStyles, navHeaderStyles } from '../styles';
 
 
-const styles = navHeaderStyles;
+const styles = { ...containerStyles, ...navHeaderStyles };
 const NavHeader = ({
   title, image, onPressBack, onPressBtn, enableBtn,
 }) => {
   if (enableBtn) {
     return (
-      <View style={[styles.containerStyle]}>
+      <View style={[styles.flexRowContainer, styles.mainContainer]}>
         <ImageButton
           source={images.iconChevronLeft}
           onPress={onPressBack}
@@ -28,12 +28,12 @@ const NavHeader = ({
     );
   }
   return (
-    <View style={[styles.containerStyle2]}>
+    <View style={[styles.flexRowContainer, styles.contentContainer]}>
       <ImageButton
         source={images.iconChevronLeft}
         onPress={onPressBack}
       />
-      <Text style={[styles.textStyle]}>{title}</Text>
+      <Text style={[styles.text]}>{title}</Text>
     </View>
   );
 };

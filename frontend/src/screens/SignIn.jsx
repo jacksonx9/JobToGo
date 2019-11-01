@@ -10,10 +10,10 @@ import Button from '../components/Button';
 import images from '../constants/images';
 import colours from '../constants/colours';
 import config from '../constants/config';
-import { signUpStyles } from '../styles';
+import { containerStyles, displayStyles, authStyles } from '../styles';
 
 
-const styles = signUpStyles;
+const styles = { ...containerStyles, ...displayStyles, ...authStyles };
 export default class SignIn extends Component {
   constructor(props) {
     super(props);
@@ -67,21 +67,21 @@ export default class SignIn extends Component {
     const { email, password } = this.state;
     const { navigation } = this.props;
     return (
-      <View style={[styles.containerStyle]}>
-        <View style={[styles.formStyle]}>
+      <View style={[styles.flexColContainer, styles.accentBackground]}>
+        <View style={[styles.formContainer]}>
           <Image
             source={images.logoDark}
-            style={[styles.imageStyle]}
+            style={[styles.image]}
           />
           <TextInput
-            style={styles.inputStyle}
+            style={[styles.inputContainer, styles.inputDark]}
             placeholder="Email"
             value={email}
             placeholderTextColor={colours.lightBlue}
             onChangeText={(text) => { this.setState({ email: text }); }}
           />
           <TextInput
-            style={styles.inputStyle}
+            style={[styles.inputContainer, styles.inputDark]}
             placeholder="Password"
             value={password}
             secureTextEntry
@@ -93,15 +93,15 @@ export default class SignIn extends Component {
             title="Sign In"
             textColor={colours.blue}
             backgroundColor="white"
-            style={[styles.buttonStyle]}
+            style={[styles.button]}
             onPress={this.onPressSignIn}
           />
-          <View style={[styles.linkStyle]}>
-            <Text style={[styles.textStyle]}>or</Text>
+          <View style={[styles.alignCenter]}>
+            <Text style={[styles.lightText]}>or</Text>
           </View>
 
           <GoogleSigninButton
-            style={[styles.buttonStyle]}
+            style={[styles.button]}
             size={GoogleSigninButton.Size.Wide}
             color={GoogleSigninButton.Color.Light}
             onPress={this.onPressGoogleSignIn}
@@ -109,16 +109,16 @@ export default class SignIn extends Component {
           />
 
           <TouchableOpacity
-            style={[styles.linkStyle]}
+            style={[styles.alignCenter]}
             onPress={() => { navigation.navigate('SignUp'); }}
           >
-            <Text style={[styles.textStyle]}>Sign Up</Text>
+            <Text style={[styles.lightText]}>Sign Up</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.linkStyle]}
+            style={[styles.alignCenter]}
             onPress={() => { navigation.navigate('SignUp'); }}
           >
-            <Text style={[styles.textStyle]}>Forgot Password</Text>
+            <Text style={[styles.lightText]}>Forgot Password</Text>
           </TouchableOpacity>
         </View>
       </View>

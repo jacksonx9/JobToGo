@@ -7,10 +7,10 @@ import Loader from '../components/Loader';
 import NavHeader from '../components/NavHeader';
 import images from '../constants/images';
 import config from '../constants/config';
-import { sendLikedJobsStyles } from '../styles';
+import { containerStyles } from '../styles';
 
 
-const styles = sendLikedJobsStyles;
+const styles = containerStyles;
 export default class SendLikedJobs extends Component {
   constructor(props) {
     super(props);
@@ -72,7 +72,7 @@ export default class SendLikedJobs extends Component {
     if (loading) return <Loader />;
 
     return (
-      <View style={[styles.containerStyle]}>
+      <View style={[styles.flexColContainer]}>
         <NavHeader
           title="Your Liked Jobs"
           image={images.iconSendAcc}

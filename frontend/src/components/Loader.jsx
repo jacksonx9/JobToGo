@@ -3,15 +3,15 @@ import { Image, View } from 'react-native';
 
 import images from '../constants/images';
 
-import { loaderStyles } from '../styles';
+import { containerStyles, displayStyles, loaderStyles } from '../styles';
 
 
-const styles = loaderStyles;
+const styles = { ...containerStyles, ...displayStyles, ...loaderStyles };
 const Loader = () => (
-  <View style={[styles.containerStyle]}>
+  <View style={[styles.accentBackground, styles.flexRowContainer]}>
     <Image
       source={images.iconLogo}
-      style={[styles.imageStyle]}
+      style={[styles.images]}
     />
   </View>
 );

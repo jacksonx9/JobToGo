@@ -11,10 +11,10 @@ import NavHeader from '../components/NavHeader';
 import images from '../constants/images';
 import colours from '../constants/colours';
 import config from '../constants/config';
-import { editFriendsStyles } from '../styles';
+import { containerStyles, editFriendsStyles } from '../styles';
 
 
-const styles = editFriendsStyles;
+const styles = { ...containerStyles, ...editFriendsStyles };
 export default class EditFriends extends Component {
   constructor(props) {
     super(props);
@@ -115,7 +115,7 @@ export default class EditFriends extends Component {
     if (loading) return <Loader />;
 
     return (
-      <View style={[styles.containerStyle]}>
+      <View style={[styles.flexColContainer]}>
         <NavHeader
           title="Friends"
           image={images.iconSend}
@@ -123,9 +123,9 @@ export default class EditFriends extends Component {
           onPressBtn={this.addFriends}
           enableBtn={false}
         />
-        <View style={[styles.searchBarStyle]}>
+        <View style={[styles.searchBar]}>
           <TextInput
-            style={styles.inputStyle}
+            style={styles.input}
             placeholder="Add a friend"
             value={addFriendName}
             placeholderTextColor={colours.Gray}
@@ -135,7 +135,7 @@ export default class EditFriends extends Component {
             title="Add"
             textColor="white"
             backgroundColor={colours.blue}
-            style={[styles.buttonStyle]}
+            style={[styles.button]}
             onPress={this.addFriend}
           />
         </View>
@@ -154,7 +154,7 @@ export default class EditFriends extends Component {
             />
           )}
         />
-        <View style={[styles.dividerStyle]}>
+        <View style={[styles.divider]}>
           <Text>Your Friends</Text>
         </View>
         <FlatList

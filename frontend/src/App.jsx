@@ -15,7 +15,7 @@ import EditSkills from './screens/EditSkills';
 
 import { appStyles } from './styles';
 
-
+const styles = appStyles;
 export default class App extends React.Component {
   async componentDidMount() {
     if (Platform.OS === 'android') {
@@ -74,7 +74,7 @@ export default class App extends React.Component {
   render() {
     return (
       <AppContainer
-        styles={appStyles.containerStyle}
+        styles={styles.container}
       />
     );
   }

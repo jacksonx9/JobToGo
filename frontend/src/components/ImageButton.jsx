@@ -2,13 +2,13 @@ import React from 'react';
 import { TouchableOpacity, Image } from 'react-native';
 import PropTypes from 'prop-types';
 
-import { imageButtonStyles } from '../styles';
+import { containerStyles } from '../styles';
 
 
-const styles = imageButtonStyles;
+const styles = containerStyles;
 const ImageButton = ({ source, onPress }) => (
   <TouchableOpacity
-    style={[styles.containerStyle]}
+    style={[styles.alignJustifyCenter]}
     onPress={onPress}
   >
     <Image

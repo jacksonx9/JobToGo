@@ -5,24 +5,24 @@ import {
 import PropTypes from 'prop-types';
 
 import images from '../constants/images';
-import { selectableItemStyles } from '../styles';
+import { containerStyles, selectableItemStyles } from '../styles';
 
 
-const styles = selectableItemStyles;
+const styles = { ...containerStyles, ...selectableItemStyles };
 const SelectableItem = ({
   header, subHeader, onPress, actionIcon,
 }) => (
-  <View style={[styles.containerStyle]}>
-    <View style={styles.infoContainerStyle}>
-      <Image source={images.tempBg1} style={[styles.thumbnailStyle]} />
-      <View style={[styles.infoStyle]}>
+  <View style={[styles.flexRowContainer, styles.container]}>
+    <View style={styles.rowJustifyCenter}>
+      <Image source={images.tempBg1} style={[styles.thumbnail]} />
+      <View style={[styles.info]}>
         <Text
-          style={[styles.textStyle, styles.headerStyle]}
+          style={[styles.text, styles.header]}
         >
           {header}
         </Text>
         <Text
-          style={[styles.textStyle, styles.subHeaderStyle]}
+          style={[styles.text, styles.subHeader]}
         >
           {subHeader}
         </Text>
@@ -30,7 +30,7 @@ const SelectableItem = ({
     </View>
 
     <TouchableOpacity onPress={onPress}>
-      <Text style={[styles.iconStyle]}>{actionIcon}</Text>
+      <Text style={[styles.icon]}>{actionIcon}</Text>
     </TouchableOpacity>
   </View>
 );
