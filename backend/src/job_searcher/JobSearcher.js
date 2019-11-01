@@ -49,7 +49,7 @@ class JobSearcher {
     await Promise.all(keyphrases.map(async (keyphrase) => {
       // TODO: change these hardcoded params
       try {
-        const results = await indeed.query({
+        responses = await indeed.query({
           query: keyphrase,
           maxAge: '30',
           sort: 'relevance',

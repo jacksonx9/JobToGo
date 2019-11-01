@@ -26,8 +26,8 @@ class Messenger {
     });
 
     app.post('/messenger/email', async (req, res) => {
-      const result = await this.emailLikedJobs(req.body.userId);
-      res.status(result.status).send(result);
+      const response = await this.emailLikedJobs(req.body.userId);
+      res.status(response.status).send(response);
     });
   }
 

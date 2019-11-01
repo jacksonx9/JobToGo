@@ -24,8 +24,8 @@ class ResumeParser {
     // Upload resume as multipart form data
     const upload = multer();
     app.post('/resume', upload.single('resume'), async (req, res) => {
-      const result = await this.handleResume(req.body.userId, req.file);
-      res.status(result.status).send(result);
+      const response = await this.handleResume(req.body.userId, req.file);
+      res.status(response.status).send(response);
     });
   }
 

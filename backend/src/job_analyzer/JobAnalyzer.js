@@ -13,8 +13,8 @@ class JobAnalyzer {
     this.shortlister = shortlister;
 
     app.get('/jobs/find/:userId', async (req, res) => {
-      const result = await this.getRelevantJobs(req.params.userId);
-      res.status(result.status).send(result);
+      const response = await this.getRelevantJobs(req.params.userId);
+      res.status(response.status).send(response);
     });
   }
 

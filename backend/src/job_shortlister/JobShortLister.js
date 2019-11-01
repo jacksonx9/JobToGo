@@ -11,19 +11,19 @@ class JobShortLister {
 
     app.post('/jobs/like', async (req, res) => {
       const { userId, jobId } = req.body;
-      const result = await this.addLikedJobs(userId, jobId);
-      res.status(result.status).send(result);
+      const response = await this.addLikedJobs(userId, jobId);
+      res.status(response.status).send(response);
     });
 
     app.post('/jobs/dislike', async (req, res) => {
       const { userId, jobId } = req.body;
-      const result = await this.addDislikedJobs(userId, jobId);
-      res.status(result.status).send(result);
+      const response = await this.addDislikedJobs(userId, jobId);
+      res.status(response.status).send(response);
     });
 
     app.get('/jobs/like/:userId', async (req, res) => {
-      const result = await this.getLikedJobsData(req.params.userId);
-      res.status(result.status).send(result);
+      const response = await this.getLikedJobsData(req.params.userId);
+      res.status(response.status).send(response);
     });
   }
 

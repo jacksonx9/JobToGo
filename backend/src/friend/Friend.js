@@ -11,28 +11,28 @@ class Friend {
     this.messenger = messenger;
 
     app.post('/friends', async (req, res) => {
-      const result = await this.addFriend(req.body.userId, req.body.friendId);
-      res.status(result.status).send(result);
+      const response = await this.addFriend(req.body.userId, req.body.friendId);
+      res.status(response.status).send(response);
     });
 
     app.delete('/friends', async (req, res) => {
-      const result = await this.removeFriend(req.body.userId, req.body.friendId);
-      res.status(result.status).send(result);
+      const response = await this.removeFriend(req.body.userId, req.body.friendId);
+      res.status(response.status).send(response);
     });
 
     app.post('/friends/confirm', async (req, res) => {
-      const result = await this.confirmFriend(req.body.userId, req.body.friendId);
-      res.status(result.status).send(result);
+      const response = await this.confirmFriend(req.body.userId, req.body.friendId);
+      res.status(response.status).send(response);
     });
 
     app.get('/friends/:userId', async (req, res) => {
-      const result = await this.getFriends(req.params.userId);
-      res.status(result.status).send(result);
+      const response = await this.getFriends(req.params.userId);
+      res.status(response.status).send(response);
     });
 
     app.get('/friends/pending/:userId', async (req, res) => {
-      const result = await this.getPendingFriends(req.params.userId);
-      res.status(result.status).send(result);
+      const response = await this.getPendingFriends(req.params.userId);
+      res.status(response.status).send(response);
     });
   }
 
@@ -67,7 +67,7 @@ class Friend {
       }).orFail();
 
       // Send push notification
-      const messageResponse = await this.messenger.requestFriend(userId, friendId);
+      const messageconst response = await this.messenger.requestFriend(userId, friendId);
       return messageResponse;
     } catch (e) {
       return new Response(false, 'Invalid userId or friendId', 400);

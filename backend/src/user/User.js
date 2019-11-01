@@ -13,35 +13,35 @@ class User {
 
     app.post('/users/googleLogin', async (req, res) => {
       const { idToken, firebaseToken } = req.body;
-      const result = await this.loginGoogle(idToken, firebaseToken);
-      res.status(result.status).send(result);
+      const response = await this.loginGoogle(idToken, firebaseToken);
+      res.status(response.status).send(response);
     });
 
     app.post('/users/login', async (req, res) => {
       const { email, password } = req.body;
-      const result = await this.login(email, password);
-      res.status(result.status).send(result);
+      const response = await this.login(email, password);
+      res.status(response.status).send(response);
     });
 
     app.post('/users', async (req, res) => {
-      const result = await User.createUser(req.body.userData);
-      res.status(result.status).send(result);
+      const response = await User.createUser(req.body.userData);
+      res.status(response.status).send(response);
     });
 
     app.get('/users/:userName', async (req, res) => {
-      const result = await this.getUser(req.params.userName);
-      res.status(result.status).send(result);
+      const response = await this.getUser(req.params.userName);
+      res.status(response.status).send(response);
     });
 
     // param: user that contains the user's id and a json object userInfo
     app.put('/users/userInfo/:userId', async (req, res) => {
-      const result = await this.updateUserInfo(req.params.userId, req.body.userInfo);
-      res.status(result.status).send(result);
+      const response = await this.updateUserInfo(req.params.userId, req.body.userInfo);
+      res.status(response.status).send(response);
     });
 
     app.get('/users/skills/:userId', async (req, res) => {
-      const result = await this.getSkills(req.params.userId);
-      res.status(result.status).send(result);
+      const response = await this.getSkills(req.params.userId);
+      res.status(response.status).send(response);
     });
   }
 
