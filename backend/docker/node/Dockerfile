@@ -4,7 +4,8 @@ FROM node:10.16.3
 RUN apt-get -qq update
 RUN apt-get -qq -y install \
     apt-utils \
-    apt-transport-https
+    apt-transport-https \
+    xpdf
 
 # Create work dir
 RUN mkdir -p /jobtogo/backend

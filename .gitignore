@@ -1,6 +1,7 @@
 # OSX
 #
 .DS_Store
+.vscode
 
 # Xcode
 #
@@ -58,3 +59,7 @@ buck-out/
 
 # CocoaPods
 /ios/Pods/
+
+mediafiles
+credentials
+mongodata

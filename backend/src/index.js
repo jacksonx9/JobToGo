@@ -1,33 +1,61 @@
 import express from 'express';
-import { MongoClient } from 'mongodb';
+import mongoose from 'mongoose';
+import bodyParser from 'body-parser';
+import Logger from 'js-logger';
+import morgan from 'morgan';
+import admin from 'firebase-admin';
+
+import User from './user';
+import Friend from './friend';
+import ResumeParser from './resume_parser';
+import JobSearcher from './job_searcher';
+import JobShortLister from './job_shortlister';
+import JobAnalyzer from './job_analyzer';
+import Messenger from './messenger';
+import firebaseCredentials from '../credentials/firebase';
+
 
 const PORT = 8080;
-const MONGO_URL = 'mongodb://171.0.0.3:27017';
+const MONGO_URL = 'mongodb://171.0.0.3:27017/JobToGo';
+const FIREBASE_URL = 'https://jobtogo-103fd.firebaseio.com';
 
+// Setup logger
+Logger.useDefaults({
+  formatter: (messages, context) => {
+    messages.unshift(`${context.level.name} [${context.name}]`);
+  },
+});
+const logger = Logger.get('Main');
+
+// Instantiate express server and setup middleware
 const app = express();
-const mongoClient = MongoClient(MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true });
+app.use(bodyParser.json());
+app.use(morgan(':method :url :status - :response-time ms'));
 
-mongoClient.connect(async (e) => {
-  if (e) {
-    throw Error('Database connection failed!');
-  }
+// Connect to mongodb
+// If this fails, just crash the server
+mongoose.connect(MONGO_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false,
+});
 
-  const db = mongoClient.db('test');
-  const collection = db.collection('test');
-  const collectionData = await collection.find({}).toArray();
+// Setup firebase
+admin.initializeApp({
+  credential: admin.credential.cert(firebaseCredentials),
+  databaseURL: FIREBASE_URL,
+});
 
-  // If collection is empty, insert Hello World message
-  if (collectionData.length === 0) {
-    await collection.insertOne({ message: 'Hello World!' }).catch((e) => console.log(e));
-  }
+// Setup modules
+const shortlister = new JobShortLister(app);
+const messenger = new Messenger(app, shortlister);
+const user = new User(app);
+const jobAnalyzer = new JobAnalyzer(app, shortlister);
+new Friend(app, messenger);
+new JobSearcher(jobAnalyzer);
+new ResumeParser(app, user);
 
-  // On / access, return Hello World message from db
-  app.get('/', async (req, res) => {
-    const helloWorldData = await collection.find({}).toArray();
-    res.send(helloWorldData[0].message);
-  });
-
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
+// Start the server
+app.listen(PORT, () => {
+  logger.info(`Server running on port ${PORT}`);
 });
