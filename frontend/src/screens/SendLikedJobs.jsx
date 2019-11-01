@@ -5,7 +5,6 @@ import axios from 'axios';
 import SelectableItem from '../components/SelectableItem';
 import Loader from '../components/Loader';
 import NavHeader from '../components/NavHeader';
-
 import images from '../constants/images';
 import config from '../constants/config';
 import { sendLikedJobsStyles } from '../styles';

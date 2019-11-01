@@ -2,24 +2,28 @@ import React, { Component } from 'react';
 import { View } from 'react-native';
 import FilePickerManager from 'react-native-file-picker';
 import axios from 'axios';
+import { logger } from 'react-native-logger';
 
 import Button from '../components/Button';
 import NavHeader from '../components/NavHeader';
-
 import images from '../constants/images';
 import config from '../constants/config';
 import { editSkillsStyles } from '../styles';
 
 const styles = editSkillsStyles;
 export default class EditSkills extends Component {
+  static navigationOptions = {
+    drawerLabel: 'Edit Skills',
+  }
+
   onPressUpload = () => {
     FilePickerManager.showFilePicker(null, async (response) => {
-      console.log('Response = ', response);
+      logger.log('Response = ', response);
 
       if (response.didCancel) {
-        console.log('User cancelled file picker');
+        logger.log('User cancelled file picker');
       } else if (response.error) {
-        console.log('FilePickerManager Error: ', response.error);
+        logger.log('FilePickerManager Error: ', response.error);
       } else {
         const data = new FormData();
         data.append('userId', global.userId);
@@ -34,16 +38,11 @@ export default class EditSkills extends Component {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
-          }).catch((e) => console.log(e));
-
-        alert('Resume Sent for analysis');
+          }).catch((e) => logger.log(e));
       }
     });
   }
 
-  static navigationOptions = {
-    drawerLabel: 'Edit Skills',
-  }
 
   render() {
     const { navigation } = this.props;

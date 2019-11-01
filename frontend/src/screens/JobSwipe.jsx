@@ -8,7 +8,6 @@ import JobImage from '../components/JobImage';
 import JobDetails from '../components/JobDetails';
 import Loader from '../components/Loader';
 import MainHeader from '../components/MainHeader';
-
 import config from '../constants/config';
 import { jobSwipeStyles } from '../styles';
 

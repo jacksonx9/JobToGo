@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, Alert } from 'react-native';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createDrawerNavigator } from 'react-navigation-drawer';
@@ -52,7 +52,7 @@ export default class App extends React.Component {
   }
 
   showAlert = (title, body) => {
-    alert(
+    Alert.alert(
       title, body,
       [
         { text: 'OK', onPress: () => logger.log('OK Pressed') },
@@ -68,14 +68,6 @@ export default class App extends React.Component {
     this.notificationListener = firebase.notifications().onNotification((notification) => {
       const { title, body } = notification;
       this.showAlert(title, body);
-    });
-
-    /*
-    * Triggered for data only payload in foreground
-    * */
-    this.messageListener = firebase.messaging().onMessage((message) => {
-      // process data message
-      logger.log(JSON.stringify(message));
     });
   }
 

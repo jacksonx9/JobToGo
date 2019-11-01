@@ -4,9 +4,9 @@ import {
 } from 'react-native';
 import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 import axios from 'axios';
+import { logger } from 'react-native-logger';
 
 import Button from '../components/Button';
-
 import images from '../constants/images';
 import colours from '../constants/colours';
 import config from '../constants/config';
@@ -40,7 +40,7 @@ export default class SignIn extends Component {
       const userInfo = await GoogleSignin.signIn();
 
       const { firebaseToken } = global;
-      console.log(`Firebase token: ${global.firebaseToken}`);
+      logger.log(`Firebase token: ${global.firebaseToken}`);
 
       const ret = await axios.post(`${config.ENDP_GOOGLE}`,
         {
@@ -52,13 +52,13 @@ export default class SignIn extends Component {
       navigation.navigate('App');
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        console.log('Google sign in cancelled');
+        logger.log('Google sign in cancelled');
       } else if (error.code === statusCodes.IN_PROGRESS) {
-        console.log('Google sign in in progress already');
+        logger.log('Google sign in in progress already');
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        console.log('Googlep Play service not available');
+        logger.log('Googlep Play service not available');
       } else {
-        console.log(error);
+        logger.log(error);
       }
     }
   }
@@ -78,7 +78,7 @@ export default class SignIn extends Component {
             placeholder="Email"
             value={email}
             placeholderTextColor={colours.lightBlue}
-            onChangeText={(text) => this.setState({ email: text })}
+            onChangeText={(text) => { this.setState({ email: text }); }}
           />
           <TextInput
             style={styles.inputStyle}
@@ -86,7 +86,7 @@ export default class SignIn extends Component {
             value={password}
             secureTextEntry
             placeholderTextColor={colours.lightBlue}
-            onChangeText={(text) => this.setState({ password: text })}
+            onChangeText={(text) => { this.setState({ password: text }); }}
           />
 
           <Button
