@@ -18,6 +18,11 @@ class JobAnalyzer {
     });
   }
 
+  /**
+   * Computes the tf_idf scores for the new jobs.
+   *
+   * @returns {Response}
+   */
   async computeJobScores() {
     this.logger.info('Starting to compute job scores...');
 
@@ -57,6 +62,12 @@ class JobAnalyzer {
     this.logger.info('Computed job scores!');
   }
 
+  /**
+   * Gets the most relevant jobs to the user.
+   *
+   * @param {int} userId user's mongoose id
+   * @returns {Response}
+   */
   async getRelevantJobs(userId) {
     this.logger.info('Getting most relevant jobs.');
 
@@ -64,10 +75,6 @@ class JobAnalyzer {
     const mostRelevantJobs = [];
     const jobScoreCache = new Map();
     let user;
-
-    if (!userId) {
-      return new Response(null, 'Invalid userId', 400);
-    }
 
     try {
       user = await Users.findById(userId).orFail();
