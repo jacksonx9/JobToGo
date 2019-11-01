@@ -64,7 +64,7 @@ class JobSearcher {
           results[i].description = $('#jobDescriptionText').text();
           results[i].url = $('#indeed-share-url').attr('content');
 
-          const jobExists = await Jobs.findOne({ url: result.url });
+          const jobExists = await Jobs.findOne({ url: result[i].url });
           // Check if job exists in the database already
           if (jobExists !== null) {
             return;
