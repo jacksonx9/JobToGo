@@ -102,10 +102,10 @@ class JobShortLister {
 
     try {
       // Make sure job is valid
-      await Jobs.findById(jobId).orFail();
+      const job = await Jobs.findById(jobId).orFail();
 
       // Check if already swiped
-      const user = await Users.findOne({
+      const userSeenJob = await Users.findOne({
         _id: userId,
         $or: [
           { likedJobs: jobId },
@@ -113,7 +113,7 @@ class JobShortLister {
         ],
       });
 
-      if (user !== null) {
+      if (userSeenJob !== null) {
         return {
           result: false,
           errorMessage: 'Job already selected once',
@@ -121,7 +121,29 @@ class JobShortLister {
         };
       }
 
-      await Users.findByIdAndUpdate(userId, { $addToSet: { [type]: jobId } }).orFail();
+      const user = await Users.findByIdAndUpdate(userId, { $addToSet: { [type]: jobId } }).orFail();
+
+      // Increment and decrement the user's keywords' score
+      await Promise.all(job.keywords.map(async (jobKeywordData) => {
+        try {
+          const userKeywordIdx = user.keywords.findIndex((userKeywordData) => (
+            jobKeywordData.name === userKeywordData.name
+          ));
+
+          if (userKeywordIdx !== -1) {
+            if (type === 'likedJobs') {
+              user.keywords[userKeywordIdx].score += jobKeywordData.count;
+            } else {
+              user.keywords[userKeywordIdx].score -= jobKeywordData.count;
+            }
+            user.keywords[userKeywordIdx].jobCount += 1;
+          }
+        } catch (e) {
+          this.logger.error(e);
+        }
+      }));
+
+      await user.save();
 
       return {
         result: true,

@@ -82,22 +82,12 @@ class JobAnalyzer {
       };
     }
 
-    if (user === null) {
-      return {
-        result: null,
-        errorMessage: 'Invalid userId',
-        status: 400,
-      };
-    }
-
-    const userKeywords = user.keywords.map((keyword) => keyword.name);
-
     // Get jobs the user has already seen
     swipedJobs.push(...await this.shortlister.getLikedJobs(userId));
     swipedJobs.push(...await this.shortlister.getDislikedJobs(userId));
 
     // If the user has not uploaded a resume
-    if (userKeywords.length === 0) {
+    if (user.keywords.length === 0) {
       mostRelevantJobs.push(
         ...await Jobs.find({ _id: { $nin: swipedJobs } }).limit(JOBS_PER_SEND).lean(),
       );
@@ -115,37 +105,34 @@ class JobAnalyzer {
 
     // Compute overall tf_idf score of a job
     const jobScore = (job) => {
-      let sum = 0;
+      let score = 0;
 
       if (jobScoreCache.has(job._id)) {
-        sum = jobScoreCache.get(job._id);
+        score = jobScoreCache.get(job._id);
       } else {
-        job.keywords.forEach((keyword) => {
-          if (userKeywords.includes(keyword.name)) {
-            sum += keyword.tfidf;
+        job.keywords.forEach((jobKeywordData) => {
+          const userKeywordIdx = user.keywords.findIndex((userKeywordData) => (
+            jobKeywordData.name === userKeywordData.name
+          ));
+
+          if (userKeywordIdx !== -1) {
+            const { tfidf } = jobKeywordData;
+            const userValueKeyword = user.keywords[userKeywordIdx].score;
+            const userSeenKeywordTimes = user.keywords[userKeywordIdx].jobCount;
+            const keywordWeight = userValueKeyword / userSeenKeywordTimes;
+            score += tfidf * keywordWeight;
           }
         });
-        jobScoreCache.set(job._id, sum);
+        jobScoreCache.set(job._id, score);
       }
 
-      return sum;
+      return score;
     };
 
     // Get jobs with overall highest tfidf scores
     mostRelevantJobs.push(...unseenJobs
-      .sort((jobA, jobB) => {
-        const jobAScore = jobScore(jobA);
-        const jobBScore = jobScore(jobB);
-
-        if (jobAScore > jobBScore) {
-          return 1;
-        }
-        if (jobBScore < jobAScore) {
-          return -1;
-        }
-
-        return 0;
-      }).slice(0, JOBS_PER_SEND));
+      .sort((jobA, jobB) => jobScore(jobA) - jobScore(jobB))
+      .slice(0, JOBS_PER_SEND));
 
     // Users don't need keywords
     mostRelevantJobs.forEach((_, i) => delete mostRelevantJobs[i].keywords);
