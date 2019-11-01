@@ -8,10 +8,10 @@ import { containerStyles, displayStyles, loaderStyles } from '../styles';
 
 const styles = { ...containerStyles, ...displayStyles, ...loaderStyles };
 const Loader = () => (
-  <View style={[styles.accentBackground, styles.flexRowContainer]}>
+  <View style={[styles.flexRowContainer, styles.accentBackground]}>
     <Image
       source={images.iconLogo}
-      style={[styles.images]}
+      style={[styles.image]}
     />
   </View>
 );

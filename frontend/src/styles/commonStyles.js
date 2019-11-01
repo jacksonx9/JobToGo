@@ -3,43 +3,36 @@ import { StyleSheet } from 'react-native';
 import colours from '../constants/colours';
 import fonts from '../constants/fonts';
 
+
 export const containerStyles = StyleSheet.create({
-  alignCenter: {
-    alignItems: 'center',
-  },
-  justifyCenter: {
-    justifyContent: 'center',
-  },
-  rowJustifyCenter: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  colAlignCenter: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-  alignJustifyCenter: {
-    ...this.alignCenter,
-    ...this.justifyCenter,
-  },
-  fullContainer: {
+  flexColContainer: {
     height: '100%',
     width: '100%',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: 'white',
   },
-  colAlignCenterContainer: {
-    ...this.fullContainer,
-    ...this.colAlignCenter,
+  flexColAlignCenterContainer: {
+    height: '100%',
+    width: '100%',
+    flexDirection: 'column',
+    alignItems: 'center',
+    backgroundColor: 'white',
   },
-  rowContainer: {
-    ...this.fullContainer,
-    ...this.alignJustifyCenter,
+  flexRowContainer: {
+    height: '100%',
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'white',
   },
   formContainer: {
+    paddingTop: 100,
     height: '100%',
     width: '80%',
     position: 'absolute',
-    paddingTop: 100,
   },
   inputContainer: {
     height: 50,
@@ -48,9 +41,20 @@ export const containerStyles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 5,
   },
+  alignCenter: {
+    alignItems: 'center',
+  },
+  rowJustifyCenter: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  alignJustifyCenter: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
 
-export const contentStyles = StyleSheet.create({
+export const displayStyles = StyleSheet.create({
   lightText: {
     color: 'white',
     textDecorationColor: 'white',
