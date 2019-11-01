@@ -124,7 +124,7 @@ class JobShortLister {
       const user = await Users.findByIdAndUpdate(userId, { $addToSet: { [type]: jobId } }).orFail();
 
       // Increment and decrement the user's keywords' score
-      await Promise.all(job.keywords.map(async (jobKeywordData) => {
+      job.keywords.forEach((jobKeywordData) => {
         try {
           const userKeywordIdx = user.keywords.findIndex((userKeywordData) => (
             jobKeywordData.name === userKeywordData.name
@@ -141,7 +141,7 @@ class JobShortLister {
         } catch (e) {
           this.logger.error(e);
         }
-      }));
+      });
 
       await user.save();
 
