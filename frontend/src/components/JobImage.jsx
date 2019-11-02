@@ -8,7 +8,10 @@ import { containerStyles, displayStyles, jobImageStyles } from '../styles';
 
 const styles = { ...containerStyles, ...displayStyles, ...jobImageStyles };
 const JobImage = ({ company }) => (
-  <ImageBackground source={images.jobBackground} style={[styles.flexRowContainer, styles.container]}>
+  <ImageBackground
+    source={images.jobBackground}
+    style={[styles.flexRowContainer, styles.container]}
+  >
     <Text style={[styles.lightText, styles.text]}>{company}</Text>
   </ImageBackground>
 );
