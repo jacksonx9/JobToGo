@@ -93,13 +93,8 @@ export default class SignIn extends Component {
             title="Sign In"
             textColor={colours.blue}
             backgroundColor="white"
-<<<<<<< HEAD
             style={[styles.button]}
-            onPress={this.onPressSignIn}
-=======
-            style={[styles.buttonStyle]}
             onPress={this.signIn}
->>>>>>> a56ad76... fix codacy errors
           />
           <View style={[styles.alignCenter]}>
             <Text style={[styles.lightText]}>or</Text>

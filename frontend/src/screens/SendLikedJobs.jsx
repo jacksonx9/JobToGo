@@ -38,7 +38,7 @@ export default class SendLikedJobs extends Component {
   fetchLikedJobs = async () => {
     const { userId } = global;
     const likedJobs = await axios.get(`${config.ENDP_LIKE}${userId}`)
-      .catch((e) => { logger.log(e); });
+      .catch(e => logger.log(e));
     this.setState({
       likedJobs: likedJobs.data.result,
       loading: 0,
@@ -50,10 +50,10 @@ export default class SendLikedJobs extends Component {
     await axios.post(`${config.ENDP_EMAIL}`,
       {
         userId,
-      }).catch((e) => { logger.log(e); });
+      }).catch(e => logger.log(e));
 
     const likedJobs = await axios.get(`${config.ENDP_LIKE}${userId}`)
-      .catch((e) => { logger.log(e); });
+      .catch(e => logger.log(e));
 
     this.setState({
       likedJobs: likedJobs.data.result,
@@ -76,14 +76,14 @@ export default class SendLikedJobs extends Component {
       <View style={[styles.flexColContainer]}>
         <NavHeader
           title="Your Liked Jobs"
-          image={images.iconSendAcc}
+          image={images.iconSendColoured}
           onPressBack={() => navigation.goBack()}
           onPressBtn={this.sendLikedJobs}
         />
         <FlatList
           style
           data={likedJobs}
-          keyExtractor={(item) => (item._id)}
+          keyExtractor={item => item._id}
           renderItem={({ item, index }) => (
             <SelectableItem
               key={item._id}

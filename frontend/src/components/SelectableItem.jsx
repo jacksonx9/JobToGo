@@ -14,7 +14,7 @@ const SelectableItem = ({
 }) => (
   <View style={[styles.flexRowContainer, styles.container]}>
     <View style={styles.rowJustifyCenter}>
-      <Image source={images.tempBg1} style={[styles.thumbnail]} />
+      <Image source={images.jobBackground} style={[styles.thumbnail]} />
       <View style={[styles.info]}>
         <Text
           style={[styles.text, styles.header]}

@@ -40,7 +40,7 @@ export default class JobSwipe extends Component {
     });
 
     const jobs = await axios.get(`${config.ENDP_JOBS}${userId}`)
-      .catch((e) => logger.log(e));
+      .catch(e => logger.log(e));
 
     this.setState({
       jobs: jobs.data.result,
@@ -65,7 +65,7 @@ export default class JobSwipe extends Component {
     await axios.post(`${config.ENDP_DISLIKE}`, {
       userId,
       jobId: jobs[jobIndex]._id,
-    }).catch((e) => logger.log(e));
+    }).catch(e => logger.log(e));
 
     this.getNextJob(jobs.length, jobIndex, userId);
   }
@@ -75,7 +75,7 @@ export default class JobSwipe extends Component {
     await axios.post(`${config.ENDP_LIKE}`, {
       userId,
       jobId: jobs[jobIndex]._id,
-    }).catch((e) => logger.log(e));
+    }).catch(e => logger.log(e));
 
     this.getNextJob(jobs.length, jobIndex, userId);
   }

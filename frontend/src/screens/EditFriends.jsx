@@ -44,9 +44,9 @@ export default class EditFriends extends Component {
   fetchFriends = async () => {
     const { userId } = global;
     const friends = await axios.get(`${config.ENDP_FRIENDS}${userId}`)
-      .catch((e) => { logger.log(e); });
+      .catch(e => logger.log(e));
     const friendRequests = await axios.get(`${config.ENDP_PENDING_FRIENDS}${userId}`)
-      .catch((e) => { logger.log(e); });
+      .catch(e => logger.log(e));
 
     this.setState({
       friends: friends.data.result,
@@ -59,12 +59,12 @@ export default class EditFriends extends Component {
     const { addFriendName } = this.state;
     const { userId } = global;
     const friend = await axios.get(`${config.ENDP_USERS}${addFriendName}`)
-      .catch((e) => { logger.log(e); });
+      .catch(e => logger.log(e));
 
     await axios.post(config.ENDP_FRIENDS, {
       userId,
       friendId: friend.data.result._id,
-    }).catch((e) => { logger.log(e); });
+    }).catch(e => logger.log(e));
   }
 
   comfirmFriendRequest = async (item) => {
@@ -72,12 +72,12 @@ export default class EditFriends extends Component {
     await axios.post(config.ENDP_CONFIRM_FRIENDS, {
       userId,
       friendId: item._id,
-    }).catch((e) => { logger.log(e); });
+    }).catch(e => logger.log(e));
 
     const friends = await axios.get(`${config.ENDP_FRIENDS}${userId}`)
-      .catch((e) => { logger.log(e); });
+      .catch(e => logger.log(e));
     const friendRequests = await axios.get(`${config.ENDP_PENDING_FRIENDS}${userId}`)
-      .catch((e) => { logger.log(e); });
+      .catch(e => logger.log(e));
 
     this.setState({
       friends: friends.data.result,
@@ -93,12 +93,12 @@ export default class EditFriends extends Component {
         userId,
         friendId: item._id,
       },
-    }).catch((e) => { logger.log(e); });
+    }).catch(e => logger.log(e));
 
     const friends = await axios.get(`${config.ENDP_FRIENDS}${userId}`)
-      .catch((e) => { logger.log(e); });
+      .catch(e => logger.log(e));
     const friendRequests = await axios.get(`${config.ENDP_PENDING_FRIENDS}${userId}`)
-      .catch((e) => { logger.log(e); });
+      .catch(e => logger.log(e));
 
     this.setState({
       friends: friends.data.result,
@@ -144,7 +144,7 @@ export default class EditFriends extends Component {
         <FlatList
           style
           data={friendRequests}
-          keyExtractor={(item) => item._id}
+          keyExtractor={item => item._id}
           renderItem={({ item }) => (
             <SelectableItem
               key={item._id}
@@ -161,7 +161,7 @@ export default class EditFriends extends Component {
         <FlatList
           style
           data={friends}
-          keyExtractor={(item) => (item._id)}
+          keyExtractor={item => item._id}
           renderItem={({ item }) => (
             <SelectableItem
               key={item._id}

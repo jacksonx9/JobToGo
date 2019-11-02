@@ -38,7 +38,7 @@ export default class EditSkills extends Component {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
-          }).catch((e) => logger.log(e));
+          }).catch(e => logger.log(e));
       }
     });
   }
