@@ -4,13 +4,12 @@ import {
 } from 'react-native';
 
 import Button from '../components/Button';
-
 import images from '../constants/images';
 import colours from '../constants/colours';
-import { signInStyles } from '../styles';
+import { containerStyles, displayStyles, authStyles } from '../styles';
 
 
-const styles = signInStyles;
+const styles = { ...containerStyles, ...displayStyles, ...authStyles };
 export default class SignUp extends Component {
   text = {
     showPassword: 'Show Password',
@@ -48,46 +47,46 @@ export default class SignUp extends Component {
       firstName, lastName, email, password, showPassword, showPasswordText,
     } = this.state;
     return (
-      <View style={[styles.containerStyle]}>
-        <View style={[styles.formStyle]}>
+      <View style={[styles.flexColContainer, styles.accentBackground]}>
+        <View style={[styles.formContainer]}>
           <Image
             source={images.logoDark}
-            style={[styles.imageStyle]}
+            style={[styles.image]}
           />
           <TextInput
-            style={styles.inputStyle}
+            style={[styles.inputContainer, styles.inputDark]}
             placeholder="First Name"
             value={firstName}
             placeholderTextColor={colours.lightBlue}
-            onChangeText={(text) => this.setState({ lastName: text })}
+            onChangeText={(text) => { this.setState({ lastName: text }); }}
           />
           <TextInput
-            style={styles.inputStyle}
+            style={[styles.inputContainer, styles.inputDark]}
             placeholder="Last Name"
             value={lastName}
             placeholderTextColor={colours.lightBlue}
-            onChangeText={(text) => this.setState({ lastName: text })}
+            onChangeText={(text) => { this.setState({ lastName: text }); }}
           />
           <TextInput
-            style={styles.inputStyle}
+            style={[styles.inputContainer, styles.inputDark]}
             placeholder="Email"
             value={email}
             placeholderTextColor={colours.lightBlue}
-            onChangeText={(text) => this.setState({ email: text })}
+            onChangeText={(text) => { this.setState({ email: text }); }}
           />
           <TextInput
-            style={styles.inputStyle}
+            style={[styles.inputContainer, styles.inputDark]}
             placeholder="Password"
             value={password}
             secureTextEntry={showPassword}
             placeholderTextColor={colours.lightBlue}
-            onChangeText={(text) => this.setState({ password: text })}
+            onChangeText={(text) => { this.setState({ password: text }); }}
           />
           <TouchableOpacity
-            style={[styles.linkStyle]}
+            style={[styles.alignCenter]}
             onPress={this.togglePasswordView}
           >
-            <Text style={[styles.textStyle]}>{showPasswordText}</Text>
+            <Text style={[styles.lightText]}>{showPasswordText}</Text>
           </TouchableOpacity>
 
           <Button

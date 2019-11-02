@@ -7,9 +7,9 @@ import PropTypes from 'prop-types';
 
 import ImageButton from './ImageButton';
 import images from '../constants/images';
-import { jobDetailsStyles } from '../styles';
+import { containerStyles, jobDetailsStyles } from '../styles';
 
-
+const styles = { ...containerStyles, ...jobDetailsStyles };
 class JobDetails extends Component {
   constructor(props) {
     super(props);
@@ -23,67 +23,66 @@ class JobDetails extends Component {
   }
 
   render() {
-    const styles = jobDetailsStyles;
     const { modalVisible } = this.state;
     const {
       company, title, location, description,
     } = this.props;
     return (
-      <View style={[styles.containerStyle]}>
+      <View style={[styles.container]}>
         <Modal
           animationType="slide"
           transparent={false}
           visible={modalVisible}
         >
-          <View style={[styles.modalContainerStyle]}>
+          <View style={[styles.modalContainer]}>
             <ImageButton
               source={images.iconChevronDown}
               onPress={() => {
                 this.setModalVisible(false);
               }}
             />
-            <Text style={[styles.headerStyle]}>{company}</Text>
-            <View style={[styles.subHeaderContainerStyle]}>
+            <Text style={[styles.header]}>{company}</Text>
+            <View style={[styles.subHeaderContainer]}>
               <Image
                 source={images.iconJob}
-                styles={[styles.iconStyle]}
+                styles={[styles.icon]}
               />
-              <Text style={[styles.subHeaderStyle]}>{title}</Text>
+              <Text style={[styles.subHeader]}>{title}</Text>
             </View>
-            <View style={[styles.subHeaderContainerStyle]}>
+            <View style={[styles.subHeaderContainer]}>
               <Image
                 source={images.iconLocation}
-                styles={[styles.iconStyle]}
+                styles={[styles.icon]}
               />
-              <Text style={[styles.subHeaderStyle]}>{location}</Text>
+              <Text style={[styles.subHeader]}>{location}</Text>
             </View>
-            <ScrollView style={[styles.scrollStyle]}>
+            <ScrollView style={[styles.scroll]}>
               <Text>{description}</Text>
             </ScrollView>
           </View>
         </Modal>
 
-        <View style={[styles.textContainerStyle]}>
+        <View style={[styles.textContainer]}>
           <ImageButton
             source={images.iconChevronUp}
             onPress={() => {
               this.setModalVisible(true);
             }}
           />
-          <Text style={[styles.headerStyle]}>{company}</Text>
-          <View style={[styles.subHeaderContainerStyle]}>
+          <Text style={[styles.header]}>{company}</Text>
+          <View style={[styles.subHeaderContainer]}>
             <Image
               source={images.iconJob}
-              styles={[styles.iconStyle]}
+              styles={[styles.icon]}
             />
-            <Text style={[styles.subHeaderStyle]}>{title}</Text>
+            <Text style={[styles.subHeader]}>{title}</Text>
           </View>
-          <View style={[styles.subHeaderContainerStyle]}>
+          <View style={[styles.subHeaderContainer]}>
             <Image
               source={images.iconLocation}
-              styles={[styles.iconStyle]}
+              styles={[styles.icon]}
             />
-            <Text style={[styles.subHeaderStyle]}>{location}</Text>
+            <Text style={[styles.subHeader]}>{location}</Text>
           </View>
         </View>
       </View>

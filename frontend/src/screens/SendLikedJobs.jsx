@@ -1,18 +1,22 @@
 import React, { Component } from 'react';
 import { View, FlatList } from 'react-native';
 import axios from 'axios';
+import { logger } from 'react-native-logger';
 
 import SelectableItem from '../components/SelectableItem';
 import Loader from '../components/Loader';
 import NavHeader from '../components/NavHeader';
-
 import images from '../constants/images';
 import config from '../constants/config';
-import { sendLikedJobsStyles } from '../styles';
+import { containerStyles } from '../styles';
 
 
-const styles = sendLikedJobsStyles;
+const styles = containerStyles;
 export default class SendLikedJobs extends Component {
+  static navigationOptions = {
+    drawerLabel: 'Liked Jobs',
+  }
+
   constructor(props) {
     super(props);
     this.state = {
@@ -34,7 +38,7 @@ export default class SendLikedJobs extends Component {
   fetchLikedJobs = async () => {
     const { userId } = global;
     const likedJobs = await axios.get(`${config.ENDP_LIKE}${userId}`)
-      .catch((e) => console.log(e));
+      .catch(e => logger.log(e));
     this.setState({
       likedJobs: likedJobs.data.result,
       loading: 0,
@@ -46,25 +50,21 @@ export default class SendLikedJobs extends Component {
     await axios.post(`${config.ENDP_EMAIL}`,
       {
         userId,
-      }).catch((e) => console.log(e));
+      }).catch(e => logger.log(e));
 
     const likedJobs = await axios.get(`${config.ENDP_LIKE}${userId}`)
-      .catch((e) => console.log(e));
+      .catch(e => logger.log(e));
 
     this.setState({
       likedJobs: likedJobs.data.result,
       loading: 0,
     });
 
-    alert('Sent liked jobs to your email');
+    logger.log('Sent liked jobs to your email');
   }
 
   removeLikedJob = (item, index) => {
-    alert(`${item.company}: ${index}`);
-  }
-
-  static navigationOptions = {
-    drawerLabel: 'Liked Jobs',
+    logger.log(`${item.company}: ${index}`);
   }
 
   render() {
@@ -73,17 +73,17 @@ export default class SendLikedJobs extends Component {
     if (loading) return <Loader />;
 
     return (
-      <View style={[styles.containerStyle]}>
+      <View style={[styles.flexColContainer]}>
         <NavHeader
           title="Your Liked Jobs"
-          image={images.iconSendAcc}
+          image={images.iconSendColoured}
           onPressBack={() => navigation.goBack()}
           onPressBtn={this.sendLikedJobs}
         />
         <FlatList
           style
           data={likedJobs}
-          keyExtractor={(item) => item._id}
+          keyExtractor={item => item._id}
           renderItem={({ item, index }) => (
             <SelectableItem
               key={item._id}
