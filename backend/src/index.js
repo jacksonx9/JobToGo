@@ -12,6 +12,7 @@ import JobSearcher from './job_searcher';
 import JobShortLister from './job_shortlister';
 import JobAnalyzer from './job_analyzer';
 import Messenger from './messenger';
+import AllSkills from './all_skills';
 import firebaseCredentials from '../credentials/firebase';
 
 
@@ -47,13 +48,16 @@ admin.initializeApp({
 });
 
 // Setup modules
-const shortlister = new JobShortLister(app);
-const messenger = new Messenger(app, shortlister);
-const user = new User(app);
-const jobAnalyzer = new JobAnalyzer(app, shortlister);
-new Friend(app, messenger);
-new JobSearcher(jobAnalyzer);
-new ResumeParser(app, user);
+AllSkills.setup().then(() => {
+  const shortlister = new JobShortLister(app);
+  const messenger = new Messenger(app, shortlister);
+  const jobAnalyzer = new JobAnalyzer(app, shortlister);
+  const allSkills = new AllSkills(jobAnalyzer);
+  const user = new User(app, allSkills);
+  new Friend(app, messenger);
+  new JobSearcher(jobAnalyzer);
+  new ResumeParser(app, user);
+});
 
 // Start the server
 app.listen(PORT, () => {
