@@ -1,10 +1,9 @@
 import React from 'react';
 import { ImageBackground, Image } from 'react-native';
 import PropTypes from 'prop-types';
+
 import images from '../constants/images';
-
 import { containerStyles, jobImageStyles } from '../styles';
-
 
 const styles = { ...containerStyles, ...jobImageStyles };
 const JobImage = ({ logo }) => {
