@@ -1,37 +1,49 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 
 import colours from '../constants/colours';
 import fonts from '../constants/fonts';
 
+const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
 export const selectableItemStyles = StyleSheet.create({
   container: {
     justifyContent: 'space-evenly',
     height: 80,
-    paddingHorizontal: 20,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderColor: colours.lightGray,
-    backgroundColor: 'white',
+    borderColor: colours.lightBlue,
+    backgroundColor: colours.white,
   },
   thumbnail: {
     height: 50,
     width: 50,
-    borderRadius: 50,
+    borderRadius: 10,
     marginRight: 15,
   },
   text: {
     fontFamily: fonts.normal,
   },
   header: {
-    fontSize: 14,
-    color: colours.darkGray,
+    fontSize: 15,
+    fontFamily: fonts.bold,
+    color: colours.gray,
   },
   subHeader: {
-    fontSize: 12,
-    color: colours.gray,
+    fontSize: 13,
+    fontFamily: fonts.semiBold,
+    color: colours.lightGray,
+  },
+  infoContainer: {
+    width: '80%',
+  },
+  iconContainer: {
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    height: 70,
+    width: '20%',
   },
   icon: {
-    fontSize: 14,
-    color: colours.gray,
+    fontSize: 24,
+    color: colours.lightGray,
   },
   info: {
     flexDirection: 'column',
@@ -41,7 +53,7 @@ export const selectableItemStyles = StyleSheet.create({
 
 export const buttonStyles = StyleSheet.create({
   container: {
-    borderRadius: 5,
+    borderRadius: 15,
     height: 50,
   },
   text: {
@@ -141,28 +153,22 @@ export const mainHeaderStyles = StyleSheet.create({
 export const navHeaderStyles = StyleSheet.create({
   mainContainer: {
     paddingTop: 5,
-    justifyContent: 'space-between',
-    paddingHorizontal: 15,
+    paddingLeft: 30,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
     height: 80,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-
-  contentContainer: {
-    paddingTop: 5,
-    justifyContent: 'space-between',
-    paddingLeft: 15,
-    paddingRight: '45%',
-    height: 80,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    position: 'absolute',
+    top: 10,
+    backgroundColor: 'transparent',
   },
   logo: {
     width: 170,
     height: 50,
   },
   text: {
-    fontFamily: fonts.normal,
-    color: colours.darkGray,
-    fontSize: 16,
+    fontFamily: fonts.extraBold,
+    color: colours.white,
+    fontSize: 22,
   },
 });
 

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, FlatList } from 'react-native';
+import { View, FlatList, ImageBackground } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
 
@@ -8,10 +8,10 @@ import Loader from '../components/Loader';
 import NavHeader from '../components/NavHeader';
 import images from '../constants/images';
 import config from '../constants/config';
-import { containerStyles } from '../styles';
+import { containerStyles, displayStyles } from '../styles';
 
 
-const styles = containerStyles;
+const styles = { ...containerStyles, ...displayStyles };
 export default class SendLikedJobs extends Component {
   static navigationOptions = {
     drawerLabel: 'Liked Jobs',
@@ -32,7 +32,7 @@ export default class SendLikedJobs extends Component {
 
   async componentDidUpdate(prevProps) {
     if (prevProps !== this.props) {
-      this.fetchLikedJobs();
+      // this.fetchLikedJobs();
     }
   }
 
@@ -74,28 +74,32 @@ export default class SendLikedJobs extends Component {
     if (loading) return <Loader />;
 
     return (
-      <View style={[styles.flexColContainer]}>
+      <ImageBackground
+        source={images.navBarBackground}
+        style={[styles.flexColContainer]}
+      >
         <NavHeader
-          title="Your Liked Jobs"
+          title="Liked Jobs"
           image={images.iconSendColoured}
           onPressBack={() => navigation.goBack()}
           onPressBtn={this.sendLikedJobs}
         />
-        <FlatList
-          style
-          data={likedJobs}
-          keyExtractor={item => item._id}
-          renderItem={({ item, index }) => (
-            <SelectableItem
-              key={item._id}
-              header={item.company}
-              subHeader={item.title}
-              onPress={() => this.removeLikedJob(item, index)}
-              actionIcon="x"
-            />
-          )}
-        />
-      </View>
+        <View style={[styles.accentContainer]}>
+          <FlatList
+            data={likedJobs}
+            keyExtractor={item => item._id}
+            renderItem={({ item, index }) => (
+              <SelectableItem
+                key={item._id}
+                header={item.company}
+                subHeader={item.title}
+                onPress={() => this.removeLikedJob(item, index)}
+                actionIcon="x"
+              />
+            )}
+          />
+        </View>
+      </ImageBackground>
     );
   }
 }

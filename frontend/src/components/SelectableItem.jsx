@@ -13,7 +13,7 @@ const SelectableItem = ({
   header, subHeader, onPress, actionIcon,
 }) => (
   <View style={[styles.flexRowContainer, styles.container]}>
-    <View style={styles.rowJustifyCenter}>
+    <View style={[styles.rowJustifyCenter, styles.infoContainer]}>
       <Image source={images.jobBackground} style={[styles.thumbnail]} />
       <View style={[styles.info]}>
         <Text
@@ -29,7 +29,10 @@ const SelectableItem = ({
       </View>
     </View>
 
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity
+      style={[styles.iconContainer]}
+      onPress={onPress}
+    >
       <Text style={[styles.icon]}>{actionIcon}</Text>
     </TouchableOpacity>
   </View>

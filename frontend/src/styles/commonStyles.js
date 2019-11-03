@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 
 import colours from '../constants/colours';
 import fonts from '../constants/fonts';
@@ -8,6 +8,8 @@ export const styleConsts = {
   LOGO_SIZE: 200,
 };
 
+const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
 export const containerStyles = StyleSheet.create({
   flexColContainer: {
     height: '100%',
@@ -56,6 +58,16 @@ export const containerStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  accentContainer: {
+    height: screenHeight * 0.75,
+    width: screenWidth,
+    padding: 30,
+    borderTopRightRadius: 30,
+    borderTopLeftRadius: 30,
+    backgroundColor: colours.white,
+    position: 'absolute',
+    top: 120,
+  },
 });
 
 export const displayStyles = StyleSheet.create({
@@ -66,9 +78,13 @@ export const displayStyles = StyleSheet.create({
   accentBackground: {
     backgroundColor: colours.blue,
   },
+  lightBackground: {
+    backgroundColor: colours.white,
+  },
   inputDark: {
     color: 'white',
-    backgroundColor: colours.darkBlue,
+    borderBottomWidth: 4,
+    borderBottomColor: colours.lightBlue,
     fontFamily: fonts.normal,
   },
 });

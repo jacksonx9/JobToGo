@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { ImageBackground, View, Text } from 'react-native';
 import PropTypes from 'prop-types';
 
 import ImageButton from './ImageButton';
@@ -11,32 +11,13 @@ import { containerStyles, navHeaderStyles } from '../styles';
 const styles = { ...containerStyles, ...navHeaderStyles };
 const NavHeader = ({
   title, image, onPressBack, onPressBtn, enableBtn,
-}) => {
-  if (enableBtn) {
-    return (
-      <View style={[styles.flexRowContainer, styles.mainContainer]}>
-        <ImageButton
-          source={images.iconChevronLeft}
-          onPress={onPressBack}
-        />
-        <Text>{title}</Text>
-        <ImageButton
-          source={image}
-          onPress={onPressBtn}
-        />
-      </View>
-    );
-  }
-  return (
-    <View style={[styles.flexRowContainer, styles.contentContainer]}>
-      <ImageButton
-        source={images.iconChevronLeft}
-        onPress={onPressBack}
-      />
-      <Text style={[styles.text]}>{title}</Text>
-    </View>
-  );
-};
+}) => (
+  <View
+    style={[styles.flexRowContainer, styles.mainContainer]}
+  >
+    <Text style={styles.text}>{title}</Text>
+  </View>
+);
 
 NavHeader.defaultProps = {
   onPressBtn: () => null,
