@@ -10,8 +10,7 @@ import JobDetails from '../components/JobDetails';
 import Loader from '../components/Loader';
 import MainHeader from '../components/MainHeader';
 import config from '../constants/config';
-import { jobSwipeStyles } from '../styles';
-
+import { styleConsts, jobSwipeStyles } from '../styles';
 
 const styles = jobSwipeStyles;
 export default class JobSwipe extends Component {
@@ -39,13 +38,24 @@ export default class JobSwipe extends Component {
     this.setState({
       loading: 1,
     });
+    const jobsResp = await axios.get(`${config.ENDP_JOBS}${userId}`).catch(e => this.logger.error(e));
+    const jobs = jobsResp.data.result;
 
-    const jobs = await axios.get(`${config.ENDP_JOBS}${userId}`)
-      .catch(e => this.logger.error(e));
+    await Promise.all(jobs.map(async (job, i) => {
+      const companyInfoResp = await axios.get(
+        `${config.ENDP_COMPANY_API}${job.company}`,
+      );
+      const companyInfo = companyInfoResp.data[0];
+      if (companyInfo) {
+        jobs[i].logo = `${companyInfo.logo}?size=${styleConsts.LOGO_SIZE}`;
+      } else {
+        jobs[i].logo = null;
+      }
+    })).catch(e => this.logger.error(e));
 
     this.setState({
-      jobs: jobs.data.result,
       loading: 0,
+      jobs,
     });
   }
 
@@ -106,7 +116,7 @@ export default class JobSwipe extends Component {
           config={gestureConfig}
         >
           <JobImage
-            company={job.company}
+            logo={job.logo}
           />
         </GestureRecognizer>
 

@@ -107,9 +107,10 @@ export const jobImageStyles = StyleSheet.create({
     padding: 30,
     height: 420,
   },
-  text: {
-    textAlign: 'center',
-    fontSize: 50,
+  companyLogo: {
+    height: 200,
+    width: 200,
+    borderRadius: 15,
   },
 });
 
