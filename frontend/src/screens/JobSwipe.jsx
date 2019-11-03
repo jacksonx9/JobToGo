@@ -107,8 +107,7 @@ export default class JobSwipe extends Component {
         />
         <Swiper
           cards={jobs}
-          renderCard={posting => {
-            return (
+          renderCard={posting => (
               <View>
                 <JobImage
                   logo={posting.logo}
@@ -120,12 +119,12 @@ export default class JobSwipe extends Component {
                   description={posting.description}
                 />
               </View>
-            );
-          }}
+            )
+          }
           onSwipedLeft={() => this.dislikeJob(jobs, jobIndex)}
           onSwipedRight={() => this.likeJob(jobs, jobIndex)}
           cardIndex={jobIndex}
-          backgroundColor='white'
+          backgroundColor="white"
           stackSize={1}
           animateOverlayLabelsOpacity
           overlayLabels={{
@@ -147,7 +146,8 @@ export default class JobSwipe extends Component {
                 },
               },
             },
-          }}/>
+          }}
+        />
       </View>
     );
   }
