@@ -38,26 +38,27 @@ export default class JobSwipe extends Component {
     this.setState({
       loading: 1,
     });
+    const jobsResp = await axios.get(`${config.ENDP_JOBS}${userId}`).catch(e => this.logger.error(e));
+    const jobs = jobsResp.data.result;
 
     try {
-      const jobsResp = await axios.get(`${config.ENDP_JOBS}${userId}`);
-      const jobs = jobsResp.data.result;
-
       await Promise.all(jobs.map(async (job, i) => {
-        const companyInfoResp = await fetch(
-          `${config.COMPANY_API_ENDPT}${job.company}`,
+        const companyInfoResp = await axios.get(
+          `${config.ENDP_COMPANY_API}${job.company}`,
         );
-        const companyInfo = await companyInfoResp.json();
 
-        if (companyInfo[0] !== undefined) {
-          jobs[i].logo = `${companyInfo[0].logo}?size=${config.LOGO_SIZE}`;
+        const companyInfo = companyInfoResp.data[0];
+        if (companyInfo) {
+          jobs[i].logo = `${companyInfo.logo}?size=${config.LOGO_SIZE}`;
         } else {
           jobs[i].logo = null;
         }
-      })).then(() => this.setState({
+      }));
+
+      this.setState({
         loading: 0,
         jobs,
-      }));
+      });
     } catch (error) {
       this.logger.error(error);
     }
