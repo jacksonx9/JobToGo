@@ -168,18 +168,18 @@ class JobAnalyzer {
       assert(k > 0 && k <= right - left + 1);
 
       // Partition the array around last element and get position of pivot element in sorted array
-      const pos = partition();
+      const pivot = partition();
 
-      // If position is same as k
-      if (pos - left === k - 1) {
+      // If pivot is same as k
+      if (pivot - left === k - 1) {
         return jobs.slice(0, JOBS_PER_SEND);
       }
-      // If position is more, recur for left subarray
-      if (pos - left > k - 1) {
-        return getKSmallestElements(left, pos - 1, k);
+      // If pivot is more, recur for left subarray
+      if (pivot - left > k - 1) {
+        return getKSmallestElements(left, pivot - 1, k);
       }
       // Else recur for right subarray
-      return getKSmallestElements(pos + 1, right, k - pos + left - 1);
+      return getKSmallestElements(pivot + 1, right, k - pivot + left - 1);
     };
 
     return getKSmallestElements(0, jobs.length - 1, JOBS_PER_SEND);
