@@ -123,6 +123,8 @@ class JobAnalyzer {
 
   /**
    * Users don't need access to jobs' keywords
+   *
+   * @param {Array<Job>} jobs all jobs to be sent to user
    */
   _deleteJobKeywords(jobs) {
     jobs.forEach((_, i) => delete jobs[i].keywords);
@@ -133,7 +135,7 @@ class JobAnalyzer {
    * using quick sort like implementation
    *
    * @param {Array<String>} userKeywords user's keywords
-   * @param {Array<Jobs>} jobs all jobs the user has not seen yet
+   * @param {Array<Job>} jobs all jobs the user has not seen yet
    */
   _getMostRelevantJobs(userKeywords, jobs) {
     // If there are less unseenJobs than JOBS_PER_SEND
