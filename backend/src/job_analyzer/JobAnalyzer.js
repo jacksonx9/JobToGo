@@ -106,9 +106,7 @@ class JobAnalyzer {
     const unseenJobs = await Jobs.find({ _id: { $nin: seenJobs } }).lean();
     const mostRelevantJobs = this._getMostRelevantJobs(user.keywords, unseenJobs);
 
-    // Users don't need access to jobs' keywords
-    mostRelevantJobs.forEach((_, i) => delete mostRelevantJobs[i].keywords);
-
+    this._deleteJobKeywords(mostRelevantJobs);
     return new Response(mostRelevantJobs, '', 200);
   }
 
@@ -119,10 +117,15 @@ class JobAnalyzer {
       ...await Jobs.find({ _id: { $nin: seenJobs } }).limit(JOBS_PER_SEND).lean(),
     );
 
-    // Users don't need access to jobs' keywords
-    randomJobs.forEach((_, i) => delete randomJobs[i].keywords);
-
+    this._deleteJobKeywords(randomJobs);
     return new Response(randomJobs, '', 200);
+  }
+
+  /**
+   * Users don't need access to jobs' keywords
+   */
+  _deleteJobKeywords(jobs) {
+    jobs.forEach((_, i) => delete jobs[i].keywords);
   }
 
   /**
