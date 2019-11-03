@@ -179,11 +179,18 @@ export const overlayLabelStyles = StyleSheet.create({
     fontFamily: fonts.normal,
     textAlign: 'center',
   },
-  overlayWrapper: {
+  overlayDislike: {
     flexDirection: 'column',
     alignItems: 'flex-end',
     justifyContent: 'space-between',
     marginTop: 30,
     marginLeft: -30,
+  },
+  overlayLike: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    marginTop: 30,
+    marginLeft: 30,
   },
 });

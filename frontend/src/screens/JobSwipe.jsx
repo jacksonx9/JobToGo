@@ -131,18 +131,14 @@ export default class JobSwipe extends Component {
               title: 'NOPE',
               element: <OverlayLabel label="NOPE" color={colours.red} />,
               style: {
-                wrapper: overlayLabelStyles.overlayWrapper,
+                wrapper: overlayLabelStyles.overlayDislike,
               },
             },
             right: {
               title: 'LIKE',
               element: <OverlayLabel label="LIKE" color={colours.green} />,
               style: {
-                wrapper: {
-                  ...overlayLabelStyles.overlayWrapper,
-                  alignItems: 'flex-start',
-                  marginLeft: 30,
-                },
+                wrapper: overlayLabelStyles.overlayLike,
               },
             },
           }}
