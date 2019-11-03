@@ -1,9 +1,10 @@
 
 import React, { Component } from 'react';
-import { View } from 'react-native';
+import { View, Button, StyleSheet, Text } from 'react-native';
 import GestureRecognizer from 'react-native-swipe-gestures';
 import axios from 'axios';
 import Logger from 'js-logger';
+import Swiper from 'react-native-deck-swiper'
 
 import JobImage from '../components/JobImage';
 import JobDetails from '../components/JobDetails';
@@ -109,7 +110,7 @@ export default class JobSwipe extends Component {
           onPressSend={() => navigation.navigate('SendLikedJobs')}
         />
 
-        <GestureRecognizer
+        {/* <GestureRecognizer
           onSwipeUp={this.shareJob}
           onSwipeLeft={() => this.dislikeJob(jobs, jobIndex)}
           onSwipeRight={() => this.likeJob(jobs, jobIndex)}
@@ -118,7 +119,27 @@ export default class JobSwipe extends Component {
           <JobImage
             logo={job.logo}
           />
-        </GestureRecognizer>
+        </GestureRecognizer> */}
+        <Swiper
+            cards={jobs}
+            renderCard={(posting) => {
+                return (
+                    <View >
+                      <JobImage
+                        company={posting.company}
+                      />
+                    </View>
+                )
+            }}
+            onSwipedLeft={() => this.dislikeJob(jobs, jobIndex)}
+            onSwipedRight={() => this.likeJob(jobs, jobIndex)}
+            onSwiped={(jobIndex) => {console.log(jobIndex)}}
+            cardIndex={jobIndex}
+            backgroundColor={'white'}
+            stackSize= {5}
+            containerStyle = {styles.jobImageStyles}>
+
+        </Swiper>
 
         <JobDetails
           company={job.company}
