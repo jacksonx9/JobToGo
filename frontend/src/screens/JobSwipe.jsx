@@ -10,6 +10,7 @@ import JobDetails from '../components/JobDetails';
 import Loader from '../components/Loader';
 import MainHeader from '../components/MainHeader';
 import config from '../constants/config';
+import images from '../constants/images';
 import { jobSwipeStyles } from '../styles';
 
 
@@ -40,13 +41,31 @@ export default class JobSwipe extends Component {
       loading: 1,
     });
 
-    const jobs = await axios.get(`${config.ENDP_JOBS}${userId}`)
-      .catch(e => this.logger.error(e));
+    try {
+      const jobsResponse = await axios.get(`${config.ENDP_JOBS}${userId}`);
+      const jobs = jobsResponse.data.result;
 
-    this.setState({
-      jobs: jobs.data.result,
-      loading: 0,
-    });
+      await Promise.all(jobs.map(async (job, i) => {
+        const result = await fetch(
+          `https://autocomplete.clearbit.com/v1/companies/suggest?query=${job.company}`,
+        );
+        const companyInfo = await result.json();
+
+        if (companyInfo[0] !== undefined) {
+          jobs[i].logo = companyInfo[0].logo;
+          console.log(jobs[i]);
+        } else {
+          jobs[i].logo = images.jobBackground;
+        }
+      }));
+
+      this.setState({
+        loading: 0,
+        jobs,
+      });
+    } catch (error) {
+      this.logger.error(error);
+    }
   }
 
   shareJob = () => {
