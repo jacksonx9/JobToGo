@@ -12,8 +12,6 @@ import MainHeader from '../components/MainHeader';
 import config from '../constants/config';
 import { jobSwipeStyles } from '../styles';
 
-const COMPANY_API_ENDPT = 'https://autocomplete.clearbit.com/v1/companies/suggest?query=';
-const LOGO_SIZE = 200;
 const styles = jobSwipeStyles;
 export default class JobSwipe extends Component {
   static navigationOptions = {
@@ -47,12 +45,12 @@ export default class JobSwipe extends Component {
 
       await Promise.all(jobs.map(async (job, i) => {
         const companyInfoResp = await fetch(
-          `${COMPANY_API_ENDPT}${job.company}`,
+          `${config.COMPANY_API_ENDPT}${job.company}`,
         );
         const companyInfo = await companyInfoResp.json();
 
         if (companyInfo[0] !== undefined) {
-          jobs[i].logo = `${companyInfo[0].logo}?size=${LOGO_SIZE}`;
+          jobs[i].logo = `${companyInfo[0].logo}?size=${config.LOGO_SIZE}`;
         } else {
           jobs[i].logo = null;
         }
