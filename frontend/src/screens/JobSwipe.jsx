@@ -13,7 +13,8 @@ import config from '../constants/config';
 import images from '../constants/images';
 import { jobSwipeStyles } from '../styles';
 
-
+const COMPANY_API_ENDPT = 'https://autocomplete.clearbit.com/v1/companies/suggest?query=';
+const LOGO_SIZE = 200;
 const styles = jobSwipeStyles;
 export default class JobSwipe extends Component {
   static navigationOptions = {
@@ -42,27 +43,24 @@ export default class JobSwipe extends Component {
     });
 
     try {
-      const jobsResponse = await axios.get(`${config.ENDP_JOBS}${userId}`);
-      const jobs = jobsResponse.data.result;
+      const jobsResp = await axios.get(`${config.ENDP_JOBS}${userId}`);
+      const jobs = jobsResp.data.result;
 
       await Promise.all(jobs.map(async (job, i) => {
-        const result = await fetch(
-          `https://autocomplete.clearbit.com/v1/companies/suggest?query=${job.company}`,
+        const companyInfoResp = await fetch(
+          `${COMPANY_API_ENDPT}${job.company}`,
         );
-        const companyInfo = await result.json();
+        const companyInfo = await companyInfoResp.json();
 
         if (companyInfo[0] !== undefined) {
-          jobs[i].logo = companyInfo[0].logo;
-          console.log(jobs[i]);
+          jobs[i].logo = `${companyInfo[0].logo}?size=${LOGO_SIZE}`;
         } else {
-          jobs[i].logo = images.jobBackground;
+          jobs[i].logo = 'https://logo.clearbit.com/sophos.com?size=200';
         }
-      }));
-
-      this.setState({
+      })).then(() => this.setState({
         loading: 0,
         jobs,
-      });
+      }));
     } catch (error) {
       this.logger.error(error);
     }
@@ -125,7 +123,7 @@ export default class JobSwipe extends Component {
           config={gestureConfig}
         >
           <JobImage
-            company={job.company}
+            logo={job.logo}
           />
         </GestureRecognizer>
 
