@@ -1,7 +1,6 @@
 
 import React, { Component } from 'react';
-import { View, Button, StyleSheet, Text } from 'react-native';
-import GestureRecognizer from 'react-native-swipe-gestures';
+import { View } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
 import Swiper from 'react-native-deck-swiper'
@@ -10,8 +9,11 @@ import JobImage from '../components/JobImage';
 import JobDetails from '../components/JobDetails';
 import Loader from '../components/Loader';
 import MainHeader from '../components/MainHeader';
+import OverlayLabel from '../components/overlayLabel';
 import config from '../constants/config';
-import { styleConsts, jobSwipeStyles } from '../styles';
+import { styleConsts, jobSwipeStyles, overlayLabelStyles } from '../styles';
+import colours from '../constants/colours';
+
 
 const styles = jobSwipeStyles;
 export default class JobSwipe extends Component {
@@ -109,33 +111,22 @@ export default class JobSwipe extends Component {
           onPressMenu={() => navigation.openDrawer()}
           onPressSend={() => navigation.navigate('SendLikedJobs')}
         />
-
-        {/* <GestureRecognizer
-          onSwipeUp={this.shareJob}
-          onSwipeLeft={() => this.dislikeJob(jobs, jobIndex)}
-          onSwipeRight={() => this.likeJob(jobs, jobIndex)}
-          config={gestureConfig}
-        >
-          <JobImage
-            logo={job.logo}
-          />
-        </GestureRecognizer> */}
         <Swiper
             cards={jobs}
             renderCard={(posting) => {
-                return (
-                    <View >
-                      <JobImage
-                        company={posting.company}
-                      />
-                      <JobDetails
-                        company={posting.company}
-                        title={posting.title}
-                        location={posting.location}
-                        description={posting.description}
-                      />
-                    </View>
-                )
+              return (
+                <View >
+                  <JobImage
+                    company={posting.company}
+                  />
+                  <JobDetails
+                    company={posting.company}
+                    title={posting.title}
+                    location={posting.location}
+                    description={posting.description}
+                  />
+                </View>
+              )
             }}
             onSwipedLeft={async () => await this.dislikeJob(jobs, jobIndex)}
             onSwipedRight={async () => await this.likeJob(jobs, jobIndex)}
@@ -143,8 +134,27 @@ export default class JobSwipe extends Component {
             cardIndex={jobIndex}
             backgroundColor={'white'}
             stackSize= {1}
-            containerStyle = {styles.jobImageStyles}>
-
+            animateOverlayLabelsOpacity
+            overlayLabels={{
+              left: {
+                title: 'NOPE',
+                element: <OverlayLabel label="NOPE" color={colours.red} />,
+                style: {
+                  wrapper: overlayLabelStyles.overlayWrapper,
+                },
+              },
+              right: {
+                title: 'LIKE',
+                element: <OverlayLabel label="LIKE" color={colours.green} />,
+                style: {
+                  wrapper: {
+                    ...overlayLabelStyles.overlayWrapper,
+                    alignItems: 'flex-start',
+                    marginLeft: 30,
+                  },
+                },
+              },
+            }}>
         </Swiper>
       </View>
     );

@@ -165,3 +165,25 @@ export const navHeaderStyles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
+export const overlayLabelStyles = StyleSheet.create({
+  overlayLabel: {
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 10,
+    borderWidth: 2,
+    borderRadius: 10,
+  },
+  overlayLabelText: {
+    fontSize: 25,
+    fontFamily: fonts.normal,
+    textAlign: 'center',
+  },
+  overlayWrapper: {
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    marginTop: 30,
+    marginLeft: -30,
+  },
+});
