@@ -51,23 +51,23 @@ class JobAnalyzer {
     const jobs = await Jobs.find({});
     const offset = skillsStart || 0;
     const allSkills = await AllSkills.getAll();
-    const keywords = offset > 0 ? allSkills.slice(offset, skillsEnd) : allSkills;
+    const newKeywords = offset > 0 ? allSkills.slice(offset, skillsEnd) : allSkills;
 
-    await forEachAsync(keywords, async (_, keywordIdxBase) => {
-      const keywordIdx = keywordIdxBase + offset;
+    await forEachAsync(newKeywords, async (_, newKeywordIdxBase) => {
+      const allKeywordIdx = newKeywordIdxBase + offset;
       // Count the number of jobs with the given skill
       const docCount = jobs.reduce((sum, job) => sum
-        + Number(job.keywords[keywordIdx].count > 0), 0);
+        + Number(job.keywords[allKeywordIdx].count > 0), 0);
 
       // calculate tf_idf each doc and save it
       await forEachAsync(jobs, async (job, jobIdx) => {
-        const keywordOccurrences = job.keywords[keywordIdx].count;
+        const keywordOccurrences = job.keywords[allKeywordIdx].count;
         const wordCount = job.description.split(' ').length;
         const tf = keywordOccurrences / wordCount;
         const idf = docCount !== 0 ? Math.log(jobs.length / docCount) : 0;
 
         // replace tf_idf score for a keyword for each job
-        jobs[jobIdx].keywords[keywordIdx].tfidf = tf * idf;
+        jobs[jobIdx].keywords[allKeywordIdx].tfidf = tf * idf;
 
         await job.save();
       });
