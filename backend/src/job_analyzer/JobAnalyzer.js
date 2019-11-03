@@ -82,6 +82,7 @@ class JobAnalyzer {
 
   /**
    * Gets the JOBS_PER_SEND most relevant jobs to the user
+   *
    * @param {String} userId
    */
   async getRelevantJobs(userId) {
@@ -139,16 +140,21 @@ class JobAnalyzer {
     }
 
     const jobScoreCache = new Map();
+    const userKeywordsMap = new Map();
+
+    userKeywords.forEach((keywordData) => {
+      userKeywordsMap.set(keywordData.name, keywordData);
+    });
 
     const getKSmallestElements = (left, right, k) => {
       const partition = () => {
-        const pivotScore = this._jobScore(userKeywords, jobScoreCache, jobs[right]);
+        const pivotScore = this._jobScore(userKeywordsMap, jobScoreCache, jobs[right]);
         let l = left; // left pointer
 
         let idx = l;
         while (idx < right) {
           // Sort subarray from greatest to smallest
-          if (this._jobScore(userKeywords, jobScoreCache, jobs[idx]) >= pivotScore) {
+          if (this._jobScore(userKeywordsMap, jobScoreCache, jobs[idx]) >= pivotScore) {
             [jobs[l], jobs[idx]] = [jobs[idx], jobs[l]];
             l += 1;
           }
@@ -179,23 +185,20 @@ class JobAnalyzer {
     return getKSmallestElements(0, jobs.length - 1, JOBS_PER_SEND);
   }
 
-  _jobScore(userKeywords, jobScoreCache, job) {
+  _jobScore(userKeywordsMap, jobScoreCache, job) {
     let score = 0;
 
     if (jobScoreCache.has(job._id)) {
       score = jobScoreCache.get(job._id);
     } else {
       job.keywords.forEach((jobKeywordData) => {
-        const userKeywordIdx = userKeywords.findIndex(userKeywordData => (
-          jobKeywordData.name === userKeywordData.name
-        ));
-
         // If the user and job share a similar keyword, add the job's tf_idf
         // multiplied with the user's weighting of the keyword to the job's score
-        if (userKeywordIdx !== -1) {
+        if (userKeywordsMap.has(jobKeywordData.name)) {
+          const userKeywordData = userKeywordsMap.get(jobKeywordData.name);
           const { tfidf } = jobKeywordData;
-          const userValueKeyword = userKeywords[userKeywordIdx].score;
-          const userSeenKeywordTimes = userKeywords[userKeywordIdx].jobCount;
+          const userValueKeyword = userKeywordData.score;
+          const userSeenKeywordTimes = userKeywordData.jobCount;
           const keywordWeight = userSeenKeywordTimes > 0
             ? userValueKeyword / userSeenKeywordTimes : 0;
           score += tfidf * keywordWeight;
