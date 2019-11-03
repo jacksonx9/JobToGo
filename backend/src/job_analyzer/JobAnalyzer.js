@@ -98,16 +98,14 @@ class JobAnalyzer {
 
     // If the user has not uploaded a resume, return random jobs
     if (user.keywords.length === 0) {
-      return await this._getJobsForUserWithNoKeywords(seenJobs);
+      return this._getJobsForUserWithNoKeywords(seenJobs);
     }
 
     const unseenJobs = await Jobs.find({ _id: { $nin: seenJobs } }).lean();
+    const mostRelevantJobs = this._getMostRelevantJobs(user.keywords, unseenJobs);
 
     // Users don't need access to jobs' keywords
-    const mostRelevantJobs = this._getMostRelevantJobs(user.keywords, unseenJobs);
     mostRelevantJobs.forEach((_, i) => delete mostRelevantJobs[i].keywords);
-
-    Logger.timeEnd('testing');
 
     return new Response(mostRelevantJobs, '', 200);
   }
@@ -125,6 +123,7 @@ class JobAnalyzer {
     randomJobs.push(
       ...await Jobs.find({ _id: { $nin: seenJobs } }).limit(JOBS_PER_SEND).lean(),
     );
+
     // Users don't need access to jobs' keywords
     randomJobs.forEach((_, i) => delete randomJobs[i].keywords);
 
@@ -132,7 +131,7 @@ class JobAnalyzer {
   }
 
   /**
-   * Get the most relevant jobs in jobs in average case of O(n) time complexity
+   * Get the most relevant jobs in jobs with average time complexity of O(n)
    * using quick sort like implementation
    *
    * @param {*} userKeywords user's keywords
@@ -179,14 +178,14 @@ class JobAnalyzer {
         const m = Math.floor((right + left) / 2); // middle pointer
         let i = left; // left pointer
         let j = right; // right pointer
-        const pivot_score = jobScore(jobs[m]);
+        const pivotScore = jobScore(jobs[m]);
 
         // Normal quick sort comparison and swapping
         while (i <= j) {
-          while (jobScore(jobs[i]) < pivot_score) {
+          while (jobScore(jobs[i]) < pivotScore) {
             i += 1;
           }
-          while (jobScore(jobs[j]) > pivot_score) {
+          while (jobScore(jobs[j]) > pivotScore) {
             j -= 1;
           }
           if (i <= j) {
@@ -197,7 +196,7 @@ class JobAnalyzer {
           }
         }
         return i;
-      }
+      };
 
       // Partition the array around last element and get position of pivot element in sorted array
       // eslint-disable-next-line no-use-before-define
@@ -213,7 +212,7 @@ class JobAnalyzer {
       }
       // Else recur for right subarray
       return getKthSmallestElements(userKeywords, jobs, pos + 1, right, k - pos + left - 1);
-    }
+    };
 
     return getKthSmallestElements(0, jobs.length - 1, JOBS_PER_SEND);
   }
