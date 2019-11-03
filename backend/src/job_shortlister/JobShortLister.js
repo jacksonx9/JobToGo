@@ -27,6 +27,13 @@ class JobShortLister {
     });
   }
 
+  async getSeenJobs(userId) {
+    const seenJobs = [];
+    seenJobs.push(...await this.getLikedJobs(userId));
+    seenJobs.push(...await this.getDislikedJobs(userId));
+    return seenJobs;
+  }
+
   async addLikedJobs(userId, jobId) {
     return this._addLikedDislikedJobs(userId, jobId, 'likedJobs');
   }
