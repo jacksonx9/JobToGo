@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import assert from 'assert';
 import Logger from 'js-logger';
 import { forEachAsync } from 'foreachasync';
@@ -165,7 +166,8 @@ class JobAnalyzer {
                 const { tfidf } = jobKeywordData;
                 const userValueKeyword = userKeywords[userKeywordIdx].score;
                 const userSeenKeywordTimes = userKeywords[userKeywordIdx].jobCount;
-                const keywordWeight = userValueKeyword / userSeenKeywordTimes;
+                const keywordWeight = userSeenKeywordTimes > 0
+                  ? userValueKeyword / userSeenKeywordTimes : 0;
                 score += tfidf * keywordWeight;
               }
             });
@@ -175,28 +177,24 @@ class JobAnalyzer {
           return score;
         };
 
-        const m = Math.floor((right + left) / 2); // middle pointer
+        const pivotScore = jobScore(jobs[right]);
         let i = left; // left pointer
-        let j = right; // right pointer
-        const pivotScore = jobScore(jobs[m]);
 
-        // Normal quick sort comparison and swapping
-        while (i <= j) {
-          while (jobScore(jobs[i]) < pivotScore) {
-            i += 1;
-          }
-          while (jobScore(jobs[j]) > pivotScore) {
-            j -= 1;
-          }
-          if (i <= j) {
-            // eslint-disable-next-line no-param-reassign
+        let j = i;
+        while (j < right) {
+          // Sort subarray from greatest to smallest
+          if (jobScore(jobs[j]) >= pivotScore) {
             [jobs[i], jobs[j]] = [jobs[j], jobs[i]];
             i += 1;
-            j -= 1;
           }
+          j += 1;
         }
+
+        [jobs[i], jobs[right]] = [jobs[right], jobs[i]];
         return i;
       };
+
+      assert(k > 0 && k <= right - left + 1);
 
       // Partition the array around last element and get position of pivot element in sorted array
       // eslint-disable-next-line no-use-before-define
@@ -208,10 +206,10 @@ class JobAnalyzer {
       }
       // If position is more, recur for left subarray
       if (pos - left > k - 1) {
-        return getKthSmallestElements(userKeywords, jobs, left, pos - 1, k);
+        return getKthSmallestElements(left, pos - 1, k);
       }
       // Else recur for right subarray
-      return getKthSmallestElements(userKeywords, jobs, pos + 1, right, k - pos + left - 1);
+      return getKthSmallestElements(pos + 1, right, k - pos + left - 1);
     };
 
     return getKthSmallestElements(0, jobs.length - 1, JOBS_PER_SEND);
