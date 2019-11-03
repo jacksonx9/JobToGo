@@ -108,19 +108,18 @@ export default class JobSwipe extends Component {
         <Swiper
           cards={jobs}
           renderCard={posting => (
-              <View>
-                <JobImage
-                  logo={posting.logo}
-                />
-                <JobDetails
-                  company={posting.company}
-                  title={posting.title}
-                  location={posting.location}
-                  description={posting.description}
-                />
-              </View>
-            )
-          }
+            <View>
+              <JobImage
+                logo={posting.logo}
+              />
+              <JobDetails
+                company={posting.company}
+                title={posting.title}
+                location={posting.location}
+                description={posting.description}
+              />
+            </View>
+          )}
           onSwipedLeft={() => this.dislikeJob(jobs, jobIndex)}
           onSwipedRight={() => this.likeJob(jobs, jobIndex)}
           cardIndex={jobIndex}
