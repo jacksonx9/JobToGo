@@ -105,10 +105,10 @@ export default class JobSwipe extends Component {
 
     return (
       <View style={[styles.container]}>
-        {/* <MainHeader
+        <MainHeader
           onPressMenu={() => navigation.openDrawer()}
           onPressSend={() => navigation.navigate('SendLikedJobs')}
-        /> */}
+        />
 
         {/* <GestureRecognizer
           onSwipeUp={this.shareJob}
@@ -146,11 +146,6 @@ export default class JobSwipe extends Component {
             containerStyle = {styles.jobImageStyles}>
 
         </Swiper>
-        <MainHeader
-          onPressMenu={() => navigation.openDrawer()}
-          onPressSend={() => navigation.navigate('SendLikedJobs')}
-        />
-
       </View>
     );
   }

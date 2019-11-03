@@ -124,6 +124,7 @@ export const loaderStyles = StyleSheet.create({
 export const mainHeaderStyles = StyleSheet.create({
   container: {
     paddingTop: 5,
+    zIndex: 1000,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
