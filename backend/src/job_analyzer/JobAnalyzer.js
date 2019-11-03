@@ -178,20 +178,20 @@ class JobAnalyzer {
         };
 
         const pivotScore = jobScore(jobs[right]);
-        let i = left; // left pointer
+        let l = left; // left pointer
 
-        let j = i;
-        while (j < right) {
+        let idx = l;
+        while (idx < right) {
           // Sort subarray from greatest to smallest
-          if (jobScore(jobs[j]) >= pivotScore) {
-            [jobs[i], jobs[j]] = [jobs[j], jobs[i]];
-            i += 1;
+          if (jobScore(jobs[idx]) >= pivotScore) {
+            [jobs[l], jobs[idx]] = [jobs[idx], jobs[l]];
+            l += 1;
           }
-          j += 1;
+          idx += 1;
         }
 
-        [jobs[i], jobs[right]] = [jobs[right], jobs[i]];
-        return i;
+        [jobs[l], jobs[right]] = [jobs[right], jobs[l]];
+        return l;
       };
 
       assert(k > 0 && k <= right - left + 1);
