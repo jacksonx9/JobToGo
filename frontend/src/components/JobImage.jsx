@@ -7,20 +7,30 @@ import { containerStyles, jobImageStyles } from '../styles';
 
 
 const styles = { ...containerStyles, ...jobImageStyles };
-const JobImage = ({ logo }) => (
-  <ImageBackground
-    source={images.jobBackground}
-    style={[styles.flexRowContainer, styles.container]}
-  >
-    <Image
-      source={{ uri: logo }}
-      style={[styles.companyLogo]}
-    />
-  </ImageBackground>
-);
+const JobImage = ({ logo }) => {
+  let source = { uri: logo };
+  if (logo === null) {
+    source = images.iconLogo;
+  }
+  return (
+    <ImageBackground
+      source={images.jobBackground}
+      style={[styles.flexRowContainer, styles.container]}
+    >
+      <Image
+        source={source}
+        style={[styles.companyLogo]}
+      />
+    </ImageBackground>
+  );
+};
+
+JobImage.defaultProps = {
+  logo: null,
+};
 
 JobImage.propTypes = {
-  logo: PropTypes.string.isRequired,
+  logo: PropTypes.string,
 };
 
 export default JobImage;

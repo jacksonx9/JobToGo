@@ -10,7 +10,6 @@ import JobDetails from '../components/JobDetails';
 import Loader from '../components/Loader';
 import MainHeader from '../components/MainHeader';
 import config from '../constants/config';
-import images from '../constants/images';
 import { jobSwipeStyles } from '../styles';
 
 const COMPANY_API_ENDPT = 'https://autocomplete.clearbit.com/v1/companies/suggest?query=';
@@ -55,7 +54,7 @@ export default class JobSwipe extends Component {
         if (companyInfo[0] !== undefined) {
           jobs[i].logo = `${companyInfo[0].logo}?size=${LOGO_SIZE}`;
         } else {
-          jobs[i].logo = 'https://logo.clearbit.com/sophos.com?size=200';
+          jobs[i].logo = null;
         }
       })).then(() => this.setState({
         loading: 0,
