@@ -10,7 +10,7 @@ import JobDetails from '../components/JobDetails';
 import Loader from '../components/Loader';
 import MainHeader from '../components/MainHeader';
 import config from '../constants/config';
-import { jobSwipeStyles } from '../styles';
+import { styleConsts, jobSwipeStyles } from '../styles';
 
 const styles = jobSwipeStyles;
 export default class JobSwipe extends Component {
@@ -47,7 +47,7 @@ export default class JobSwipe extends Component {
       );
       const companyInfo = companyInfoResp.data[0];
       if (companyInfo) {
-        jobs[i].logo = `${companyInfo.logo}?size=${config.LOGO_SIZE}`;
+        jobs[i].logo = `${companyInfo.logo}?size=${styleConsts.LOGO_SIZE}`;
       } else {
         jobs[i].logo = null;
       }

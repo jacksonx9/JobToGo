@@ -4,6 +4,10 @@ import colours from '../constants/colours';
 import fonts from '../constants/fonts';
 
 
+export const styleConsts = {
+  LOGO_SIZE: 200,
+};
+
 export const containerStyles = StyleSheet.create({
   flexColContainer: {
     height: '100%',
