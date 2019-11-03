@@ -1,16 +1,18 @@
 
 import React, { Component } from 'react';
 import { View } from 'react-native';
-import GestureRecognizer from 'react-native-swipe-gestures';
 import axios from 'axios';
 import Logger from 'js-logger';
+import Swiper from 'react-native-deck-swiper';
 
 import JobImage from '../components/JobImage';
 import JobDetails from '../components/JobDetails';
 import Loader from '../components/Loader';
 import MainHeader from '../components/MainHeader';
+import OverlayLabel from '../components/OverlayLabel';
 import config from '../constants/config';
-import { styleConsts, jobSwipeStyles } from '../styles';
+import { styleConsts, jobSwipeStyles, overlayLabelStyles } from '../styles';
+import colours from '../constants/colours';
 
 const styles = jobSwipeStyles;
 export default class JobSwipe extends Component {
@@ -94,11 +96,6 @@ export default class JobSwipe extends Component {
   render() {
     const { loading, jobs, jobIndex } = this.state;
     const { navigation } = this.props;
-    const job = jobs[jobIndex];
-    const gestureConfig = {
-      velocityThreshold: 0.3,
-      directionalOffsetThreshold: 80,
-    };
 
     if (loading) return <Loader />;
 
@@ -108,23 +105,43 @@ export default class JobSwipe extends Component {
           onPressMenu={() => navigation.openDrawer()}
           onPressSend={() => navigation.navigate('SendLikedJobs')}
         />
-
-        <GestureRecognizer
-          onSwipeUp={this.shareJob}
-          onSwipeLeft={() => this.dislikeJob(jobs, jobIndex)}
-          onSwipeRight={() => this.likeJob(jobs, jobIndex)}
-          config={gestureConfig}
-        >
-          <JobImage
-            logo={job.logo}
-          />
-        </GestureRecognizer>
-
-        <JobDetails
-          company={job.company}
-          title={job.title}
-          location={job.location}
-          description={job.description}
+        <Swiper
+          cards={jobs}
+          renderCard={posting => (
+            <View>
+              <JobImage
+                logo={posting.logo}
+              />
+              <JobDetails
+                company={posting.company}
+                title={posting.title}
+                location={posting.location}
+                description={posting.description}
+              />
+            </View>
+          )}
+          onSwipedLeft={() => this.dislikeJob(jobs, jobIndex)}
+          onSwipedRight={() => this.likeJob(jobs, jobIndex)}
+          cardIndex={jobIndex}
+          backgroundColor="white"
+          stackSize={1}
+          animateOverlayLabelsOpacity
+          overlayLabels={{
+            left: {
+              title: 'NOPE',
+              element: <OverlayLabel label="NOPE" color={colours.red} />,
+              style: {
+                wrapper: overlayLabelStyles.overlayDislike,
+              },
+            },
+            right: {
+              title: 'LIKE',
+              element: <OverlayLabel label="LIKE" color={colours.green} />,
+              style: {
+                wrapper: overlayLabelStyles.overlayLike,
+              },
+            },
+          }}
         />
       </View>
     );

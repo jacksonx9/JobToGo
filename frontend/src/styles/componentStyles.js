@@ -124,6 +124,7 @@ export const loaderStyles = StyleSheet.create({
 export const mainHeaderStyles = StyleSheet.create({
   container: {
     paddingTop: 5,
+    zIndex: 1000,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -162,5 +163,34 @@ export const navHeaderStyles = StyleSheet.create({
     fontFamily: fonts.normal,
     color: colours.darkGray,
     fontSize: 16,
+  },
+});
+
+export const overlayLabelStyles = StyleSheet.create({
+  overlayLabel: {
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 10,
+    borderWidth: 2,
+    borderRadius: 10,
+  },
+  overlayLabelText: {
+    fontSize: 25,
+    fontFamily: fonts.normal,
+    textAlign: 'center',
+  },
+  overlayDislike: {
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    marginTop: 30,
+    marginLeft: -30,
+  },
+  overlayLike: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    marginTop: 30,
+    marginLeft: 30,
   },
 });
