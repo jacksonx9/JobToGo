@@ -47,16 +47,15 @@ class JobAnalyzer {
    * @param {Number} skillsStart Index of first skill to use (nullable)
    * @param {Number} skillsEnd One past the index of the last skill to use (nullable)
    */
-  async computeJobScores(skillsStart, skillsEnd) {
+  async computeJobScores(skillsStart = 0, skillsEnd = 0) {
     this.logger.info('Starting to compute job scores...');
 
     const jobs = await Jobs.find({});
-    const offset = skillsStart || 0; // if skillsStart = null, offset = 0
     const allSkills = await AllSkills.getAll();
-    const newKeywords = offset > 0 ? allSkills.slice(offset, skillsEnd) : allSkills;
+    const newKeywords = skillsStart > 0 ? allSkills.slice(skillsStart, skillsEnd) : allSkills;
 
     await forEachAsync(newKeywords, async (_, newKeywordIdxBase) => {
-      const allKeywordIdx = newKeywordIdxBase + offset;
+      const allKeywordIdx = newKeywordIdxBase + skillsStart;
       // Count the number of jobs with the given skill
       const docCount = jobs.reduce((sum, job) => sum
         + Number(job.keywords[allKeywordIdx].count > 0), 0);
