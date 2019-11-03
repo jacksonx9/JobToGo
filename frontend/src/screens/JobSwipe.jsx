@@ -105,10 +105,10 @@ export default class JobSwipe extends Component {
 
     return (
       <View style={[styles.container]}>
-        <MainHeader
+        {/* <MainHeader
           onPressMenu={() => navigation.openDrawer()}
           onPressSend={() => navigation.navigate('SendLikedJobs')}
-        />
+        /> */}
 
         {/* <GestureRecognizer
           onSwipeUp={this.shareJob}
@@ -128,25 +128,29 @@ export default class JobSwipe extends Component {
                       <JobImage
                         company={posting.company}
                       />
+                      <JobDetails
+                        company={posting.company}
+                        title={posting.title}
+                        location={posting.location}
+                        description={posting.description}
+                      />
                     </View>
                 )
             }}
-            onSwipedLeft={() => this.dislikeJob(jobs, jobIndex)}
-            onSwipedRight={() => this.likeJob(jobs, jobIndex)}
+            onSwipedLeft={async () => await this.dislikeJob(jobs, jobIndex)}
+            onSwipedRight={async () => await this.likeJob(jobs, jobIndex)}
             onSwiped={(jobIndex) => {console.log(jobIndex)}}
             cardIndex={jobIndex}
             backgroundColor={'white'}
-            stackSize= {5}
+            stackSize= {1}
             containerStyle = {styles.jobImageStyles}>
 
         </Swiper>
-
-        <JobDetails
-          company={job.company}
-          title={job.title}
-          location={job.location}
-          description={job.description}
+        <MainHeader
+          onPressMenu={() => navigation.openDrawer()}
+          onPressSend={() => navigation.navigate('SendLikedJobs')}
         />
+
       </View>
     );
   }
