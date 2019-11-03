@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 import axios from 'axios';
-import { logger } from 'react-native-logger';
+import Logger from 'js-logger';
 
 import Button from '../components/Button';
 import images from '../constants/images';
@@ -21,6 +21,7 @@ export default class SignIn extends Component {
       email: '',
       password: '',
     };
+    this.logger = Logger.get(this.constructor.name);
   }
 
   signIn = async () => {
@@ -40,7 +41,7 @@ export default class SignIn extends Component {
       const userInfo = await GoogleSignin.signIn();
 
       const { firebaseToken } = global;
-      logger.log(`Firebase token: ${global.firebaseToken}`);
+      this.logger.info(`Firebase token: ${global.firebaseToken}`);
 
       const ret = await axios.post(`${config.ENDP_GOOGLE}`,
         {
@@ -52,13 +53,13 @@ export default class SignIn extends Component {
       navigation.navigate('App');
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        logger.log('Google sign in cancelled');
+        this.logger.warn('Google sign in cancelled');
       } else if (error.code === statusCodes.IN_PROGRESS) {
-        logger.log('Google sign in in progress already');
+        this.logger.warn('Google sign in in progress already');
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        logger.log('Google Play service not available');
+        this.logger.error('Google Play service not available');
       } else {
-        logger.log(error);
+        this.logger.error(error);
       }
     }
   }
@@ -78,7 +79,7 @@ export default class SignIn extends Component {
             placeholder="Email"
             value={email}
             placeholderTextColor={colours.lightBlue}
-            onChangeText={(text) => { this.setState({ email: text }); }}
+            onChangeText={text => { this.setState({ email: text }); }}
           />
           <TextInput
             style={[styles.inputContainer, styles.inputDark]}
@@ -86,7 +87,7 @@ export default class SignIn extends Component {
             value={password}
             secureTextEntry
             placeholderTextColor={colours.lightBlue}
-            onChangeText={(text) => { this.setState({ password: text }); }}
+            onChangeText={text => { this.setState({ password: text }); }}
           />
 
           <Button

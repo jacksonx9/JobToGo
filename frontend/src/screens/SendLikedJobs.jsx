@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, FlatList } from 'react-native';
 import axios from 'axios';
-import { logger } from 'react-native-logger';
+import Logger from 'js-logger';
 
 import SelectableItem from '../components/SelectableItem';
 import Loader from '../components/Loader';
@@ -23,6 +23,7 @@ export default class SendLikedJobs extends Component {
       likedJobs: [],
       loading: 1,
     };
+    this.logger = Logger.get(this.constructor.name);
   }
 
   async componentDidMount() {
@@ -38,7 +39,7 @@ export default class SendLikedJobs extends Component {
   fetchLikedJobs = async () => {
     const { userId } = global;
     const likedJobs = await axios.get(`${config.ENDP_LIKE}${userId}`)
-      .catch(e => logger.log(e));
+      .catch(e => this.logger.error(e));
     this.setState({
       likedJobs: likedJobs.data.result,
       loading: 0,
@@ -50,21 +51,21 @@ export default class SendLikedJobs extends Component {
     await axios.post(`${config.ENDP_EMAIL}`,
       {
         userId,
-      }).catch(e => logger.log(e));
+      }).catch(e => this.logger.error(e));
 
     const likedJobs = await axios.get(`${config.ENDP_LIKE}${userId}`)
-      .catch(e => logger.log(e));
+      .catch(e => this.logger.error(e));
 
     this.setState({
       likedJobs: likedJobs.data.result,
       loading: 0,
     });
 
-    logger.log('Sent liked jobs to your email');
+    this.logger.info('Sent liked jobs to your email');
   }
 
   removeLikedJob = (item, index) => {
-    logger.log(`${item.company}: ${index}`);
+    this.logger.info(`${item.company}: ${index}`);
   }
 
   render() {

@@ -58,21 +58,21 @@ export default class SignUp extends Component {
             placeholder="First Name"
             value={firstName}
             placeholderTextColor={colours.lightBlue}
-            onChangeText={(text) => { this.setState({ lastName: text }); }}
+            onChangeText={text => { this.setState({ lastName: text }); }}
           />
           <TextInput
             style={[styles.inputContainer, styles.inputDark]}
             placeholder="Last Name"
             value={lastName}
             placeholderTextColor={colours.lightBlue}
-            onChangeText={(text) => { this.setState({ lastName: text }); }}
+            onChangeText={text => { this.setState({ lastName: text }); }}
           />
           <TextInput
             style={[styles.inputContainer, styles.inputDark]}
             placeholder="Email"
             value={email}
             placeholderTextColor={colours.lightBlue}
-            onChangeText={(text) => { this.setState({ email: text }); }}
+            onChangeText={text => { this.setState({ email: text }); }}
           />
           <TextInput
             style={[styles.inputContainer, styles.inputDark]}
@@ -80,7 +80,7 @@ export default class SignUp extends Component {
             value={password}
             secureTextEntry={showPassword}
             placeholderTextColor={colours.lightBlue}
-            onChangeText={(text) => { this.setState({ password: text }); }}
+            onChangeText={text => { this.setState({ password: text }); }}
           />
           <TouchableOpacity
             style={[styles.alignCenter]}

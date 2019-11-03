@@ -4,7 +4,7 @@ import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createDrawerNavigator } from 'react-navigation-drawer';
 import firebase from 'react-native-firebase';
-import { logger } from 'react-native-logger';
+import Logger from 'js-logger';
 
 import SignIn from './screens/SignIn';
 import SignUp from './screens/SignUp';
@@ -17,45 +17,50 @@ import { appStyles } from './styles';
 
 const styles = appStyles;
 export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+    Logger.useDefaults();
+    this.logger = Logger.get(this.constructor.name);
+  }
+
   async componentDidMount() {
     if (Platform.OS === 'android') {
       try {
         await firebase.messaging().requestPermission();
         const fcmToken = await firebase.messaging().getToken();
         if (fcmToken) {
-          logger.log('FCM Token: ', fcmToken);
+          this.logger.info('FCM Token: ', fcmToken);
           global.firebaseToken = fcmToken;
           const enabled = await firebase.messaging().hasPermission();
           if (enabled) {
-            logger.log(`FCM messaging has permission:${enabled}`);
+            this.logger.info(`FCM messaging has permission:${enabled}`);
           } else {
             try {
               await firebase.messaging().requestPermission();
-              logger.log('FCM permission granted');
+              this.logger.info('FCM permission granted');
             } catch (error) {
-              logger.log('FCM Permission Error', error);
+              this.logger.error('FCM Permission Error', error);
             }
           }
           this.createNotificationListeners();
         } else {
-          logger.log('FCM Token not available');
+          this.logger.error('FCM Token not available');
         }
       } catch (e) {
-        logger.log('Error initializing FCM', e);
+        this.logger.error('Error initializing FCM', e);
       }
     }
   }
 
   componentWillUnmount() {
     this.notificationListener();
-    this.notificationOpenedListener();
   }
 
   showAlert = (title, body) => {
     Alert.alert(
       title, body,
       [
-        { text: 'OK', onPress: () => logger.log('OK Pressed') },
+        { text: 'OK', onPress: () => this.logger.info('OK Pressed') },
       ],
       { cancelable: false },
     );
@@ -65,7 +70,7 @@ export default class App extends React.Component {
     /*
     * Triggered when a particular notification has been received in foreground
     * */
-    this.notificationListener = firebase.notifications().onNotification((notification) => {
+    this.notificationListener = firebase.notifications().onNotification(notification => {
       const { title, body } = notification;
       this.showAlert(title, body);
     });

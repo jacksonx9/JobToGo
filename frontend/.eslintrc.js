@@ -25,6 +25,7 @@ module.exports = {
   rules: {
     "react/prop-types": ["error", { "ignore": ["navigation"] }],
     "no-underscore-dangle": [2, { "allow": ["_id"] }],
+    "arrow-parens": ["error", "as-needed"],
     "react/sort-comp": [1, {
       order: [
         "static-variables",
