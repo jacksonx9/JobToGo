@@ -18,7 +18,7 @@ class JobDetails extends Component {
     };
   }
 
-  setModalVisible = (visible) => {
+  setModalVisible = visible => {
     this.setState({ modalVisible: visible });
   }
 

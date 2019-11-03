@@ -3,7 +3,7 @@ import {
   View, FlatList, Text, TextInput,
 } from 'react-native';
 import axios from 'axios';
-import { logger } from 'react-native-logger';
+import Logger from 'js-logger';
 
 import Button from '../components/Button';
 import SelectableItem from '../components/SelectableItem';
@@ -29,6 +29,7 @@ export default class EditFriends extends Component {
       addFriendName: '',
       loading: 1,
     };
+    this.logger = Logger.get(this.constructor.name);
   }
 
   async componentDidMount() {
@@ -44,9 +45,9 @@ export default class EditFriends extends Component {
   fetchFriends = async () => {
     const { userId } = global;
     const friends = await axios.get(`${config.ENDP_FRIENDS}${userId}`)
-      .catch(e => logger.log(e));
+      .catch(e => this.logger.error(e));
     const friendRequests = await axios.get(`${config.ENDP_PENDING_FRIENDS}${userId}`)
-      .catch(e => logger.log(e));
+      .catch(e => this.logger.error(e));
 
     this.setState({
       friends: friends.data.result,
@@ -59,25 +60,25 @@ export default class EditFriends extends Component {
     const { addFriendName } = this.state;
     const { userId } = global;
     const friend = await axios.get(`${config.ENDP_USERS}${addFriendName}`)
-      .catch(e => logger.log(e));
+      .catch(e => this.logger.error(e));
 
     await axios.post(config.ENDP_FRIENDS, {
       userId,
       friendId: friend.data.result._id,
-    }).catch(e => logger.log(e));
+    }).catch(e => this.logger.error(e));
   }
 
-  comfirmFriendRequest = async (item) => {
+  comfirmFriendRequest = async item => {
     const { userId } = global;
     await axios.post(config.ENDP_CONFIRM_FRIENDS, {
       userId,
       friendId: item._id,
-    }).catch(e => logger.log(e));
+    }).catch(e => this.logger.error(e));
 
     const friends = await axios.get(`${config.ENDP_FRIENDS}${userId}`)
-      .catch(e => logger.log(e));
+      .catch(e => this.logger.error(e));
     const friendRequests = await axios.get(`${config.ENDP_PENDING_FRIENDS}${userId}`)
-      .catch(e => logger.log(e));
+      .catch(e => this.logger.error(e));
 
     this.setState({
       friends: friends.data.result,
@@ -86,19 +87,19 @@ export default class EditFriends extends Component {
     });
   }
 
-  removeFriend = async (item) => {
+  removeFriend = async item => {
     const { userId } = global;
     await axios.delete(config.ENDP_FRIENDS, {
       data: {
         userId,
         friendId: item._id,
       },
-    }).catch(e => logger.log(e));
+    }).catch(e => this.logger.error(e));
 
     const friends = await axios.get(`${config.ENDP_FRIENDS}${userId}`)
-      .catch(e => logger.log(e));
+      .catch(e => this.logger.error(e));
     const friendRequests = await axios.get(`${config.ENDP_PENDING_FRIENDS}${userId}`)
-      .catch(e => logger.log(e));
+      .catch(e => this.logger.error(e));
 
     this.setState({
       friends: friends.data.result,
@@ -130,7 +131,7 @@ export default class EditFriends extends Component {
             placeholder="Add a friend"
             value={addFriendName}
             placeholderTextColor={colours.Gray}
-            onChangeText={(text) => { this.setState({ addFriendName: text }); }}
+            onChangeText={text => { this.setState({ addFriendName: text }); }}
           />
           <Button
             title="Add"

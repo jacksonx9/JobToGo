@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { View } from 'react-native';
 import GestureRecognizer from 'react-native-swipe-gestures';
 import axios from 'axios';
-import { logger } from 'react-native-logger';
+import Logger from 'js-logger';
 
 import JobImage from '../components/JobImage';
 import JobDetails from '../components/JobDetails';
@@ -26,21 +26,22 @@ export default class JobSwipe extends Component {
       jobIndex: 0,
       loading: 1,
     };
+    this.logger = Logger.get(this.constructor.name);
   }
 
   async componentDidMount() {
     const { userId } = global;
-    logger.log(`User id is: ${userId}`);
+    this.logger.info(`User id is: ${userId}`);
     this.fetchJobs(userId);
   }
 
-  fetchJobs = async (userId) => {
+  fetchJobs = async userId => {
     this.setState({
       loading: 1,
     });
 
     const jobs = await axios.get(`${config.ENDP_JOBS}${userId}`)
-      .catch(e => logger.log(e));
+      .catch(e => this.logger.error(e));
 
     this.setState({
       jobs: jobs.data.result,
@@ -49,7 +50,7 @@ export default class JobSwipe extends Component {
   }
 
   shareJob = () => {
-    logger.log('Shared job');
+    this.logger.info('Shared job');
   }
 
   getNextJob = (jobNum, jobIndex, userId) => {
@@ -65,7 +66,7 @@ export default class JobSwipe extends Component {
     await axios.post(`${config.ENDP_DISLIKE}`, {
       userId,
       jobId: jobs[jobIndex]._id,
-    }).catch(e => logger.log(e));
+    }).catch(e => this.logger.error(e));
 
     this.getNextJob(jobs.length, jobIndex, userId);
   }
@@ -75,7 +76,7 @@ export default class JobSwipe extends Component {
     await axios.post(`${config.ENDP_LIKE}`, {
       userId,
       jobId: jobs[jobIndex]._id,
-    }).catch(e => logger.log(e));
+    }).catch(e => this.logger.error(e));
 
     this.getNextJob(jobs.length, jobIndex, userId);
   }
