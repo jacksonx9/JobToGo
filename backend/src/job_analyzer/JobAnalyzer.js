@@ -123,6 +123,8 @@ class JobAnalyzer {
 
   /**
    * Users don't need access to jobs' keywords
+   *
+   * @param {Array<Job>} jobs all jobs to be sent to user
    */
   _deleteJobKeywords(jobs) {
     jobs.forEach((_, i) => delete jobs[i].keywords);
