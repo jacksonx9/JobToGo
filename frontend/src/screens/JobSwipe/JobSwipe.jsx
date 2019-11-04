@@ -56,6 +56,7 @@ export default class JobSwipe extends Component {
     this.setState({
       loading: 0,
       jobs,
+      jobIndex: 0,
     });
   }
 
