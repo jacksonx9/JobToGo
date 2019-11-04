@@ -23,6 +23,7 @@ class JobAnalyzer {
   /**
    * Computes the number of times the given keywords appear in the given job
    * and modifies in the job in-place
+   *
    * @param {Array<String>} keywords
    * @param {Job} job
    */
@@ -31,7 +32,7 @@ class JobAnalyzer {
     const description = job.description.toLowerCase();
     keywords.forEach((keyword) => {
       // TODO: matches "java" with "javascript" from description
-      // NOTE: if you map with spaces around it, problems such as "java," arise
+      // NOTE: if you map with spaces around it, problems such as "java," being excluded arise
       const re = new RegExp(keyword, 'g');
       job.keywords.push({
         name: keyword,
