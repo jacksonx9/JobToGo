@@ -124,7 +124,7 @@ export default class JobSwipe extends Component {
           onSwipedRight={() => this.likeJob(jobs, jobIndex)}
           cardIndex={jobIndex}
           backgroundColor="white"
-          stackSize={1}
+          stackSize={5}
           animateOverlayLabelsOpacity
           overlayLabels={{
             left: {
