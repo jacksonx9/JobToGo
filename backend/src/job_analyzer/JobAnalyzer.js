@@ -8,6 +8,15 @@ import AllSkills from '../all_skills';
 import { Jobs, Users } from '../schema';
 import { JOBS_PER_SEND } from '../constants';
 
+/**
+ * Breif overview for reviewer's reference. JobAnalyzer is created with the objective
+ * of improving the user’s overall experience. Keywords will be extracted from the user’s
+ * resume and each job posting. In order to show the jobs more suitable for the user,
+ * we will be recording the keywords of the jobs he or she has show interest and disinterest in.
+ * Based on these keywords, we can organize the remaining unvisited jobs based on the number of
+ * matches with favorable and unfavorable keywords. This will help improve the user’s experience
+ * because the user will see more suitable jobs earlier.
+ */
 
 class JobAnalyzer {
   constructor(app, shortlister) {
@@ -53,7 +62,7 @@ class JobAnalyzer {
 
     const jobs = await Jobs.find({});
     const offset = skillsStart || 0;
-    const allSkills = await AllSkills.getAll();
+    const allSkills = await AllSkills.getAll(); // For reviewer, returns all users' skills
     const newKeywords = offset > 0 ? allSkills.slice(offset, skillsEnd) : allSkills;
 
     await forEachAsync(newKeywords, async (_, newKeywordIdxBase) => {
@@ -97,6 +106,7 @@ class JobAnalyzer {
       return new Response(null, 'Invalid userId', 400);
     }
 
+    // For reviewer, returns all job's that the user has not seen yet
     const seenJobs = await this.shortlister.getSeenJobs(userId);
 
     // If the user has not uploaded a resume, return random jobs
