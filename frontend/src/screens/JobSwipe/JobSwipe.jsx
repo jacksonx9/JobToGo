@@ -73,7 +73,7 @@ export default class JobSwipe extends Component {
 
   dislikeJob = async (jobs, jobIndex) => {
     const { userId } = global;
-    await axios.post(`${config.ENDP_DISLIKE}`, {
+    axios.post(`${config.ENDP_DISLIKE}`, {
       userId,
       jobId: jobs[jobIndex]._id,
     }).catch(e => this.logger.error(e));
@@ -83,7 +83,7 @@ export default class JobSwipe extends Component {
 
   likeJob = async (jobs, jobIndex) => {
     const { userId } = global;
-    await axios.post(`${config.ENDP_LIKE}`, {
+    axios.post(`${config.ENDP_LIKE}`, {
       userId,
       jobId: jobs[jobIndex]._id,
     }).catch(e => this.logger.error(e));
@@ -98,7 +98,7 @@ export default class JobSwipe extends Component {
     if (loading) return <Loader />;
 
     return (
-      <View style={[styles.container]}>
+      <View style={[jobSwipeStyles.container]}>
         <MainHeader
           onPressMenu={() => navigation.openDrawer()}
           onPressSend={() => navigation.navigate('SendLikedJobs')}
