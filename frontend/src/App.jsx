@@ -9,7 +9,7 @@ import Logger from 'js-logger';
 import SignIn from './screens/SignIn';
 import SignUp from './screens/SignUp';
 import JobSwipe from './screens/JobSwipe';
-import SendLikedJobs from './screens/SendLikedJobs';
+import SendLikedJobs from './screens/SendLikedJobs/SendLikedJobs';
 import EditFriends from './screens/EditFriends';
 import EditSkills from './screens/EditSkills';
 

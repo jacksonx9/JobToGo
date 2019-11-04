@@ -6,9 +6,9 @@ import axios from 'axios';
 import Logger from 'js-logger';
 
 import Button from '../components/Button';
-import SelectableItem from '../components/SelectableItem/SelectableItem';
+import SelectableItem from '../components/SelectableItem';
 import Loader from '../components/Loader';
-import NavHeader from '../components/NavHeader/NavHeader';
+import NavHeader from '../components/NavHeader';
 import images from '../constants/images';
 import colours from '../constants/colours';
 import config from '../constants/config';

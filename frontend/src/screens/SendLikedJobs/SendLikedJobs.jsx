@@ -3,16 +3,14 @@ import { View, FlatList, Text } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
 
-import SelectableItem from '../components/SelectableItem/SelectableItem';
-import Loader from '../components/Loader';
-import NavHeader from '../components/NavHeader/NavHeader';
-import Button from '../components/Button';
-import images from '../constants/images';
-import config from '../constants/config';
-import { containerStyles, displayStyles } from '../styles';
+import SelectableItem from '../../components/SelectableItem/SelectableItem';
+import Loader from '../../components/Loader';
+import NavHeader from '../../components/NavHeader/NavHeader';
+import Button from '../../components/Button';
+import images from '../../constants/images';
+import config from '../../constants/config';
+import styles from './styles';
 
-
-const styles = { ...containerStyles, ...displayStyles };
 export default class SendLikedJobs extends Component {
   static navigationOptions = {
     drawerLabel: 'Liked Jobs',
@@ -75,7 +73,7 @@ export default class SendLikedJobs extends Component {
     if (loading) return <Loader />;
 
     return (
-      <View style={[styles.flexColContainer]}>
+      <View style={[styles.container]}>
         <NavHeader
           title="Liked Jobs"
           image={images.iconSendColoured}
@@ -84,10 +82,10 @@ export default class SendLikedJobs extends Component {
         />
         <View style={[styles.buttonSection]}>
           <View style={styles.infoContainer}>
-            <Text style={[styles.lightText, styles.textBig]}>
+            <Text style={styles.bigText}>
             5 jobs
             </Text>
-            <Text style={styles.subText}>
+            <Text style={styles.normalText}>
             are ready to be emailed
             </Text>
           </View>
@@ -101,7 +99,7 @@ export default class SendLikedJobs extends Component {
             />
           </View>
         </View>
-        <View style={[styles.accentContainer]}>
+        <View style={[styles.listContainer]}>
           <FlatList
             data={likedJobs}
             keyExtractor={item => item._id}

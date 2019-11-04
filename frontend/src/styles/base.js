@@ -8,8 +8,8 @@ export const dimensions = {
 export const colours = {
   white: 'white',
   primary: '#100B69',
-  secondary: '#254B5A',
-  tertiary: '#5DA6A7',
+  secondary: '#b7b6d1',
+  accentPrimary: '#f4775a',
   gray: '#696969',
 };
 
@@ -33,6 +33,10 @@ export const border = {
   radius: 15,
 };
 
+export const elevation = {
+  md: 10,
+};
+
 export const fonts = {
   sm: 12,
   md: 18,
@@ -41,4 +45,11 @@ export const fonts = {
   semiBold: 'Muli-SemiBold',
   bold: 'Muli-Bold',
   extraBold: 'Muli-ExtraBold',
+};
+
+export const containers = {
+  fullScreenContainer: {
+    height: dimensions.fullHeight,
+    width: dimensions.fullWidth,
+  },
 };
