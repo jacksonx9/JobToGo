@@ -9,7 +9,7 @@ import { Jobs, Users } from '../schema';
 import { JOBS_PER_SEND } from '../constants';
 
 /**
- * Breif overview for reviewer's reference. JobAnalyzer is created with the objective
+ * Brief overview for reviewer's reference. JobAnalyzer is created with the objective
  * of improving the user’s overall experience. Keywords will be extracted from the user’s
  * resume and each job posting. In order to show the jobs more suitable for the user,
  * we will be recording the keywords of the jobs he or she has show interest and disinterest in.
