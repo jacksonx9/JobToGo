@@ -5,7 +5,7 @@ import axios from 'axios';
 import Logger from 'js-logger';
 
 import Button from '../components/Button';
-import NavHeader from '../components/NavHeader';
+import NavHeader from '../components/NavHeader/NavHeader';
 import images from '../constants/images';
 import config from '../constants/config';
 import { containerStyles, editSkillsStyles } from '../styles';

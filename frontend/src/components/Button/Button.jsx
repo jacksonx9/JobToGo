@@ -2,10 +2,8 @@ import React from 'react';
 import { Text, TouchableOpacity, ViewPropTypes } from 'react-native';
 import PropTypes from 'prop-types';
 
-import { buttonStyles, containerStyles } from '../styles';
+import styles from './styles';
 
-
-const styles = { ...containerStyles, ...buttonStyles };
 const Button = ({
   style, backgroundColor, textColor, title, enable, onPress,
 }) => (
@@ -13,7 +11,7 @@ const Button = ({
     style={[{
       opacity: enable ? 1 : 0.3,
       backgroundColor,
-    }, styles.alignJustifyCenter, styles.container, style]}
+    }, styles.container, style]}
     disabled={!enable}
     onPress={onPress}
   >

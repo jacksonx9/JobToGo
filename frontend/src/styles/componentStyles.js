@@ -9,9 +9,13 @@ export const selectableItemStyles = StyleSheet.create({
   container: {
     justifyContent: 'space-evenly',
     height: 80,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderColor: colours.lightBlue,
+    width: '95%',
     backgroundColor: colours.white,
+    borderRadius: 15,
+    elevation: 10,
+    paddingHorizontal: 15,
+    marginHorizontal: 10,
+    marginVertical: 10,
   },
   thumbnail: {
     height: 50,
@@ -25,21 +29,21 @@ export const selectableItemStyles = StyleSheet.create({
   header: {
     fontSize: 15,
     fontFamily: fonts.bold,
-    color: colours.gray,
+    color: colours.blue,
   },
   subHeader: {
     fontSize: 13,
     fontFamily: fonts.semiBold,
-    color: colours.lightGray,
+    color: colours.blue,
   },
   infoContainer: {
-    width: '80%',
+    width: '90%',
   },
   iconContainer: {
     alignItems: 'flex-end',
     justifyContent: 'center',
     height: 70,
-    width: '20%',
+    width: '10%',
   },
   icon: {
     fontSize: 24,
@@ -167,7 +171,7 @@ export const navHeaderStyles = StyleSheet.create({
   },
   text: {
     fontFamily: fonts.extraBold,
-    color: colours.white,
+    color: colours.blue,
     fontSize: 22,
   },
 });

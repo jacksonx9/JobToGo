@@ -4,25 +4,25 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 
-import images from '../constants/images';
-import { containerStyles, selectableItemStyles } from '../styles';
+import images from '../../constants/images';
+import styles from './styles';
 
-
-const styles = { ...containerStyles, ...selectableItemStyles };
 const SelectableItem = ({
   header, subHeader, onPress, actionIcon,
 }) => (
-  <View style={[styles.flexRowContainer, styles.container]}>
-    <View style={[styles.rowJustifyCenter, styles.infoContainer]}>
-      <Image source={images.jobBackground} style={[styles.thumbnail]} />
-      <View style={[styles.info]}>
+  <View style={styles.container}>
+    <View style={styles.contentContainer}>
+      <Image source={images.jobBackground} style={styles.logo} />
+      <View style={[styles.infoContainer]}>
         <Text
-          style={[styles.text, styles.header]}
+          numberOfLines={1}
+          style={styles.companyText}
         >
           {header}
         </Text>
         <Text
-          style={[styles.text, styles.subHeader]}
+          numberOfLines={2}
+          style={styles.titleText}
         >
           {subHeader}
         </Text>
@@ -30,10 +30,10 @@ const SelectableItem = ({
     </View>
 
     <TouchableOpacity
-      style={[styles.iconContainer]}
+      style={[styles.buttonContainer]}
       onPress={onPress}
     >
-      <Text style={[styles.icon]}>{actionIcon}</Text>
+      <Text style={[styles.button]}>{actionIcon}</Text>
     </TouchableOpacity>
   </View>
 );

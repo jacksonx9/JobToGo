@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { View, FlatList, ImageBackground } from 'react-native';
+import { View, FlatList, Text } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
 
-import SelectableItem from '../components/SelectableItem';
+import SelectableItem from '../components/SelectableItem/SelectableItem';
 import Loader from '../components/Loader';
-import NavHeader from '../components/NavHeader';
+import NavHeader from '../components/NavHeader/NavHeader';
+import Button from '../components/Button';
 import images from '../constants/images';
 import config from '../constants/config';
 import { containerStyles, displayStyles } from '../styles';
@@ -74,16 +75,32 @@ export default class SendLikedJobs extends Component {
     if (loading) return <Loader />;
 
     return (
-      <ImageBackground
-        source={images.navBarBackground}
-        style={[styles.flexColContainer]}
-      >
+      <View style={[styles.flexColContainer]}>
         <NavHeader
           title="Liked Jobs"
           image={images.iconSendColoured}
           onPressBack={() => navigation.goBack()}
           onPressBtn={this.sendLikedJobs}
         />
+        <View style={[styles.buttonSection]}>
+          <View style={styles.infoContainer}>
+            <Text style={[styles.lightText, styles.textBig]}>
+            5 jobs
+            </Text>
+            <Text style={styles.subText}>
+            are ready to be emailed
+            </Text>
+          </View>
+          <View styles={[styles.buttonContainer]}>
+            <Button
+              title="Send Jobs"
+              textColor="white"
+              backgroundColor="#f4775a"
+              style={[styles.button]}
+              onPress={this.sendLikedJobs}
+            />
+          </View>
+        </View>
         <View style={[styles.accentContainer]}>
           <FlatList
             data={likedJobs}
@@ -99,7 +116,7 @@ export default class SendLikedJobs extends Component {
             )}
           />
         </View>
-      </ImageBackground>
+      </View>
     );
   }
 }

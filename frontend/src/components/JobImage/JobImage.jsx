@@ -2,10 +2,9 @@ import React from 'react';
 import { ImageBackground, Image } from 'react-native';
 import PropTypes from 'prop-types';
 
-import images from '../constants/images';
-import { containerStyles, jobImageStyles } from '../styles';
+import images from '../../constants/images';
+import styles from './styles';
 
-const styles = { ...containerStyles, ...jobImageStyles };
 const JobImage = ({ logo }) => {
   let source = { uri: logo };
   if (logo === null) {
@@ -14,11 +13,11 @@ const JobImage = ({ logo }) => {
   return (
     <ImageBackground
       source={images.jobBackground}
-      style={[styles.flexRowContainer, styles.container]}
+      style={styles.container}
     >
       <Image
         source={source}
-        style={[styles.companyLogo]}
+        style={styles.companyLogo}
       />
     </ImageBackground>
   );

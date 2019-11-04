@@ -5,11 +5,10 @@ import {
 import { ScrollView } from 'react-native-gesture-handler';
 import PropTypes from 'prop-types';
 
-import ImageButton from './ImageButton';
-import images from '../constants/images';
-import { containerStyles, jobDetailsStyles } from '../styles';
+import ImageButton from '../ImageButton';
+import images from '../../constants/images';
+import styles from './styles';
 
-const styles = { ...containerStyles, ...jobDetailsStyles };
 class JobDetails extends Component {
   constructor(props) {
     super(props);
