@@ -227,7 +227,7 @@ class JobAnalyzer {
           const userValueKeyword = userKeywordData.score;
           const userSeenKeywordTimes = userKeywordData.jobCount;
           const keywordWeight = userSeenKeywordTimes > 0
-            ? userValueKeyword / userSeenKeywordTimes : 0;
+            ? userValueKeyword / userSeenKeywordTimes : 1;
           score += tfidf * keywordWeight;
         }
       });
