@@ -134,8 +134,9 @@ class JobAnalyzer {
 
   /**
    * If there are too many unseen jobs, it will take a long time to compute the most relevant jobs,
-   * which would cause the user to wait for the next array of jobs. Therefore, if Job count reaches
-   * a value that hinders performance, we will search a smaller subset of all the jobs randomly
+   * which would cause the user to wait for the next array of jobs. Therefore, if number of jobs
+   * stored in the database reaches a value that hinders performance, we will search a smaller
+   * subset of all the jobs randomly
    *
    * @param {Array<String>} seenJobIds job ids that the user has seen already
    */
