@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import { Dimensions } from 'react-native';
 
 export const dimensions = {
   fullHeight: Dimensions.get('window').height,
@@ -31,6 +31,7 @@ export const margin = {
 
 export const border = {
   radius: 15,
+  inputBorderWidth: 3,
 };
 
 export const elevation = {

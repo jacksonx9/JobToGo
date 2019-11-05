@@ -5,17 +5,14 @@ import {
 import axios from 'axios';
 import Logger from 'js-logger';
 
-import Button from '../components/Button';
-import SelectableItem from '../components/SelectableItem';
-import Loader from '../components/Loader';
-import NavHeader from '../components/NavHeader';
-import images from '../constants/images';
-import colours from '../constants/colours';
-import config from '../constants/config';
-import { containerStyles, editFriendsStyles } from '../styles';
+import SelectableItem from '../../components/SelectableItem';
+import Loader from '../../components/Loader';
+import NavHeader from '../../components/NavHeader';
+import images from '../../constants/images';
+import config from '../../constants/config';
+import styles from './styles';
+import SearchBar from '../../components/SeachBar';
 
-
-const styles = { ...containerStyles, ...editFriendsStyles };
 export default class EditFriends extends Component {
   static navigationOptions = {
     drawerLabel: 'Friends',
@@ -38,7 +35,7 @@ export default class EditFriends extends Component {
 
   async componentDidUpdate(prevState) {
     if (prevState !== this.state) {
-      this.fetchFriends();
+      // this.fetchFriends();
     }
   }
 
@@ -115,64 +112,40 @@ export default class EditFriends extends Component {
     const { navigation } = this.props;
 
     if (loading) return <Loader />;
-
     return (
-      <View style={[styles.flexColContainer]}>
+      <View
+        style={[styles.container]}
+      >
         <NavHeader
-          title="Friends"
-          image={images.iconSend}
+          title="Liked Jobs"
+          image={images.iconSendColoured}
           onPressBack={() => navigation.goBack()}
-          onPressBtn={this.addFriends}
-          enableBtn={false}
+          onPressBtn={this.sendLikedJobs}
         />
-        <View style={[styles.searchBar]}>
-          <TextInput
-            style={styles.input}
-            placeholder="Add a friend"
-            value={addFriendName}
-            placeholderTextColor={colours.Gray}
-            onChangeText={text => { this.setState({ addFriendName: text }); }}
-          />
-          <Button
-            title="Add"
-            textColor="white"
-            backgroundColor={colours.blue}
-            style={[styles.button]}
-            onPress={this.addFriend}
+        <SearchBar
+          value={addFriendName}
+          onChangeText={text => { this.setState({ addFriendName: text }); }}
+          onEndSearch={() => { this.setState({ addFriendName: '' }); }}
+          onStartSearch={() => {}}
+        />
+        <View style={[styles.buttonSection]}>
+          <View style={styles.infoContainer} />
+        </View>
+        <View style={[styles.listContainer]}>
+          <FlatList
+            data={friendRequests}
+            keyExtractor={item => item._id}
+            renderItem={item => (
+              <SelectableItem
+                key={item._id}
+                header={item.userName}
+                subHeader={item.email}
+                onPress={() => this.comfirmFriendRequest(item)}
+                actionIcon="+"
+              />
+            )}
           />
         </View>
-        <Text>Friend Requests</Text>
-        <FlatList
-          style
-          data={friendRequests}
-          keyExtractor={item => item._id}
-          renderItem={({ item }) => (
-            <SelectableItem
-              key={item._id}
-              header={item.userName}
-              subHeader={item.email}
-              onPress={() => this.comfirmFriendRequest(item)}
-              actionIcon="+"
-            />
-          )}
-        />
-        <View style={[styles.divider]}>
-          <Text>Your Friends</Text>
-        </View>
-        <FlatList
-          style
-          data={friends}
-          keyExtractor={item => item._id}
-          renderItem={({ item }) => (
-            <SelectableItem
-              key={item._id}
-              header={item.userName}
-              subHeader={item.email}
-              onPress={() => this.removeFriend(item)}
-              actionIcon="x"
-            />
-          )}
-        />
       </View>
     );
   }

@@ -92,8 +92,6 @@ export default class SendLikedJobs extends Component {
           <View styles={[styles.buttonContainer]}>
             <Button
               title="Send Jobs"
-              textColor="white"
-              backgroundColor="#f4775a"
               style={[styles.button]}
               onPress={this.sendLikedJobs}
             />

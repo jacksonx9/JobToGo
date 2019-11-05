@@ -10,7 +10,7 @@ import SignIn from './screens/SignIn';
 import SignUp from './screens/SignUp';
 import JobSwipe from './screens/JobSwipe';
 import SendLikedJobs from './screens/SendLikedJobs/SendLikedJobs';
-import EditFriends from './screens/EditFriends';
+import EditFriends from './screens/EditFriends/EditFriends';
 import EditSkills from './screens/EditSkills';
 
 import { appStyles } from './styles';
