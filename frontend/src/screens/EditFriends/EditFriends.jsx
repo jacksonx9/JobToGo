@@ -109,7 +109,6 @@ export default class EditFriends extends Component {
     const {
       loading, addFriendName, friendRequests, friends,
     } = this.state;
-    const { navigation } = this.props;
 
     if (loading) return <Loader />;
     return (
@@ -118,11 +117,7 @@ export default class EditFriends extends Component {
       >
         <NavHeader
           title="Liked Jobs"
-          image={images.iconSendColoured}
-          onPressBack={() => navigation.goBack()}
-          onPressBtn={this.sendLikedJobs}
-        />
-        <SearchBar
+          searchEnabled
           value={addFriendName}
           onChangeText={text => { this.setState({ addFriendName: text }); }}
           onEndSearch={() => { this.setState({ addFriendName: '' }); }}

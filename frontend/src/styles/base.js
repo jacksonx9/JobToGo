@@ -19,6 +19,7 @@ export const padding = {
   md: 15,
   lg: 20,
   xl: 30,
+  xxl: 50,
 };
 
 export const margin = {

@@ -2,7 +2,7 @@
 import { StyleSheet } from 'react-native';
 
 import {
-  padding, margin, colours, fonts,
+  padding, margin, colours, fonts, border,
 } from '../../styles';
 
 const styles = StyleSheet.create({
@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.normal,
     fontSize: fonts.md,
     borderBottomColor: colours.gray,
-    borderBottomWidth: 1,
+    borderBottomWidth: border.inputBorderWidth,
   },
 });
 
