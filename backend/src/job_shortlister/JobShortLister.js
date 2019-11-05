@@ -40,7 +40,7 @@ class JobShortLister {
           dailyJobCount: 0,
         });
 
-        this.logger.info('Reset!');
+        this.logger.info('Reset daily job count for all users!');
       } catch (e) {
         this.logger.error(e);
       }
