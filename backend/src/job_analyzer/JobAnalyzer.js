@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+import assert from 'assert';
 import Logger from 'js-logger';
 import { forEachAsync } from 'foreachasync';
 
@@ -21,6 +23,7 @@ class JobAnalyzer {
   /**
    * Computes the number of times the given keywords appear in the given job
    * and modifies in the job in-place
+   *
    * @param {Array<String>} keywords
    * @param {Job} job
    */
@@ -29,7 +32,7 @@ class JobAnalyzer {
     const description = job.description.toLowerCase();
     keywords.forEach((keyword) => {
       // TODO: matches "java" with "javascript" from description
-      // NOTE: if you map with spaces around it, problems such as "java," arise
+      // NOTE: if you map with spaces around it, problems such as "java," being excluded arise
       const re = new RegExp(keyword, 'g');
       job.keywords.push({
         name: keyword,
@@ -42,8 +45,8 @@ class JobAnalyzer {
    * Computes tf-idf scores for all jobs using all user skills
    * Optionally specify a range of skills to use
    *
-   * @param {Number} skillsStart Index of first skill to use
-   * @param {Number} skillsEnd One past the index of the last skill to use
+   * @param {Number} skillsStart Index of first skill to use (nullable)
+   * @param {Number} skillsEnd One past the index of the last skill to use (nullable)
    */
   async computeJobScores(skillsStart, skillsEnd) {
     this.logger.info('Starting to compute job scores...');
@@ -65,9 +68,11 @@ class JobAnalyzer {
         const wordCount = job.description.split(' ').length;
         const tf = keywordOccurrences / wordCount;
         const idf = docCount !== 0 ? Math.log(jobs.length / docCount) : 0;
+        const tfidf = tf * idf;
 
         // replace tf_idf score for a keyword for each job
-        jobs[jobIdx].keywords[allKeywordIdx].tfidf = tf * idf;
+        assert(tfidf >= 0 && tfidf <= 1);
+        jobs[jobIdx].keywords[allKeywordIdx].tfidf = tfidf;
 
         await job.save();
       });
@@ -76,17 +81,15 @@ class JobAnalyzer {
     this.logger.info('Computed job scores!');
   }
 
+  /**
+   * Gets the JOBS_PER_SEND most relevant jobs to the user
+   *
+   * @param {String} userId
+   */
   async getRelevantJobs(userId) {
     this.logger.info('Getting most relevant jobs.');
 
-    const swipedJobs = [];
-    const mostRelevantJobs = [];
-    const jobScoreCache = new Map();
     let user;
-
-    if (!userId) {
-      return new Response(null, 'Invalid userId', 400);
-    }
 
     try {
       user = await Users.findById(userId).orFail();
@@ -94,58 +97,123 @@ class JobAnalyzer {
       return new Response(null, 'Invalid userId', 400);
     }
 
-    // Get jobs the user has already seen
-    swipedJobs.push(...await this.shortlister.getLikedJobs(userId));
-    swipedJobs.push(...await this.shortlister.getDislikedJobs(userId));
+    const seenJobs = await this.shortlister.getSeenJobs(userId);
 
-    // If the user has not uploaded a resume
+    // If the user has not uploaded a resume, return random jobs
     if (user.keywords.length === 0) {
-      mostRelevantJobs.push(
-        ...await Jobs.find({ _id: { $nin: swipedJobs } }).limit(JOBS_PER_SEND).lean(),
-      );
-      // Users don't need keywords
-      mostRelevantJobs.forEach((_, i) => delete mostRelevantJobs[i].keywords);
-
-      return new Response(mostRelevantJobs, '', 200);
+      return this._getJobsForUserWithNoKeywords(seenJobs);
     }
 
-    const unseenJobs = await Jobs.find({ _id: { $nin: swipedJobs } }).lean();
+    const unseenJobs = await Jobs.find({ _id: { $nin: seenJobs } }).lean();
+    const mostRelevantJobs = this._getMostRelevantJobs(user.keywords, unseenJobs);
 
-    // Compute overall tf_idf score of a job
-    const jobScore = (job) => {
-      let score = 0;
+    this._deleteJobKeywords(mostRelevantJobs);
+    return new Response(mostRelevantJobs, '', 200);
+  }
 
-      if (jobScoreCache.has(job._id)) {
-        score = jobScoreCache.get(job._id);
-      } else {
-        job.keywords.forEach((jobKeywordData) => {
-          const userKeywordIdx = user.keywords.findIndex(userKeywordData => (
-            jobKeywordData.name === userKeywordData.name
-          ));
+  async _getJobsForUserWithNoKeywords(seenJobs) {
+    const randomJobs = [];
 
-          if (userKeywordIdx !== -1) {
-            const { tfidf } = jobKeywordData;
-            const userValueKeyword = user.keywords[userKeywordIdx].score;
-            const userSeenKeywordTimes = user.keywords[userKeywordIdx].jobCount;
-            const keywordWeight = userValueKeyword / userSeenKeywordTimes;
-            score += tfidf * keywordWeight;
+    randomJobs.push(
+      ...await Jobs.find({ _id: { $nin: seenJobs } }).limit(JOBS_PER_SEND).lean(),
+    );
+
+    this._deleteJobKeywords(randomJobs);
+    return new Response(randomJobs, '', 200);
+  }
+
+  /**
+   * Users don't need access to jobs' keywords
+   *
+   * @param {Array<Job>} jobs all jobs to be sent to user
+   */
+  _deleteJobKeywords(jobs) {
+    jobs.forEach((_, i) => delete jobs[i].keywords);
+  }
+
+  /**
+   * Get the most relevant jobs in jobs with average time complexity of O(n)
+   * using quick sort like implementation
+   *
+   * @param {Array<String>} userKeywords user's keywords
+   * @param {Array<Job>} jobs all jobs the user has not seen yet
+   */
+  _getMostRelevantJobs(userKeywords, jobs) {
+    // If there are less unseenJobs than JOBS_PER_SEND
+    if (jobs.length <= JOBS_PER_SEND) {
+      // TODO: notify server to query for more jobs
+      return jobs;
+    }
+
+    const jobScoreCache = new Map();
+    const userKeywordsMap = new Map();
+
+    userKeywords.forEach((keywordData) => {
+      userKeywordsMap.set(keywordData.name, keywordData);
+    });
+
+    const getKSmallestElements = (left, right, k) => {
+      const partition = () => {
+        const pivotScore = this._jobScore(userKeywordsMap, jobScoreCache, jobs[right]);
+        let l = left; // left pointer
+
+        let idx = l;
+        while (idx < right) {
+          // Sort subarray from greatest to smallest
+          if (this._jobScore(userKeywordsMap, jobScoreCache, jobs[idx]) >= pivotScore) {
+            [jobs[l], jobs[idx]] = [jobs[idx], jobs[l]];
+            l += 1;
           }
-        });
-        jobScoreCache.set(job._id, score);
-      }
+          idx += 1;
+        }
 
-      return score;
+        [jobs[l], jobs[right]] = [jobs[right], jobs[l]];
+        return l;
+      };
+
+      assert(k > 0 && k <= right - left + 1);
+
+      // Partition the array around last element and get position of pivot element in sorted array
+      const pivot = partition();
+
+      // If pivot is same as k
+      if (pivot - left === k - 1) {
+        return jobs.slice(0, JOBS_PER_SEND);
+      }
+      // If pivot is more, recur for left subarray
+      if (pivot - left > k - 1) {
+        return getKSmallestElements(left, pivot - 1, k);
+      }
+      // Else recur for right subarray
+      return getKSmallestElements(pivot + 1, right, k - pivot + left - 1);
     };
 
-    // Get jobs with overall highest tfidf scores
-    mostRelevantJobs.push(...unseenJobs
-      .sort((jobA, jobB) => jobScore(jobA) - jobScore(jobB))
-      .slice(0, JOBS_PER_SEND));
+    return getKSmallestElements(0, jobs.length - 1, JOBS_PER_SEND);
+  }
 
-    // Users don't need keywords
-    mostRelevantJobs.forEach((_, i) => delete mostRelevantJobs[i].keywords);
+  _jobScore(userKeywordsMap, jobScoreCache, job) {
+    let score = 0;
 
-    return new Response(mostRelevantJobs, '', 200);
+    if (jobScoreCache.has(job._id)) {
+      score = jobScoreCache.get(job._id);
+    } else {
+      job.keywords.forEach((jobKeywordData) => {
+        // If the user and job share a similar keyword, add the job's tf_idf
+        // multiplied with the user's weighting of the keyword to the job's score
+        if (userKeywordsMap.has(jobKeywordData.name)) {
+          const userKeywordData = userKeywordsMap.get(jobKeywordData.name);
+          const { tfidf } = jobKeywordData;
+          const userValueKeyword = userKeywordData.score;
+          const userSeenKeywordTimes = userKeywordData.jobCount;
+          const keywordWeight = userSeenKeywordTimes > 0
+            ? userValueKeyword / userSeenKeywordTimes : 0;
+          score += tfidf * keywordWeight;
+        }
+      });
+      jobScoreCache.set(job._id, score);
+    }
+
+    return score;
   }
 }
 
