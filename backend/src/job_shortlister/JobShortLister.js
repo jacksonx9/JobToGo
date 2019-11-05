@@ -27,7 +27,7 @@ class JobShortLister {
     });
   }
 
-  async getSeenJobs(userId) {
+  async getSeenJobIds(userId) {
     const seenJobs = [];
     seenJobs.push(...await this.getLikedJobs(userId));
     seenJobs.push(...await this.getDislikedJobs(userId));

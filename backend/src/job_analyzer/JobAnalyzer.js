@@ -2,11 +2,12 @@
 import assert from 'assert';
 import Logger from 'js-logger';
 import { forEachAsync } from 'foreachasync';
+import mongoose from 'mongoose';
 
 import Response from '../types';
 import AllSkills from '../all_skills';
 import { Jobs, Users } from '../schema';
-import { JOBS_PER_SEND } from '../constants';
+import { JOBS_PER_SEND, JOBS_SEARCH_MAX_SIZE, JOBS_SEARCH_PERCENT_SIZE } from '../constants';
 
 
 class JobAnalyzer {
@@ -97,14 +98,14 @@ class JobAnalyzer {
       return new Response(null, 'Invalid userId', 400);
     }
 
-    const seenJobs = await this.shortlister.getSeenJobs(userId);
+    const seenJobIds = await this.shortlister.getSeenJobIds(userId);
 
     // If the user has not uploaded a resume, return random jobs
     if (user.keywords.length === 0) {
-      return this._getJobsForUserWithNoKeywords(seenJobs);
+      return this._getJobsForUserWithNoKeywords(seenJobIds);
     }
 
-    const unseenJobs = await Jobs.find({ _id: { $nin: seenJobs } }).lean();
+    const unseenJobs = await this._getUnseenJobs(seenJobIds);
     const mostRelevantJobs = this._getMostRelevantJobs(user.keywords, unseenJobs);
 
     this._deleteJobKeywords(mostRelevantJobs);
@@ -129,6 +130,25 @@ class JobAnalyzer {
    */
   _deleteJobKeywords(jobs) {
     jobs.forEach((_, i) => delete jobs[i].keywords);
+  }
+
+  /**
+   * If there are too many unseen jobs, it will take a long time to compute the most relevant jobs,
+   * which would cause the user to wait for the next array of jobs. Therefore, if Job count reaches
+   * a value that hinders performance, we will search a smaller subset of all the jobs randomly
+   *
+   * @param {Array<String>} seenJobIds job ids that the user has seen already
+   */
+  async _getUnseenJobs(seenJobIds) {
+    if (await Jobs.countDocuments({}) > JOBS_SEARCH_MAX_SIZE) {
+      const jobids = seenJobIds.map(el => mongoose.Types.ObjectId(el));
+      return Jobs.aggregate([
+        { $match: { _id: { $nin: [jobids] } } },
+        { $sample: { size: JOBS_SEARCH_MAX_SIZE * JOBS_SEARCH_PERCENT_SIZE } },
+      ]);
+    }
+
+    return Jobs.find({ _id: { $nin: seenJobIds } }).lean();
   }
 
   /**
