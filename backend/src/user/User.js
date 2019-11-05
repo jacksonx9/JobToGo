@@ -6,10 +6,12 @@ import { Users } from '../schema';
 import credentials from '../../credentials/google';
 
 class User {
-  constructor(app) {
+  constructor(app, allSkills) {
     this.logger = Logger.get(this.constructor.name);
 
     this.googleAuth = new OAuth2Client(credentials.clientId);
+
+    this.allSkills = allSkills;
 
     app.post('/users/googleLogin', async (req, res) => {
       const { idToken, firebaseToken } = req.body;
@@ -172,19 +174,6 @@ class User {
     }
   }
 
-  /* gets and returns a set containing the collective skills of all the users */
-  static async _getAllSkills() {
-    const keywords = [];
-    const users = await Users.find({});
-
-    users.forEach((user) => {
-      const skills = user.keywords.map(keyword => keyword.name);
-      keywords.push(...skills);
-    });
-
-    return keywords;
-  }
-
   async updateSkills(userId, skills) {
     if (!userId || !skills) {
       return new Response(false, 'Invalid userId or skills', 400);
@@ -207,6 +196,9 @@ class User {
       });
 
       await user.save();
+
+      // Update global set of skills
+      await this.allSkills.update(skills);
 
       return new Response(true, '', 200);
     } catch (e) {

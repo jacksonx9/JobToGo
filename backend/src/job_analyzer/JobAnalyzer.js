@@ -1,8 +1,8 @@
 import Logger from 'js-logger';
 import { forEachAsync } from 'foreachasync';
 
-import User from '../user';
 import Response from '../types';
+import AllSkills from '../all_skills';
 import { Jobs, Users } from '../schema';
 import { JOBS_PER_SEND } from '../constants';
 
@@ -18,37 +18,56 @@ class JobAnalyzer {
     });
   }
 
-  async computeJobScores() {
+  /**
+   * Computes the number of times the given keywords appear in the given job
+   * and modifies in the job in-place
+   * @param {Array<String>} keywords
+   * @param {Job} job
+   */
+  computeJobKeywordCount(job, keywords) {
+    // Add the number of occurance of all keywords of the result
+    const description = job.description.toLowerCase();
+    keywords.forEach((keyword) => {
+      // TODO: matches "java" with "javascript" from description
+      // NOTE: if you map with spaces around it, problems such as "java," arise
+      const re = new RegExp(keyword, 'g');
+      job.keywords.push({
+        name: keyword,
+        count: (description.match(re) || []).length,
+      });
+    });
+  }
+
+  /**
+   * Computes tf-idf scores for all jobs using all user skills
+   * Optionally specify a range of skills to use
+   *
+   * @param {Number} skillsStart Index of first skill to use
+   * @param {Number} skillsEnd One past the index of the last skill to use
+   */
+  async computeJobScores(skillsStart, skillsEnd) {
     this.logger.info('Starting to compute job scores...');
 
     const jobs = await Jobs.find({});
-    const skills = await User._getAllSkills();
+    const offset = skillsStart || 0;
+    const allSkills = await AllSkills.getAll();
+    const newKeywords = offset > 0 ? allSkills.slice(offset, skillsEnd) : allSkills;
 
-    await forEachAsync(skills, async (skill, skillIdx) => {
-      const keyword = skill.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-      const docCount = jobs.reduce((sum, posting) => sum
-        + Number(posting.keywords[skillIdx].count > 0), 0);
+    await forEachAsync(newKeywords, async (_, newKeywordIdxBase) => {
+      const allKeywordIdx = newKeywordIdxBase + offset;
+      // Count the number of jobs with the given skill
+      const docCount = jobs.reduce((sum, job) => sum
+        + Number(job.keywords[allKeywordIdx].count > 0), 0);
 
-      const jobsLen = jobs.length;
       // calculate tf_idf each doc and save it
-      await forEachAsync(jobs, async (job, i) => {
-        const keywordOccurrences = job.keywords[skillIdx].count; // TODO: what if new keyword?
+      await forEachAsync(jobs, async (job, jobIdx) => {
+        const keywordOccurrences = job.keywords[allKeywordIdx].count;
         const wordCount = job.description.split(' ').length;
         const tf = keywordOccurrences / wordCount;
-        const idf = docCount !== 0 ? Math.log(jobsLen / docCount) : 0;
-        const tfidf = tf * idf;
+        const idf = docCount !== 0 ? Math.log(jobs.length / docCount) : 0;
 
-        // add name and tf_idf score to each job's keywords the first time
         // replace tf_idf score for a keyword for each job
-        const keywordIdx = job.keywords.findIndex(elem => elem.name === keyword);
-        if (keywordIdx === -1) {
-          job.keywords.push({
-            name: keyword,
-            tfidf,
-          });
-        } else {
-          jobs[i].keywords[keywordIdx].tfidf = tfidf;
-        }
+        jobs[jobIdx].keywords[allKeywordIdx].tfidf = tf * idf;
 
         await job.save();
       });
