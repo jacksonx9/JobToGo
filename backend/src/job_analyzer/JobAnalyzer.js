@@ -7,7 +7,12 @@ import { Types } from 'mongoose';
 import Response from '../types';
 import AllSkills from '../all_skills';
 import { Jobs, Users } from '../schema';
-import { JOBS_PER_SEND, JOBS_SEARCH_MAX_SIZE, JOBS_SEARCH_PERCENT_SIZE } from '../constants';
+import {
+  JOBS_PER_SEND,
+  JOBS_SEARCH_MAX_SIZE,
+  JOBS_SEARCH_PERCENT_SIZE,
+  DAILY_JOB_COUNT_LIMIT
+} from '../constants';
 
 
 class JobAnalyzer {
@@ -83,7 +88,7 @@ class JobAnalyzer {
   }
 
   /**
-   * Gets the JOBS_PER_SEND most relevant jobs to the user
+   * Gets the most relevant jobs to the user
    *
    * @param {String} userId
    */
@@ -98,25 +103,36 @@ class JobAnalyzer {
       return new Response(null, 'Invalid userId', 400);
     }
 
+    // Determine number of jobs to send based on daily limit
+    let numJobsToSend = JOBS_PER_SEND;
+
+    if (numJobsToSend + user.dailyJobCount > DAILY_JOB_COUNT_LIMIT) {
+      numJobsToSend = DAILY_JOB_COUNT_LIMIT - user.dailyJobCount;
+    }
+
+    if (numJobsToSend <= 0) {
+      return new Response(null, 'Exceeded maximum number of daily jobs', 403);
+    }
+
     const seenJobIds = await this.shortlister.getSeenJobIds(userId);
 
     // If the user has not uploaded a resume, return random jobs
     if (user.keywords.length === 0) {
-      return this._getJobsForUserWithNoKeywords(seenJobIds);
+      return this._getJobsForUserWithNoKeywords(seenJobIds, numJobsToSend);
     }
 
     const unseenJobs = await this._getUnseenJobs(seenJobIds);
-    const mostRelevantJobs = this._getMostRelevantJobs(user.keywords, unseenJobs);
+    const mostRelevantJobs = this._getMostRelevantJobs(user.keywords, unseenJobs, numJobsToSend);
 
     this._deleteJobKeywords(mostRelevantJobs);
     return new Response(mostRelevantJobs, '', 200);
   }
 
-  async _getJobsForUserWithNoKeywords(seenJobs) {
+  async _getJobsForUserWithNoKeywords(seenJobs, numJobsToSend) {
     const randomJobs = [];
 
     randomJobs.push(
-      ...await Jobs.find({ _id: { $nin: seenJobs } }).limit(JOBS_PER_SEND).lean(),
+      ...await Jobs.find({ _id: { $nin: seenJobs } }).limit(numJobsToSend).lean(),
     );
 
     this._deleteJobKeywords(randomJobs);
@@ -159,9 +175,9 @@ class JobAnalyzer {
    * @param {Array<String>} userKeywords user's keywords
    * @param {Array<Job>} jobs all jobs the user has not seen yet
    */
-  _getMostRelevantJobs(userKeywords, jobs) {
-    // If there are less unseenJobs than JOBS_PER_SEND
-    if (jobs.length <= JOBS_PER_SEND) {
+  _getMostRelevantJobs(userKeywords, jobs, numJobsToSend) {
+    // If there are less unseenJobs than numJobsToSend
+    if (jobs.length <= numJobsToSend) {
       // TODO: notify server to query for more jobs
       return jobs;
     }
@@ -199,7 +215,7 @@ class JobAnalyzer {
 
       // If pivot is same as k
       if (pivot - left === k - 1) {
-        return jobs.slice(0, JOBS_PER_SEND);
+        return jobs.slice(0, numJobsToSend);
       }
       // If pivot is more, recur for left subarray
       if (pivot - left > k - 1) {
@@ -209,7 +225,7 @@ class JobAnalyzer {
       return getKSmallestElements(pivot + 1, right, k - pivot + left - 1);
     };
 
-    return getKSmallestElements(0, jobs.length - 1, JOBS_PER_SEND);
+    return getKSmallestElements(0, jobs.length - 1, numJobsToSend);
   }
 
   _jobScore(userKeywordsMap, jobScoreCache, job) {
