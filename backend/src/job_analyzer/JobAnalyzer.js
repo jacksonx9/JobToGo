@@ -2,7 +2,7 @@
 import assert from 'assert';
 import Logger from 'js-logger';
 import { forEachAsync } from 'foreachasync';
-import mongoose from 'mongoose';
+import { Types } from 'mongoose';
 
 import Response from '../types';
 import AllSkills from '../all_skills';
@@ -142,7 +142,7 @@ class JobAnalyzer {
    */
   async _getUnseenJobs(seenJobIds) {
     if (await Jobs.countDocuments({}) > JOBS_SEARCH_MAX_SIZE) {
-      const jobids = seenJobIds.map(el => mongoose.Types.ObjectId(el));
+      const jobids = seenJobIds.map(el => Types.ObjectId(el));
       return Jobs.aggregate([
         { $match: { _id: { $nin: [jobids] } } },
         { $sample: { size: JOBS_SEARCH_MAX_SIZE * JOBS_SEARCH_PERCENT_SIZE } },
