@@ -69,6 +69,16 @@ class Friend {
         return new Response(false, 'Friend has already been added', 400);
       }
 
+      const user = await Users.findOne({
+        _id: userId,
+        pendingFriends: friendId,
+      });
+
+      // Verify friend has not already tried to add user
+      if (user !== null) {
+        return new Response(false, 'Friend already a pending friend of user', 400);
+      }
+
       await Users.findByIdAndUpdate(friendId, {
         $addToSet: {
           pendingFriends: userId,
