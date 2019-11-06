@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema({
   friends: [String],
   pendingFriends: [String],
   likedJobs: [String],
-  dislikedJobs: [String],
+  seenJobs: [String],
   dailyJobCount: {
     type: Number,
     default: 0,
