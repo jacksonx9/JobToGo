@@ -80,7 +80,7 @@ class Messenger {
 
     try {
       user = await Users.findById(userId, 'credentials.email').orFail();
-      const jobsResult = await this.shortlister.getLikedJobsData(userId);
+      const jobsResult = await this.shortlister.getLikedJobs(userId);
 
       if (jobsResult.status !== 200) {
         return jobsResult;
