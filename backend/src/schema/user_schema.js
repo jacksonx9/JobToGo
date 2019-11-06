@@ -40,6 +40,10 @@ const userSchema = new mongoose.Schema({
   pendingFriends: [String],
   likedJobs: [String],
   dislikedJobs: [String],
+  dailyJobCount: {
+    type: Number,
+    default: 0,
+  },
   resumePath: String,
 },
 { versionKey: false });

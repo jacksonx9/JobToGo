@@ -1,5 +1,6 @@
 import Logger from 'js-logger';
 import { forEachAsync } from 'foreachasync';
+import scheduler from 'node-schedule';
 import assert from 'assert';
 
 import Response from '../types';
@@ -25,6 +26,32 @@ class JobShortLister {
       const response = await this.getLikedJobsData(req.params.userId);
       res.status(response.status).send(response);
     });
+
+    this.setupResetDailyJobCount();
+  }
+
+  setupResetDailyJobCount() {
+    // Reset daily job count for all users at 0s, 0min, 0h UTC (midnight)
+    scheduler.scheduleJob('0 0 0 * * *', async () => {
+      this.logger.info('Resetting daily job count for all users...');
+
+      try {
+        await Users.updateMany({}, {
+          dailyJobCount: 0,
+        });
+
+        this.logger.info('Reset daily job count for all users!');
+      } catch (e) {
+        this.logger.error(e);
+      }
+    });
+  }
+
+  async getSeenJobIds(userId) {
+    const seenJobs = [];
+    seenJobs.push(...await this.getLikedJobs(userId));
+    seenJobs.push(...await this.getDislikedJobs(userId));
+    return seenJobs;
   }
 
   async addLikedJobs(userId, jobId) {
@@ -123,6 +150,8 @@ class JobShortLister {
           this.logger.error(e);
         }
       });
+
+      user.dailyJobCount += 1;
 
       await user.save();
 
