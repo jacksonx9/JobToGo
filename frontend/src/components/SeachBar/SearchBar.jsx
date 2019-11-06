@@ -48,7 +48,7 @@ class SearchBar extends Component {
     return (
       <View style={[styles.container]}>
         <ImageButton
-          source={images.iconSendColoured}
+          source={images.iconSearch}
           onPress={this.startSearch}
         />
       </View>

@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 80,
+    height: 70,
     width: '95%',
     paddingHorizontal: padding.md,
     margin: margin.sm,
@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
   titleText: {
     fontSize: fonts.sm,
     fontFamily: fonts.semiBold,
-    color: colours.primary,
+    color: colours.gray,
   },
   contentContainer: {
     flexDirection: 'row',

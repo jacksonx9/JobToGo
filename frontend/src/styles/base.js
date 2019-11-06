@@ -7,8 +7,8 @@ export const dimensions = {
 
 export const colours = {
   white: 'white',
-  primary: '#100B69',
-  secondary: '#b7b6d1',
+  primary: '#003391',
+  secondary: '#b9cbeb',
   accentPrimary: '#f4775a',
   gray: '#696969',
 };
@@ -41,8 +41,8 @@ export const elevation = {
 
 export const fonts = {
   sm: 12,
-  md: 18,
-  lg: 28,
+  md: 15,
+  lg: 23,
   normal: 'Muli-Regular',
   semiBold: 'Muli-SemiBold',
   bold: 'Muli-Bold',
