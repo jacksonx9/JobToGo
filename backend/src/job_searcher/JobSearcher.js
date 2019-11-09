@@ -5,7 +5,7 @@ import Logger from 'js-logger';
 import scheduler from 'node-schedule';
 
 import AllSkills from '../all_skills';
-import { Jobs } from '../schema';
+import { Jobs, Users } from '../schema';
 import { MIN_JOBS_IN_DB } from '../constants';
 import jobConfig from './config';
 
@@ -40,8 +40,8 @@ class JobSearcher {
 
     // If we need more jobs, search and update the job store
     await this.searchAndUpdateJobs(jobConfig.keywords);
-    // Recompute job scores on all jobs
     // TODO: Change this to compute on only newly added jobs
+    // Recompute job scores on all jobs
     await this.jobAnalyzer.computeJobScores();
   }
 
@@ -116,10 +116,21 @@ class JobSearcher {
       }
     }));
 
+    // Filter out all the non-null outdated jobIds
+    const filteredOutdatedJobIds = outdatedJobIds.filter(Boolean);
+
     try {
+      // TODO: Change this so that jobs do not silently disappear
+      // Remove jobs from all users
+      await Users.updateMany({}, {
+        $pullAll: {
+          likedJobs: filteredOutdatedJobIds,
+          seenJobs: filteredOutdatedJobIds,
+        },
+      });
+      // Delete jobs from job store
       const deleteResult = await Jobs.deleteMany({
-        // Filter out all the non-null outdated jobIds
-        _id: outdatedJobIds.filter(Boolean),
+        _id: filteredOutdatedJobIds,
       });
       this.logger.info(`Removed ${deleteResult.deletedCount} outdated jobs!`);
     } catch (e) {
