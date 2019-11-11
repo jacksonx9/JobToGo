@@ -1,4 +1,3 @@
-import Logger from 'js-logger';
 import assert from 'assert';
 
 import Response from '../types';
@@ -6,8 +5,6 @@ import { Users } from '../schema';
 
 class Friend {
   constructor(app, messenger) {
-    this.logger = Logger.get(this.constructor.name);
-
     this.messenger = messenger;
 
     app.post('/friends', async (req, res) => {
