@@ -7,7 +7,7 @@ export const dimensions = {
 
 export const colours = {
   white: 'white',
-  primary: '#003391',
+  primary: '#2564C2',
   secondary: '#b9cbeb',
   accentPrimary: '#f4775a',
   gray: '#696969',

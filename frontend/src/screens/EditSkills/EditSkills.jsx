@@ -4,13 +4,12 @@ import FilePickerManager from 'react-native-file-picker';
 import axios from 'axios';
 import Logger from 'js-logger';
 
-import Button from '../components/Button';
-import NavHeader from '../components/NavHeader/NavHeader';
-import images from '../constants/images';
-import config from '../constants/config';
-import { containerStyles, editSkillsStyles } from '../styles';
+import Button from '../../components/Button';
+import NavHeader from '../../components/NavHeader/NavHeader';
+import config from '../../constants/config';
+import styles from './styles';
+import { colours } from '../../styles';
 
-const styles = { ...containerStyles, ...editSkillsStyles };
 export default class EditSkills extends Component {
   static navigationOptions = {
     drawerLabel: 'Edit Skills',
@@ -49,21 +48,17 @@ export default class EditSkills extends Component {
   }
 
   render() {
-    const { navigation } = this.props;
     return (
-      <View style={[styles.flexColAlignCenterContainer]}>
+      <View style={styles.container}>
         <NavHeader
           title="Edit Skills"
-          image={images.iconSend}
-          onPressBack={() => navigation.goBack()}
-          onPressBtn={() => navigation.navigate('SendLikedJobs')}
-          enableBtn={false}
+          enableSearch={false}
         />
         <Button
-          backgroundColor="#E6E6E6"
+          backgroundColor={colours.accentPrimary}
           title="Upload Resume"
-          textColor="white"
-          style={[styles.button]}
+          textColor={colours.white}
+          style={styles.button}
           onPress={() => this.onPressUpload()}
         />
       </View>
