@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { string, } from 'prop-types';
+import { string } from 'prop-types';
 
 import JobDetails from '../JobDetails';
 import JobImage from '../JobImage';

@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 import {
-  padding, margin, border, colours, fonts,
+  padding, margin, colours, fonts,
 } from '../../styles';
 
 const styles = StyleSheet.create({
