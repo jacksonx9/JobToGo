@@ -52,7 +52,6 @@ export default class EditSkills extends Component {
       <View style={styles.container}>
         <NavHeader
           title="Edit Skills"
-          enableSearch={false}
         />
         <Button
           backgroundColor={colours.accentPrimary}

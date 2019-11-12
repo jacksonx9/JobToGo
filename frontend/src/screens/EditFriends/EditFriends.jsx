@@ -115,7 +115,7 @@ export default class EditFriends extends Component {
       >
         <NavHeader
           title="Friends"
-          searchEnabled
+          buttonOption="search"
           value={addFriendName}
           onChangeText={text => { this.setState({ addFriendName: text }); }}
           onEndSearch={() => { this.setState({ addFriendName: '' }); }}

@@ -12,7 +12,7 @@ import AuthLanding from './screens/AuthLanding';
 import JobSwipe from './screens/JobSwipe';
 import SendLikedJobs from './screens/SendLikedJobs/SendLikedJobs';
 import EditFriends from './screens/EditFriends/EditFriends';
-import EditSkills from './screens/EditSkills';
+import EditSkills from './screens/EditSkills/EditSkills';
 
 import { appStyles } from './styles';
 

@@ -69,15 +69,12 @@ export default class SendLikedJobs extends Component {
 
   render() {
     const { loading, likedJobs } = this.state;
-    const { navigation } = this.props;
     if (loading) return <Loader />;
 
     return (
       <View style={[styles.container]}>
         <NavHeader
           title="Liked Jobs"
-          onPressBack={() => navigation.goBack()}
-          onPressBtn={this.sendLikedJobs}
         />
         <View style={[styles.buttonSection]}>
           <View style={styles.infoContainer}>
