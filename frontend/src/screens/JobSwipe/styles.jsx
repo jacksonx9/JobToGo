@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 import {
-  containers, padding, margin, elevation, border, colours, fonts,
+  containers, padding, colours,
 } from '../../styles';
 
 const LOGO_SIZE = 200;
