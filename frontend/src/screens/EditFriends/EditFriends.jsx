@@ -118,7 +118,7 @@ export default class EditFriends extends Component {
           buttonOption="search"
           value={addFriendName}
           onChangeText={text => { this.setState({ addFriendName: text }); }}
-          onEndSearch={() => { this.setState({ addFriendName: '' }); }}
+          onEndSearch={() => this.addFriend()}
           onStartSearch={() => {}}
         />
         <SwitchableNav
@@ -133,7 +133,7 @@ export default class EditFriends extends Component {
             <FlatList
               data={pendingFriends}
               keyExtractor={item => item._id}
-              renderItem={item => (
+              renderItem={({ item }) => (
                 <SelectableItem
                   key={item._id}
                   header={item.userName}
@@ -148,12 +148,12 @@ export default class EditFriends extends Component {
               <FlatList
                 data={friends}
                 keyExtractor={item => item._id}
-                renderItem={item => (
+                renderItem={({ item, index }) => (
                   <SelectableItem
                     key={item._id}
                     header={item.userName}
                     subHeader={item.email}
-                    onPress={() => this.removeFriend(item)}
+                    onPress={() => this.removeFriend(item, index)}
                     actionIcon="x"
                   />
                 )}
