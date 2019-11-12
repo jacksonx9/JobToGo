@@ -34,6 +34,11 @@ class Friend {
       const response = await this.getPendingFriends(req.params.userId);
       res.status(response.status).send(response);
     });
+
+    app.delete('/friends/pending', async (req, res) => {
+      const response = await this.removePendingFriend(req.body.userId, req.body.friendId);
+      res.status(response.status).send(response);
+    });
   }
 
   // Adds the user making the friend request to the friend's pendingFriend array
@@ -47,6 +52,10 @@ class Friend {
       // Verify userId is valid
       await Users.findById(userId).orFail();
 
+      if (userId === friendId) {
+        return new Response(false, 'Cannot add self as a friend', 400);
+      }
+
       const friend = await Users.findOne({
         _id: friendId,
         $or: [
@@ -58,6 +67,16 @@ class Friend {
       // Verify friend has not already been added
       if (friend !== null) {
         return new Response(false, 'Friend has already been added', 400);
+      }
+
+      const user = await Users.findOne({
+        _id: userId,
+        pendingFriends: friendId,
+      });
+
+      // Verify friend has not already tried to add user
+      if (user !== null) {
+        return new Response(false, 'Friend already a pending friend of user', 400);
       }
 
       await Users.findByIdAndUpdate(friendId, {
@@ -147,6 +166,39 @@ class Friend {
       await Users.findByIdAndUpdate(friendId, {
         $addToSet: {
           friends: userId,
+        },
+      }).orFail();
+
+      return new Response(true, '', 200);
+    } catch (e) {
+      return new Response(false, 'Invalid userId or friendId', 400);
+    }
+  }
+
+  async removePendingFriend(userId, friendId) {
+    if (!userId || !friendId) {
+      return new Response(false, 'Invalid userId or friendId', 400);
+    }
+
+    try {
+      // Verify userId and friendId are valid
+      await Users.findById(userId).orFail();
+      await Users.findById(friendId).orFail();
+
+      // Verify friend is pending
+      const friend = await Users.findOne({
+        _id: userId,
+        pendingFriends: friendId,
+      });
+
+      if (friend === null) {
+        return new Response(false, 'Not a pending friend', 400);
+      }
+
+      // remove friend from pending friends list
+      await Users.findByIdAndUpdate(userId, {
+        $pull: {
+          pendingFriends: friendId,
         },
       }).orFail();
 

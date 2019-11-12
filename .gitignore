@@ -67,3 +67,4 @@ frontend/android/app/google-services.json
 mediafiles
 credentials
 mongodata
+coverage
