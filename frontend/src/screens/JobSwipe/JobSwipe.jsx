@@ -5,8 +5,7 @@ import axios from 'axios';
 import Logger from 'js-logger';
 import Swiper from 'react-native-deck-swiper';
 
-import JobImage from '../../components/JobImage';
-import JobDetails from '../../components/JobDetails';
+import JobCard from '../../components/JobCard';
 import Loader from '../../components/Loader';
 import MainHeader from '../../components/MainHeader';
 import OverlayLabel from '../../components/OverlayLabel/OverlayLabel';
@@ -52,7 +51,6 @@ export default class JobSwipe extends Component {
       } else {
         jobs[i].logo = null;
       }
-      console.log(jobs[i].logo);
     })).catch(e => this.logger.error(e));
 
     this.setState({
@@ -108,21 +106,19 @@ export default class JobSwipe extends Component {
         <Swiper
           cards={jobs}
           renderCard={posting => (
-            <View>
-              <JobImage
-                logo={posting.logo}
-              />
-              <JobDetails
-                company={posting.company}
-                title={posting.title}
-                location={posting.location}
-                description={posting.description}
-              />
-            </View>
+            <JobCard
+              logo={null}
+              company={'posting.company'}
+              title={'posting.title'}
+              location={'posting.location'}
+              description={'posting.description'}
+            />
+
           )}
           onSwipedLeft={() => this.dislikeJob(jobs, jobIndex)}
           onSwipedRight={() => this.likeJob(jobs, jobIndex)}
           cardIndex={jobIndex}
+          marginTop={35}
           backgroundColor={colours.white}
           stackSize={5}
           animateOverlayLabelsOpacity

@@ -1,16 +1,17 @@
 import { StyleSheet } from 'react-native';
 
-import { padding, colours } from '../../styles';
+import { padding, colours, dimensions } from '../../styles';
 
 const styles = StyleSheet.create({
   container: {
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: padding.md,
+    paddingTop: padding.xl,
     paddingHorizontal: padding.md,
     height: 80,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    width: dimensions.fullWidth,
     backgroundColor: colours.white,
+    zIndex: 1000,
   },
   logo: {
     width: 170,

@@ -1,6 +1,6 @@
 import React from 'react';
-import { ImageBackground, Image } from 'react-native';
-import PropTypes from 'prop-types';
+import { View, Image } from 'react-native';
+import { string } from 'prop-types';
 
 import images from '../../constants/images';
 import styles from './styles';
@@ -11,15 +11,14 @@ const JobImage = ({ logo }) => {
     source = images.iconLogo;
   }
   return (
-    <ImageBackground
-      source={images.jobBackground}
+    <View
       style={styles.container}
     >
       <Image
         source={source}
         style={styles.companyLogo}
       />
-    </ImageBackground>
+    </View>
   );
 };
 
@@ -28,7 +27,7 @@ JobImage.defaultProps = {
 };
 
 JobImage.propTypes = {
-  logo: PropTypes.string,
+  logo: string,
 };
 
 export default JobImage;

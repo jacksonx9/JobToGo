@@ -6,7 +6,8 @@ const styles = StyleSheet.create({
   container: {
     paddingTop: 15,
     justifyContent: 'center',
-    height: 100,
+    height: 150,
+    width: '100%',
     overflow: 'scroll',
     backgroundColor: 'white',
   },

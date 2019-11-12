@@ -12,6 +12,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: padding.md,
   },
+  swiperContainer: {
+    backgroundColor: colours.white,
+  },
   overlayDislike: {
     flexDirection: 'column',
     alignItems: 'flex-end',

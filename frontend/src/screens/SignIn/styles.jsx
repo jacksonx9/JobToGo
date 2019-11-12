@@ -9,11 +9,11 @@ const styles = StyleSheet.create({
     ...containers.fullScreenContainer,
     flexDirection: 'column',
     alignItems: 'center',
-    paddingHorizontal: padding.xxl,
+    paddingHorizontal: padding.lg,
   },
   inputContainer: {
     height: 50,
-    width: '100%',
+    width: '90%',
     marginBottom: margin.sm,
     paddingHorizontal: padding.sm,
     borderRadius: border.radius,
@@ -23,11 +23,12 @@ const styles = StyleSheet.create({
   logo: {
     height: 80,
     width: '100%',
+    transform: [{ scale: 0.65 }],
     marginTop: 100,
     marginBottom: 50,
   },
   button: {
-    width: '100%',
+    width: '90%',
     marginTop: margin.md,
     marginBottom: margin.sm,
   },

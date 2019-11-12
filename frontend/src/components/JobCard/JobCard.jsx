@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { number, func } from 'prop-types';
+import { string, } from 'prop-types';
 
 import JobDetails from '../JobDetails';
 import JobImage from '../JobImage';
@@ -23,12 +23,15 @@ const JobCard = ({
 );
 
 JobCard.defaultProps = {
-  onPress: () => {},
+  logo: null,
 };
 
 JobCard.propTypes = {
-  source: number.isRequired,
-  onPress: func,
+  logo: string,
+  company: string.isRequired,
+  title: string.isRequired,
+  location: string.isRequired,
+  description: string.isRequired,
 };
 
 export default JobCard;
