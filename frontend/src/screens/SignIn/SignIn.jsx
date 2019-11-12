@@ -6,12 +6,11 @@ import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-goog
 import axios from 'axios';
 import Logger from 'js-logger';
 
-import Button from '../components/Button';
-import images from '../constants/images';
-import colours from '../constants/colours';
-import config from '../constants/config';
-import { containerStyles, displayStyles, authStyles } from '../styles';
-
+import Button from '../../components/Button';
+import images from '../../constants/images';
+import colours from '../../constants/colours';
+import config from '../../constants/config';
+import { containerStyles, displayStyles, authStyles } from '../../styles';
 
 const styles = { ...containerStyles, ...displayStyles, ...authStyles };
 export default class SignIn extends Component {

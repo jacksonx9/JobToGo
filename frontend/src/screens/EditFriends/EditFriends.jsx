@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import {
-  View, FlatList,
-} from 'react-native';
+import { View, FlatList } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
 

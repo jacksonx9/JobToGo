@@ -9,6 +9,11 @@ export const authStyles = StyleSheet.create({
     width: '100%',
     marginBottom: 40,
   },
+  image2: {
+    height: 300,
+    width: '100%',
+    marginBottom: 40,
+  },
   button: {
     marginTop: 5,
     marginBottom: 20,

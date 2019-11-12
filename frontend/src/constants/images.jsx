@@ -11,7 +11,7 @@ import iconChevronLeft from '../../assets/icon-chevron-left.png';
 import iconJob from '../../assets/icon-job.png';
 import iconSearch from '../../assets/icon-search.png';
 import jobBackground from '../../assets/temp-bg1.png';
-import navBarBackground from '../../assets/navbar-background.png';
+import jobSeeker from '../../assets/job-seeker.png';
 
 const images = {
   logoLight,
@@ -27,7 +27,7 @@ const images = {
   iconJob,
   iconSearch,
   jobBackground,
-  navBarBackground,
+  jobSeeker,
 };
 
 export default images;

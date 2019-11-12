@@ -7,7 +7,6 @@ import SelectableItem from '../../components/SelectableItem/SelectableItem';
 import Loader from '../../components/Loader';
 import NavHeader from '../../components/NavHeader/NavHeader';
 import Button from '../../components/Button';
-import images from '../../constants/images';
 import config from '../../constants/config';
 import styles from './styles';
 import { colours } from '../../styles';

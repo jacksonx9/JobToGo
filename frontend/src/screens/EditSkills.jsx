@@ -48,7 +48,6 @@ export default class EditSkills extends Component {
     });
   }
 
-
   render() {
     const { navigation } = this.props;
     return (
