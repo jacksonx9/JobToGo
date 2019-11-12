@@ -52,6 +52,7 @@ export default class JobSwipe extends Component {
       } else {
         jobs[i].logo = null;
       }
+      console.log(jobs[i].logo);
     })).catch(e => this.logger.error(e));
 
     this.setState({
