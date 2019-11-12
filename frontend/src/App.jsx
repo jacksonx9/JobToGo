@@ -14,9 +14,6 @@ import SendLikedJobs from './screens/SendLikedJobs/SendLikedJobs';
 import EditFriends from './screens/EditFriends/EditFriends';
 import EditSkills from './screens/EditSkills/EditSkills';
 
-import { appStyles } from './styles';
-
-const styles = appStyles;
 export default class App extends React.Component {
   constructor(props) {
     super(props);
@@ -80,7 +77,7 @@ export default class App extends React.Component {
   render() {
     return (
       <AppContainer
-        styles={styles.container}
+        styles={[{ flex: 1 }]}
       />
     );
   }
@@ -116,7 +113,7 @@ const navConfig = {
 //     activeTintColor: 'tomato',
 //     inactiveTintColor: 'gray',
 //   },
-//}
+// }
 
 const tabNavConfig = {
   initialRouteName: 'JobSwipe',

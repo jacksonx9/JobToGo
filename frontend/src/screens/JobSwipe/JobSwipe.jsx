@@ -5,16 +5,15 @@ import axios from 'axios';
 import Logger from 'js-logger';
 import Swiper from 'react-native-deck-swiper';
 
-import JobImage from '../components/JobImage';
-import JobDetails from '../components/JobDetails';
-import Loader from '../components/Loader';
-import MainHeader from '../components/MainHeader';
-import OverlayLabel from '../components/OverlayLabel';
-import config from '../constants/config';
-import { styleConsts, jobSwipeStyles, overlayLabelStyles } from '../styles';
-import colours from '../constants/colours';
+import JobImage from '../../components/JobImage';
+import JobDetails from '../../components/JobDetails';
+import Loader from '../../components/Loader';
+import MainHeader from '../../components/MainHeader';
+import OverlayLabel from '../../components/OverlayLabel/OverlayLabel';
+import config from '../../constants/config';
+import styles, { LOGO_SIZE } from './styles';
+import { colours } from '../../styles';
 
-const styles = jobSwipeStyles;
 export default class JobSwipe extends Component {
   static navigationOptions = {
     drawerLabel: 'Job Swipe',
@@ -49,7 +48,7 @@ export default class JobSwipe extends Component {
       );
       const companyInfo = companyInfoResp.data[0];
       if (companyInfo) {
-        jobs[i].logo = `${companyInfo.logo}?size=${styleConsts.LOGO_SIZE}`;
+        jobs[i].logo = `${companyInfo.logo}?size=${LOGO_SIZE}`;
       } else {
         jobs[i].logo = null;
       }
@@ -123,22 +122,22 @@ export default class JobSwipe extends Component {
           onSwipedLeft={() => this.dislikeJob(jobs, jobIndex)}
           onSwipedRight={() => this.likeJob(jobs, jobIndex)}
           cardIndex={jobIndex}
-          backgroundColor="white"
+          backgroundColor={colours.white}
           stackSize={5}
           animateOverlayLabelsOpacity
           overlayLabels={{
             left: {
               title: 'NOPE',
-              element: <OverlayLabel label="NOPE" color={colours.red} />,
+              element: <OverlayLabel label="NOPE" color={colours.primary} />,
               style: {
-                wrapper: overlayLabelStyles.overlayDislike,
+                wrapper: styles.overlayDislike,
               },
             },
             right: {
               title: 'LIKE',
-              element: <OverlayLabel label="LIKE" color={colours.green} />,
+              element: <OverlayLabel label="LIKE" color={colours.accentPrimary} />,
               style: {
-                wrapper: overlayLabelStyles.overlayLike,
+                wrapper: styles.overlayLike,
               },
             },
           }}
