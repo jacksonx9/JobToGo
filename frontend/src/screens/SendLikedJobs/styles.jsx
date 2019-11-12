@@ -37,9 +37,6 @@ const styles = StyleSheet.create({
   },
   button: {
     width: 100,
-    fontSize: fonts.md,
-    color: colours.white,
-    backgroundColor: colours.accentPrimary,
   },
   bigText: {
     fontSize: fonts.md,

@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: padding.md,
   },
-  buttonSection: {
+  friendNavSection: {
     borderRadius: border.radius,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -34,22 +34,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: 70,
     width: '50%',
-  },
-  button: {
-    width: 100,
-    fontSize: fonts.md,
-    color: colours.white,
-    backgroundColor: colours.accentPrimary,
-  },
-  bigText: {
-    fontSize: fonts.md,
-    fontFamily: fonts.bold,
-    color: colours.white,
-  },
-  normalText: {
-    fontSize: fonts.sm,
-    fontFamily: fonts.bold,
-    color: colours.secondary,
   },
   listContainer: {
     height: '100%',

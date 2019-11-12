@@ -10,6 +10,7 @@ import Button from '../../components/Button';
 import images from '../../constants/images';
 import config from '../../constants/config';
 import styles from './styles';
+import { colours } from '../../styles';
 
 export default class SendLikedJobs extends Component {
   static navigationOptions = {
@@ -76,7 +77,6 @@ export default class SendLikedJobs extends Component {
       <View style={[styles.container]}>
         <NavHeader
           title="Liked Jobs"
-          image={images.iconSendColoured}
           onPressBack={() => navigation.goBack()}
           onPressBtn={this.sendLikedJobs}
         />
@@ -91,6 +91,8 @@ export default class SendLikedJobs extends Component {
           </View>
           <View styles={[styles.buttonContainer]}>
             <Button
+              textColor={colours.white}
+              backgroundColor={colours.accentPrimary}
               title="Send Jobs"
               style={[styles.button]}
               onPress={this.sendLikedJobs}

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-  View, FlatList, Text, TextInput,
+  View, FlatList,
 } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
@@ -8,10 +8,9 @@ import Logger from 'js-logger';
 import SelectableItem from '../../components/SelectableItem';
 import Loader from '../../components/Loader';
 import NavHeader from '../../components/NavHeader';
-import images from '../../constants/images';
+import SwitchableNav from '../../components/SwitchableNav';
 import config from '../../constants/config';
 import styles from './styles';
-import SearchBar from '../../components/SeachBar';
 
 export default class EditFriends extends Component {
   static navigationOptions = {
@@ -22,9 +21,10 @@ export default class EditFriends extends Component {
     super(props);
     this.state = {
       friends: [],
-      friendRequests: [],
+      pendingFriends: [],
       addFriendName: '',
       loading: 1,
+      showPendingFriends: true,
     };
     this.logger = Logger.get(this.constructor.name);
   }
@@ -43,12 +43,12 @@ export default class EditFriends extends Component {
     const { userId } = global;
     const friends = await axios.get(`${config.ENDP_FRIENDS}${userId}`)
       .catch(e => this.logger.error(e));
-    const friendRequests = await axios.get(`${config.ENDP_PENDING_FRIENDS}${userId}`)
+    const pendingFriends = await axios.get(`${config.ENDP_PENDING_FRIENDS}${userId}`)
       .catch(e => this.logger.error(e));
 
     this.setState({
       friends: friends.data.result,
-      friendRequests: friendRequests.data.result,
+      pendingFriends: pendingFriends.data.result,
       loading: 0,
     });
   }
@@ -74,12 +74,12 @@ export default class EditFriends extends Component {
 
     const friends = await axios.get(`${config.ENDP_FRIENDS}${userId}`)
       .catch(e => this.logger.error(e));
-    const friendRequests = await axios.get(`${config.ENDP_PENDING_FRIENDS}${userId}`)
+    const pendingFriends = await axios.get(`${config.ENDP_PENDING_FRIENDS}${userId}`)
       .catch(e => this.logger.error(e));
 
     this.setState({
       friends: friends.data.result,
-      friendRequests: friendRequests.data.result,
+      pendingFriends: pendingFriends.data.result,
       loading: 0,
     });
   }
@@ -95,19 +95,19 @@ export default class EditFriends extends Component {
 
     const friends = await axios.get(`${config.ENDP_FRIENDS}${userId}`)
       .catch(e => this.logger.error(e));
-    const friendRequests = await axios.get(`${config.ENDP_PENDING_FRIENDS}${userId}`)
+    const pendingFriends = await axios.get(`${config.ENDP_PENDING_FRIENDS}${userId}`)
       .catch(e => this.logger.error(e));
 
     this.setState({
       friends: friends.data.result,
-      friendRequests: friendRequests.data.result,
+      pendingFriends: pendingFriends.data.result,
       loading: 0,
     });
   }
 
   render() {
     const {
-      loading, addFriendName, friendRequests, friends,
+      loading, addFriendName, pendingFriends, friends, showPendingFriends,
     } = this.state;
 
     if (loading) return <Loader />;
@@ -116,30 +116,51 @@ export default class EditFriends extends Component {
         style={[styles.container]}
       >
         <NavHeader
-          title="Liked Jobs"
+          title="Friends"
           searchEnabled
           value={addFriendName}
           onChangeText={text => { this.setState({ addFriendName: text }); }}
           onEndSearch={() => { this.setState({ addFriendName: '' }); }}
           onStartSearch={() => {}}
         />
-        <View style={[styles.buttonSection]}>
-          <View style={styles.infoContainer} />
-        </View>
+        <SwitchableNav
+          showNavOption1={showPendingFriends}
+          navOption1Title="Pending Friends"
+          navOption2Title="Your Friends"
+          onPressNavOption1={() => { this.setState({ showPendingFriends: true }); }}
+          onPressNavOption2={() => { this.setState({ showPendingFriends: false }); }}
+        />
         <View style={[styles.listContainer]}>
-          <FlatList
-            data={friendRequests}
-            keyExtractor={item => item._id}
-            renderItem={item => (
-              <SelectableItem
-                key={item._id}
-                header={item.userName}
-                subHeader={item.email}
-                onPress={() => this.comfirmFriendRequest(item)}
-                actionIcon="+"
+          {showPendingFriends ? (
+            <FlatList
+              data={pendingFriends}
+              keyExtractor={item => item._id}
+              renderItem={item => (
+                <SelectableItem
+                  key={item._id}
+                  header={item.userName}
+                  subHeader={item.email}
+                  onPress={() => this.comfirmFriendRequest(item)}
+                  actionIcon="+"
+                />
+              )}
+            />
+          )
+            : (
+              <FlatList
+                data={friends}
+                keyExtractor={item => item._id}
+                renderItem={item => (
+                  <SelectableItem
+                    key={item._id}
+                    header={item.userName}
+                    subHeader={item.email}
+                    onPress={() => this.removeFriend(item)}
+                    actionIcon="x"
+                  />
+                )}
               />
             )}
-          />
         </View>
       </View>
     );

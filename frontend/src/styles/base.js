@@ -11,6 +11,7 @@ export const colours = {
   secondary: '#b9cbeb',
   accentPrimary: '#f4775a',
   gray: '#696969',
+  lightGray: '#a6a6a6',
 };
 
 export const padding = {
@@ -32,7 +33,7 @@ export const margin = {
 
 export const border = {
   radius: 15,
-  inputBorderWidth: 3,
+  inputBorderWidth: 1,
 };
 
 export const elevation = {
@@ -53,5 +54,6 @@ export const containers = {
   fullScreenContainer: {
     height: dimensions.fullHeight,
     width: dimensions.fullWidth,
+    backgroundColor: colours.white,
   },
 };
