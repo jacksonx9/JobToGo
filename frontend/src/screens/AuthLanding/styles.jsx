@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 import {
-  containers, padding, margin, border, colours, fonts,
+  containers, padding, margin, border, colours,
 } from '../../styles';
 
 const styles = StyleSheet.create({
@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
     ...containers.fullScreenContainer,
     flexDirection: 'column',
     alignItems: 'center',
-    paddingHorizontal: padding.md,
+    paddingHorizontal: padding.xxl,
   },
   logo: {
     height: 80,
@@ -24,17 +24,17 @@ const styles = StyleSheet.create({
   },
   googleButton: {
     height: 50,
-    width: '85%',
+    width: '100%',
     elevation: 0,
     marginBottom: margin.xs,
     borderRadius: border.borderRadius,
   },
   signInButton: {
-    width: '85%',
+    width: '100%',
     marginBottom: margin.xs,
   },
   signUpButton: {
-    width: '85%',
+    width: '100%',
     borderColor: colours.accentPrimary,
     borderWidth: 2,
   },

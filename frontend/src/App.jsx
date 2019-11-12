@@ -7,7 +7,7 @@ import firebase from 'react-native-firebase';
 import Logger from 'js-logger';
 
 import SignIn from './screens/SignIn';
-import SignUp from './screens/SignUp';
+import SignUp from './screens/SignUp/SignUp';
 import AuthLanding from './screens/AuthLanding';
 import JobSwipe from './screens/JobSwipe';
 import SendLikedJobs from './screens/SendLikedJobs/SendLikedJobs';

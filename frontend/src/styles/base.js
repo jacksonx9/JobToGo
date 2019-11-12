@@ -12,6 +12,7 @@ export const colours = {
   accentPrimary: '#f4775a',
   gray: '#696969',
   lightGray: '#a6a6a6',
+  lighterGray: '#ededed',
 };
 
 export const padding = {
