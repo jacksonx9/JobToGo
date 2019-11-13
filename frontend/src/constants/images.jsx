@@ -9,7 +9,9 @@ import iconChevronUp from '../../assets/icon-chevron-up.png';
 import iconChevronDown from '../../assets/icon-chevron-down.png';
 import iconChevronLeft from '../../assets/icon-chevron-left.png';
 import iconJob from '../../assets/icon-job.png';
+import iconSearch from '../../assets/icon-search.png';
 import jobBackground from '../../assets/temp-bg1.png';
+import jobSeeker from '../../assets/job-seeker.png';
 
 const images = {
   logoLight,
@@ -23,7 +25,9 @@ const images = {
   iconChevronDown,
   iconChevronLeft,
   iconJob,
+  iconSearch,
   jobBackground,
+  jobSeeker,
 };
 
 export default images;
