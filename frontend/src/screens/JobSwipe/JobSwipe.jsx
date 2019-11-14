@@ -38,11 +38,11 @@ export default class JobSwipe extends Component {
     const { userId } = global;
     this.logger.info(`User id is: ${userId}`);
     this.fetchJobs(userId);
+    this.fetchFriends(userId);
   }
 
 
-  fetchFriends = async () => {
-    const { userId } = global;
+  fetchFriends = async userId => {
     const friends = await axios.get(`${config.ENDP_FRIENDS}${userId}`)
       .catch(e => this.logger.error(e));
 
@@ -56,7 +56,7 @@ export default class JobSwipe extends Component {
       loading: 1,
     });
 
-    const sharedJobsResp = await axios.get(`${config.ENDP_JOBS}${userId}`).catch(e => this.logger.error(e));
+    const sharedJobsResp = await axios.get(`${config.ENDP_SHARED_JOBS}${userId}`).catch(e => this.logger.error(e));
     const sharedJobs = sharedJobsResp.data.result;
     sharedJobs.map(sharedJob => Object.assign(sharedJob, { isShared: true }));
 
@@ -94,12 +94,10 @@ export default class JobSwipe extends Component {
 
   shareJob = async (friend, jobs, jobIndex) => {
     const { userId } = global;
-    await axios.post(config.ENDP_FRIENDS, {
-      data: {
-        userId,
-        friendId: friend._id,
-        jobId: jobs[jobIndex]._id,
-      },
+    await axios.post(config.ENDP_SHARE_JOB, {
+      userId,
+      friendId: friend._id,
+      jobId: jobs[jobIndex]._id,
     }).catch(e => this.logger.error(e));
 
     console.log(friend.userName);
@@ -118,7 +116,7 @@ export default class JobSwipe extends Component {
       this.setState({ jobIndex: jobIndex + 1 });
     }
 
-    await axios.post(`${jobs[oldIndex].isShared ? config.ENDP_DISLIKE : config.ENDP_DISLIKE}`, {
+    await axios.post(`${jobs[oldIndex].isShared ? config.ENDP_DISLIKE_SHARED : config.ENDP_DISLIKE}`, {
       userId,
       jobId: jobs[oldIndex]._id,
     }).catch(e => this.logger.error(e));
@@ -132,7 +130,7 @@ export default class JobSwipe extends Component {
     if (jobIndex < jobs.length - 1) {
       this.setState({ jobIndex: jobIndex + 1 });
     }
-    await axios.post(`${jobs[oldIndex].isShared ? config.ENXP_LIKE : config.ENDP_LIKE}`, {
+    await axios.post(`${jobs[oldIndex].isShared ? config.ENDP_LIKE_SHARED : config.ENDP_LIKE}`, {
       userId,
       jobId: jobs[oldIndex]._id,
     }).catch(e => this.logger.error(e));
