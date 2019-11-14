@@ -2,13 +2,34 @@ import Logger from 'js-logger';
 import assert from 'assert';
 
 import Response from '../types';
-import { Users } from '../schema';
+import { Users, Jobs } from '../schema';
 
 class Friend {
   constructor(app, messenger) {
     this.logger = Logger.get(this.constructor.name);
 
     this.messenger = messenger;
+
+    app.post('/friends/sendJob', async (req, res) => {
+      const response = await this.sendJob(req.body.userId, req.body.friendId, req.body.jobId);
+      res.status(response.status).send(response);
+    });
+
+    // TODO: change request type
+    app.post('/friends/confirmJob', async (req, res) => {
+      const response = await this.confirmJob(req.body.userId, req.body.jobId);
+      res.status(response.status).send(response);
+    });
+
+    app.delete('/friends/rejectJob', async (req, res) => {
+      const response = await this.rejectJob(req.body.userId, req.body.jobId);
+      res.status(response.status).send(response);
+    });
+
+    app.get('/friends/recommendedJobs/:userId', async (req, res) => {
+      const response = await this.getRecommendedJobs(req.params.userId);
+      res.status(response.status).send(response);
+    });
 
     app.post('/friends', async (req, res) => {
       const response = await this.addFriend(req.body.userId, req.body.friendId);
@@ -41,6 +62,97 @@ class Friend {
     });
   }
 
+  // Sends job from user to friend and alert using push notification
+  async sendJob(userId, friendId, jobId) {
+    if (!userId || !friendId || !jobId) {
+      return new Response(false, 'Invalid userId, friendId, or jobId', 400);
+    }
+
+    try {
+      // Verify userId is valid
+      await Users.findById(userId).orFail();
+      // Verify jobId is valid
+      await Jobs.findById(jobId).orFail();
+
+      // Verify user is not adding itself
+      if (userId === friendId) {
+        return new Response(false, 'Cannot add self as a friend', 400);
+      }
+
+      const friend = await this._verifyAreFriends(userId, friendId);
+      if (friend === null) {
+        return new Response(false, 'Not a friend', 400);
+      }
+
+      friend.seenJobs.push(jobId);
+      friend.friendSuggestedJobs.push(jobId);
+      await friend.save();
+
+      // Send push notification
+      const messageResponse = await this.messenger.sendFriendJob(userId, friendId, jobId);
+      return messageResponse;
+    } catch (e) {
+      return new Response(false, 'Invalid userId, friendId, or jobId', 400);
+    }
+  }
+
+  // User confirms job sent from a friend
+  async confirmJob(userId, jobId) {
+    return this._removeJobFromSeen(userId, jobId, true);
+  }
+
+  // User reject job sent from a friend
+  async rejectJob(userId, jobId) {
+    return this._removeJobFromSeen(userId, jobId, false);
+  }
+
+  async _removeJobFromSeen(userId, jobId, addToLikedJobs) {
+    if (!userId || !jobId) {
+      return new Response(false, 'Invalid userId or jobId', 400);
+    }
+
+    try {
+      // Verify userId is valid
+      const user = await Users.findById(userId).orFail();
+      // Verify jobId is valid
+      await Jobs.findById(jobId).orFail();
+
+      // Verify jobId is was sent by friend
+      const idx = user.friendSuggestedJobs.indexOf(jobId);
+      if (idx !== -1) {
+        user.friendSuggestedJobs.splice(idx, 1);
+        if (addToLikedJobs) [
+          user.likedJobs.push(job);
+        ]
+        await user.save();
+      } else {
+        return new Response(false, 'User did not get job from friend', 400);
+      }
+
+      return new Response(true, '', 200);
+    } catch (e) {
+      return new Response(false, 'Invalid userId or jobId', 400);
+    }
+  }
+
+  // Get jobs recommended by friends
+  async getRecommendedJobs(userId) {
+    if (!userId) {
+      return new Response(null, 'Invalid userId', 400);
+    }
+
+    try {
+      const user = await Users.findById(userId).orFail();
+      const jobs = user.friendSuggestedJobs;
+      // TODO: make sure not
+      this.logger.info(jobs);
+
+      return new Response(jobs, '', 200);
+    } catch (e) {
+      return new Response(null, 'Invalid userId', 400);
+    }
+  }
+
   // Adds the user making the friend request to the friend's pendingFriend array
   // Returns true if success and false otherwise
   async addFriend(userId, friendId) {
@@ -52,6 +164,7 @@ class Friend {
       // Verify userId is valid
       await Users.findById(userId).orFail();
 
+      // Verify user is not adding itself
       if (userId === friendId) {
         return new Response(false, 'Cannot add self as a friend', 400);
       }
@@ -100,16 +213,12 @@ class Friend {
     }
 
     try {
+      // TODO: do findOneAndUpdate and match userId, friendId, and update friends in one function
       // Verify userId and friendId are valid
       await Users.findById(userId).orFail();
       await Users.findById(friendId).orFail();
 
-      // Verify that users are friends
-      const friend = await Users.findOne({
-        _id: friendId,
-        friends: userId,
-      });
-
+      const friend = await this._verifyAreFriends(userId, friendId);
       if (friend === null) {
         return new Response(false, 'Not a friend', 400);
       }
@@ -130,6 +239,14 @@ class Friend {
     } catch (e) {
       return new Response(false, 'Invalid userId or friendId', 400);
     }
+  }
+
+  // Returns null if not friends and friend UserObj if succeeded
+  _verifyAreFriends(userId, friendId) {
+    return Users.findOne({
+      _id: friendId,
+      friends: userId,
+    });
   }
 
   // userId belongs to the user confirming the friend request.
