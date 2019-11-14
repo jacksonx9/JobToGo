@@ -55,9 +55,20 @@ export default class JobSwipe extends Component {
     this.setState({
       loading: 1,
     });
-    const jobsResp = await axios.get(`${config.ENDP_JOBS}${userId}`).catch(e => this.logger.error(e));
-    const jobs = jobsResp.data.result;
 
+    const sharedJobsResp = await axios.get(`${config.ENDP_JOBS}${userId}`).catch(e => this.logger.error(e));
+    const sharedJobs = sharedJobsResp.data.result;
+    sharedJobs.map(sharedJob => Object.assign(sharedJob, { isShared: true }));
+
+    const matchedJobsResp = await axios.get(`${config.ENDP_JOBS}${userId}`).catch(e => this.logger.error(e));
+    const matchedJobs = matchedJobsResp.data.result;
+    matchedJobs.map(matchedJob => Object.assign(matchedJob, { isShared: false }));
+
+    console.log(sharedJobs);
+
+    const jobs = [...sharedJobs, ...matchedJobs];
+
+    // Get the logo uri of each company in jobs
     await Promise.all(jobs.map(async (job, i) => {
       const companyInfoResp = await axios.get(
         `${config.ENDP_COMPANY_API}${job.company}`,
@@ -115,10 +126,16 @@ export default class JobSwipe extends Component {
     if (jobIndex < jobs.length - 1) {
       this.setState({ jobIndex: jobIndex + 1 });
     }
-    await axios.post(`${config.ENDP_DISLIKE}`, {
-      userId,
-      jobId: jobs[oldIndex]._id,
-    }).catch(e => this.logger.error(e));
+
+    if (jobs[oldIndex].isShared) {
+      console.log('is shared');
+    } else {
+      console.log('not shared');
+    }
+    // await axios.post(`${config.ENDP_DISLIKE}`, {
+    //   userId,
+    //   jobId: jobs[oldIndex]._id,
+    // }).catch(e => this.logger.error(e));
 
     this.getNextJob(jobs.length, oldIndex, userId);
   }
@@ -159,6 +176,7 @@ export default class JobSwipe extends Component {
               title={posting.title}
               location={posting.location}
               description={posting.description}
+              isShared={posting.isShared}
             />
           )}
           onSwipedLeft={() => this.dislikeJob(jobs, jobIndex)}
@@ -187,7 +205,9 @@ export default class JobSwipe extends Component {
           }}
         />
 
-        <Modal isVisible={this.state.isModalVisible}>
+        <Modal
+          isVisible={this.state.isModalVisible}
+        >
           <View style={styles.modalContainer}>
             <View style={styles.exitButtonContainer}>
               <ImageButton
@@ -195,7 +215,6 @@ export default class JobSwipe extends Component {
                 onPress={() => this.setState({ isModalVisible: false })}
               />
             </View>
-
             <SelectableItem
               header={jobs[jobIndex].title}
               subHeader={jobs[jobIndex].company}
