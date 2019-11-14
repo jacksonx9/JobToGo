@@ -1,5 +1,5 @@
 #!/bin/sh
-set -e
+# set -e
 cd backend
 mkdir credentials
 echo ' { "clientID": "encrypted.apps.googleusercontent.com" }' > credentials/google.json
