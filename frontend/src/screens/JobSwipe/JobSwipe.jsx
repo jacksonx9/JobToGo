@@ -56,6 +56,7 @@ export default class JobSwipe extends Component {
     this.setState({
       loading: 0,
       jobs,
+      jobIndex: 0,
     });
   }
 
@@ -66,29 +67,35 @@ export default class JobSwipe extends Component {
   getNextJob = (jobNum, jobIndex, userId) => {
     if (jobNum === (jobIndex + 1)) {
       this.fetchJobs(userId);
-    } else {
-      this.setState({ jobIndex: jobIndex + 1 });
     }
   }
 
   dislikeJob = async (jobs, jobIndex) => {
     const { userId } = global;
+    const oldIndex = jobIndex;
+    if (jobIndex < jobs.length - 1) {
+      this.setState({ jobIndex: jobIndex + 1 });
+    }
     await axios.post(`${config.ENDP_DISLIKE}`, {
       userId,
-      jobId: jobs[jobIndex]._id,
+      jobId: jobs[oldIndex]._id,
     }).catch(e => this.logger.error(e));
 
-    this.getNextJob(jobs.length, jobIndex, userId);
+    this.getNextJob(jobs.length, oldIndex, userId);
   }
 
   likeJob = async (jobs, jobIndex) => {
     const { userId } = global;
+    const oldIndex = jobIndex;
+    if (jobIndex < jobs.length - 1) {
+      this.setState({ jobIndex: jobIndex + 1 });
+    }
     await axios.post(`${config.ENDP_LIKE}`, {
       userId,
-      jobId: jobs[jobIndex]._id,
+      jobId: jobs[oldIndex]._id,
     }).catch(e => this.logger.error(e));
 
-    this.getNextJob(jobs.length, jobIndex, userId);
+    this.getNextJob(jobs.length, oldIndex, userId);
   }
 
   render() {
