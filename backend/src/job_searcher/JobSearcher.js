@@ -15,14 +15,13 @@ class JobSearcher {
 
     this.jobAnalyzer = jobAnalyzer;
 
-    this.updateJobStore().then({}).catch(e => this.logger.error(e));
     this.setupDailyUpdateJobStore();
   }
 
   setupDailyUpdateJobStore() {
     // Update job store at 0s, 0min, 0h UTC (midnight)
     scheduler.scheduleJob('0 0 0 * * *', async () => {
-      await this.updateJobStore().catch(e => this.logger.error(e));
+      await this.updateJobStore();
     });
   }
 
@@ -32,7 +31,7 @@ class JobSearcher {
 
     const count = await Jobs.countDocuments({});
 
-    if (count > MIN_JOBS_IN_DB) {
+    if (count >= MIN_JOBS_IN_DB) {
       return;
     }
 
@@ -50,31 +49,40 @@ class JobSearcher {
 
     await Promise.all(keyphrases.map(async (keyphrase) => {
       try {
-        const jobs = await indeed.query({
+        const queriedJobs = await indeed.query({
           query: keyphrase,
           ...jobConfig.indeedQuery,
         });
 
-        await Promise.all(jobs.map(async (job, jobIdx) => {
-          // Add description, unique url to each result by scraping the webpage
-          const jobPage = await axios.get(job.url);
-          const $ = cheerio.load(jobPage.data);
-          jobs[jobIdx].description = $(job.indeedJobDescTag).text();
-          jobs[jobIdx].url = $(job.indeedJobUrlTag).attr('content');
+        const jobs = await Promise.all(queriedJobs.map(async (queriedJob) => {
+          try {
+            const job = queriedJob;
+            // Add description, unique url to each result by scraping the webpage
+            const jobPage = await axios.get(queriedJob.url);
+            const $ = cheerio.load(jobPage.data);
+            job.description = $(jobConfig.indeedJobDescTag).text();
+            job.url = $(jobConfig.indeedJobUrlTag).attr('content');
 
-          const jobExists = await Jobs.findOne({ url: jobs[jobIdx].url });
-          // Check if job exists in the database already
-          if (jobExists !== null) {
-            return;
+            const jobExists = await Jobs.findOne({ url: job.url });
+            // Check if job exists in the database already
+            if (jobExists !== null) {
+              return job;
+            }
+
+            job.keywords = [];
+            // Compute count of each keyword in the job
+            this.jobAnalyzer.computeJobKeywordCount(job, keywords);
+            return job;
+          } catch (e) {
+            // If we fail to get the job page, just ignore the job
+            this.logger.error(e);
+            return null;
           }
-
-          jobs[jobIdx].keywords = [];
-          // Compute count of each keyword in the job
-          this.jobAnalyzer.computeJobKeywordCount(jobs[jobIdx], keywords);
         }));
+        const filteredJobs = jobs.filter(Boolean);
 
-        this.logger.info(`Found ${jobs.length} jobs for keyword ${keyphrase}`);
-        await this.addToJobStore(jobs);
+        this.logger.info(`Found ${filteredJobs.length} jobs for keyword ${keyphrase}`);
+        await this.addToJobStore(filteredJobs);
       } catch (e) {
         this.logger.error(e);
       }
@@ -96,6 +104,11 @@ class JobSearcher {
     this.logger.info('Removing outdated jobs...');
 
     const jobs = await Jobs.find({});
+
+    if (jobs.length === 0) {
+      this.logger.info('No jobs to be removed!');
+      return;
+    }
 
     // Map all jobs to either the id if the job is outdated, or null if the job is still active
     const outdatedJobIds = await Promise.all(jobs.map(async (job) => {

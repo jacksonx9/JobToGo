@@ -48,15 +48,17 @@ admin.initializeApp({
 });
 
 // Setup modules
-AllSkills.setup().then(() => {
+AllSkills.setup().then(async () => {
   const shortlister = new JobShortLister(app);
   const messenger = new Messenger(app, shortlister);
   const jobAnalyzer = new JobAnalyzer(app, shortlister);
   const allSkills = new AllSkills(jobAnalyzer);
   const user = new User(app, allSkills);
+  const searcher = new JobSearcher(jobAnalyzer);
   new Friend(app, messenger);
-  new JobSearcher(jobAnalyzer);
   new ResumeParser(app, user);
+
+  await searcher.updateJobStore();
 });
 
 // Start the server
