@@ -43,7 +43,7 @@ export const elevation = {
 
 export const fonts = {
   sm: 12,
-  md: 15,
+  md: 14,
   lg: 23,
   normal: 'Muli-Regular',
   semiBold: 'Muli-SemiBold',
