@@ -73,7 +73,7 @@ export default class JobSwipe extends Component {
   dislikeJob = async (jobs, jobIndex) => {
     const { userId } = global;
     const oldIndex = jobIndex;
-    if (jobIndex < jobs.length) {
+    if (jobIndex < jobs.length - 1) {
       this.setState({ jobIndex: jobIndex + 1 });
     }
     await axios.post(`${config.ENDP_DISLIKE}`, {
@@ -87,7 +87,7 @@ export default class JobSwipe extends Component {
   likeJob = async (jobs, jobIndex) => {
     const { userId } = global;
     const oldIndex = jobIndex;
-    if (jobIndex < jobs.length) {
+    if (jobIndex < jobs.length - 1) {
       this.setState({ jobIndex: jobIndex + 1 });
     }
     await axios.post(`${config.ENDP_LIKE}`, {
