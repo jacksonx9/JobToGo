@@ -8,12 +8,14 @@ matrix:
     services:
       - docker
 
+    sudo: required
+
     - language: node_js
       node_js:
         - "10"
       before_script:
         - .travis/before_run.sh
-      script: docker-compose run node npm run test
+      script: sudo docker-compose run node npm run test
 
     # - os: osx
     #   language: objective-c
