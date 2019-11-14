@@ -7,20 +7,13 @@ matrix:
   include:
     - language: node_js
       node_js:
-        - "9"
+        - "10"
       before_script:
         - cd backend
+        - mkdir credentials
         - echo ' { "clientID": "encrypted.apps.googleusercontent.com" }' > credentials/google.json
         - npm i
       script: npm run test
-
-    # - language: node_js
-    #   node_js:
-    #     - "8"
-    #   before_script:
-    #     - cd backend
-    #     - npm i
-    #   script: npm run test
 
     # - os: osx
     #   language: objective-c
