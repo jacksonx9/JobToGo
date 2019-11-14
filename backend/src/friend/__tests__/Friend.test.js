@@ -6,7 +6,6 @@ import Messenger from '../../messenger';
 import Response from '../../types';
 import { Users } from '../../schema';
 
-jest.mock('../../../credentials/google');
 jest.mock('../../messenger');
 
 describe('Friend', () => {

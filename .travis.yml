@@ -10,6 +10,7 @@ matrix:
         - "9"
       before_script:
         - cd backend
+        - echo ' { "clientID": "encrypted.apps.googleusercontent.com" }' > credentials/google.json
         - npm i
       script: npm run test
 
