@@ -11,7 +11,6 @@ matrix:
       before_script:
         - cd backend
         - npm i
-        - docker-compose build
       script: npm run test
 
     # - language: node_js
@@ -20,7 +19,6 @@ matrix:
     #   before_script:
     #     - cd backend
     #     - npm i
-    #     - docker-compose build
     #   script: npm run test
 
     # - os: osx
