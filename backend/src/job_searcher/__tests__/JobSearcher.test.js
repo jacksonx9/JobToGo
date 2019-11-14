@@ -111,9 +111,10 @@ describe('Job Searcher', () => {
 
   test('updateJobStore: No Jobs', async () => {
     // First job fails, so we start at the second
-    const expectedJobs = testData.jobs.slice(1);
+    const expectedJobs = testData.jobs.slice(1).sort((a, b) => a.url.localeCompare(b.url));
     await jobSearcher.updateJobStore();
-    expect(await Jobs.find({}).lean()).toMatchObject(expectedJobs);
+    const jobs = await Jobs.find({}).lean();
+    expect(jobs.sort((a, b) => a.url.localeCompare(b.url))).toMatchObject(expectedJobs);
   });
 
   test('updateJobStore: Enough Jobs', async () => {
@@ -124,16 +125,11 @@ describe('Job Searcher', () => {
   });
 
   test('updateJobStore: Remove and add jobs', async () => {
-    /*
-     * We start with jobs 0, 1, 2, 3
-     * removeOutdatedJobs will remove jobs 0, 1, 2
-     * searchAndUpdateJobs will add jobs 1, 2, 3
-     * We end up with jobs 3, 1, 2
-     */
-    const expectedJobs = [testData.jobs[3], testData.jobs[1], testData.jobs[2]];
+    const expectedJobs = testData.jobs.slice(1).sort((a, b) => a.url.localeCompare(b.url));
     await Jobs.insertMany(testData.jobs);
     await jobSearcher.updateJobStore();
-    expect(await Jobs.find({}).lean()).toMatchObject(expectedJobs);
+    const jobs = await Jobs.find({}).lean();
+    expect(jobs.sort((a, b) => a.url.localeCompare(b.url))).toMatchObject(expectedJobs);
   });
 
   test('addToJobStore: None', async () => {
@@ -162,10 +158,11 @@ describe('Job Searcher', () => {
   });
 
   test('searchAndUpdateJobs: Success', async () => {
-    const expectedJobs = testData.jobs.slice(1);
+    const expectedJobs = testData.jobs.slice(1).sort((a, b) => a.url.localeCompare(b.url));
     await jobSearcher.searchAndUpdateJobs(jobConfig.keywords);
 
-    expect(await Jobs.find({}).lean()).toMatchObject(expectedJobs);
+    const jobs = await Jobs.find({}).lean();
+    expect(jobs.sort((a, b) => a.url.localeCompare(b.url))).toMatchObject(expectedJobs);
 
     // computeJobKeywordCount is called per job, per keyphrase
     expect(jobAnalyzer.computeJobKeywordCount)

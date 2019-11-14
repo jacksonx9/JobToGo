@@ -54,7 +54,9 @@ class JobSearcher {
           ...jobConfig.indeedQuery,
         });
 
-        const jobs = await Promise.all(queriedJobs.map(async (queriedJob) => {
+        const jobs = [];
+
+        await Promise.all(queriedJobs.map(async (queriedJob) => {
           try {
             const job = queriedJob;
             // Add description, unique url to each result by scraping the webpage
@@ -65,24 +67,21 @@ class JobSearcher {
 
             const jobExists = await Jobs.findOne({ url: job.url });
             // Check if job exists in the database already
-            if (jobExists !== null) {
-              return job;
+            if (!jobExists) {
+              job.keywords = [];
+              // Compute count of each keyword in the job
+              this.jobAnalyzer.computeJobKeywordCount(job, keywords);
             }
 
-            job.keywords = [];
-            // Compute count of each keyword in the job
-            this.jobAnalyzer.computeJobKeywordCount(job, keywords);
-            return job;
+            jobs.push(job);
           } catch (e) {
             // If we fail to get the job page, just ignore the job
             this.logger.error(e);
-            return null;
           }
         }));
-        const filteredJobs = jobs.filter(Boolean);
 
-        this.logger.info(`Found ${filteredJobs.length} jobs for keyword ${keyphrase}`);
-        await this.addToJobStore(filteredJobs);
+        this.logger.info(`Found ${jobs.length} jobs for keyword ${keyphrase}`);
+        await this.addToJobStore(jobs);
       } catch (e) {
         this.logger.error(e);
       }
@@ -110,40 +109,38 @@ class JobSearcher {
       return;
     }
 
-    // Map all jobs to either the id if the job is outdated, or null if the job is still active
-    const outdatedJobIds = await Promise.all(jobs.map(async (job) => {
+    const outdatedJobIds = [];
+    await Promise.all(jobs.map(async (job) => {
       try {
         const jobPage = await axios.get(job.url);
         const $ = cheerio.load(jobPage.data);
         // Look for HTML tags that determine a job has expired
         const expired = jobConfig.indeedExpiredTags.some(tag => $(tag).length > 0);
-        return expired ? job._id : null;
+        if (expired) {
+          outdatedJobIds.push(job._id);
+        }
       } catch (e) {
         // If the job url is not found, we assume the job has been taken down
         if (e.response.status === 404) {
-          return job._id;
+          outdatedJobIds.push(job._id);
         }
         // Or else log the error and keep the job
         this.logger.error(e.response.statusText);
-        return null;
       }
     }));
-
-    // Filter out all the non-null outdated jobIds
-    const filteredOutdatedJobIds = outdatedJobIds.filter(Boolean);
 
     try {
       // TODO: Change this so that jobs do not silently disappear
       // Remove jobs from all users
       await Users.updateMany({}, {
         $pullAll: {
-          likedJobs: filteredOutdatedJobIds,
-          seenJobs: filteredOutdatedJobIds,
+          likedJobs: outdatedJobIds,
+          seenJobs: outdatedJobIds,
         },
       });
       // Delete jobs from job store
       const deleteResult = await Jobs.deleteMany({
-        _id: filteredOutdatedJobIds,
+        _id: outdatedJobIds,
       });
       this.logger.info(`Removed ${deleteResult.deletedCount} outdated jobs!`);
     } catch (e) {
