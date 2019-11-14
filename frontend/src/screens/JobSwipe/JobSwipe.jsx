@@ -1,13 +1,15 @@
 
 import React, { Component } from 'react';
-import { View } from 'react-native';
+import { View, Text, FlatList } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
 import Swiper from 'react-native-deck-swiper';
+import Modal from 'react-native-modal';
 
 import JobCard from '../../components/JobCard';
 import Loader from '../../components/Loader';
 import MainHeader from '../../components/MainHeader';
+import SelectableItem from '../../components/SelectableItem';
 import OverlayLabel from '../../components/OverlayLabel/OverlayLabel';
 import config from '../../constants/config';
 import styles, { LOGO_SIZE } from './styles';
@@ -23,7 +25,9 @@ export default class JobSwipe extends Component {
     this.state = {
       jobs: [],
       jobIndex: 0,
+      friends: [],
       loading: 1,
+      isModalVisible: false,
     };
     this.logger = Logger.get(this.constructor.name);
   }
@@ -32,6 +36,17 @@ export default class JobSwipe extends Component {
     const { userId } = global;
     this.logger.info(`User id is: ${userId}`);
     this.fetchJobs(userId);
+  }
+
+
+  fetchFriends = async () => {
+    const { userId } = global;
+    const friends = await axios.get(`${config.ENDP_FRIENDS}${userId}`)
+      .catch(e => this.logger.error(e));
+
+    this.setState({
+      friends: friends.data.result,
+    });
   }
 
   fetchJobs = async userId => {
@@ -60,8 +75,20 @@ export default class JobSwipe extends Component {
     });
   }
 
-  shareJob = () => {
-    this.logger.info('Shared job');
+  shareJob = async friend => {
+    const { userId } = global;
+    // await axios.delete(config.ENDP_FRIENDS, {
+    //   data: {
+    //     userId,
+    //     friendId: item._id,
+    //   },
+    // }).catch(e => this.logger.error(e));
+
+    // this.setState({
+    //   sentJobFriends: pendingFriends.data.result,
+    //   loading: 0,
+    // });
+    console.log(friend.title);
   }
 
   getNextJob = (jobNum, jobIndex, userId) => {
@@ -123,6 +150,7 @@ export default class JobSwipe extends Component {
           )}
           onSwipedLeft={() => this.dislikeJob(jobs, jobIndex)}
           onSwipedRight={() => this.likeJob(jobs, jobIndex)}
+          onSwipedTop={() => this.setState({ isModalVisible: true })}
           cardIndex={jobIndex}
           marginTop={35}
           backgroundColor={colours.white}
@@ -145,6 +173,38 @@ export default class JobSwipe extends Component {
             },
           }}
         />
+
+        <Modal isVisible={this.state.isModalVisible}>
+          <View style={styles.modalContainer}>
+
+            <SelectableItem
+              key={jobs[jobIndex]._id}
+              header={jobs[jobIndex].title}
+              subHeader={jobs[jobIndex].company}
+              onPress={() => console.log('hi')}
+              actionIcon=""
+              disabled
+              backgroundColor={colours.primary}
+              titleColor={colours.white}
+              descriptionColor={colours.secondary}
+            />
+            <View style={styles.listContainer}>
+              <FlatList
+                data={jobs}
+                keyExtractor={item => item._id}
+                renderItem={({ item }) => (
+                  <SelectableItem
+                    key={item._id}
+                    header={item.title}
+                    subHeader={item.company}
+                    onPress={() => this.shareJob(item)}
+                    actionIcon="+"
+                  />
+                )}
+              />
+            </View>
+          </View>
+        </Modal>
       </View>
     );
   }
