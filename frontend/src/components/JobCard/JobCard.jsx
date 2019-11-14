@@ -1,13 +1,13 @@
 import React from 'react';
 import { View } from 'react-native';
-import { string } from 'prop-types';
+import { string, bool } from 'prop-types';
 
 import JobDetails from '../JobDetails';
 import JobImage from '../JobImage';
 import styles from './styles';
 
 const JobCard = ({
-  logo, company, title, location, description,
+  logo, company, title, location, description, isShared,
 }) => (
   <View style={styles.container}>
     <JobImage
@@ -16,7 +16,7 @@ const JobCard = ({
     <JobDetails
       company={company}
       title={title}
-      location={location}
+      location={isShared ? 'shared' : location}
       description={description}
     />
   </View>
@@ -32,6 +32,7 @@ JobCard.propTypes = {
   title: string.isRequired,
   location: string.isRequired,
   description: string.isRequired,
+  isShared: bool.isRequired,
 };
 
 export default JobCard;

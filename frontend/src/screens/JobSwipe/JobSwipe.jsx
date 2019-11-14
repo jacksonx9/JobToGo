@@ -88,30 +88,21 @@ export default class JobSwipe extends Component {
     });
   }
 
-  openJobShareModal = (jobs, jobIndex) => {
-    const { userId } = global;
+  openJobShareModal = () => {
     this.setState({ isModalVisible: true });
-    const oldIndex = jobIndex;
-    if (jobIndex < jobs.length - 1) {
-      this.setState({ jobIndex: jobIndex + 1 });
-    }
-    this.getNextJob(jobs.length, oldIndex, userId);
   }
 
-  shareJob = async friend => {
+  shareJob = async (friend, jobs, jobIndex) => {
     const { userId } = global;
-    // await axios.delete(config.ENDP_FRIENDS, {
-    //   data: {
-    //     userId,
-    //     friendId: item._id,
-    //   },
-    // }).catch(e => this.logger.error(e));
+    await axios.post(config.ENDP_FRIENDS, {
+      data: {
+        userId,
+        friendId: friend._id,
+        jobId: jobs[jobIndex]._id,
+      },
+    }).catch(e => this.logger.error(e));
 
-    // this.setState({
-    //   sentJobFriends: pendingFriends.data.result,
-    //   loading: 0,
-    // });
-    console.log(friend.title);
+    console.log(friend.userName);
   }
 
   getNextJob = (jobNum, jobIndex, userId) => {
@@ -127,15 +118,10 @@ export default class JobSwipe extends Component {
       this.setState({ jobIndex: jobIndex + 1 });
     }
 
-    if (jobs[oldIndex].isShared) {
-      console.log('is shared');
-    } else {
-      console.log('not shared');
-    }
-    // await axios.post(`${config.ENDP_DISLIKE}`, {
-    //   userId,
-    //   jobId: jobs[oldIndex]._id,
-    // }).catch(e => this.logger.error(e));
+    await axios.post(`${jobs[oldIndex].isShared ? config.ENDP_DISLIKE : config.ENDP_DISLIKE}`, {
+      userId,
+      jobId: jobs[oldIndex]._id,
+    }).catch(e => this.logger.error(e));
 
     this.getNextJob(jobs.length, oldIndex, userId);
   }
@@ -146,7 +132,7 @@ export default class JobSwipe extends Component {
     if (jobIndex < jobs.length - 1) {
       this.setState({ jobIndex: jobIndex + 1 });
     }
-    await axios.post(`${config.ENDP_LIKE}`, {
+    await axios.post(`${jobs[oldIndex].isShared ? config.ENXP_LIKE : config.ENDP_LIKE}`, {
       userId,
       jobId: jobs[oldIndex]._id,
     }).catch(e => this.logger.error(e));
@@ -156,7 +142,9 @@ export default class JobSwipe extends Component {
   }
 
   render() {
-    const { loading, jobs, jobIndex } = this.state;
+    const {
+      loading, jobs, jobIndex, friends,
+    } = this.state;
     const { navigation } = this.props;
 
     if (loading) return <Loader />;
@@ -181,7 +169,7 @@ export default class JobSwipe extends Component {
           )}
           onSwipedLeft={() => this.dislikeJob(jobs, jobIndex)}
           onSwipedRight={() => this.likeJob(jobs, jobIndex)}
-          onSwipedTop={() => this.openJobShareModal(jobs, jobIndex)}
+          onTapCard={() => this.openJobShareModal()}
           cardIndex={jobIndex}
           marginTop={35}
           backgroundColor={colours.white}
@@ -230,14 +218,14 @@ export default class JobSwipe extends Component {
             </View>
             <View style={styles.listContainer}>
               <FlatList
-                data={jobs}
+                data={friends}
                 keyExtractor={item => item._id}
                 renderItem={({ item }) => (
                   <SelectableItem
                     key={item._id}
-                    header={item.title}
-                    subHeader={item.company}
-                    onPress={() => this.shareJob(item)}
+                    header={item.userName}
+                    subHeader={item.email}
+                    onPress={() => this.shareJob(item, jobs, jobIndex)}
                     actionIcon="+"
                   />
                 )}
