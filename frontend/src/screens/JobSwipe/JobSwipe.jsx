@@ -105,7 +105,7 @@ export default class JobSwipe extends Component {
     if (loading) return <Loader />;
 
     return (
-      <View style={[jobSwipeStyles.container]}>
+      <View style={[styles.container]}>
         <MainHeader
           onPressMenu={() => navigation.openDrawer()}
           onPressSend={() => navigation.navigate('SendLikedJobs')}
