@@ -9,11 +9,7 @@ matrix:
       node_js:
         - "10"
       before_script:
-        - git checkout travis-ci
-        - cd backend
-        - mkdir credentials
-        - echo ' { "clientID": "encrypted.apps.googleusercontent.com" }' > credentials/google.json
-        - npm i
+        - .travis/before_run.sh
       script: npm run test
 
     # - os: osx
