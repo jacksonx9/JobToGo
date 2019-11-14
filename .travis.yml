@@ -1,7 +1,7 @@
-branches:
-  only:
-    # - master
-    - travis-ci
+# branches:
+#   only:
+#     # - master
+#     - travis-ci
 
 matrix:
   include:
@@ -9,6 +9,7 @@ matrix:
       node_js:
         - "10"
       before_script:
+        - git checkout travis-ci
         - cd backend
         - mkdir credentials
         - echo ' { "clientID": "encrypted.apps.googleusercontent.com" }' > credentials/google.json
