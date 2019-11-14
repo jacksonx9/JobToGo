@@ -7,6 +7,7 @@ import Swiper from 'react-native-deck-swiper';
 import Modal from 'react-native-modal';
 
 import JobCard from '../../components/JobCard';
+import ImageButton from '../../components/ImageButton';
 import Loader from '../../components/Loader';
 import MainHeader from '../../components/MainHeader';
 import SelectableItem from '../../components/SelectableItem';
@@ -14,6 +15,7 @@ import OverlayLabel from '../../components/OverlayLabel/OverlayLabel';
 import config from '../../constants/config';
 import styles, { LOGO_SIZE } from './styles';
 import { colours } from '../../styles';
+import images from '../../constants/images';
 
 export default class JobSwipe extends Component {
   static navigationOptions = {
@@ -75,6 +77,16 @@ export default class JobSwipe extends Component {
     });
   }
 
+  openJobShareModal = (jobs, jobIndex) => {
+    const { userId } = global;
+    this.setState({ isModalVisible: true });
+    const oldIndex = jobIndex;
+    if (jobIndex < jobs.length - 1) {
+      this.setState({ jobIndex: jobIndex + 1 });
+    }
+    this.getNextJob(jobs.length, oldIndex, userId);
+  }
+
   shareJob = async friend => {
     const { userId } = global;
     // await axios.delete(config.ENDP_FRIENDS, {
@@ -122,6 +134,7 @@ export default class JobSwipe extends Component {
       jobId: jobs[oldIndex]._id,
     }).catch(e => this.logger.error(e));
 
+    console.log(jobs[oldIndex].company);
     this.getNextJob(jobs.length, oldIndex, userId);
   }
 
@@ -150,7 +163,7 @@ export default class JobSwipe extends Component {
           )}
           onSwipedLeft={() => this.dislikeJob(jobs, jobIndex)}
           onSwipedRight={() => this.likeJob(jobs, jobIndex)}
-          onSwipedTop={() => this.setState({ isModalVisible: true })}
+          onSwipedTop={() => this.openJobShareModal(jobs, jobIndex)}
           cardIndex={jobIndex}
           marginTop={35}
           backgroundColor={colours.white}
@@ -176,9 +189,14 @@ export default class JobSwipe extends Component {
 
         <Modal isVisible={this.state.isModalVisible}>
           <View style={styles.modalContainer}>
+            <View style={styles.exitButtonContainer}>
+              <ImageButton
+                source={images.iconChevronLeft}
+                onPress={() => this.setState({ isModalVisible: false })}
+              />
+            </View>
 
             <SelectableItem
-              key={jobs[jobIndex]._id}
               header={jobs[jobIndex].title}
               subHeader={jobs[jobIndex].company}
               onPress={() => console.log('hi')}
@@ -188,6 +206,9 @@ export default class JobSwipe extends Component {
               titleColor={colours.white}
               descriptionColor={colours.secondary}
             />
+            <View style={styles.sectionTitleContainer}>
+              <Text style={styles.sectionTitle}>Share this Job with Friends</Text>
+            </View>
             <View style={styles.listContainer}>
               <FlatList
                 data={jobs}
