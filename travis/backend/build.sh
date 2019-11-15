@@ -5,7 +5,7 @@ set -e
 cd backend
 
 mkdir credentials
-echo ' { "clientID": "encrypted.apps.googleusercontent.com" }' > credentials/google.json
+cp ../travis/backend/dummy_credentials/* credentials/
 
 docker-compose build --parallel
 
