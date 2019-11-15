@@ -60,7 +60,7 @@ class JobShortLister {
 
   async getSeenJobIds(userId) {
     // Throws if userId is invalid
-    const user = await Users.findById(userId, 'seenJobs').orFail();
+    const user = await Users.findById(userId, 'seenJobs').lean().orFail();
     return user.seenJobs;
   }
 
@@ -114,13 +114,10 @@ class JobShortLister {
     }
 
     try {
-      // Make sure the job is a liked job
-      const userLikedJob = await Users.findOne({
-        _id: userId,
-        likedJobs: jobId,
-      });
+      const user = await Users.findById(userId).orFail();
+      await Jobs.findById(jobId).orFail();
 
-      if (userLikedJob === null) {
+      if (!user.likedJobs.includes(jobId)) {
         return new Response(false, 'Not a liked job', 400);
       }
 
@@ -192,21 +189,17 @@ class JobShortLister {
 
       // Increment and decrement the user's keywords' score
       job.keywords.forEach((jobKeywordData) => {
-        try {
-          const userKeywordIdx = user.keywords.findIndex(userKeywordData => (
-            jobKeywordData.name === userKeywordData.name
-          ));
+        const userKeywordIdx = user.keywords.findIndex(userKeywordData => (
+          jobKeywordData.name === userKeywordData.name
+        ));
 
-          if (userKeywordIdx !== -1) {
-            if (type === 'likedJobs') {
-              user.keywords[userKeywordIdx].score += jobKeywordData.count;
-            } else {
-              user.keywords[userKeywordIdx].score -= jobKeywordData.count;
-            }
-            user.keywords[userKeywordIdx].jobCount += 1;
+        if (userKeywordIdx !== -1) {
+          if (type === 'likedJobs') {
+            user.keywords[userKeywordIdx].score += jobKeywordData.count;
+          } else {
+            user.keywords[userKeywordIdx].score -= jobKeywordData.count;
           }
-        } catch (e) {
-          this.logger.error(e);
+          user.keywords[userKeywordIdx].jobCount += 1;
         }
       });
 
