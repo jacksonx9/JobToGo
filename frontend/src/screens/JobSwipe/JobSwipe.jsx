@@ -31,8 +31,8 @@ export default class JobSwipe extends Component {
       sharedJobIndex: 0,
       friends: [],
       loading: 1,
-      sharedJobsView: false,
-      isModalVisible: false,
+      isSharedJobsView: true,
+      isJobShareModalVisible: false,
     };
     this.logger = Logger.get(this.constructor.name);
     this.jobTypes = {
@@ -49,7 +49,6 @@ export default class JobSwipe extends Component {
     const { userId } = global;
     this.logger.info(`User id is: ${userId}`);
     this.fetchJobs(userId, this.jobTypes.MATCHED);
-    this.fetchJobs(userId, this.jobTypes.SHARED);
     this.fetchFriends(userId);
   }
 
@@ -70,7 +69,7 @@ export default class JobSwipe extends Component {
     const fetchSharedJobs = (jobType === this.jobTypes.SHARED);
 
     const jobsResp = await axios.get(`${fetchSharedJobs
-      ? config.ENDP_SHARED_JOBS : config.ENDP_JOBS}${userId}`).catch(e => this.logger.error(e));
+      ? config.ENDP_LIKE : config.ENDP_JOBS}${userId}`).catch(e => this.logger.error(e));
     const jobs = jobsResp.data.result;
 
     // Get the logo url of each company
@@ -102,7 +101,13 @@ export default class JobSwipe extends Component {
   }
 
 openJobShareModal = () => {
-  this.setState({ isModalVisible: true });
+  this.setState({ isJobShareModalVisible: true });
+}
+
+toggleSharedJobsView = () => {
+  const { userId } = global;
+  this.fetchJobs(userId, this.jobTypes.SHARED);
+  this.setState({ isSharedJobsView: true });
 }
 
 shareJob = async (friend, jobs, jobIndex) => {
@@ -115,6 +120,8 @@ shareJob = async (friend, jobs, jobIndex) => {
 }
 
 swipeJob = async (jobs, jobIndex, jobType, swipeAction) => {
+  this.logger.info(`${swipeAction} ${jobType} job`);
+
   const { userId } = global;
   const isSharedJob = (jobType === this.jobTypes.SHARED);
   const isLikedJob = (swipeAction === this.swipeActionTypes.LIKE);
@@ -153,12 +160,12 @@ swipeJob = async (jobs, jobIndex, jobType, swipeAction) => {
 
 render() {
   const {
-    loading, sharedJobsView, matchedJobs, matchedJobIndex, sharedJobs, sharedJobIndex, friends,
+    loading, isSharedJobsView, matchedJobs, matchedJobIndex, sharedJobs, sharedJobIndex, friends,
   } = this.state;
   const { navigation } = this.props;
-  const jobs = sharedJobsView ? sharedJobs : matchedJobs;
-  const jobIndex = sharedJobsView ? sharedJobIndex : matchedJobIndex;
-  const jobType = sharedJobsView ? this.jobTypes.SHARED : this.jobTypes.MATCHED;
+  const jobs = isSharedJobsView ? sharedJobs : matchedJobs;
+  const jobIndex = isSharedJobsView ? sharedJobIndex : matchedJobIndex;
+  const jobType = isSharedJobsView ? this.jobTypes.SHARED : this.jobTypes.MATCHED;
 
   if (loading) return <Loader />;
 
@@ -207,13 +214,13 @@ render() {
       />
 
       <Modal
-        isVisible={this.state.isModalVisible}
+        isVisible={this.state.isJobShareModalVisible}
       >
         <View style={styles.modalContainer}>
           <View style={styles.exitButtonContainer}>
             <ImageButton
               source={images.iconChevronLeft}
-              onPress={() => this.setState({ isModalVisible: false })}
+              onPress={() => this.setState({ isJobShareModalVisible: false })}
             />
           </View>
           <SelectableItem
