@@ -1,21 +1,19 @@
 
 import React, { Component } from 'react';
-import { View, Text, FlatList } from 'react-native';
+import { View } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
 import Swiper from 'react-native-deck-swiper';
-import Modal from 'react-native-modal';
 
 import JobCard from '../../components/JobCard';
-import ImageButton from '../../components/ImageButton';
 import Loader from '../../components/Loader';
 import MainHeader from '../../components/MainHeader';
-import SelectableItem from '../../components/SelectableItem';
 import OverlayLabel from '../../components/OverlayLabel/OverlayLabel';
 import config from '../../constants/config';
 import styles, { LOGO_SIZE } from './styles';
 import { colours } from '../../styles';
 import images from '../../constants/images';
+import JobShareModal from '../../components/JobShareModal';
 
 export default class JobSwipe extends Component {
   static navigationOptions = {
@@ -100,161 +98,133 @@ export default class JobSwipe extends Component {
     }
   }
 
-openJobShareModal = () => {
-  this.setState({ isJobShareModalVisible: true });
-}
-
-toggleSharedJobsView = () => {
-  const { userId } = global;
-  const { isSharedJobsView } = this.state;
-  this.fetchJobs(userId, this.jobTypes.SHARED);
-  this.setState({ isSharedJobsView: !isSharedJobsView });
-}
-
-shareJob = async (friend, jobs, jobIndex) => {
-  const { userId } = global;
-  await axios.post(config.ENDP_SHARE_JOB, {
-    userId,
-    friendId: friend._id,
-    jobId: jobs[jobIndex]._id,
-  }).catch(e => this.logger.error(e));
-}
-
-swipeJob = async (jobs, jobIndex, jobType, swipeAction) => {
-  this.logger.info(`${swipeAction} ${jobType} job`);
-
-  const { userId } = global;
-  const isSharedJob = (jobType === this.jobTypes.SHARED);
-  const isLikedJob = (swipeAction === this.swipeActionTypes.LIKE);
-  let endpoint;
-
-  if (isSharedJob) {
-    if (isLikedJob) {
-      endpoint = config.ENDP_LIKE_SHARED;
-    } else {
-      endpoint = config.ENDP_DISLIKE_SHARED;
-    }
-  } else if (isLikedJob) {
-    endpoint = config.ENDP_LIKE;
-  } else {
-    endpoint = config.ENDP_DISLIKE;
+  openJobShareModal = () => {
+    this.setState({ isJobShareModalVisible: true });
   }
 
-  const oldIndex = jobIndex;
-  if (jobIndex < jobs.length - 1) {
+  toggleSharedJobsView = () => {
+    const { userId } = global;
+    const { isSharedJobsView } = this.state;
+    this.fetchJobs(userId, this.jobTypes.SHARED);
+    this.setState({ isSharedJobsView: !isSharedJobsView });
+  }
+
+  shareJob = async (friend, jobId) => {
+    this.logger.info(`Shared job with Id: ${jobId} with ${friend.userName}`);
+    const { userId } = global;
+    await axios.post(config.ENDP_SHARE_JOB, {
+      userId,
+      friendId: friend._id,
+      jobId,
+    }).catch(e => this.logger.error(e));
+  }
+
+  swipeJob = async (jobs, jobIndex, jobType, swipeAction) => {
+    this.logger.info(`${swipeAction} ${jobType} job`);
+
+    const { userId } = global;
+    const isSharedJob = (jobType === this.jobTypes.SHARED);
+    const isLikedJob = (swipeAction === this.swipeActionTypes.LIKE);
+    let endpoint;
+
     if (isSharedJob) {
-      this.setState({ sharedJobIndex: jobIndex + 1 });
+      if (isLikedJob) {
+        endpoint = config.ENDP_LIKE_SHARED;
+      } else {
+        endpoint = config.ENDP_DISLIKE_SHARED;
+      }
+    } else if (isLikedJob) {
+      endpoint = config.ENDP_LIKE;
     } else {
-      this.setState({ matchedJobIndex: jobIndex + 1 });
+      endpoint = config.ENDP_DISLIKE;
+    }
+
+    const oldIndex = jobIndex;
+    if (jobIndex < jobs.length - 1) {
+      if (isSharedJob) {
+        this.setState({ sharedJobIndex: jobIndex + 1 });
+      } else {
+        this.setState({ matchedJobIndex: jobIndex + 1 });
+      }
+    }
+
+    await axios.post(`${endpoint}`, {
+      userId,
+      jobId: jobs[oldIndex]._id,
+    }).catch(e => this.logger.error(e));
+
+    if (jobs.length === (oldIndex + 1)) {
+      this.fetchJobs(userId, jobType);
     }
   }
 
-  await axios.post(`${endpoint}`, {
-    userId,
-    jobId: jobs[oldIndex]._id,
-  }).catch(e => this.logger.error(e));
+  render() {
+    const {
+      loading, isSharedJobsView, isJobShareModalVisible, matchedJobs, matchedJobIndex,
+      sharedJobs, sharedJobIndex, friends,
+    } = this.state;
+    const jobs = isSharedJobsView ? sharedJobs : matchedJobs;
+    const jobIndex = isSharedJobsView ? sharedJobIndex : matchedJobIndex;
+    const jobType = isSharedJobsView ? this.jobTypes.SHARED : this.jobTypes.MATCHED;
+    const job = jobs[jobIndex];
+    const menuButtonSource = isSharedJobsView ? images.iconChevronLeft : images.iconInbox;
 
-  if (jobs.length === (oldIndex + 1)) {
-    this.fetchJobs(userId, jobType);
+    if (loading) return <Loader />;
+
+    return (
+      <View style={[styles.container]}>
+        <MainHeader
+          buttonSource={menuButtonSource}
+          onPress={() => this.toggleSharedJobsView()}
+        />
+        <Swiper
+          cards={jobs}
+          renderCard={posting => (
+            <JobCard
+              logo={posting.logo}
+              company={posting.company}
+              title={posting.title}
+              location={posting.location}
+              description={posting.description}
+              isShared={posting.isShared}
+            />
+          )}
+          onSwipedLeft={() => this.swipeJob(jobs, jobIndex, jobType, this.swipeActionTypes.LIKE)}
+          onSwipedRight={() => this.swipeJob(jobs, jobIndex, jobType, this.swipeActionTypes.DISLIKE)}
+          onTapCard={() => this.openJobShareModal()}
+          cardIndex={jobIndex}
+          marginTop={35}
+          backgroundColor={colours.white}
+          stackSize={5}
+          animateOverlayLabelsOpacity
+          overlayLabels={{
+            left: {
+              title: 'NOPE',
+              element: <OverlayLabel label="NOPE" color={colours.primary} />,
+              style: {
+                wrapper: styles.overlayDislike,
+              },
+            },
+            right: {
+              title: 'LIKE',
+              element: <OverlayLabel label="LIKE" color={colours.accentPrimary} />,
+              style: {
+                wrapper: styles.overlayLike,
+              },
+            },
+          }}
+        />
+
+        <JobShareModal
+          isVisible={isJobShareModalVisible}
+          onPressExit={() => this.setState({ isJobShareModalVisible: false })}
+          jobTitle={job.title}
+          jobCompany={job.company}
+          jobId={job._id}
+          friends={friends}
+          onPressSend={this.shareJob}
+        />
+      </View>
+    );
   }
-}
-
-render() {
-  const {
-    loading, isSharedJobsView, matchedJobs, matchedJobIndex, sharedJobs, sharedJobIndex, friends,
-  } = this.state;
-  const jobs = isSharedJobsView ? sharedJobs : matchedJobs;
-  const jobIndex = isSharedJobsView ? sharedJobIndex : matchedJobIndex;
-  const jobType = isSharedJobsView ? this.jobTypes.SHARED : this.jobTypes.MATCHED;
-  const menuButtonSource = isSharedJobsView ? images.iconChevronLeft : images.iconInbox;
-
-  if (loading) return <Loader />;
-
-  return (
-    <View style={[styles.container]}>
-      <MainHeader
-        buttonSource={menuButtonSource}
-        onPress={() => this.toggleSharedJobsView()}
-      />
-      <Swiper
-        cards={jobs}
-        renderCard={posting => (
-          <JobCard
-            logo={posting.logo}
-            company={posting.company}
-            title={posting.title}
-            location={posting.location}
-            description={posting.description}
-            isShared={posting.isShared}
-          />
-        )}
-        onSwipedLeft={() => this.swipeJob(jobs, jobIndex, jobType, this.swipeActionTypes.LIKE)}
-        onSwipedRight={() => this.swipeJob(jobs, jobIndex, jobType, this.swipeActionTypes.DISLIKE)}
-        onTapCard={() => this.openJobShareModal()}
-        cardIndex={jobIndex}
-        marginTop={35}
-        backgroundColor={colours.white}
-        stackSize={5}
-        animateOverlayLabelsOpacity
-        overlayLabels={{
-          left: {
-            title: 'NOPE',
-            element: <OverlayLabel label="NOPE" color={colours.primary} />,
-            style: {
-              wrapper: styles.overlayDislike,
-            },
-          },
-          right: {
-            title: 'LIKE',
-            element: <OverlayLabel label="LIKE" color={colours.accentPrimary} />,
-            style: {
-              wrapper: styles.overlayLike,
-            },
-          },
-        }}
-      />
-
-      <Modal
-        isVisible={this.state.isJobShareModalVisible}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.exitButtonContainer}>
-            <ImageButton
-              source={images.iconCross}
-              onPress={() => this.setState({ isJobShareModalVisible: false })}
-            />
-          </View>
-          <SelectableItem
-            header={jobs[jobIndex].title}
-            subHeader={jobs[jobIndex].company}
-            onPress={() => console.log('hi')}
-            actionIcon=""
-            disabled
-            backgroundColor={colours.primary}
-            titleColor={colours.white}
-            descriptionColor={colours.secondary}
-          />
-          <View style={styles.sectionTitleContainer}>
-            <Text style={styles.sectionTitle}>Share this Job with Friends</Text>
-          </View>
-          <View style={styles.listContainer}>
-            <FlatList
-              data={friends}
-              keyExtractor={item => item._id}
-              renderItem={({ item }) => (
-                <SelectableItem
-                  key={item._id}
-                  header={item.userName}
-                  subHeader={item.email}
-                  onPress={() => this.shareJob(item, jobs, jobIndex)}
-                  actionIcon="+"
-                />
-              )}
-            />
-          </View>
-        </View>
-      </Modal>
-    </View>
-  );
-}
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Image } from 'react-native';
+import { number, func } from 'prop-types';
 
 import ImageButton from '../ImageButton';
 import images from '../../constants/images';
@@ -18,5 +19,10 @@ const MainHeader = ({ buttonSource, onPress }) => (
     </View>
   </View>
 );
+
+MainHeader.propTypes = {
+  buttonSource: number.isRequired,
+  onPress: func.isRequired,
+};
 
 export default MainHeader;
