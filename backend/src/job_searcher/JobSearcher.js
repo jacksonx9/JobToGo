@@ -15,14 +15,13 @@ class JobSearcher {
 
     this.jobAnalyzer = jobAnalyzer;
 
-    this.updateJobStore().then({}).catch(e => this.logger.error(e));
     this.setupDailyUpdateJobStore();
   }
 
   setupDailyUpdateJobStore() {
     // Update job store at 0s, 0min, 0h UTC (midnight)
     scheduler.scheduleJob('0 0 0 * * *', async () => {
-      await this.updateJobStore().catch(e => this.logger.error(e));
+      await this.updateJobStore();
     });
   }
 
@@ -32,7 +31,7 @@ class JobSearcher {
 
     const count = await Jobs.countDocuments({});
 
-    if (count > MIN_JOBS_IN_DB) {
+    if (count >= MIN_JOBS_IN_DB) {
       return;
     }
 
@@ -50,27 +49,35 @@ class JobSearcher {
 
     await Promise.all(keyphrases.map(async (keyphrase) => {
       try {
-        const jobs = await indeed.query({
+        const queriedJobs = await indeed.query({
           query: keyphrase,
           ...jobConfig.indeedQuery,
         });
 
-        await Promise.all(jobs.map(async (job, jobIdx) => {
-          // Add description, unique url to each result by scraping the webpage
-          const jobPage = await axios.get(job.url);
-          const $ = cheerio.load(jobPage.data);
-          jobs[jobIdx].description = $(job.indeedJobDescTag).text();
-          jobs[jobIdx].url = $(job.indeedJobUrlTag).attr('content');
+        const jobs = [];
 
-          const jobExists = await Jobs.findOne({ url: jobs[jobIdx].url });
-          // Check if job exists in the database already
-          if (jobExists !== null) {
-            return;
+        await Promise.all(queriedJobs.map(async (queriedJob) => {
+          try {
+            const job = queriedJob;
+            // Add description, unique url to each result by scraping the webpage
+            const jobPage = await axios.get(queriedJob.url);
+            const $ = cheerio.load(jobPage.data);
+            job.description = $(jobConfig.indeedJobDescTag).text();
+            job.url = $(jobConfig.indeedJobUrlTag).attr('content');
+
+            const jobExists = await Jobs.findOne({ url: job.url });
+            // Check if job exists in the database already
+            if (!jobExists) {
+              job.keywords = [];
+              // Compute count of each keyword in the job
+              this.jobAnalyzer.computeJobKeywordCount(job, keywords);
+            }
+
+            jobs.push(job);
+          } catch (e) {
+            // If we fail to get the job page, just ignore the job
+            this.logger.error(e);
           }
-
-          jobs[jobIdx].keywords = [];
-          // Compute count of each keyword in the job
-          this.jobAnalyzer.computeJobKeywordCount(jobs[jobIdx], keywords);
         }));
 
         this.logger.info(`Found ${jobs.length} jobs for keyword ${keyphrase}`);
@@ -97,40 +104,43 @@ class JobSearcher {
 
     const jobs = await Jobs.find({});
 
-    // Map all jobs to either the id if the job is outdated, or null if the job is still active
-    const outdatedJobIds = await Promise.all(jobs.map(async (job) => {
+    if (jobs.length === 0) {
+      this.logger.info('No jobs to be removed!');
+      return;
+    }
+
+    const outdatedJobIds = [];
+    await Promise.all(jobs.map(async (job) => {
       try {
         const jobPage = await axios.get(job.url);
         const $ = cheerio.load(jobPage.data);
         // Look for HTML tags that determine a job has expired
         const expired = jobConfig.indeedExpiredTags.some(tag => $(tag).length > 0);
-        return expired ? job._id : null;
+        if (expired) {
+          outdatedJobIds.push(job._id);
+        }
       } catch (e) {
         // If the job url is not found, we assume the job has been taken down
         if (e.response.status === 404) {
-          return job._id;
+          outdatedJobIds.push(job._id);
         }
         // Or else log the error and keep the job
         this.logger.error(e.response.statusText);
-        return null;
       }
     }));
-
-    // Filter out all the non-null outdated jobIds
-    const filteredOutdatedJobIds = outdatedJobIds.filter(Boolean);
 
     try {
       // TODO: Change this so that jobs do not silently disappear
       // Remove jobs from all users
       await Users.updateMany({}, {
         $pullAll: {
-          likedJobs: filteredOutdatedJobIds,
-          seenJobs: filteredOutdatedJobIds,
+          likedJobs: outdatedJobIds,
+          seenJobs: outdatedJobIds,
         },
       });
       // Delete jobs from job store
       const deleteResult = await Jobs.deleteMany({
-        _id: filteredOutdatedJobIds,
+        _id: outdatedJobIds,
       });
       this.logger.info(`Removed ${deleteResult.deletedCount} outdated jobs!`);
     } catch (e) {
