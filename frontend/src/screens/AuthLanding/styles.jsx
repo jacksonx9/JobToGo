@@ -8,20 +8,23 @@ const styles = StyleSheet.create({
   container: {
     ...containers.fullScreenContainer,
     flexDirection: 'column',
+    justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: padding.lg,
   },
   logo: {
-    height: 80,
-    width: '100%',
-    transform: [{ scale: 0.65 }],
-    marginTop: 50,
-    marginBottom: margin.md,
+    resizeMode: 'contain',
+    height: '10%',
   },
   image: {
-    height: 300,
+    resizeMode: 'contain',
+    height: '50%',
+  },
+  buttonSection: {
     width: '100%',
-    marginBottom: margin.md,
+    height: '30%',
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   googleButton: {
     height: 50,
