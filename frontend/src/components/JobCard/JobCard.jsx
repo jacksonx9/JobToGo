@@ -24,6 +24,7 @@ const JobCard = ({
 
 JobCard.defaultProps = {
   logo: null,
+  isShared: false,
 };
 
 JobCard.propTypes = {
@@ -32,7 +33,7 @@ JobCard.propTypes = {
   title: string.isRequired,
   location: string.isRequired,
   description: string.isRequired,
-  isShared: bool.isRequired,
+  isShared: bool,
 };
 
 export default JobCard;
