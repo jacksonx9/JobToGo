@@ -40,6 +40,7 @@ export const border = {
 
 export const elevation = {
   md: 10,
+  lg: 20,
 };
 
 export const fonts = {

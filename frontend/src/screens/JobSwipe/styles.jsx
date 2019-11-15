@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 import {
-  containers, padding, colours,
+  containers, padding, colours, elevation,
 } from '../../styles';
 
 const LOGO_SIZE = 200;
@@ -21,6 +21,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 30,
     marginLeft: -30,
+    elevation: elevation.lg,
   },
   overlayLike: {
     flexDirection: 'column',
@@ -28,6 +29,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 30,
     marginLeft: 30,
+    elevation: elevation.lg,
   },
 });
 
