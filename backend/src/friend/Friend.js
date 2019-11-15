@@ -90,13 +90,7 @@ class Friend {
 
       // Send push notification
       const messageResponse = await this.messenger.sendFriendJob(userId, friendId, jobId);
-      if (!messageResponse.result) {
-        return messageResponse;
-      }
-
-      // user does not need to see job keywords
-      delete job.keywords;
-      return new Response(job, '', 200);
+      return new Response(messageResponse, '', 200);
     } catch (e) {
       return new Response(false, 'Invalid userId, friendId, or jobId', 400);
     }
