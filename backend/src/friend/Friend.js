@@ -11,7 +11,6 @@ class Friend {
     this.messenger = messenger;
 
     app.post('/friends/sendJob', async (req, res) => {
-      this.logger.info(req.body);
       const response = await this.sendJob(req.body.userId, req.body.friendId, req.body.jobId);
       res.status(response.status).send(response);
     });
@@ -69,7 +68,6 @@ class Friend {
     }
 
     // TODO: check if user has already seen or rejected the job
-
     try {
       // Verify userId is valid
       await Users.findById(userId).orFail();
@@ -137,9 +135,9 @@ class Friend {
         await user.save();
 
         return new Response(true, '', 200);
-      } else {
-        return new Response(false, 'User did not get job from friend', 400);
       }
+
+      return new Response(false, 'User did not get job from friend', 400);
     } catch (e) {
       return new Response(false, 'Invalid userId or jobId', 400);
     }
@@ -154,7 +152,9 @@ class Friend {
     try {
       const user = await Users.findById(userId).lean().orFail();
       const jobIds = user.friendSuggestedJobs;
-      const jobs = await Jobs.find({ _id: { $in: jobIds }});
+      const jobs = await Jobs.find({
+        _id: { $in: jobIds },
+      });
 
       return new Response(jobs, '', 200);
     } catch (e) {
