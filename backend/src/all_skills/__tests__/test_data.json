@@ -1,0 +1,38 @@
+{
+    "skills": [
+        "c++",
+        "java",
+        "python",
+        "software development",
+        "docker"
+    ],
+    "jobs": [
+        {
+            "title" : "GUI Developer",
+            "url" : "http://www.indeed.com/viewjob?from=appsharedroid&jk=5c8da5f9bbcdd50e",
+            "company" : "Convergent Science",
+            "location" : "Madison, WI 53719",
+            "postDate" : "",
+            "salary" : "",
+            "description" : "GUI DEVELOPER"
+        },
+        {
+            "title" : "System Safety Engineer",
+            "url" : "http://www.indeed.com/viewjob?from=appsharedroid&jk=569fc33a06b50b45",
+            "company" : "Advanced Logistics Support Corporation",
+            "location" : "Albuquerque, NM 87102 (Barelas area)",
+            "postDate" : "",
+            "salary" : "",
+            "description" : "Senior Avionics Systems Safety Engineer Advanced Logistics Support"
+        },
+        {
+            "title" : "PyMOL Engineer",
+            "url" : "http://www.indeed.com/viewjob?from=appsharedroid&jk=f529f96e15869d03",
+            "company" : "Schrödinger",
+            "location" : "New York, NY 10036",
+            "postDate" : "13 days ago",
+            "salary" : "",
+            "description" : "We’re looking to hire a PyMOL Software Engineer to join us in our mission to design drugs that improve human health and materials that increase quality of life!"
+        }
+    ]
+}
