@@ -10,6 +10,8 @@ import iconChevronDown from '../../assets/icon-chevron-down.png';
 import iconChevronLeft from '../../assets/icon-chevron-left.png';
 import iconJob from '../../assets/icon-job.png';
 import iconSearch from '../../assets/icon-search.png';
+import iconCross from '../../assets/icon-cross.png';
+import iconInbox from '../../assets/icon-inbox.png';
 import jobBackground from '../../assets/temp-bg1.png';
 import jobSeeker from '../../assets/job-seeker.png';
 
@@ -26,6 +28,8 @@ const images = {
   iconChevronLeft,
   iconJob,
   iconSearch,
+  iconCross,
+  iconInbox,
   jobBackground,
   jobSeeker,
 };

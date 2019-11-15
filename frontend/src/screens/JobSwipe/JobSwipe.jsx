@@ -166,7 +166,7 @@ render() {
   const jobs = isSharedJobsView ? sharedJobs : matchedJobs;
   const jobIndex = isSharedJobsView ? sharedJobIndex : matchedJobIndex;
   const jobType = isSharedJobsView ? this.jobTypes.SHARED : this.jobTypes.MATCHED;
-  const menuButtonSource = isSharedJobsView ? images.iconMenu : images.iconChevronLeft;
+  const menuButtonSource = isSharedJobsView ? images.iconChevronLeft : images.iconInbox;
 
   if (loading) return <Loader />;
 
@@ -220,7 +220,7 @@ render() {
         <View style={styles.modalContainer}>
           <View style={styles.exitButtonContainer}>
             <ImageButton
-              source={images.iconChevronLeft}
+              source={images.iconCross}
               onPress={() => this.setState({ isJobShareModalVisible: false })}
             />
           </View>
