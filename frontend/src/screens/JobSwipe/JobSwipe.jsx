@@ -31,7 +31,7 @@ export default class JobSwipe extends Component {
       sharedJobIndex: 0,
       friends: [],
       loading: 1,
-      isSharedJobsView: true,
+      isSharedJobsView: false,
       isJobShareModalVisible: false,
     };
     this.logger = Logger.get(this.constructor.name);
@@ -106,8 +106,9 @@ openJobShareModal = () => {
 
 toggleSharedJobsView = () => {
   const { userId } = global;
+  const { isSharedJobsView } = this.state;
   this.fetchJobs(userId, this.jobTypes.SHARED);
-  this.setState({ isSharedJobsView: true });
+  this.setState({ isSharedJobsView: !isSharedJobsView });
 }
 
 shareJob = async (friend, jobs, jobIndex) => {
@@ -162,18 +163,18 @@ render() {
   const {
     loading, isSharedJobsView, matchedJobs, matchedJobIndex, sharedJobs, sharedJobIndex, friends,
   } = this.state;
-  const { navigation } = this.props;
   const jobs = isSharedJobsView ? sharedJobs : matchedJobs;
   const jobIndex = isSharedJobsView ? sharedJobIndex : matchedJobIndex;
   const jobType = isSharedJobsView ? this.jobTypes.SHARED : this.jobTypes.MATCHED;
+  const menuButtonSource = isSharedJobsView ? images.iconMenu : images.iconChevronLeft;
 
   if (loading) return <Loader />;
 
   return (
     <View style={[styles.container]}>
       <MainHeader
-        onPressMenu={() => navigation.openDrawer()}
-        onPressSend={() => navigation.navigate('SendLikedJobs')}
+        buttonSource={menuButtonSource}
+        onPress={() => this.toggleSharedJobsView()}
       />
       <Swiper
         cards={jobs}
