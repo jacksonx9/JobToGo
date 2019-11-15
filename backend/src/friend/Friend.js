@@ -71,8 +71,10 @@ class Friend {
     try {
       // Verify userId is valid
       await Users.findById(userId).orFail();
+      // Verify friend is valid
+      await Users.findById(friendId).orFail();
       // Verify jobId is valid
-      const job = await Jobs.findById(jobId).lean().orFail();
+      await Jobs.findById(jobId).lean().orFail();
 
       // Verify user is not adding itself
       if (userId === friendId) {
