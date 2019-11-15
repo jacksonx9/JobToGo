@@ -8,12 +8,12 @@ import Swiper from 'react-native-deck-swiper';
 import JobCard from '../../components/JobCard';
 import Loader from '../../components/Loader';
 import MainHeader from '../../components/MainHeader';
+import JobShareModal from '../../components/JobShareModal';
 import OverlayLabel from '../../components/OverlayLabel/OverlayLabel';
 import config from '../../constants/config';
 import styles, { LOGO_SIZE } from './styles';
 import { colours } from '../../styles';
 import images from '../../constants/images';
-import JobShareModal from '../../components/JobShareModal';
 
 export default class JobSwipe extends Component {
   static navigationOptions = {
@@ -190,7 +190,8 @@ export default class JobSwipe extends Component {
             />
           )}
           onSwipedLeft={() => this.swipeJob(jobs, jobIndex, jobType, this.swipeActionTypes.LIKE)}
-          onSwipedRight={() => this.swipeJob(jobs, jobIndex, jobType, this.swipeActionTypes.DISLIKE)}
+          onSwipedRight={() => this.swipeJob(jobs, jobIndex, jobType,
+            this.swipeActionTypes.DISLIKE)}
           onTapCard={() => this.openJobShareModal()}
           cardIndex={jobIndex}
           marginTop={35}

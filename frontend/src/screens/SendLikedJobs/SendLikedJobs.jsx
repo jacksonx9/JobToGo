@@ -4,7 +4,6 @@ import axios from 'axios';
 import Logger from 'js-logger';
 
 import SelectableItem from '../../components/SelectableItem';
-import JobShareModal from '../../components/JobShareModal';
 import Loader from '../../components/Loader';
 import NavHeader from '../../components/NavHeader';
 import Button from '../../components/Button';
