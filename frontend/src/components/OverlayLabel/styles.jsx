@@ -14,8 +14,8 @@ const styles = StyleSheet.create({
     borderRadius: border.radius,
   },
   overlayLabelText: {
-    fontSize: fonts.lg,
-    fontFamily: fonts.bold,
+    fontSize: fonts.xl,
+    fontFamily: fonts.extraBold,
     textAlign: 'center',
   },
 });
