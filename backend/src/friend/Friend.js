@@ -68,6 +68,8 @@ class Friend {
       return new Response(false, 'Invalid userId, friendId, or jobId', 400);
     }
 
+    // TODO: check if user has already seen or rejected the job
+
     try {
       // Verify userId is valid
       await Users.findById(userId).orFail();
@@ -123,14 +125,11 @@ class Friend {
       // Verify jobId is valid
       await Jobs.findById(jobId).orFail();
 
-
       // Verify jobId is was sent by friend
       const idx = user.friendSuggestedJobs.indexOf(jobId);
 
       if (idx !== -1) {
         const job = user.friendSuggestedJobs.splice(idx, 1);
-        console.log(user.friendSuggestedJobs);
-        console.log(job);
 
         if (addToLikedJobs) {
           user.likedJobs.push(...job);
