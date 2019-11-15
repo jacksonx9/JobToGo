@@ -1,0 +1,3042 @@
+diff --git a/frontend/android/app/build.gradle b/frontend/android/app/build.gradle
+index 824fa1a..8ab80b5 100644
+--- a/frontend/android/app/build.gradle
++++ b/frontend/android/app/build.gradle
+@@ -138,6 +138,8 @@ android {
+         targetSdkVersion rootProject.ext.targetSdkVersion
+         versionCode 1
+         versionName "1.0"
++        testBuildType System.getProperty('testBuildType', 'debug')  // This will later be used to control the test apk build type
++        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+     }
+     splits {
+         abi {
+@@ -213,6 +215,8 @@ dependencies {
+     } else {
+       implementation jscFlavor
+     }
++    androidTestImplementation('com.wix:detox:+') { transitive = true } 
++    androidTestImplementation 'junit:junit:4.12'    
+ }
+ 
+ // Run this once to be able to run the application with BUCK
+@@ -224,4 +228,5 @@ task copyDownloadableDepsToLibs(type: Copy) {
+ 
+ apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+ apply plugin: 'com.google.gms.google-services' 
++apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
+ //com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true
+diff --git a/frontend/android/app/src/androidTest/java/com/jobtogo/DetoxTest.java b/frontend/android/app/src/androidTest/java/com/jobtogo/DetoxTest.java
+new file mode 100644
+index 0000000..8518f9b
+--- /dev/null
++++ b/frontend/android/app/src/androidTest/java/com/jobtogo/DetoxTest.java
+@@ -0,0 +1,24 @@
++package com.jobtogo;
++
++import com.wix.detox.Detox;
++
++import org.junit.Rule;
++import org.junit.Test;
++import org.junit.runner.RunWith;
++
++import androidx.test.ext.junit.runners.AndroidJUnit4;
++import androidx.test.filters.LargeTest;
++import androidx.test.rule.ActivityTestRule;
++
++@RunWith(AndroidJUnit4.class)
++@LargeTest
++public class DetoxTest {
++
++    @Rule
++    public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(MainActivity.class, false, false);
++
++    @Test
++    public void runDetoxTests() {
++        Detox.runTests(mActivityRule);
++    }
++}
+\ No newline at end of file
+diff --git a/frontend/android/build.gradle b/frontend/android/build.gradle
+index 2b4a2ea..342418c 100644
+--- a/frontend/android/build.gradle
++++ b/frontend/android/build.gradle
+@@ -2,8 +2,9 @@
+ 
+ buildscript {
+     ext {
++        kotlinVersion = '1.3.10'
+         buildToolsVersion = "28.0.3"
+-        minSdkVersion = 16
++        minSdkVersion = 18
+         compileSdkVersion = 28
+         targetSdkVersion = 28
+         supportLibVersion = "28.0.0"
+@@ -17,6 +18,7 @@ buildscript {
+     dependencies {
+         classpath("com.android.tools.build:gradle:3.4.1")
+         classpath 'com.google.gms:google-services:4.3.2'
++        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+ 
+         // NOTE: Do not place your application dependencies here; they belong
+         // in the individual module build.gradle files
+@@ -36,6 +38,10 @@ allprojects {
+             url("$rootDir/../node_modules/jsc-android/dist")
+         }
+ 
++        maven {
++            // All of Detox' artifacts are provided via the npm module
++            url "$rootDir/../node_modules/detox/Detox-android"
++        }
+         jcenter()
+     }
+ }
+diff --git a/frontend/assets/checking-document.png b/frontend/assets/checking-document.png
+new file mode 100644
+index 0000000..7e7d494
+Binary files /dev/null and b/frontend/assets/checking-document.png differ
+diff --git a/frontend/assets/img-placeholder.png b/frontend/assets/img-placeholder.png
+new file mode 100644
+index 0000000..6317161
+Binary files /dev/null and b/frontend/assets/img-placeholder.png differ
+diff --git a/frontend/assets/navbar-background.png b/frontend/assets/navbar-background.png
+deleted file mode 100644
+index bbc58c6..0000000
+Binary files a/frontend/assets/navbar-background.png and /dev/null differ
+diff --git a/frontend/assets/navbar-background1.png b/frontend/assets/navbar-background1.png
+deleted file mode 100644
+index 49b86c0..0000000
+Binary files a/frontend/assets/navbar-background1.png and /dev/null differ
+diff --git a/frontend/assets/temp-bg1.png b/frontend/assets/temp-bg1.png
+deleted file mode 100644
+index b71368b..0000000
+Binary files a/frontend/assets/temp-bg1.png and /dev/null differ
+diff --git a/frontend/e2e/config.json b/frontend/e2e/config.json
+new file mode 100644
+index 0000000..3ff37ef
+--- /dev/null
++++ b/frontend/e2e/config.json
+@@ -0,0 +1,6 @@
++{
++    "setupFilesAfterEnv": ["./init.js"],
++    "testEnvironment": "node",
++    "reporters": ["detox/runners/jest/streamlineReporter"],
++    "verbose": true
++}
+diff --git a/frontend/e2e/firstTest.spec.js b/frontend/e2e/firstTest.spec.js
+new file mode 100644
+index 0000000..f428966
+--- /dev/null
++++ b/frontend/e2e/firstTest.spec.js
+@@ -0,0 +1,194 @@
++beforeEach(async () => {
++  await device.reloadReactNative();
++  await element(by.id('signInAuth')).tap();
++  element(by.id('email')).typeText('a\n');
++  await waitFor(element(by.id('password'))).toBeVisible().withTimeout(2000);
++  element(by.id('password')).typeText('a\n');
++  await waitFor(element(by.id('signIn'))).toBeVisible().withTimeout(2000);
++  await element(by.id('signIn')).tap();
++});
++
++describe('Auth Screens', () => {
++  it('Check AuthLanding component', async () => {
++    await device.reloadReactNative();
++    await expect(element(by.id('logoLight'))).toBeVisible();
++    await expect(element(by.id('jobSeeker'))).toBeVisible();
++    await expect(element(by.id('google'))).toBeVisible();
++    await expect(element(by.id('signInAuth'))).toBeVisible();
++
++    await element(by.id('signInAuth')).tap();
++    await expect(element(by.id('logoSignin'))).toBeVisible();
++    await expect(element(by.id('email'))).toBeVisible();
++    await expect(element(by.id('password'))).toBeVisible();
++    await expect(element(by.id('signIn'))).toBeVisible();
++  });
++
++  it('Correct login sequence', async () => {
++    await device.reloadReactNative();
++    await element(by.id('signInAuth')).tap();
++    await element(by.id('email')).typeText('a\n');
++    await element(by.id('signInAuth')).tap();
++    await waitFor(element(by.id('password'))).toBeVisible().withTimeout(2000);
++    await element(by.id('password')).typeText('a\n');
++    await waitFor(element(by.id('signIn'))).toBeVisible().withTimeout(2000);
++    await element(by.id('signIn')).tap();
++    await waitFor(element(by.id('jobSwipe'))).toBeVisible();
++  });
++
++  it('Incorrect login sequence', async () => {
++    await device.reloadReactNative();
++    await element(by.id('signInAuth')).tap();
++    await element(by.id('email')).typeText('\n');
++    await waitFor(element(by.id('password'))).toBeVisible().withTimeout(2000);
++    await element(by.id('password')).typeText('\n');
++    await waitFor(element(by.id('signIn'))).toBeVisible().withTimeout(2000);
++    // await element(by.id('signIn')).tap();
++    await expect(element(by.id('loginErrorMsg'))).toBeVisible();
++    // TODO: test for difference error responses
++  });
++});
++
++describe('Home Screen', () => {
++  it('Check Jobswipe components', async () => {
++    await expect(element(by.id('mainHeader'))).toBeVisible();
++    await expect(element(by.id('inbox'))).toBeVisible();
++    // Check the inbox model
++    await element(by.id('inbox')).tap();
++    await expect(element(by.id('mainHeader'))).toBeVisible();
++    await expect(element(by.id('infoDisplay'))).toBeVisible();
++
++    // Switch back from the inbox model
++    await element(by.id('inbox')).tap();
++    await expect(element(by.id('mainHeader'))).toBeVisible();
++  });
++
++  it('Check share modal', async () => {
++    // Check the share job modal
++    await element(by.id('card0')).tap();
++    await expect(element(by.id('shareModal'))).toBeVisible();
++
++    // Close the share job modal
++    await element(by.id('closeShare')).tap();
++    await expect(element(by.id('shareModal'))).toBeNotVisible();
++    await expect(element(by.id('mainHeader'))).toBeVisible();
++  });
++
++  it('Check info modal', async () => {
++    // Check the share job modal
++    await element(by.id('card0Open')).tap();
++    await waitFor(element(by.id('card0Description'))).toBeVisible().withTimeout(2000);
++    await expect(element(by.id('card0Description'))).toBeVisible();
++
++    // Close the share job modal
++    await element(by.id('card0Close')).tap();
++    await expect(element(by.id('card0Description'))).toBeNotVisible();
++  });
++});
++
++describe('Liked Screen', () => {
++  it('Check Liked components', async () => {
++    await element(by.id('liked')).tap();
++    await expect(element(by.id('navHeaderLiked'))).toBeVisible();
++    await expect(element(by.id('search'))).toBeVisible();
++    await expect(element(by.id('user'))).toBeVisible();
++    await expect(element(by.text('Liked Jobs'))).toBeVisible();
++
++    await expect(element(by.id('sendJobs'))).toBeVisible();
++    await expect(element(by.id('likedJobs'))).toBeVisible();
++    await expect(element(by.id('jobItem0'))).toBeVisible();
++  });
++});
++
++describe('Friends Screen', () => {
++  it('Check Friends components', async () => {
++    await element(by.id('friends')).tap();
++
++    // Nav header
++    await expect(element(by.id('navHeaderFriends'))).toBeVisible();
++    await expect(element(by.id('search'))).toBeVisible();
++    await expect(element(by.id('user'))).toBeVisible();
++
++    // Switch navigator
++    await expect(element(by.id('switchNav'))).toBeVisible();
++    await expect(element(by.id('switchNavOption1'))).toBeVisible();
++    await expect(element(by.id('switchNavOption2'))).toBeVisible();
++    await expect(element(by.text('Pending Friends'))).toBeVisible();
++    await expect(element(by.text('Your Friends'))).toBeVisible();
++
++    // User should have no pending friends
++    await expect(element(by.id('infoDisplay'))).toBeVisible();
++  });
++
++  it('Navigate between Pending/Your Friends', async () => {
++    await element(by.id('friends')).tap();
++    await element(by.id('switchNavOption2')).tap();
++    await element(by.id('switchNavOption1')).tap();
++
++    // xfail once friends are added to user
++    await expect(element(by.id('infoDisplay'))).toBeVisible();
++  });
++
++  it('Display 100 friends', async () => {
++    const NON_FUNC_REQ_FRIEND_COUNT = 100;
++    await element(by.id('friends')).tap();
++    await element(by.id('switchNavOption2')).tap();
++
++    for (i = 0; i < NON_FUNC_REQ_FRIEND_COUNT; i++) {
++      await waitFor(element(by.id(`userItem${i}`)))
++        .toBeVisible().whileElement(by.id('userList')).scroll(300, 'down');
++    }
++  });
++
++  it('Check user search component', async () => {
++    await element(by.id('friends')).tap();
++    await element(by.id('search')).tap();
++    await expect(element(by.id('searchBack'))).toBeVisible();
++    await expect(element(by.id('searchInput'))).toBeVisible();
++  });
++
++  it('Users search sequence', async () => {
++    await element(by.id('friends')).tap();
++    await element(by.id('search')).tap();
++
++    await expect(element(by.id('userList'))).toBeNotVisible();
++
++    element(by.id('searchInput')).typeText('search query\n');
++    await element(by.id('searchBack')).tap();
++
++    await expect(element(by.id('userList'))).toBeVisible();
++
++    // Go back to previous screen
++    await expect(element(by.id('editFriends'))).toBeVisible();
++  });
++});
++
++describe('Resume Page', () => {
++  it('Check resume components', async () => {
++    await element(by.id('resume')).tap();
++    await expect(element(by.id('navHeaderSkills'))).toBeVisible();
++    await expect(element(by.id('textSkills'))).toBeVisible();
++    await expect(element(by.id('checkingDoc'))).toBeVisible();
++    await expect(element(by.id('uploadResume'))).toBeVisible();
++    // await element(by.id('uploadResume')).tap();
++    // todo
++  });
++});
++
++describe('Navigation', () => {
++  it('Navigation between pages', async () => {
++    // Check navigation buttons
++    await expect(element(by.id('home'))).toBeVisible();
++    await expect(element(by.id('liked'))).toBeVisible();
++    await expect(element(by.id('friends'))).toBeVisible();
++    await expect(element(by.id('resume'))).toBeVisible();
++
++    await element(by.id('friends')).tap();
++    await expect(element(by.id('editFriends'))).toBeVisible();
++    await element(by.id('resume')).tap();
++    await expect(element(by.id('editSkills'))).toBeVisible();
++    await element(by.id('home')).tap();
++    await expect(element(by.id('jobSwipe'))).toBeVisible();
++    await element(by.id('liked')).tap();
++    await expect(element(by.id('sendLikedJobs'))).toBeVisible();
++  });
++});
+diff --git a/frontend/e2e/init.js b/frontend/e2e/init.js
+new file mode 100644
+index 0000000..26d2bff
+--- /dev/null
++++ b/frontend/e2e/init.js
+@@ -0,0 +1,25 @@
++const detox = require('detox');
++const config = require('../package.json').detox;
++const adapter = require('detox/runners/jest/adapter');
++const specReporter = require('detox/runners/jest/specReporter');
++
++// Set the default timeout
++jest.setTimeout(120000);
++jasmine.getEnv().addReporter(adapter);
++
++// This takes care of generating status logs on a per-spec basis. By default, jest only reports at file-level.
++// This is strictly optional.
++jasmine.getEnv().addReporter(specReporter);
++
++beforeAll(async () => {
++  await detox.init(config);
++});
++
++beforeEach(async () => {
++  await adapter.beforeEach();
++});
++
++afterAll(async () => {
++  await adapter.afterAll();
++  await detox.cleanup();
++});
+diff --git a/frontend/package-lock.json b/frontend/package-lock.json
+index 731cf5a..c975e05 100644
+--- a/frontend/package-lock.json
++++ b/frontend/package-lock.json
+@@ -1765,6 +1765,12 @@
+       "resolved": "https://registry.npmjs.org/big-integer/-/big-integer-1.6.44.tgz",
+       "integrity": "sha512-7MzElZPTyJ2fNvBkPxtFQ2fWIkVmuzw41+BZHSzpEq3ymB2MfeKp1+yXl/tS75xCx+WnyV+yb0kp+K1C3UNwmQ=="
+     },
++    "bluebird": {
++      "version": "3.5.5",
++      "resolved": "https://registry.npmjs.org/bluebird/-/bluebird-3.5.5.tgz",
++      "integrity": "sha512-5am6HnnfN+urzt4yfg7IgTbotDjIT/u8AJpEt0sIU9FtXfVeezXAPKswrG+xKUCOYAINpSdgZVDU6QFh+cuH3w==",
++      "dev": true
++    },
+     "bplist-creator": {
+       "version": "0.0.7",
+       "resolved": "https://registry.npmjs.org/bplist-creator/-/bplist-creator-0.0.7.tgz",
+@@ -1858,6 +1864,28 @@
+       "resolved": "https://registry.npmjs.org/buffer-from/-/buffer-from-1.1.1.tgz",
+       "integrity": "sha512-MQcXEUbCKtEo7bhqEs6560Hyd4XaovZlO/k9V3hjVUF/zwW7KBVdSK4gIt/bzwS9MbR5qob+F5jusZsb0YQK2A=="
+     },
++    "bunyan": {
++      "version": "1.8.12",
++      "resolved": "https://registry.npmjs.org/bunyan/-/bunyan-1.8.12.tgz",
++      "integrity": "sha1-8VDw9nSKvdcq6uhPBEA74u8RN5c=",
++      "dev": true,
++      "requires": {
++        "dtrace-provider": "~0.8",
++        "moment": "^2.10.6",
++        "mv": "~2",
++        "safe-json-stringify": "~1"
++      }
++    },
++    "bunyan-debug-stream": {
++      "version": "1.1.1",
++      "resolved": "https://registry.npmjs.org/bunyan-debug-stream/-/bunyan-debug-stream-1.1.1.tgz",
++      "integrity": "sha512-jJbQ1gXUL6vMmZVdbaTFK1v1sGa7axLrSQQwkB6HU9HCPTzsw2HsKcPHm1vgXZlEck/4IvEuRwg/9+083YelCg==",
++      "dev": true,
++      "requires": {
++        "colors": "^1.0.3",
++        "exception-formatter": "^1.0.4"
++      }
++    },
+     "bytes": {
+       "version": "3.0.0",
+       "resolved": "https://registry.npmjs.org/bytes/-/bytes-3.0.0.tgz",
+@@ -1934,6 +1962,29 @@
+       "resolved": "https://registry.npmjs.org/chardet/-/chardet-0.4.2.tgz",
+       "integrity": "sha1-tUc7M9yXxCTl2Y3IfVXU2KKci/I="
+     },
++    "child-process-promise": {
++      "version": "2.2.1",
++      "resolved": "https://registry.npmjs.org/child-process-promise/-/child-process-promise-2.2.1.tgz",
++      "integrity": "sha1-RzChHvYQ+tRQuPIjx50x172tgHQ=",
++      "dev": true,
++      "requires": {
++        "cross-spawn": "^4.0.2",
++        "node-version": "^1.0.0",
++        "promise-polyfill": "^6.0.1"
++      },
++      "dependencies": {
++        "cross-spawn": {
++          "version": "4.0.2",
++          "resolved": "https://registry.npmjs.org/cross-spawn/-/cross-spawn-4.0.2.tgz",
++          "integrity": "sha1-e5JHYhwjrf3ThWAEqCPL45dCTUE=",
++          "dev": true,
++          "requires": {
++            "lru-cache": "^4.0.1",
++            "which": "^1.2.9"
++          }
++        }
++      }
++    },
+     "ci-info": {
+       "version": "2.0.0",
+       "resolved": "https://registry.npmjs.org/ci-info/-/ci-info-2.0.0.tgz",
+@@ -2051,6 +2102,12 @@
+       "resolved": "https://registry.npmjs.org/colorette/-/colorette-1.1.0.tgz",
+       "integrity": "sha512-6S062WDQUXi6hOfkO/sBPVwE5ASXY4G2+b4atvhJfSsuUUhIaUKlkjLe9692Ipyt5/a+IPF5aVTu3V5gvXq5cg=="
+     },
++    "colors": {
++      "version": "1.4.0",
++      "resolved": "https://registry.npmjs.org/colors/-/colors-1.4.0.tgz",
++      "integrity": "sha512-a+UqTh4kgZg/SlGvfbzDHpgRu7AAQOmmqRHJnxhRZICKFUT91brVhNNt58CMWU9PsBbv3PDCZUHbVxuDiH2mtA==",
++      "dev": true
++    },
+     "combined-stream": {
+       "version": "1.0.8",
+       "resolved": "https://registry.npmjs.org/combined-stream/-/combined-stream-1.0.8.tgz",
+@@ -2386,6 +2443,138 @@
+       "integrity": "sha1-9B8cEL5LAOh7XxPaaAdZ8sW/0+I=",
+       "dev": true
+     },
++    "detox": {
++      "version": "14.8.0",
++      "resolved": "https://registry.npmjs.org/detox/-/detox-14.8.0.tgz",
++      "integrity": "sha512-RLAXmTn7agXAOEUy0lIJH5/l2D7HBldzsLT5AA8T23wuOVkBDiJg+qeIYHqEjaiuDouX/tSwC2tOeBoEXkgExw==",
++      "dev": true,
++      "requires": {
++        "@babel/core": "^7.4.5",
++        "bunyan": "^1.8.12",
++        "bunyan-debug-stream": "^1.1.0",
++        "chalk": "^2.4.2",
++        "child-process-promise": "^2.2.0",
++        "fs-extra": "^4.0.2",
++        "funpermaproxy": "^1.0.1",
++        "get-port": "^2.1.0",
++        "ini": "^1.3.4",
++        "lodash": "^4.17.5",
++        "minimist": "^1.2.0",
++        "proper-lockfile": "^3.0.2",
++        "sanitize-filename": "^1.6.1",
++        "shell-utils": "^1.0.9",
++        "tail": "^2.0.0",
++        "telnet-client": "0.15.3",
++        "tempfile": "^2.0.0",
++        "which": "^1.3.1",
++        "ws": "^3.3.1",
++        "yargs": "^13.0.0",
++        "yargs-parser": "^13.0.0"
++      },
++      "dependencies": {
++        "cliui": {
++          "version": "5.0.0",
++          "resolved": "https://registry.npmjs.org/cliui/-/cliui-5.0.0.tgz",
++          "integrity": "sha512-PYeGSEmmHM6zvoef2w8TPzlrnNpXIjTipYK780YswmIP9vjxmd6Y2a3CB2Ks6/AU8NHjZugXvo8w3oWM2qnwXA==",
++          "dev": true,
++          "requires": {
++            "string-width": "^3.1.0",
++            "strip-ansi": "^5.2.0",
++            "wrap-ansi": "^5.1.0"
++          }
++        },
++        "fs-extra": {
++          "version": "4.0.3",
++          "resolved": "https://registry.npmjs.org/fs-extra/-/fs-extra-4.0.3.tgz",
++          "integrity": "sha512-q6rbdDd1o2mAnQreO7YADIxf/Whx4AHBiRf6d+/cVT8h44ss+lHgxf1FemcqDnQt9X3ct4McHr+JMGlYSsK7Cg==",
++          "dev": true,
++          "requires": {
++            "graceful-fs": "^4.1.2",
++            "jsonfile": "^4.0.0",
++            "universalify": "^0.1.0"
++          }
++        },
++        "get-caller-file": {
++          "version": "2.0.5",
++          "resolved": "https://registry.npmjs.org/get-caller-file/-/get-caller-file-2.0.5.tgz",
++          "integrity": "sha512-DyFP3BM/3YHTQOCUL/w0OZHR0lpKeGrxotcHWcqNEdnltqFwXVfhEBQ94eIo34AfQpo0rGki4cyIiftY06h2Fg==",
++          "dev": true
++        },
++        "require-main-filename": {
++          "version": "2.0.0",
++          "resolved": "https://registry.npmjs.org/require-main-filename/-/require-main-filename-2.0.0.tgz",
++          "integrity": "sha512-NKN5kMDylKuldxYLSUfrbo5Tuzh4hd+2E8NPPX02mZtn1VuREQToYe/ZdlJy+J3uCpfaiGF05e7B8W0iXbQHmg==",
++          "dev": true
++        },
++        "string-width": {
++          "version": "3.1.0",
++          "resolved": "https://registry.npmjs.org/string-width/-/string-width-3.1.0.tgz",
++          "integrity": "sha512-vafcv6KjVZKSgz06oM/H6GDBrAtz8vdhQakGjFIvNrHA6y3HCF1CInLy+QLq8dTJPQ1b+KDUqDFctkdRW44e1w==",
++          "dev": true,
++          "requires": {
++            "emoji-regex": "^7.0.1",
++            "is-fullwidth-code-point": "^2.0.0",
++            "strip-ansi": "^5.1.0"
++          }
++        },
++        "ultron": {
++          "version": "1.1.1",
++          "resolved": "https://registry.npmjs.org/ultron/-/ultron-1.1.1.tgz",
++          "integrity": "sha512-UIEXBNeYmKptWH6z8ZnqTeS8fV74zG0/eRU9VGkpzz+LIJNs8W/zM/L+7ctCkRrgbNnnR0xxw4bKOr0cW0N0Og==",
++          "dev": true
++        },
++        "wrap-ansi": {
++          "version": "5.1.0",
++          "resolved": "https://registry.npmjs.org/wrap-ansi/-/wrap-ansi-5.1.0.tgz",
++          "integrity": "sha512-QC1/iN/2/RPVJ5jYK8BGttj5z83LmSKmvbvrXPNCLZSEb32KKVDJDl/MOt2N01qU2H/FkzEa9PKto1BqDjtd7Q==",
++          "dev": true,
++          "requires": {
++            "ansi-styles": "^3.2.0",
++            "string-width": "^3.0.0",
++            "strip-ansi": "^5.0.0"
++          }
++        },
++        "ws": {
++          "version": "3.3.3",
++          "resolved": "https://registry.npmjs.org/ws/-/ws-3.3.3.tgz",
++          "integrity": "sha512-nnWLa/NwZSt4KQJu51MYlCcSQ5g7INpOrOMt4XV8j4dqTXdmlUmSHQ8/oLC069ckre0fRsgfvsKwbTdtKLCDkA==",
++          "dev": true,
++          "requires": {
++            "async-limiter": "~1.0.0",
++            "safe-buffer": "~5.1.0",
++            "ultron": "~1.1.0"
++          }
++        },
++        "yargs": {
++          "version": "13.3.0",
++          "resolved": "https://registry.npmjs.org/yargs/-/yargs-13.3.0.tgz",
++          "integrity": "sha512-2eehun/8ALW8TLoIl7MVaRUrg+yCnenu8B4kBlRxj3GJGDKU1Og7sMXPNm1BYyM1DOJmTZ4YeN/Nwxv+8XJsUA==",
++          "dev": true,
++          "requires": {
++            "cliui": "^5.0.0",
++            "find-up": "^3.0.0",
++            "get-caller-file": "^2.0.1",
++            "require-directory": "^2.1.1",
++            "require-main-filename": "^2.0.0",
++            "set-blocking": "^2.0.0",
++            "string-width": "^3.0.0",
++            "which-module": "^2.0.0",
++            "y18n": "^4.0.0",
++            "yargs-parser": "^13.1.1"
++          }
++        },
++        "yargs-parser": {
++          "version": "13.1.1",
++          "resolved": "https://registry.npmjs.org/yargs-parser/-/yargs-parser-13.1.1.tgz",
++          "integrity": "sha512-oVAVsHz6uFrg3XQheFII8ESO2ssAf9luWuAd6Wexsu4F3OtIW0o8IribPXYrD4WC24LWtPrJlGy87y5udK+dxQ==",
++          "dev": true,
++          "requires": {
++            "camelcase": "^5.0.0",
++            "decamelize": "^1.2.0"
++          }
++        }
++      }
++    },
+     "diff-sequences": {
+       "version": "24.9.0",
+       "resolved": "https://registry.npmjs.org/diff-sequences/-/diff-sequences-24.9.0.tgz",
+@@ -2415,6 +2604,16 @@
+         "webidl-conversions": "^4.0.2"
+       }
+     },
++    "dtrace-provider": {
++      "version": "0.8.8",
++      "resolved": "https://registry.npmjs.org/dtrace-provider/-/dtrace-provider-0.8.8.tgz",
++      "integrity": "sha512-b7Z7cNtHPhH9EJhNNbbeqTcXB8LGFFZhq1PGgEvpeHlzd36bhbdTWoE/Ba/YguqpBSlAPKnARWhVlhunCMwfxg==",
++      "dev": true,
++      "optional": true,
++      "requires": {
++        "nan": "^2.14.0"
++      }
++    },
+     "ecc-jsbn": {
+       "version": "0.1.2",
+       "resolved": "https://registry.npmjs.org/ecc-jsbn/-/ecc-jsbn-0.1.2.tgz",
+@@ -2433,8 +2632,7 @@
+     "emoji-regex": {
+       "version": "7.0.3",
+       "resolved": "https://registry.npmjs.org/emoji-regex/-/emoji-regex-7.0.3.tgz",
+-      "integrity": "sha512-CwBLREIQ7LvYFB0WyRvwhq5N5qPhc6PMjD6bYggFlI5YyDgl+0vxq5VHbMOFqLg7hfWzmu8T5Z1QofhmTIhItA==",
+-      "dev": true
++      "integrity": "sha512-CwBLREIQ7LvYFB0WyRvwhq5N5qPhc6PMjD6bYggFlI5YyDgl+0vxq5VHbMOFqLg7hfWzmu8T5Z1QofhmTIhItA=="
+     },
+     "encodeurl": {
+       "version": "1.0.2",
+@@ -3087,6 +3285,15 @@
+       "resolved": "https://registry.npmjs.org/eventemitter3/-/eventemitter3-3.1.2.tgz",
+       "integrity": "sha512-tvtQIeLVHjDkJYnzf2dgVMxfuSGJeM/7UCG17TT4EumTfNtF+0nebF/4zWOIkCreAbtNqhGEboB6BWrwqNaw4Q=="
+     },
++    "exception-formatter": {
++      "version": "1.0.7",
++      "resolved": "https://registry.npmjs.org/exception-formatter/-/exception-formatter-1.0.7.tgz",
++      "integrity": "sha512-zV45vEsjytJrwfGq6X9qd1Ll56cW4NC2mhCO6lqwMk4ZpA1fZ6C3UiaQM/X7if+7wZFmCgss3ahp9B/uVFuLRw==",
++      "dev": true,
++      "requires": {
++        "colors": "^1.0.3"
++      }
++    },
+     "exec-sh": {
+       "version": "0.3.2",
+       "resolved": "https://registry.npmjs.org/exec-sh/-/exec-sh-0.3.2.tgz",
+@@ -4008,11 +4215,26 @@
+       "integrity": "sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc=",
+       "dev": true
+     },
++    "funpermaproxy": {
++      "version": "1.0.1",
++      "resolved": "https://registry.npmjs.org/funpermaproxy/-/funpermaproxy-1.0.1.tgz",
++      "integrity": "sha512-9pEzs5vnNtR7ZGihly98w/mQ7blsvl68Wj30ZCDAXy7qDN4CWLLjdfjtH/P2m6whsnaJkw15hysCNHMXue+wdA==",
++      "dev": true
++    },
+     "get-caller-file": {
+       "version": "1.0.3",
+       "resolved": "https://registry.npmjs.org/get-caller-file/-/get-caller-file-1.0.3.tgz",
+       "integrity": "sha512-3t6rVToeoZfYSGd8YoLFR2DJkiQrIiUrGcjvFX2mDw3bn6k2OtwHN0TNCLbBO+w8qTvimhDkv+LSscbJY1vE6w=="
+     },
++    "get-port": {
++      "version": "2.1.0",
++      "resolved": "https://registry.npmjs.org/get-port/-/get-port-2.1.0.tgz",
++      "integrity": "sha1-h4P53OvR7qSVozThpqJR54iHqxo=",
++      "dev": true,
++      "requires": {
++        "pinkie-promise": "^2.0.0"
++      }
++    },
+     "get-stream": {
+       "version": "4.1.0",
+       "resolved": "https://registry.npmjs.org/get-stream/-/get-stream-4.1.0.tgz",
+@@ -4292,6 +4514,12 @@
+       "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz",
+       "integrity": "sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ=="
+     },
++    "ini": {
++      "version": "1.3.5",
++      "resolved": "https://registry.npmjs.org/ini/-/ini-1.3.5.tgz",
++      "integrity": "sha512-RZY5huIKCMRWDUqZlEi72f/lmXKMvuszcMBduliQ3nnWbx9X/ZBQO7DijMEYS9EhHBb2qacRUMtC7svLwe0lcw==",
++      "dev": true
++    },
+     "inquirer": {
+       "version": "3.3.0",
+       "resolved": "https://registry.npmjs.org/inquirer/-/inquirer-3.3.0.tgz",
+@@ -6308,6 +6536,13 @@
+         }
+       }
+     },
++    "moment": {
++      "version": "2.24.0",
++      "resolved": "https://registry.npmjs.org/moment/-/moment-2.24.0.tgz",
++      "integrity": "sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==",
++      "dev": true,
++      "optional": true
++    },
+     "morgan": {
+       "version": "1.9.1",
+       "resolved": "https://registry.npmjs.org/morgan/-/morgan-1.9.1.tgz",
+@@ -6330,6 +6565,44 @@
+       "resolved": "https://registry.npmjs.org/mute-stream/-/mute-stream-0.0.7.tgz",
+       "integrity": "sha1-MHXOk7whuPq0PhvE2n6BFe0ee6s="
+     },
++    "mv": {
++      "version": "2.1.1",
++      "resolved": "https://registry.npmjs.org/mv/-/mv-2.1.1.tgz",
++      "integrity": "sha1-rmzg1vbV4KT32JN5jQPB6pVZtqI=",
++      "dev": true,
++      "optional": true,
++      "requires": {
++        "mkdirp": "~0.5.1",
++        "ncp": "~2.0.0",
++        "rimraf": "~2.4.0"
++      },
++      "dependencies": {
++        "glob": {
++          "version": "6.0.4",
++          "resolved": "https://registry.npmjs.org/glob/-/glob-6.0.4.tgz",
++          "integrity": "sha1-DwiGD2oVUSey+t1PnOJLGqtuTSI=",
++          "dev": true,
++          "optional": true,
++          "requires": {
++            "inflight": "^1.0.4",
++            "inherits": "2",
++            "minimatch": "2 || 3",
++            "once": "^1.3.0",
++            "path-is-absolute": "^1.0.0"
++          }
++        },
++        "rimraf": {
++          "version": "2.4.5",
++          "resolved": "https://registry.npmjs.org/rimraf/-/rimraf-2.4.5.tgz",
++          "integrity": "sha1-7nEM5dk6j9uFb7Xqj/Di11k0sto=",
++          "dev": true,
++          "optional": true,
++          "requires": {
++            "glob": "^6.0.1"
++          }
++        }
++      }
++    },
+     "nan": {
+       "version": "2.14.0",
+       "resolved": "https://registry.npmjs.org/nan/-/nan-2.14.0.tgz",
+@@ -6360,6 +6633,13 @@
+       "integrity": "sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=",
+       "dev": true
+     },
++    "ncp": {
++      "version": "2.0.0",
++      "resolved": "https://registry.npmjs.org/ncp/-/ncp-2.0.0.tgz",
++      "integrity": "sha1-GVoh1sRuNh0vsSgbo4uR6d9727M=",
++      "dev": true,
++      "optional": true
++    },
+     "negotiator": {
+       "version": "0.6.2",
+       "resolved": "https://registry.npmjs.org/negotiator/-/negotiator-0.6.2.tgz",
+@@ -6403,6 +6683,12 @@
+         "which": "^1.3.0"
+       }
+     },
++    "node-version": {
++      "version": "1.2.0",
++      "resolved": "https://registry.npmjs.org/node-version/-/node-version-1.2.0.tgz",
++      "integrity": "sha512-ma6oU4Sk0qOoKEAymVoTvk8EdXEobdS7m/mAGhDJ8Rouugho48crHBORAmy5BoOcv8wraPM6xumapQp5hl4iIQ==",
++      "dev": true
++    },
+     "normalize-package-data": {
+       "version": "2.5.0",
+       "resolved": "https://registry.npmjs.org/normalize-package-data/-/normalize-package-data-2.5.0.tgz",
+@@ -6873,6 +7159,21 @@
+       "resolved": "https://registry.npmjs.org/pify/-/pify-4.0.1.tgz",
+       "integrity": "sha512-uB80kBFb/tfd68bVleG9T5GGsGPjJrLAUpR5PZIrhBnIaRTQRjqdJSsIKkOP6OAIFbj7GOrcudc5pNjZ+geV2g=="
+     },
++    "pinkie": {
++      "version": "2.0.4",
++      "resolved": "https://registry.npmjs.org/pinkie/-/pinkie-2.0.4.tgz",
++      "integrity": "sha1-clVrgM+g1IqXToDnckjoDtT3+HA=",
++      "dev": true
++    },
++    "pinkie-promise": {
++      "version": "2.0.1",
++      "resolved": "https://registry.npmjs.org/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
++      "integrity": "sha1-ITXW36ejWMBprJsXh3YogihFD/o=",
++      "dev": true,
++      "requires": {
++        "pinkie": "^2.0.0"
++      }
++    },
+     "pirates": {
+       "version": "4.0.1",
+       "resolved": "https://registry.npmjs.org/pirates/-/pirates-4.0.1.tgz",
+@@ -7003,6 +7304,12 @@
+         "asap": "~2.0.3"
+       }
+     },
++    "promise-polyfill": {
++      "version": "6.1.0",
++      "resolved": "https://registry.npmjs.org/promise-polyfill/-/promise-polyfill-6.1.0.tgz",
++      "integrity": "sha1-36lpQ+qcEh/KTem1hoyznTRy4Fc=",
++      "dev": true
++    },
+     "prompts": {
+       "version": "2.2.1",
+       "resolved": "https://registry.npmjs.org/prompts/-/prompts-2.2.1.tgz",
+@@ -7023,6 +7330,17 @@
+         "react-is": "^16.8.1"
+       }
+     },
++    "proper-lockfile": {
++      "version": "3.2.0",
++      "resolved": "https://registry.npmjs.org/proper-lockfile/-/proper-lockfile-3.2.0.tgz",
++      "integrity": "sha512-iMghHHXv2bsxl6NchhEaFck8tvX3F9cknEEh1SUpguUOBjN7PAAW9BLzmbc1g/mCD1gY3EE2EABBHPJfFdHFmA==",
++      "dev": true,
++      "requires": {
++        "graceful-fs": "^4.1.11",
++        "retry": "^0.12.0",
++        "signal-exit": "^3.0.2"
++      }
++    },
+     "pseudomap": {
+       "version": "1.0.2",
+       "resolved": "https://registry.npmjs.org/pseudomap/-/pseudomap-1.0.2.tgz",
+@@ -7331,6 +7649,84 @@
+       "resolved": "https://registry.npmjs.org/react-native-tab-view/-/react-native-tab-view-2.10.0.tgz",
+       "integrity": "sha512-qgexVz5eO4yaFjdkmn/sURXgVvaBo6pZD/q1eoca96SbPVbaH3WzVhF3bRUfeTHwZkXwznFTpS3JURqIFU8vQA=="
+     },
++    "react-native-vector-icons": {
++      "version": "6.6.0",
++      "resolved": "https://registry.npmjs.org/react-native-vector-icons/-/react-native-vector-icons-6.6.0.tgz",
++      "integrity": "sha512-MImKVx8JEvVVBnaShMr7/yTX4Y062JZMupht1T+IEgbqBj4aQeQ1z2SH4VHWKNtWtppk4kz9gYyUiMWqx6tNSw==",
++      "requires": {
++        "lodash": "^4.0.0",
++        "prop-types": "^15.6.2",
++        "yargs": "^13.2.2"
++      },
++      "dependencies": {
++        "cliui": {
++          "version": "5.0.0",
++          "resolved": "https://registry.npmjs.org/cliui/-/cliui-5.0.0.tgz",
++          "integrity": "sha512-PYeGSEmmHM6zvoef2w8TPzlrnNpXIjTipYK780YswmIP9vjxmd6Y2a3CB2Ks6/AU8NHjZugXvo8w3oWM2qnwXA==",
++          "requires": {
++            "string-width": "^3.1.0",
++            "strip-ansi": "^5.2.0",
++            "wrap-ansi": "^5.1.0"
++          }
++        },
++        "get-caller-file": {
++          "version": "2.0.5",
++          "resolved": "https://registry.npmjs.org/get-caller-file/-/get-caller-file-2.0.5.tgz",
++          "integrity": "sha512-DyFP3BM/3YHTQOCUL/w0OZHR0lpKeGrxotcHWcqNEdnltqFwXVfhEBQ94eIo34AfQpo0rGki4cyIiftY06h2Fg=="
++        },
++        "require-main-filename": {
++          "version": "2.0.0",
++          "resolved": "https://registry.npmjs.org/require-main-filename/-/require-main-filename-2.0.0.tgz",
++          "integrity": "sha512-NKN5kMDylKuldxYLSUfrbo5Tuzh4hd+2E8NPPX02mZtn1VuREQToYe/ZdlJy+J3uCpfaiGF05e7B8W0iXbQHmg=="
++        },
++        "string-width": {
++          "version": "3.1.0",
++          "resolved": "https://registry.npmjs.org/string-width/-/string-width-3.1.0.tgz",
++          "integrity": "sha512-vafcv6KjVZKSgz06oM/H6GDBrAtz8vdhQakGjFIvNrHA6y3HCF1CInLy+QLq8dTJPQ1b+KDUqDFctkdRW44e1w==",
++          "requires": {
++            "emoji-regex": "^7.0.1",
++            "is-fullwidth-code-point": "^2.0.0",
++            "strip-ansi": "^5.1.0"
++          }
++        },
++        "wrap-ansi": {
++          "version": "5.1.0",
++          "resolved": "https://registry.npmjs.org/wrap-ansi/-/wrap-ansi-5.1.0.tgz",
++          "integrity": "sha512-QC1/iN/2/RPVJ5jYK8BGttj5z83LmSKmvbvrXPNCLZSEb32KKVDJDl/MOt2N01qU2H/FkzEa9PKto1BqDjtd7Q==",
++          "requires": {
++            "ansi-styles": "^3.2.0",
++            "string-width": "^3.0.0",
++            "strip-ansi": "^5.0.0"
++          }
++        },
++        "yargs": {
++          "version": "13.3.0",
++          "resolved": "https://registry.npmjs.org/yargs/-/yargs-13.3.0.tgz",
++          "integrity": "sha512-2eehun/8ALW8TLoIl7MVaRUrg+yCnenu8B4kBlRxj3GJGDKU1Og7sMXPNm1BYyM1DOJmTZ4YeN/Nwxv+8XJsUA==",
++          "requires": {
++            "cliui": "^5.0.0",
++            "find-up": "^3.0.0",
++            "get-caller-file": "^2.0.1",
++            "require-directory": "^2.1.1",
++            "require-main-filename": "^2.0.0",
++            "set-blocking": "^2.0.0",
++            "string-width": "^3.0.0",
++            "which-module": "^2.0.0",
++            "y18n": "^4.0.0",
++            "yargs-parser": "^13.1.1"
++          }
++        },
++        "yargs-parser": {
++          "version": "13.1.1",
++          "resolved": "https://registry.npmjs.org/yargs-parser/-/yargs-parser-13.1.1.tgz",
++          "integrity": "sha512-oVAVsHz6uFrg3XQheFII8ESO2ssAf9luWuAd6Wexsu4F3OtIW0o8IribPXYrD4WC24LWtPrJlGy87y5udK+dxQ==",
++          "requires": {
++            "camelcase": "^5.0.0",
++            "decamelize": "^1.2.0"
++          }
++        }
++      }
++    },
+     "react-native-view-overflow": {
+       "version": "0.0.4",
+       "resolved": "https://registry.npmjs.org/react-native-view-overflow/-/react-native-view-overflow-0.0.4.tgz",
+@@ -7709,6 +8105,12 @@
+       "resolved": "https://registry.npmjs.org/ret/-/ret-0.1.15.tgz",
+       "integrity": "sha512-TTlYpa+OL+vMMNG24xSlQGEJ3B/RzEfUlLct7b5G/ytav+wPrplCpVMFuwzXbkecJrb6IYo1iFb0S9v37754mg=="
+     },
++    "retry": {
++      "version": "0.12.0",
++      "resolved": "https://registry.npmjs.org/retry/-/retry-0.12.0.tgz",
++      "integrity": "sha1-G0KmJmoh8HQh0bC1S33BZ7AcATs=",
++      "dev": true
++    },
+     "rimraf": {
+       "version": "2.7.1",
+       "resolved": "https://registry.npmjs.org/rimraf/-/rimraf-2.7.1.tgz",
+@@ -7756,6 +8158,13 @@
+       "resolved": "https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.1.2.tgz",
+       "integrity": "sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g=="
+     },
++    "safe-json-stringify": {
++      "version": "1.2.0",
++      "resolved": "https://registry.npmjs.org/safe-json-stringify/-/safe-json-stringify-1.2.0.tgz",
++      "integrity": "sha512-gH8eh2nZudPQO6TytOvbxnuhYBOvDBBLW52tz5q6X58lJcd/tkmqFR+5Z9adS8aJtURSXWThWy/xJtJwixErvg==",
++      "dev": true,
++      "optional": true
++    },
+     "safe-regex": {
+       "version": "1.1.0",
+       "resolved": "https://registry.npmjs.org/safe-regex/-/safe-regex-1.1.0.tgz",
+@@ -7785,6 +8194,15 @@
+         "walker": "~1.0.5"
+       }
+     },
++    "sanitize-filename": {
++      "version": "1.6.3",
++      "resolved": "https://registry.npmjs.org/sanitize-filename/-/sanitize-filename-1.6.3.tgz",
++      "integrity": "sha512-y/52Mcy7aw3gRm7IrcGDFx/bCk4AhRh2eI9luHOQM86nZsqwiRkkq2GekHXBBD+SmPidc8i2PqtYZl+pWJ8Oeg==",
++      "dev": true,
++      "requires": {
++        "truncate-utf8-bytes": "^1.0.0"
++      }
++    },
+     "sax": {
+       "version": "1.2.4",
+       "resolved": "https://registry.npmjs.org/sax/-/sax-1.2.4.tgz",
+@@ -7912,6 +8330,15 @@
+         "jsonify": "~0.0.0"
+       }
+     },
++    "shell-utils": {
++      "version": "1.0.10",
++      "resolved": "https://registry.npmjs.org/shell-utils/-/shell-utils-1.0.10.tgz",
++      "integrity": "sha512-p1xuqhj3jgcXiV8wGoF1eL/NOvapN9tyGDoObqKwvZTUZn7fIzK75swLTEHfGa7sObeN9vxFplHw/zgYUYRTsg==",
++      "dev": true,
++      "requires": {
++        "lodash": "4.x.x"
++      }
++    },
+     "shellwords": {
+       "version": "0.1.1",
+       "resolved": "https://registry.npmjs.org/shellwords/-/shellwords-0.1.1.tgz",
+@@ -8356,6 +8783,21 @@
+         }
+       }
+     },
++    "tail": {
++      "version": "2.0.3",
++      "resolved": "https://registry.npmjs.org/tail/-/tail-2.0.3.tgz",
++      "integrity": "sha512-s9NOGkLqqiDEtBttQZI7acLS8ycYK5sTlDwNjGnpXG9c8AWj0cfAtwEIzo/hVRMMiC5EYz+bXaJWC1u1u0GPpQ==",
++      "dev": true
++    },
++    "telnet-client": {
++      "version": "0.15.3",
++      "resolved": "https://registry.npmjs.org/telnet-client/-/telnet-client-0.15.3.tgz",
++      "integrity": "sha512-GSfdzQV0BKIYsmeXq7bJFJ2wHeJud6icaIxCUf6QCGQUD6R0BBGbT1+yLDhq67JRdgRpwyPwUbV7JxFeRrZomQ==",
++      "dev": true,
++      "requires": {
++        "bluebird": "3.5.x"
++      }
++    },
+     "temp": {
+       "version": "0.8.3",
+       "resolved": "https://registry.npmjs.org/temp/-/temp-0.8.3.tgz",
+@@ -8372,6 +8814,22 @@
+         }
+       }
+     },
++    "temp-dir": {
++      "version": "1.0.0",
++      "resolved": "https://registry.npmjs.org/temp-dir/-/temp-dir-1.0.0.tgz",
++      "integrity": "sha1-CnwOom06Oa+n4OvqnB/AvE2qAR0=",
++      "dev": true
++    },
++    "tempfile": {
++      "version": "2.0.0",
++      "resolved": "https://registry.npmjs.org/tempfile/-/tempfile-2.0.0.tgz",
++      "integrity": "sha1-awRGhWqbERTRhW/8vlCczLCXcmU=",
++      "dev": true,
++      "requires": {
++        "temp-dir": "^1.0.0",
++        "uuid": "^3.0.1"
++      }
++    },
+     "test-exclude": {
+       "version": "5.2.3",
+       "resolved": "https://registry.npmjs.org/test-exclude/-/test-exclude-5.2.3.tgz",
+@@ -8555,6 +9013,15 @@
+       "resolved": "https://registry.npmjs.org/trim-right/-/trim-right-1.0.1.tgz",
+       "integrity": "sha1-yy4SAwZ+DI3h9hQJS5/kVwTqYAM="
+     },
++    "truncate-utf8-bytes": {
++      "version": "1.0.2",
++      "resolved": "https://registry.npmjs.org/truncate-utf8-bytes/-/truncate-utf8-bytes-1.0.2.tgz",
++      "integrity": "sha1-QFkjkJWS1W94pYGENLC3hInKXys=",
++      "dev": true,
++      "requires": {
++        "utf8-byte-length": "^1.0.1"
++      }
++    },
+     "tslib": {
+       "version": "1.10.0",
+       "resolved": "https://registry.npmjs.org/tslib/-/tslib-1.10.0.tgz",
+@@ -8726,6 +9193,12 @@
+       "resolved": "https://registry.npmjs.org/use/-/use-3.1.1.tgz",
+       "integrity": "sha512-cwESVXlO3url9YWlFW/TA9cshCEhtu7IKJ/p5soJ/gGpj7vbvFrAY/eIioQ6Dw23KjZhYgiIo8HOs1nQ2vr/oQ=="
+     },
++    "utf8-byte-length": {
++      "version": "1.0.4",
++      "resolved": "https://registry.npmjs.org/utf8-byte-length/-/utf8-byte-length-1.0.4.tgz",
++      "integrity": "sha1-9F8VDExm7uloGGUFq5P8u4rWv2E=",
++      "dev": true
++    },
+     "util-deprecate": {
+       "version": "1.0.2",
+       "resolved": "https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.2.tgz",
+diff --git a/frontend/package.json b/frontend/package.json
+index fa7dda7..804c645 100644
+--- a/frontend/package.json
++++ b/frontend/package.json
+@@ -23,6 +23,7 @@
+     "react-native-modal": "^11.5.3",
+     "react-native-reanimated": "^1.3.0",
+     "react-native-swipe-gestures": "^1.0.4",
++    "react-native-vector-icons": "^6.6.0",
+     "react-native-view-overflow": "0.0.4",
+     "react-navigation": "^4.0.10",
+     "react-navigation-drawer": "^2.2.2",
+@@ -35,13 +36,14 @@
+     "@react-native-community/eslint-config": "0.0.3",
+     "babel-eslint": "^10.0.3",
+     "babel-jest": "24.9.0",
++    "detox": "^14.7.1",
+     "eslint": "^6.6.0",
+     "eslint-config-airbnb": "^18.0.1",
+     "eslint-plugin-import": "^2.18.2",
+     "eslint-plugin-jsx-a11y": "^6.2.3",
+     "eslint-plugin-react": "^7.16.0",
+     "eslint-plugin-react-hooks": "^1.7.0",
+-    "jest": "24.9.0",
++    "jest": "^24.9.0",
+     "metro-react-native-babel-preset": "0.54.1",
+     "react-test-renderer": "16.8.6"
+   },
+@@ -52,5 +54,18 @@
+   },
+   "jest": {
+     "preset": "react-native"
++  },
++  "detox": {
++    "test-runner": "jest",
++    "configurations": {
++      "android.emu.debug": {
++        "binaryPath": "android/app/build/outputs/apk/debug/app-debug.apk",
++        "build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
++        "type": "android.emulator",
++        "device": {
++          "avdName": "Pixel_API_28"
++        }
++      }
++    }
+   }
+ }
+diff --git a/frontend/src/App.jsx b/frontend/src/App.jsx
+index afcff54..9383b7a 100644
+--- a/frontend/src/App.jsx
++++ b/frontend/src/App.jsx
+@@ -3,6 +3,7 @@ import { Platform, Alert } from 'react-native';
+ import { createAppContainer, createSwitchNavigator } from 'react-navigation';
+ import { createStackNavigator } from 'react-navigation-stack';
+ import { createBottomTabNavigator } from 'react-navigation-tabs';
++import Icon from 'react-native-vector-icons/Feather';
+ import firebase from 'react-native-firebase';
+ import Logger from 'js-logger';
+ 
+@@ -13,6 +14,7 @@ import JobSwipe from './screens/JobSwipe';
+ import SendLikedJobs from './screens/SendLikedJobs/SendLikedJobs';
+ import EditFriends from './screens/EditFriends/EditFriends';
+ import EditSkills from './screens/EditSkills/EditSkills';
++import { colours, fonts, sizes } from './styles';
+ 
+ export default class App extends React.Component {
+   constructor(props) {
+@@ -25,7 +27,9 @@ export default class App extends React.Component {
+     if (Platform.OS === 'android') {
+       try {
+         await firebase.messaging().requestPermission();
++        this.logger.log("done1");
+         const fcmToken = await firebase.messaging().getToken();
++        this.logger.log("done2");
+         if (fcmToken) {
+           this.logger.info('FCM Token: ', fcmToken);
+           global.firebaseToken = fcmToken;
+@@ -90,45 +94,63 @@ const navConfig = {
+   },
+ };
+ 
+-// {
+-//   defaultNavigationOptions: ({ navigation }) => ({
+-//     tabBarIcon: ({ focused, horizontal, tintColor }) => {
+-//       const { routeName } = navigation.state;
+-//       let IconComponent = Ionicons;
+-//       let iconName;
+-//       if (routeName === 'Home') {
+-//         iconName = `ios-information-circle${focused ? '' : '-outline'}`;
+-//         // Sometimes we want to add badges to some icons.
+-//         // You can check the implementation below.
+-//         IconComponent = HomeIconWithBadge;
+-//       } else if (routeName === 'Settings') {
+-//         iconName = `ios-options`;
+-//       }
+-
+-//       // You can return any component that you like here!
+-//       return <IconComponent name={iconName} size={25} color={tintColor} />;
+-//     },
+-//   }),
+-//   tabBarOptions: {
+-//     activeTintColor: 'tomato',
+-//     inactiveTintColor: 'gray',
+-//   },
+-// }
+-
+ const tabNavConfig = {
+-  initialRouteName: 'JobSwipe',
++  initialRouteName: 'Home',
+   tabBarOptions: {
+-    activeTintColor: 'tomato',
+-    inactiveTintColor: 'gray',
++    style: {
++      height: 50,
++      borderTopColor: 'transparent',
++    },
++    labelStyle: {
++      fontFamily: fonts.bold,
++    },
++    activeTintColor: colours.accentPrimary,
++    inactiveTintColor: colours.lightGray,
+   },
+ };
+ 
+ const AppStack = createBottomTabNavigator(
+   {
+-    JobSwipe,
+-    SendLikedJobs,
+-    EditFriends,
+-    EditSkills,
++    Home: {
++      screen: JobSwipe,
++      navigationOptions: {
++        tabBarLabel: 'Home',
++        tabBarTestID: "home",
++        tabBarIcon: ({ tintColor }) => (
++          <Icon name="home" color={tintColor} size={sizes.icon} />
++        ),
++      },
++    },
++    Send: {
++      screen: SendLikedJobs,
++      navigationOptions: {
++        tabBarLabel: 'Liked',
++        tabBarTestID: "liked",
++        tabBarIcon: ({ tintColor }) => (
++          <Icon name="heart" color={tintColor} size={sizes.icon} />
++        ),
++      },
++    },
++    Friends: {
++      screen: EditFriends,
++      navigationOptions: {
++        tabBarLabel: 'Friends',
++        tabBarTestID: "friends",
++        tabBarIcon: ({ tintColor }) => (
++          <Icon name="users" color={tintColor} size={sizes.icon} />
++        ),
++      },
++    },
++    Resume: {
++      screen: EditSkills,
++      navigationOptions: {
++        tabBarLabel: 'Resume',
++        tabBarTestID: "resume",
++        tabBarIcon: ({ tintColor }) => (
++          <Icon name="upload" color={tintColor} size={sizes.icon} />
++        ),
++      },
++    },
+   },
+   tabNavConfig,
+ );
+diff --git a/frontend/src/components/Button/Button.jsx b/frontend/src/components/Button/Button.jsx
+index 29de3a4..bbb77cb 100644
+--- a/frontend/src/components/Button/Button.jsx
++++ b/frontend/src/components/Button/Button.jsx
+@@ -5,9 +5,10 @@ import PropTypes from 'prop-types';
+ import styles from './styles';
+ 
+ const Button = ({
+-  style, backgroundColor, textColor, title, enable, onPress,
++  style, backgroundColor, textColor, title, enable, onPress, testID,
+ }) => (
+   <TouchableOpacity
++    testID={testID}
+     style={[{
+       opacity: enable ? 1 : 0.3,
+       backgroundColor,
+@@ -26,6 +27,7 @@ Button.defaultProps = {
+   backgroundColor: 'black',
+   textColor: 'white',
+   enable: true,
++  testID: '',
+ };
+ 
+ Button.propTypes = {
+@@ -35,6 +37,7 @@ Button.propTypes = {
+   title: PropTypes.string.isRequired,
+   enable: PropTypes.bool,
+   onPress: PropTypes.func.isRequired,
++  testID: PropTypes.string,
+ };
+ 
+ export default Button;
+diff --git a/frontend/src/components/IconButton/IconButton.jsx b/frontend/src/components/IconButton/IconButton.jsx
+new file mode 100644
+index 0000000..4a343e9
+--- /dev/null
++++ b/frontend/src/components/IconButton/IconButton.jsx
+@@ -0,0 +1,35 @@
++import React from 'react';
++import { TouchableOpacity } from 'react-native';
++import { number, string, func } from 'prop-types';
++import Icon from 'react-native-vector-icons/Feather';
++
++import styles from './styles';
++import { colours, sizes } from '../../styles';
++
++const IconButton = ({
++  name, color, size, onPress, testID,
++}) => (
++  <TouchableOpacity
++    testID={testID}
++    style={[styles.container]}
++    onPress={onPress}
++  >
++    <Icon name={name} color={color} size={size} />
++  </TouchableOpacity>
++);
++
++IconButton.defaultProps = {
++  color: colours.gray,
++  size: sizes.icon,
++  testID: '',
++};
++
++IconButton.propTypes = {
++  name: string.isRequired,
++  color: string,
++  size: number,
++  onPress: func.isRequired,
++  testID: string,
++};
++
++export default IconButton;
+diff --git a/frontend/src/components/IconButton/index.js b/frontend/src/components/IconButton/index.js
+new file mode 100644
+index 0000000..a51790e
+--- /dev/null
++++ b/frontend/src/components/IconButton/index.js
+@@ -0,0 +1,3 @@
++import IconButton from './IconButton';
++
++export default IconButton;
+diff --git a/frontend/src/components/IconButton/styles.jsx b/frontend/src/components/IconButton/styles.jsx
+new file mode 100644
+index 0000000..44decda
+--- /dev/null
++++ b/frontend/src/components/IconButton/styles.jsx
+@@ -0,0 +1,12 @@
++import { StyleSheet } from 'react-native';
++
++const styles = StyleSheet.create({
++  container: {
++    justifyContent: 'center',
++    alignItems: 'center',
++    width: 30,
++    height: 30,
++  },
++});
++
++export default styles;
+diff --git a/frontend/src/components/ImageButton/ImageButton.jsx b/frontend/src/components/ImageButton/ImageButton.jsx
+index 8fc5dfb..6d6fdb5 100644
+--- a/frontend/src/components/ImageButton/ImageButton.jsx
++++ b/frontend/src/components/ImageButton/ImageButton.jsx
+@@ -1,11 +1,12 @@
+ import React from 'react';
+ import { TouchableOpacity, Image } from 'react-native';
+-import { number, func } from 'prop-types';
++import { number, func, string } from 'prop-types';
+ 
+ import styles from './styles';
+ 
+-const ImageButton = ({ source, onPress }) => (
++const ImageButton = ({ source, onPress, testID }) => (
+   <TouchableOpacity
++    testID = {testID}
+     style={[styles.container]}
+     onPress={onPress}
+   >
+@@ -17,11 +18,13 @@ const ImageButton = ({ source, onPress }) => (
+ 
+ ImageButton.defaultProps = {
+   onPress: () => {},
++  testID: '',
+ };
+ 
+ ImageButton.propTypes = {
+   source: number.isRequired,
+   onPress: func,
++  testID: string,
+ };
+ 
+ export default ImageButton;
+diff --git a/frontend/src/components/InfoDisplay/InfoDisplay.jsx b/frontend/src/components/InfoDisplay/InfoDisplay.jsx
+index 6297bcc..50dff7c 100644
+--- a/frontend/src/components/InfoDisplay/InfoDisplay.jsx
++++ b/frontend/src/components/InfoDisplay/InfoDisplay.jsx
+@@ -8,12 +8,14 @@ import { errors } from '../../constants/messages';
+ import styles from './styles';
+ 
+ const InfoDisplay = ({ message, source }) => (
+-  <View style={styles.container}>
++  <View style={styles.container} testID="infoDisplay">
+     <Image
+       source={source}
+       style={styles.image}
+     />
+-    <Text style={styles.text}>{message}</Text>
++    <View style={styles.textContainer}>
++      <Text style={styles.text}>{message}</Text>
++    </View>
+   </View>
+ );
+ 
+diff --git a/frontend/src/components/InfoDisplay/styles.jsx b/frontend/src/components/InfoDisplay/styles.jsx
+index ca63537..fd5b9c7 100644
+--- a/frontend/src/components/InfoDisplay/styles.jsx
++++ b/frontend/src/components/InfoDisplay/styles.jsx
+@@ -12,6 +12,10 @@ const styles = StyleSheet.create({
+     width: '100%',
+     backgroundColor: colours.white,
+   },
++  textContainer: {
++    maxHeight: '50%',
++    width: '75%',
++  },
+   image: {
+     maxHeight: '30%',
+     maxWidth: '30%',
+diff --git a/frontend/src/components/JobCard/JobCard.jsx b/frontend/src/components/JobCard/JobCard.jsx
+index 9cab0f4..ac5acce 100644
+--- a/frontend/src/components/JobCard/JobCard.jsx
++++ b/frontend/src/components/JobCard/JobCard.jsx
+@@ -1,30 +1,39 @@
+ import React from 'react';
+ import { View } from 'react-native';
+-import { string, bool } from 'prop-types';
++import { string, bool, func } from 'prop-types';
+ 
++import IconButton from '../IconButton';
+ import JobDetails from '../JobDetails';
+ import JobImage from '../JobImage';
++import { colours, sizes } from '../../styles';
+ import styles from './styles';
+ 
+ const JobCard = ({
+-  logo, company, title, location, description, isShared,
++  logo, company, title, location, description, onPressShare, testID,
+ }) => (
+   <View style={styles.container}>
+-    <JobImage
+-      logo={logo}
+-    />
+-    <JobDetails
+-      company={company}
+-      title={title}
+-      location={isShared ? 'shared' : location}
+-      description={description}
+-    />
++    <View style={styles.shareContainer}>
++      <IconButton testID={testID} name="share-2" color={colours.lightGray} size={sizes.icon} onPress={onPressShare} />
++    </View>
++    <View style={styles.contentContainer}>
++      <JobImage
++        logo={logo}
++      />
++      <JobDetails
++        testID={testID}
++        logo={logo}
++        company={company}
++        title={title}
++        location={location}
++        description={description}
++      />
++    </View>
+   </View>
+ );
+ 
+ JobCard.defaultProps = {
+   logo: null,
+-  isShared: false,
++  testID: '',
+ };
+ 
+ JobCard.propTypes = {
+@@ -33,7 +42,8 @@ JobCard.propTypes = {
+   title: string.isRequired,
+   location: string.isRequired,
+   description: string.isRequired,
+-  isShared: bool,
++  onPressShare: func.isRequired,
++  testID: string,
+ };
+ 
+ export default JobCard;
+diff --git a/frontend/src/components/JobCard/styles.jsx b/frontend/src/components/JobCard/styles.jsx
+index 8aef72f..34af651 100644
+--- a/frontend/src/components/JobCard/styles.jsx
++++ b/frontend/src/components/JobCard/styles.jsx
+@@ -1,17 +1,35 @@
+ import { StyleSheet } from 'react-native';
+ 
+-import { colours, border, elevation } from '../../styles';
++import {
++  colours, border, elevation, padding,
++} from '../../styles';
+ 
+ const styles = StyleSheet.create({
+   container: {
+     height: '92%',
+     width: '100%',
+     flexDirection: 'column',
+-    justifyContent: 'center',
++    justifyContent: 'flex-start',
+     alignItems: 'center',
+     borderRadius: border.radius,
+     backgroundColor: colours.white,
+     elevation: elevation.md,
++    padding: padding.lg,
++  },
++  shareContainer: {
++    flexDirection: 'row',
++    justifyContent: 'flex-end',
++    alignItems: 'center',
++    height: '10%',
++    width: '100%',
++    backgroundColor: colours.white,
++  },
++  contentContainer: {
++    height: '80%',
++    width: '100%',
++    flexDirection: 'column',
++    justifyContent: 'flex-start',
++    alignItems: 'center',
+   },
+ });
+ 
+diff --git a/frontend/src/components/JobDetails/JobDetails.jsx b/frontend/src/components/JobDetails/JobDetails.jsx
+index 8fa2077..e2f835f 100644
+--- a/frontend/src/components/JobDetails/JobDetails.jsx
++++ b/frontend/src/components/JobDetails/JobDetails.jsx
+@@ -4,10 +4,14 @@ import {
+ } from 'react-native';
+ import { ScrollView } from 'react-native-gesture-handler';
+ import PropTypes from 'prop-types';
++import Icon from 'react-native-vector-icons/Feather';
+ 
++import JobImage from '../JobImage';
+ import ImageButton from '../ImageButton';
++import IconButton from '../IconButton';
+ import images from '../../constants/images';
+ import styles from './styles';
++import { colours, sizes } from '../../styles';
+ 
+ class JobDetails extends Component {
+   constructor(props) {
+@@ -24,66 +28,86 @@ class JobDetails extends Component {
+   render() {
+     const { modalVisible } = this.state;
+     const {
+-      company, title, location, description,
++      logo, company, title, location, description, testID,
+     } = this.props;
+     return (
+       <View style={[styles.container]}>
+         <Modal
+           animationType="slide"
+-          transparent={false}
++          transparent
+           visible={modalVisible}
+         >
+-          <View style={[styles.modalContainer]}>
+-            <ImageButton
+-              source={images.iconChevronDown}
++          <View style={styles.detailsContainer} testID={`${testID}Description`}>
++            <IconButton
++              testID={`${testID}Close`}
++              name="chevron-down"
++              color={colours.white}
++              size={sizes.iconLg}
+               onPress={() => {
+                 this.setModalVisible(false);
+               }}
+             />
+-            <Text style={[styles.header]}>{company}</Text>
+-            <View style={[styles.subHeaderContainer]}>
+-              <Image
+-                source={images.iconJob}
+-                styles={[styles.icon]}
++            <View style={styles.logoContainer}>
++              <JobImage
++                logo={logo}
++                sideLength={50}
+               />
+-              <Text style={[styles.subHeader]}>{title}</Text>
++              <Text style={styles.headerDark}>{company}</Text>
+             </View>
+-            <View style={[styles.subHeaderContainer]}>
+-              <Image
+-                source={images.iconLocation}
+-                styles={[styles.icon]}
+-              />
+-              <Text style={[styles.subHeader]}>{location}</Text>
++            <View style={styles.infoContainer}>
++              <View style={[styles.subHeaderContainer]}>
++                <Icon
++                  name="briefcase"
++                  color={colours.white}
++                  size={17}
++                />
++                <Text style={styles.subHeaderDark}>{title}</Text>
++              </View>
++              <View style={[styles.subHeaderContainer]}>
++                <Icon
++                  name="map-pin"
++                  color={colours.white}
++                  size={17}
++                />
++                <Text style={styles.subHeaderDark}>{location}</Text>
++              </View>
+             </View>
+-            <ScrollView style={[styles.scroll]}>
+-              <Text>{description}</Text>
++            <ScrollView style={styles.descContainer}>
++              <Text style={styles.normalText}>{description}</Text>
+             </ScrollView>
+           </View>
+         </Modal>
+ 
+-        <View style={[styles.textContainer]}>
+-          <ImageButton
+-            source={images.iconChevronUp}
+-            onPress={() => {
+-              this.setModalVisible(true);
+-            }}
+-          />
+-          <Text style={[styles.header]}>{company}</Text>
+-          <View style={[styles.subHeaderContainer]}>
+-            <Image
+-              source={images.iconJob}
+-              styles={[styles.icon]}
++        <View style={styles.textContainer}>
++          <Text style={styles.header}>{company}</Text>
++          <View style={styles.subHeaderContainer}>
++            <Icon
++              name="briefcase"
++              color={colours.lightGray}
++              size={17}
+             />
+-            <Text style={[styles.subHeader]}>{title}</Text>
++            <Text style={styles.subHeader}>{title}</Text>
+           </View>
+-          <View style={[styles.subHeaderContainer]}>
+-            <Image
+-              source={images.iconLocation}
+-              styles={[styles.icon]}
++          <View style={styles.subHeaderContainer}>
++            <Icon
++              name="map-pin"
++              color={colours.lightGray}
++              size={17}
+             />
+-            <Text style={[styles.subHeader]}>{location}</Text>
++            <Text style={styles.subHeader}>{location}</Text>
+           </View>
+         </View>
++        <View style={styles.expandBtnContainer}>
++          <IconButton
++            testID={`${testID}Open`}
++            name="info"
++            color={colours.lightGray}
++            size={sizes.icon}
++            onPress={() => {
++              this.setModalVisible(true);
++            }}
++          />
++        </View>
+       </View>
+     );
+   }
+@@ -94,6 +118,7 @@ JobDetails.propTypes = {
+   title: PropTypes.string.isRequired,
+   location: PropTypes.string.isRequired,
+   description: PropTypes.string.isRequired,
++  testID: PropTypes.string.isRequired,
+ };
+ 
+ export default JobDetails;
+diff --git a/frontend/src/components/JobDetails/styles.jsx b/frontend/src/components/JobDetails/styles.jsx
+index 5b19cc9..a90050e 100644
+--- a/frontend/src/components/JobDetails/styles.jsx
++++ b/frontend/src/components/JobDetails/styles.jsx
+@@ -1,23 +1,26 @@
+ import { StyleSheet } from 'react-native';
+ 
+-import { colours, fonts } from '../../styles';
++import {
++  colours, fonts, margin, padding, elevation,
++} from '../../styles';
+ 
+ const styles = StyleSheet.create({
+   container: {
+-    paddingTop: 15,
+-    justifyContent: 'center',
+-    height: 150,
++    flexDirection: 'column',
++    justifyContent: 'flex-start',
++    alignItems: 'flex-start',
++    height: '55%',
+     width: '100%',
+     overflow: 'scroll',
+-    backgroundColor: 'white',
++    backgroundColor: colours.white,
+   },
+   textContainer: {
+-    paddingVertical: 7,
+-    paddingHorizontal: 30,
+     flexDirection: 'column',
+-    justifyContent: 'flex-start',
+-    height: 100,
++    justifyContent: 'center',
++    height: '85%',
++    width: '100%',
+     overflow: 'scroll',
++    backgroundColor: colours.white,
+   },
+   subHeaderContainer: {
+     flexDirection: 'row',
+@@ -28,9 +31,9 @@ const styles = StyleSheet.create({
+     padding: 30,
+     fontFamily: fonts.normal,
+     color: colours.darkGray,
+-    height: '100%',
++    height: 200,
+     fontSize: 12,
+-    backgroundColor: 'white',
++    backgroundColor: 'black',
+   },
+   scroll: {
+     marginTop: 30,
+@@ -39,21 +42,84 @@ const styles = StyleSheet.create({
+     overflow: 'scroll',
+   },
+   header: {
+-    fontSize: 20,
+-    color: colours.darkGray,
+-    fontFamily: fonts.normal,
+-    paddingBottom: 7,
++    fontFamily: fonts.bold,
++    fontSize: fonts.lg,
++    color: colours.gray,
++    marginBottom: margin.md,
+   },
+   subHeader: {
+-    fontSize: 15,
++    fontFamily: fonts.bold,
++    fontSize: fonts.md,
+     color: colours.gray,
+-    fontFamily: fonts.normal,
+-    paddingLeft: 6,
++    marginLeft: margin.sm,
+   },
++
+   icon: {
+     width: 50,
+     height: 50,
+   },
++  expandBtnContainer: {
++    flexDirection: 'row',
++    justifyContent: 'flex-end',
++    alignItems: 'flex-end',
++    height: '15%',
++    width: '100%',
++    backgroundColor: colours.pink,
++  },
++
++
++  detailsContainer: {
++    height: '85%',
++    width: '100%',
++    flexDirection: 'column',
++    justifyContent: 'flex-start',
++    alignItems: 'center',
++    padding: padding.lg,
++    position: 'absolute',
++    bottom: 0,
++    borderTopLeftRadius: 30,
++    borderTopRightRadius: 30,
++    backgroundColor: colours.primary,
++    elevation: elevation.md,
++  },
++  logoContainer: {
++    flexDirection: 'row',
++    justifyContent: 'flex-start',
++    alignItems: 'center',
++    height: '15%',
++    width: '100%',
++    backgroundColor: colours.primary,
++  },
++  infoContainer: {
++    maxHeight: '20%',
++    width: '100%',
++    backgroundColor: colours.primary,
++    marginBottom: margin.md,
++  },
++  descContainer: {
++    maxHeight: '70%',
++    width: '100%',
++    backgroundColor: colours.primary,
++    overflow: 'scroll',
++  },
++  normalText: {
++    fontFamily: fonts.normal,
++    fontSize: fonts.md,
++    color: colours.white,
++  },
++  headerDark: {
++    fontFamily: fonts.semiBold,
++    fontSize: fonts.lg,
++    color: colours.white,
++    marginBottom: margin.sm,
++    marginLeft: margin.sm,
++  },
++  subHeaderDark: {
++    fontFamily: fonts.semiBold,
++    fontSize: fonts.md,
++    color: colours.white,
++    marginLeft: margin.sm,
++  },
+ });
+ 
+ export default styles;
+diff --git a/frontend/src/components/JobImage/JobImage.jsx b/frontend/src/components/JobImage/JobImage.jsx
+index df02cd9..c481260 100644
+--- a/frontend/src/components/JobImage/JobImage.jsx
++++ b/frontend/src/components/JobImage/JobImage.jsx
+@@ -8,7 +8,7 @@ import styles from './styles';
+ const JobImage = ({ logo, sideLength, style }) => {
+   let source = { uri: logo };
+   if (logo === null) {
+-    source = images.iconLogo;
++    source = images.imgPlaceholder;
+   }
+   return (
+     <Image
+diff --git a/frontend/src/components/JobImage/styles.jsx b/frontend/src/components/JobImage/styles.jsx
+index 18574b3..6c03204 100644
+--- a/frontend/src/components/JobImage/styles.jsx
++++ b/frontend/src/components/JobImage/styles.jsx
+@@ -5,6 +5,7 @@ import { border } from '../../styles';
+ const styles = StyleSheet.create({
+   companyLogo: {
+     borderRadius: border.radius,
++    resizeMode: 'contain',
+   },
+ });
+ 
+diff --git a/frontend/src/components/JobShareModal/JobShareModal.jsx b/frontend/src/components/JobShareModal/JobShareModal.jsx
+index 38f41d2..d7db7c0 100644
+--- a/frontend/src/components/JobShareModal/JobShareModal.jsx
++++ b/frontend/src/components/JobShareModal/JobShareModal.jsx
+@@ -1,7 +1,7 @@
+ import React from 'react';
+ import { View, Text, FlatList } from 'react-native';
+ import {
+-  string, bool, func, arrayOf,
++  string, bool, func, arrayOf, object,
+ } from 'prop-types';
+ import Modal from 'react-native-modal';
+ 
+@@ -12,14 +12,15 @@ import { colours } from '../../styles';
+ import styles from './styles';
+ 
+ const JobShareModal = ({
+-  isVisible, onPressExit, jobTitle, jobCompany, jobId, friends, onPressSend,
++  isVisible, onPressExit, jobTitle, jobCompany, jobId, jobLogo, friends, onPressSend,
+ }) => (
+   <Modal
+     isVisible={isVisible}
+   >
+     <View style={styles.modalContainer}>
+-      <View style={styles.exitButtonContainer}>
++      <View style={styles.exitButtonContainer} testID="shareModal">
+         <ImageButton
++          testID="closeShare"
+           source={images.iconCross}
+           onPress={onPressExit}
+         />
+@@ -30,6 +31,7 @@ const JobShareModal = ({
+         onPress={() => {}}
+         actionIcon=""
+         disabled
++        imageSource={jobLogo}
+         backgroundColor={colours.primary}
+         titleColor={colours.white}
+         descriptionColor={colours.secondary}
+@@ -39,6 +41,7 @@ const JobShareModal = ({
+       </View>
+       <View style={styles.listContainer}>
+         <FlatList
++          showsVerticalScrollIndicator={false}
+           data={friends}
+           keyExtractor={item => item._id}
+           renderItem={({ item }) => (
+@@ -56,13 +59,18 @@ const JobShareModal = ({
+   </Modal>
+ );
+ 
++JobShareModal.defaultProps = {
++  jobLogo: null,
++};
++
+ JobShareModal.propTypes = {
+   isVisible: bool.isRequired,
+   onPressExit: func.isRequired,
+   jobTitle: string.isRequired,
+   jobCompany: string.isRequired,
+   jobId: string.isRequired,
+-  friends: arrayOf(string).isRequired,
++  jobLogo: string,
++  friends: arrayOf(object).isRequired,
+   onPressSend: func.isRequired,
+ };
+ 
+diff --git a/frontend/src/components/MainHeader/MainHeader.jsx b/frontend/src/components/MainHeader/MainHeader.jsx
+index e98348a..6981126 100644
+--- a/frontend/src/components/MainHeader/MainHeader.jsx
++++ b/frontend/src/components/MainHeader/MainHeader.jsx
+@@ -1,16 +1,20 @@
+ import React from 'react';
+ import { View, Image } from 'react-native';
+-import { number, func } from 'prop-types';
++import { func } from 'prop-types';
+ 
+-import ImageButton from '../ImageButton';
++import IconButton from '../IconButton';
+ import images from '../../constants/images';
+ import styles from './styles';
++import { colours, sizes } from '../../styles';
+ 
+-const MainHeader = ({ buttonSource, onPress }) => (
+-  <View style={styles.container}>
++const MainHeader = ({ onPress }) => (
++  <View style={styles.container} testID="mainHeader">
+     <View style={styles.buttonContainer}>
+-      <ImageButton
+-        source={buttonSource}
++      <IconButton
++        testID="inbox"
++        name="inbox"
++        color={colours.lightGray}
++        size={sizes.iconLg}
+         onPress={onPress}
+       />
+     </View>
+@@ -21,7 +25,6 @@ const MainHeader = ({ buttonSource, onPress }) => (
+ );
+ 
+ MainHeader.propTypes = {
+-  buttonSource: number.isRequired,
+   onPress: func.isRequired,
+ };
+ 
+diff --git a/frontend/src/components/NavHeader/NavHeader.jsx b/frontend/src/components/NavHeader/NavHeader.jsx
+index f35726c..6eef652 100644
+--- a/frontend/src/components/NavHeader/NavHeader.jsx
++++ b/frontend/src/components/NavHeader/NavHeader.jsx
+@@ -2,29 +2,32 @@ import React from 'react';
+ import { View, Text } from 'react-native';
+ import { string, func, oneOf } from 'prop-types';
+ 
+-import SearchBar from '../SeachBar';
+-import ImageButton from '../ImageButton';
++import IconButton from '../IconButton';
+ import images from '../../constants/images';
+ import styles from './styles';
++import { colours, sizes } from '../../styles';
+ 
+ 
+ const NavHeader = ({
+-  title, buttonOption, onPressButton, value, onChangeText, onStartSearch, onEndSearch,
++  title, buttonOption, onPressButton, testID,
+ }) => {
+   let button;
+   if (buttonOption === 'search') {
+     button = (
+-      <SearchBar
+-        value={value}
+-        onChangeText={onChangeText}
+-        onStartSearch={onStartSearch}
+-        onEndSearch={onEndSearch}
++      <IconButton
++        testID="search"
++        name="search"
++        color={colours.lightGray}
++        size={sizes.icon}
++        onPress={onPressButton}
+       />
+     );
+   } else if (buttonOption === 'back') {
+     button = (
+-      <ImageButton
+-        source={images.iconChevronLeft}
++      <IconButton
++        name="menu"
++        color={colours.lightGray}
++        size={sizes.icon}
+         onPress={onPressButton}
+       />
+     );
+@@ -33,20 +36,23 @@ const NavHeader = ({
+   }
+ 
+   return (
+-    <View style={styles.container}>
++    <View style={styles.container} testID={testID}>
+       <View style={styles.componentContainer}>
+         <View style={styles.leftComponentContainer}>
+           {button}
+         </View>
+-        <ImageButton
+-          source={images.iconMenu}
++        <IconButton
++          testID="user"
++          name="user"
++          color={colours.lightGray}
++          size={sizes.icon}
+           onPress={onPressButton}
+         />
+       </View>
+       <View
+         style={styles.titleContainer}
+       >
+-        <Text style={styles.text}>{title}</Text>
++        <Text style={styles.text} testID="navTitle">{title}</Text>
+       </View>
+     </View>
+   );
+@@ -55,20 +61,14 @@ const NavHeader = ({
+ NavHeader.defaultProps = {
+   buttonOption: 'none',
+   onPressButton: () => {},
+-  value: '',
+-  onChangeText: () => {},
+-  onStartSearch: () => {},
+-  onEndSearch: () => {},
++  testID: '',
+ };
+ 
+ NavHeader.propTypes = {
+   title: string.isRequired,
+   buttonOption: oneOf(['search', 'back', 'none']),
+   onPressButton: func,
+-  value: string,
+-  onChangeText: func,
+-  onStartSearch: func,
+-  onEndSearch: func,
++  testID: string,
+ };
+ 
+ export default NavHeader;
+diff --git a/frontend/src/components/NavHeader/styles.jsx b/frontend/src/components/NavHeader/styles.jsx
+index 698cccf..95d57a0 100644
+--- a/frontend/src/components/NavHeader/styles.jsx
++++ b/frontend/src/components/NavHeader/styles.jsx
+@@ -2,7 +2,7 @@
+ import { StyleSheet } from 'react-native';
+ 
+ import {
+-  dimensions, padding, margin, colours, fonts,
++  dimensions, padding, colours, fonts,
+ } from '../../styles';
+ 
+ const styles = StyleSheet.create({
+@@ -14,13 +14,14 @@ const styles = StyleSheet.create({
+     width: dimensions.fullWidth,
+     paddingTop: padding.lg,
+     paddingHorizontal: padding.md,
+-    marginBottom: margin.md,
+     backgroundColor: 'transparent',
++    zIndex: 2,
+   },
+   leftComponentContainer: {
+     flexDirection: 'row',
+     justifyContent: 'flex-start',
+     width: '85%',
++    zIndex: 1,
+   },
+   componentContainer: {
+     flexDirection: 'row',
+@@ -29,8 +30,8 @@ const styles = StyleSheet.create({
+     height: 40,
+     width: '100%',
+     paddingTop: padding.md,
+-    marginBottom: margin.md,
+     backgroundColor: 'transparent',
++    zIndex: 1,
+   },
+   titleContainer: {
+     flexDirection: 'row',
+@@ -40,6 +41,7 @@ const styles = StyleSheet.create({
+     width: '100%',
+     paddingHorizontal: padding.xxl,
+     backgroundColor: 'transparent',
++    zIndex: 0,
+   },
+   text: {
+     fontFamily: fonts.extraBold,
+diff --git a/frontend/src/components/SeachBar/SearchBar.jsx b/frontend/src/components/SeachBar/SearchBar.jsx
+deleted file mode 100644
+index 77dc249..0000000
+--- a/frontend/src/components/SeachBar/SearchBar.jsx
++++ /dev/null
+@@ -1,66 +0,0 @@
+-import React, { Component } from 'react';
+-import { View, TextInput } from 'react-native';
+-import { string, func } from 'prop-types';
+-
+-import ImageButton from '../ImageButton';
+-import images from '../../constants/images';
+-import styles from './styles';
+-
+-class SearchBar extends Component {
+-  constructor(props) {
+-    super(props);
+-    this.state = {
+-      showInput: false,
+-    };
+-  }
+-
+-  startSearch = () => {
+-    const { onStartSearch } = this.props;
+-    onStartSearch();
+-    this.setState({ showInput: true });
+-  }
+-
+-  endSearch = () => {
+-    const { onEndSearch } = this.props;
+-    onEndSearch();
+-    this.setState({ showInput: false });
+-  }
+-
+-  render() {
+-    const { showInput } = this.state;
+-    const { value, onChangeText } = this.props;
+-    if (showInput) {
+-      return (
+-        <View style={[styles.container]}>
+-          <ImageButton
+-            source={images.iconChevronLeft}
+-            onPress={this.endSearch}
+-          />
+-          <TextInput
+-            style={styles.input}
+-            value={value}
+-            onChangeText={onChangeText}
+-          />
+-        </View>
+-      );
+-    }
+-
+-    return (
+-      <View style={[styles.container]}>
+-        <ImageButton
+-          source={images.iconSearch}
+-          onPress={this.startSearch}
+-        />
+-      </View>
+-    );
+-  }
+-}
+-
+-SearchBar.propTypes = {
+-  value: string.isRequired,
+-  onChangeText: func.isRequired,
+-  onStartSearch: func.isRequired,
+-  onEndSearch: func.isRequired,
+-};
+-
+-export default SearchBar;
+diff --git a/frontend/src/components/Search/Search.jsx b/frontend/src/components/Search/Search.jsx
+new file mode 100644
+index 0000000..ad9b400
+--- /dev/null
++++ b/frontend/src/components/Search/Search.jsx
+@@ -0,0 +1,31 @@
++import React from 'react';
++import { View } from 'react-native';
++import { string, func, element } from 'prop-types';
++
++import SearchBar from '../SearchBar';
++import styles from './styles';
++
++const Search = ({
++  value, onChangeText, onEndSearch, children,
++}) => (
++
++  <View style={styles.container}>
++    <SearchBar
++      value={value}
++      onChangeText={onChangeText}
++      onEndSearch={onEndSearch}
++    />
++    <View style={styles.listContainer}>
++      {children}
++    </View>
++  </View>
++);
++
++Search.propTypes = {
++  value: string.isRequired,
++  onChangeText: func.isRequired,
++  onEndSearch: func.isRequired,
++  children: element.isRequired,
++};
++
++export default Search;
+diff --git a/frontend/src/components/Search/index.js b/frontend/src/components/Search/index.js
+new file mode 100644
+index 0000000..517d0ee
+--- /dev/null
++++ b/frontend/src/components/Search/index.js
+@@ -0,0 +1,3 @@
++import Search from './Search';
++
++export default Search;
+diff --git a/frontend/src/components/Search/styles.jsx b/frontend/src/components/Search/styles.jsx
+new file mode 100644
+index 0000000..a44a997
+--- /dev/null
++++ b/frontend/src/components/Search/styles.jsx
+@@ -0,0 +1,60 @@
++import { StyleSheet } from 'react-native';
++
++import {
++  containers, padding, margin, elevation, border, colours, fonts,
++} from '../../styles';
++
++const styles = StyleSheet.create({
++  container: {
++    ...containers.fullScreenContainer,
++    flexDirection: 'column',
++    alignItems: 'center',
++    paddingHorizontal: padding.md,
++  },
++  buttonSection: {
++    borderRadius: border.radius,
++    flexDirection: 'row',
++    justifyContent: 'space-between',
++    alignItems: 'center',
++    height: 80,
++    width: '95%',
++    paddingHorizontal: padding.lg,
++    marginHorizontal: margin.sm,
++    marginBottom: margin.md,
++    backgroundColor: colours.primary,
++    elevation: elevation.md,
++  },
++  infoContainer: {
++    width: '50%',
++    flexDirection: 'column',
++    alignItems: 'flex-start',
++  },
++  buttonContainer: {
++    alignItems: 'center',
++    justifyContent: 'center',
++    height: 70,
++    width: '50%',
++  },
++  button: {
++    width: 100,
++  },
++  bigText: {
++    fontSize: fonts.md,
++    fontFamily: fonts.bold,
++    color: colours.white,
++  },
++  normalText: {
++    fontSize: fonts.sm,
++    fontFamily: fonts.bold,
++    color: colours.secondary,
++  },
++  listContainer: {
++    justifyContent: 'center',
++    alignItems: 'center',
++    height: '85%',
++    width: '100%',
++    backgroundColor: colours.white,
++  },
++});
++
++export default styles;
+diff --git a/frontend/src/components/SearchBar/SearchBar.jsx b/frontend/src/components/SearchBar/SearchBar.jsx
+new file mode 100644
+index 0000000..b16aa0b
+--- /dev/null
++++ b/frontend/src/components/SearchBar/SearchBar.jsx
+@@ -0,0 +1,35 @@
++import React from 'react';
++import { View, TextInput } from 'react-native';
++import { string, func } from 'prop-types';
++
++import IconButton from '../IconButton';
++import images from '../../constants/images';
++import styles from './styles';
++import { colours, sizes } from '../../styles';
++
++const SearchBar = ({ value, onChangeText, onEndSearch }) => (
++  <View style={styles.container}>
++    <IconButton
++      testID="searchBack"
++      name="chevron-left"
++      color={colours.lightGray}
++      size={sizes.icon}
++      onPress={onEndSearch}
++    />
++    <TextInput
++      testID="searchInput"
++      placeholder="Search"
++      style={styles.input}
++      value={value}
++      onChangeText={onChangeText}
++    />
++  </View>
++);
++
++SearchBar.propTypes = {
++  value: string.isRequired,
++  onChangeText: func.isRequired,
++  onEndSearch: func.isRequired,
++};
++
++export default SearchBar;
+diff --git a/frontend/src/components/SeachBar/index.js b/frontend/src/components/SearchBar/index.js
+similarity index 100%
+rename from frontend/src/components/SeachBar/index.js
+rename to frontend/src/components/SearchBar/index.js
+diff --git a/frontend/src/components/SeachBar/styles.jsx b/frontend/src/components/SearchBar/styles.jsx
+similarity index 73%
+rename from frontend/src/components/SeachBar/styles.jsx
+rename to frontend/src/components/SearchBar/styles.jsx
+index ce9dd56..863814b 100644
+--- a/frontend/src/components/SeachBar/styles.jsx
++++ b/frontend/src/components/SearchBar/styles.jsx
+@@ -19,13 +19,11 @@ const styles = StyleSheet.create({
+   input: {
+     height: 50,
+     width: '90%',
+-    marginVertical: 5,
+-    paddingHorizontal: 10,
+-    color: colours.gray,
++    marginBottom: margin.sm,
++    paddingHorizontal: padding.sm,
++    borderRadius: border.radius,
++    backgroundColor: colours.lighterGray,
+     fontFamily: fonts.normal,
+-    fontSize: fonts.md,
+-    borderBottomColor: colours.gray,
+-    borderBottomWidth: border.inputBorderWidth,
+   },
+ });
+ 
+diff --git a/frontend/src/components/SelectableItem/SelectableItem.jsx b/frontend/src/components/SelectableItem/SelectableItem.jsx
+index d14944f..098285e 100644
+--- a/frontend/src/components/SelectableItem/SelectableItem.jsx
++++ b/frontend/src/components/SelectableItem/SelectableItem.jsx
+@@ -1,19 +1,23 @@
+ import React from 'react';
+ import {
+-  Text, TouchableOpacity, View, Image,
++  Text, TouchableOpacity, View,
+ } from 'react-native';
+ import { string, func, bool } from 'prop-types';
+ 
+-import images from '../../constants/images';
++import JobImage from '../JobImage';
+ import { colours } from '../../styles';
+ import styles from './styles';
+ 
+ const SelectableItem = ({
+-  header, subHeader, onPress, actionIcon, disabled, backgroundColor, titleColor, descriptionColor,
++  header, subHeader, onPress, actionIcon, disabled, imageSource,
++  backgroundColor, titleColor, descriptionColor, testID,
+ }) => (
+-  <View style={[styles.container, { backgroundColor }]}>
++  <View style={[styles.container, { backgroundColor }]} testID={testID}>
+     <View style={styles.contentContainer}>
+-      <Image source={images.jobBackground} style={styles.logo} />
++      <JobImage
++        logo={imageSource}
++        style={styles.logo}
++      />
+       <View style={[styles.infoContainer]}>
+         <Text
+           numberOfLines={1}
+@@ -43,9 +47,11 @@ const SelectableItem = ({
+ SelectableItem.defaultProps = {
+   subHeader: '',
+   disabled: false,
++  imageSource: null,
+   backgroundColor: colours.white,
+   titleColor: colours.primary,
+   descriptionColor: colours.gray,
++  testID: '',
+ };
+ 
+ SelectableItem.propTypes = {
+@@ -54,9 +60,11 @@ SelectableItem.propTypes = {
+   onPress: func.isRequired,
+   actionIcon: string.isRequired,
+   disabled: bool,
++  imageSource: string,
+   backgroundColor: string,
+   titleColor: string,
+   descriptionColor: string,
++  testID: string,
+ };
+ 
+ export default SelectableItem;
+diff --git a/frontend/src/components/SelectableItem/styles.jsx b/frontend/src/components/SelectableItem/styles.jsx
+index a8be183..4c18197 100644
+--- a/frontend/src/components/SelectableItem/styles.jsx
++++ b/frontend/src/components/SelectableItem/styles.jsx
+@@ -12,8 +12,9 @@ const styles = StyleSheet.create({
+     width: '95%',
+     paddingHorizontal: padding.md,
+     margin: margin.xs,
++    marginLeft: margin.xs + 3,
+     borderRadius: border.radius,
+-    elevation: 10,
++    elevation: 8,
+   },
+   logo: {
+     height: 50,
+diff --git a/frontend/src/components/SwitchableNav/SwitchableNav.jsx b/frontend/src/components/SwitchableNav/SwitchableNav.jsx
+index e7cf999..e05056f 100644
+--- a/frontend/src/components/SwitchableNav/SwitchableNav.jsx
++++ b/frontend/src/components/SwitchableNav/SwitchableNav.jsx
+@@ -7,8 +7,9 @@ import styles from './styles';
+ const SwitchableNav = ({
+   showNavOption1, navOption1Title, navOption2Title, onPressNavOption1, onPressNavOption2,
+ }) => (
+-  <View style={[styles.container]}>
++  <View style={styles.container} testID="switchNav">
+     <TouchableOpacity
++      testID="switchNavOption1"
+       style={styles.navOptionContainer}
+       onPress={onPressNavOption1}
+     >
+@@ -21,6 +22,7 @@ const SwitchableNav = ({
+     </TouchableOpacity>
+ 
+     <TouchableOpacity
++      testID="switchNavOption2"
+       style={styles.navOptionContainer}
+       onPress={onPressNavOption2}
+     >
+diff --git a/frontend/src/constants/images.jsx b/frontend/src/constants/images.jsx
+index b904d57..c17cfb4 100644
+--- a/frontend/src/constants/images.jsx
++++ b/frontend/src/constants/images.jsx
+@@ -13,8 +13,9 @@ import iconJob from '../../assets/icon-job.png';
+ import iconSearch from '../../assets/icon-search.png';
+ import iconCross from '../../assets/icon-cross.png';
+ import iconInbox from '../../assets/icon-inbox.png';
+-import jobBackground from '../../assets/temp-bg1.png';
+ import jobSeeker from '../../assets/job-seeker.png';
++import checkingDoc from '../../assets/checking-document.png';
++import imgPlaceholder from '../../assets/img-placeholder.png';
+ 
+ const images = {
+   logoLight,
+@@ -32,8 +33,9 @@ const images = {
+   iconSearch,
+   iconCross,
+   iconInbox,
+-  jobBackground,
+   jobSeeker,
++  checkingDoc,
++  imgPlaceholder,
+ };
+ 
+ export default images;
+diff --git a/frontend/src/constants/messages.jsx b/frontend/src/constants/messages.jsx
+index 207f763..6750ab8 100644
+--- a/frontend/src/constants/messages.jsx
++++ b/frontend/src/constants/messages.jsx
+@@ -4,4 +4,7 @@ export const errors = {
+ 
+ export const status = {
+   noSharedJobs: 'You currently have no shared jobs.',
++  noPendingFriends: 'You currently have no pending friends.',
++  noFriends: 'You currently have no friends.',
++  noResults: 'No results',
+ };
+diff --git a/frontend/src/screens/AuthLanding/AuthLanding.jsx b/frontend/src/screens/AuthLanding/AuthLanding.jsx
+index 8239c0e..45cf12b 100644
+--- a/frontend/src/screens/AuthLanding/AuthLanding.jsx
++++ b/frontend/src/screens/AuthLanding/AuthLanding.jsx
+@@ -55,36 +55,39 @@ export default class AuthLanding extends Component {
+     return (
+       <View style={styles.container}>
+         <Image
++          testID="logoLight"
+           source={images.logoLight}
+           style={styles.logo}
+         />
+         <Image
++          testID="jobSeeker"
+           source={images.jobSeeker}
+           style={styles.image}
+         />
+-        <View style={styles.buttonSection}>
+-          <GoogleSigninButton
+-            style={styles.googleButton}
+-            size={GoogleSigninButton.Size.Wide}
+-            color={GoogleSigninButton.Color.Light}
+-            onPress={this.googleSignIn}
+-            disabled={false}
+-          />
+-          <Button
+-            title="Sign In"
+-            textColor={colours.white}
+-            backgroundColor={colours.accentPrimary}
+-            style={styles.signInButton}
+-            onPress={() => navigation.navigate('SignIn')}
+-          />
+-          <Button
+-            title="Sign Up"
+-            textColor={colours.accentPrimary}
+-            backgroundColor="transparent"
+-            style={styles.signUpButton}
+-            onPress={() => navigation.navigate('SignUp')}
+-          />
+-        </View>
++        <GoogleSigninButton
++          testID="google"
++          style={styles.googleButton}
++          size={GoogleSigninButton.Size.Wide}
++          color={GoogleSigninButton.Color.Light}
++          onPress={this.googleSignIn}
++          disabled={false}
++        />
++        <Button
++          title="Sign In"
++          textColor={colours.white}
++          backgroundColor={colours.accentPrimary}
++          style={styles.signInButton}
++          onPress={() => navigation.navigate('SignIn')}
++          testID="signInAuth"
++        />
++        <Button
++          title="Sign Up"
++          textColor={colours.accentPrimary}
++          backgroundColor="transparent"
++          style={styles.signUpButton}
++          onPress={() => navigation.navigate('SignUp')}
++          testID="signUp"
++        />
+       </View>
+     );
+   }
+diff --git a/frontend/src/screens/AuthLanding/styles.jsx b/frontend/src/screens/AuthLanding/styles.jsx
+index 8178f1f..de91e9c 100644
+--- a/frontend/src/screens/AuthLanding/styles.jsx
++++ b/frontend/src/screens/AuthLanding/styles.jsx
+@@ -8,14 +8,14 @@ const styles = StyleSheet.create({
+   container: {
+     ...containers.fullScreenContainer,
+     flexDirection: 'column',
+-    justifyContent: 'center',
++    justifyContent: 'flex-end',
+     alignItems: 'center',
+     paddingHorizontal: padding.lg,
+   },
+   logo: {
+     marginTop: margin.lg,
+     resizeMode: 'contain',
+-    height: '10%',
++    height: '9%',
+   },
+   image: {
+     resizeMode: 'contain',
+diff --git a/frontend/src/screens/EditFriends/EditFriends.jsx b/frontend/src/screens/EditFriends/EditFriends.jsx
+index 6a5cbe4..c245cd4 100644
+--- a/frontend/src/screens/EditFriends/EditFriends.jsx
++++ b/frontend/src/screens/EditFriends/EditFriends.jsx
+@@ -3,18 +3,17 @@ import { View, FlatList } from 'react-native';
+ import axios from 'axios';
+ import Logger from 'js-logger';
+ 
++import Search from '../../components/Search';
+ import SelectableItem from '../../components/SelectableItem';
+ import Loader from '../../components/Loader';
++import InfoDisplay from '../../components/InfoDisplay';
+ import NavHeader from '../../components/NavHeader';
+ import SwitchableNav from '../../components/SwitchableNav';
+ import config from '../../constants/config';
++import { status } from '../../constants/messages';
+ import styles from './styles';
+ 
+ export default class EditFriends extends Component {
+-  static navigationOptions = {
+-    drawerLabel: 'Friends',
+-  }
+-
+   constructor(props) {
+     super(props);
+     this.state = {
+@@ -23,6 +22,7 @@ export default class EditFriends extends Component {
+       addFriendName: '',
+       loading: 1,
+       showPendingFriends: true,
++      searchInProgress: false,
+     };
+     this.logger = Logger.get(this.constructor.name);
+   }
+@@ -103,23 +103,86 @@ export default class EditFriends extends Component {
+     });
+   }
+ 
++  searchUsers = async text => {
++    // TODO: get query response from server
++    this.setState({ addFriendName: text });
++  }
++
+   render() {
+     const {
+-      loading, addFriendName, pendingFriends, friends, showPendingFriends,
++      loading, addFriendName, pendingFriends, friends, showPendingFriends, searchInProgress,
+     } = this.state;
+ 
++    let users;
++    let onPress;
++    let noUsersMsg;
++    let actionIcon;
++    if (searchInProgress) {
++      users = friends; // TODO: change to user query results
++      onPress = this.addFriend;
++      noUsersMsg = status.noResults;
++      actionIcon = '+';
++    } else if (showPendingFriends) {
++      users = pendingFriends;
++      onPress = this.comfirmFriendRequest;
++      noUsersMsg = status.noPendingFriends;
++      actionIcon = '+';
++    } else {
++      users = friends;
++      onPress = this.removeFriend;
++      noUsersMsg = status.noFriends;
++      actionIcon = 'x';
++    }
++
++    const noUsers = users.length === 0;
++
++    const userList = (
++      <FlatList
++        testID="userList"
++        data={users}
++        keyExtractor={item => item._id}
++        renderItem={({ item, index }) => (
++          <SelectableItem
++            testID={`userItem${index}`}
++            key={item._id}
++            header={item.userName}
++            subHeader={item.email}
++            onPress={() => onPress(item, index)}
++            actionIcon={actionIcon}
++          />
++        )}
++      />
++    );
++
++    const noUsersInfo = (
++      <InfoDisplay message={noUsersMsg} />
++    );
++
+     if (loading) return <Loader />;
++    if (searchInProgress) {
++      return (
++        <Search
++          value={addFriendName}
++          onChangeText={text => this.searchUsers(text)}
++          onEndSearch={() => {
++            this.setState({ addFriendName: '', searchInProgress: false });
++            // this.addFriend(); // TODO: Remove this once user search is implemented
++          }}
++        >
++          {noUsers ? noUsersInfo : userList}
++        </Search>
++      );
++    }
+     return (
+       <View
++        testID="editFriends"
+         style={[styles.container]}
+       >
+         <NavHeader
++          testID="navHeaderFriends"
+           title="Friends"
+           buttonOption="search"
+-          value={addFriendName}
+-          onChangeText={text => { this.setState({ addFriendName: text }); }}
+-          onEndSearch={() => this.addFriend()}
+-          onStartSearch={() => {}}
++          onPressButton={() => { this.setState({ searchInProgress: true }); }}
+         />
+         <SwitchableNav
+           showNavOption1={showPendingFriends}
+@@ -129,36 +192,7 @@ export default class EditFriends extends Component {
+           onPressNavOption2={() => { this.setState({ showPendingFriends: false }); }}
+         />
+         <View style={[styles.listContainer]}>
+-          {showPendingFriends ? (
+-            <FlatList
+-              data={pendingFriends}
+-              keyExtractor={item => item._id}
+-              renderItem={({ item }) => (
+-                <SelectableItem
+-                  key={item._id}
+-                  header={item.userName}
+-                  subHeader={item.email}
+-                  onPress={() => this.comfirmFriendRequest(item)}
+-                  actionIcon="+"
+-                />
+-              )}
+-            />
+-          )
+-            : (
+-              <FlatList
+-                data={friends}
+-                keyExtractor={item => item._id}
+-                renderItem={({ item, index }) => (
+-                  <SelectableItem
+-                    key={item._id}
+-                    header={item.userName}
+-                    subHeader={item.email}
+-                    onPress={() => this.removeFriend(item, index)}
+-                    actionIcon="x"
+-                  />
+-                )}
+-              />
+-            )}
++          {noUsers ? noUsersInfo : userList}
+         </View>
+       </View>
+     );
+diff --git a/frontend/src/screens/EditFriends/styles.jsx b/frontend/src/screens/EditFriends/styles.jsx
+index 0b13229..48de7f0 100644
+--- a/frontend/src/screens/EditFriends/styles.jsx
++++ b/frontend/src/screens/EditFriends/styles.jsx
+@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
+     width: '50%',
+   },
+   listContainer: {
+-    height: '100%',
++    height: '65%',
+     width: '100%',
+     backgroundColor: colours.white,
+   },
+diff --git a/frontend/src/screens/EditSkills/EditSkills.jsx b/frontend/src/screens/EditSkills/EditSkills.jsx
+index 041343a..c43f543 100644
+--- a/frontend/src/screens/EditSkills/EditSkills.jsx
++++ b/frontend/src/screens/EditSkills/EditSkills.jsx
+@@ -1,5 +1,5 @@
+ import React, { Component } from 'react';
+-import { View } from 'react-native';
++import { View, Image, Text } from 'react-native';
+ import FilePickerManager from 'react-native-file-picker';
+ import axios from 'axios';
+ import Logger from 'js-logger';
+@@ -9,12 +9,9 @@ import NavHeader from '../../components/NavHeader/NavHeader';
+ import config from '../../constants/config';
+ import styles from './styles';
+ import { colours } from '../../styles';
++import images from '../../constants/images';
+ 
+ export default class EditSkills extends Component {
+-  static navigationOptions = {
+-    drawerLabel: 'Edit Skills',
+-  }
+-
+   constructor(props) {
+     super(props);
+     this.logger = Logger.get(this.constructor.name);
+@@ -49,11 +46,21 @@ export default class EditSkills extends Component {
+ 
+   render() {
+     return (
+-      <View style={styles.container}>
++      <View style={styles.container} testID="editSkills">
+         <NavHeader
++          testID="navHeaderSkills"
+           title="Edit Skills"
+         />
++        <Image
++          testID="checkingDoc"
++          source={images.checkingDoc}
++          style={styles.image}
++        />
++        <Text style={styles.text} testID="textSkills">
++          Get jobs that are tailored to your skills by uploading your resume.
++        </Text>
+         <Button
++          testID="uploadResume"
+           backgroundColor={colours.accentPrimary}
+           title="Upload Resume"
+           textColor={colours.white}
+diff --git a/frontend/src/screens/EditSkills/styles.jsx b/frontend/src/screens/EditSkills/styles.jsx
+index aab1d94..c4bec5c 100644
+--- a/frontend/src/screens/EditSkills/styles.jsx
++++ b/frontend/src/screens/EditSkills/styles.jsx
+@@ -1,7 +1,7 @@
+ import { StyleSheet } from 'react-native';
+ 
+ import {
+-  containers, padding, margin,
++  containers, padding, margin, fonts, colours,
+ } from '../../styles';
+ 
+ const styles = StyleSheet.create({
+@@ -16,6 +16,17 @@ const styles = StyleSheet.create({
+     marginTop: margin.md,
+     marginBottom: margin.sm,
+   },
++  image: {
++    resizeMode: 'contain',
++    maxHeight: '45%',
++  },
++  text: {
++    fontFamily: fonts.semiBold,
++    fontSize: fonts.md,
++    color: colours.lightGray,
++    textAlign: 'center',
++    marginBottom: '10%',
++  },
+ });
+ 
+ export default styles;
+diff --git a/frontend/src/screens/JobSwipe/JobSwipe.jsx b/frontend/src/screens/JobSwipe/JobSwipe.jsx
+index f1c7ed4..4982c56 100644
+--- a/frontend/src/screens/JobSwipe/JobSwipe.jsx
++++ b/frontend/src/screens/JobSwipe/JobSwipe.jsx
+@@ -18,10 +18,6 @@ import images from '../../constants/images';
+ import { status } from '../../constants/messages';
+ 
+ export default class JobSwipe extends Component {
+-  static navigationOptions = {
+-    drawerLabel: 'Job Swipe',
+-  }
+-
+   constructor(props) {
+     super(props);
+     this.state = {
+@@ -174,7 +170,7 @@ export default class JobSwipe extends Component {
+     if (loading) return <Loader />;
+ 
+     return (
+-      <View style={styles.container}>
++      <View style={styles.container} testID="jobSwipe">
+         <MainHeader
+           buttonSource={menuButtonSource}
+           onPress={() => this.toggleSharedJobsView()}
+@@ -186,19 +182,19 @@ export default class JobSwipe extends Component {
+               cards={jobs}
+               renderCard={posting => (
+                 <JobCard
++                  testID={`card${matchedJobs.indexOf(posting)}`}
+                   logo={posting.logo}
+                   company={posting.company}
+                   title={posting.title}
+                   location={posting.location}
+                   description={posting.description}
+-                  isShared={posting.isShared}
++                  onPressShare={() => this.openJobShareModal()}
+                 />
+               )}
+               onSwipedLeft={() => this.swipeJob(jobs, jobIndex, jobType,
+                 this.swipeActionTypes.DISLIKE)}
+               onSwipedRight={() => this.swipeJob(jobs, jobIndex, jobType,
+                 this.swipeActionTypes.LIKE)}
+-              onTapCard={() => this.openJobShareModal()}
+               cardIndex={jobIndex}
+               marginTop={35}
+               backgroundColor={colours.white}
+@@ -230,6 +226,7 @@ export default class JobSwipe extends Component {
+               jobTitle={job.title}
+               jobCompany={job.company}
+               jobId={job._id}
++              jobLogo={job.logo}
+               friends={friends}
+               onPressSend={this.shareJob}
+             />
+diff --git a/frontend/src/screens/SendLikedJobs/SendLikedJobs.jsx b/frontend/src/screens/SendLikedJobs/SendLikedJobs.jsx
+index 1bd92d2..831790c 100644
+--- a/frontend/src/screens/SendLikedJobs/SendLikedJobs.jsx
++++ b/frontend/src/screens/SendLikedJobs/SendLikedJobs.jsx
+@@ -12,10 +12,6 @@ import styles from './styles';
+ import { colours } from '../../styles';
+ 
+ export default class SendLikedJobs extends Component {
+-  static navigationOptions = {
+-    drawerLabel: 'Liked Jobs',
+-  }
+-
+   constructor(props) {
+     super(props);
+     this.state = {
+@@ -37,10 +33,25 @@ export default class SendLikedJobs extends Component {
+ 
+   fetchLikedJobs = async () => {
+     const { userId } = global;
+-    const likedJobs = await axios.get(`${config.ENDP_LIKE}${userId}`)
++    const likedJobsResp = await axios.get(`${config.ENDP_LIKE}${userId}`)
+       .catch(e => this.logger.error(e));
++    const likedJobs = likedJobsResp.data.result;
++
++    // Get the logo url of each company
++    await Promise.all(likedJobs.map(async (job, i) => {
++      const companyInfoResp = await axios.get(
++        `${config.ENDP_COMPANY_API}${job.company}`,
++      );
++      const companyInfo = companyInfoResp.data[0];
++      if (companyInfo) {
++        likedJobs[i].logo = `${companyInfo.logo}?size=${80}`;
++      } else {
++        likedJobs[i].logo = null;
++      }
++    })).catch(e => this.logger.error(e));
++
+     this.setState({
+-      likedJobs: likedJobs.data.result,
++      likedJobs,
+       loading: 0,
+     });
+   }
+@@ -72,21 +83,24 @@ export default class SendLikedJobs extends Component {
+     if (loading) return <Loader />;
+ 
+     return (
+-      <View style={[styles.container]}>
++      <View style={styles.container} testID="sendLikedJobs">
+         <NavHeader
++          testID="navHeaderLiked"
+           title="Liked Jobs"
++          buttonOption="search"
+         />
+-        <View style={[styles.buttonSection]}>
++        <View style={styles.buttonSection}>
+           <View style={styles.infoContainer}>
+             <Text style={styles.bigText}>
+-            5 jobs
++              {`${likedJobs.length} jobs`}
+             </Text>
+             <Text style={styles.normalText}>
+-            are ready to be emailed
++              are ready to be emailed
+             </Text>
+           </View>
+           <View styles={[styles.buttonContainer]}>
+             <Button
++              testID="sendJobs"
+               textColor={colours.white}
+               backgroundColor={colours.accentPrimary}
+               title="Send Jobs"
+@@ -95,17 +109,21 @@ export default class SendLikedJobs extends Component {
+             />
+           </View>
+         </View>
+-        <View style={[styles.listContainer]}>
++        <View style={styles.listContainer}>
+           <FlatList
++            testID="likedJobs"
++            showsVerticalScrollIndicator={false}
+             data={likedJobs}
+             keyExtractor={item => item._id}
+             renderItem={({ item, index }) => (
+               <SelectableItem
++                testID={`jobItem${index}`}
+                 key={item._id}
+                 header={item.company}
+                 subHeader={item.title}
+                 onPress={() => this.removeLikedJob(item, index)}
+                 actionIcon="x"
++                imageSource={item.logo}
+               />
+             )}
+           />
+diff --git a/frontend/src/screens/SendLikedJobs/styles.jsx b/frontend/src/screens/SendLikedJobs/styles.jsx
+index 897dcb9..45073a8 100644
+--- a/frontend/src/screens/SendLikedJobs/styles.jsx
++++ b/frontend/src/screens/SendLikedJobs/styles.jsx
+@@ -49,7 +49,9 @@ const styles = StyleSheet.create({
+     color: colours.secondary,
+   },
+   listContainer: {
+-    height: '100%',
++    justifyContent: 'center',
++    alignItems: 'center',
++    height: '65%',
+     width: '100%',
+     backgroundColor: colours.white,
+   },
+diff --git a/frontend/src/screens/SignIn/SignIn.jsx b/frontend/src/screens/SignIn/SignIn.jsx
+index 0bc8034..f2d80e3 100644
+--- a/frontend/src/screens/SignIn/SignIn.jsx
++++ b/frontend/src/screens/SignIn/SignIn.jsx
+@@ -3,11 +3,13 @@ import {
+   View, TouchableOpacity, Text, TextInput, Image,
+ } from 'react-native';
+ import Logger from 'js-logger';
++import axios from 'axios';
+ 
+ import Button from '../../components/Button';
+ import images from '../../constants/images';
+ import { colours } from '../../styles';
+ import styles from './styles';
++import config from '../../constants/config';
+ 
+ export default class SignIn extends Component {
+   constructor(props) {
+@@ -17,11 +19,28 @@ export default class SignIn extends Component {
+       password: '',
+     };
+     this.logger = Logger.get(this.constructor.name);
++    this.logger.log("wow\n");
+   }
+ 
+   signIn = async () => {
+     const { navigation } = this.props;
+-    global.userId = 'debug_userId';
++    global.userId = '5dd2106bb16a1f002b503255';
++
++    // global.userId = 'debug_userId';
++    const { email, password } = this.state;
++
++    // if (email === 'debug_email' && password === 'debug_password') {
++    if (email === 'a' && password === 'a') {
++      this.logger.log('got into the if\n');
++      // const ret = await axios.post(`${config.ENDP_GOOGLE}`,
++      //   {
++      //     idToken: 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImRiMDJhYjMwZTBiNzViOGVjZDRmODE2YmI5ZTE5NzhmNjI4NDk4OTQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI2MTc0MDU4NzU1NzgtcHBzbjg3YzcxbXZxZWNwNmZwbjNjYTE0c2NsNnU5MjguYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI2MTc0MDU4NzU1NzgtZjIzaDB1cWwxb2wxcWhrNjRxZDE2bWN1YnFsdWRoYWguYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTgxOTQ0ODY0MjgzMTMxMzUwMTUiLCJlbWFpbCI6InZpY2tpLndmdUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6IlZpY2tpIEZ1IiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hLS9BQXVFN21BUTNvVy13bXUxa1R6by1sby1mQmRwZUNQRkNobUxXSUcxQ2pvTD1zOTYtYyIsImdpdmVuX25hbWUiOiJWaWNraSIsImZhbWlseV9uYW1lIjoiRnUiLCJsb2NhbGUiOiJlbiIsImlhdCI6MTU3NDA0NTk1NiwiZXhwIjoxNTc0MDQ5NTU2fQ.W_TME_zoC_H9lXQZVV6ekOy5NZ0P4jNBACUHWjYV6e0IUjRSUb6bovy273EF9OcSyiv-Tn37NClypmfm1jTOGYJFL49cOnJNTq0t5eQLqNH3X6vu7khunbfsI5ql6UzJp4a5hyXJROSdDg24e64zOLxIQM9SyA53ZSRmDcqvvl9wtp5qBq9Q6uc6j-S0pJiNyRZNybTrAILiS6LLPrJFtawgsbUYh5FMNeYkSgKQsTP00Rw15vuFCDoHtHd8o9mFOaFCXAoBi4UcRMZae0XQPKsJsaWLZbRowE9l4kUjtvtV2u7v2reHEYz0VtaL9EfDD7hPgstLuqisNyQOCxxKeA',
++      //     firebaseToken: 'fkCLiurPE4M:APA91bHXQ-T1oEEBih2vC0VH1f-sDPtkYqUx-hvp9iRduRyGXDEWWDIsQ_mD7whr9RbX6J9zJXf6MiAnHKz-dmrNpH5uib361aS9sKtbY8QJxeUqVsnZ-PVGvV4nP7mw28zykMPWBolG',
++      //   });
++      // global.userId = '5dd2106bb16a1f002b503255';
++      global.userId = '5dd399d45085530034b454e2';
++      navigation.navigate('App');
++    }
+     navigation.navigate('App');
+   }
+ 
+@@ -31,10 +50,12 @@ export default class SignIn extends Component {
+     return (
+       <View style={styles.container}>
+         <Image
++          testID="logoSignin"
+           source={images.logoLight}
+           style={styles.logo}
+         />
+         <TextInput
++          testID="email"
+           style={styles.inputContainer}
+           placeholder="Email"
+           value={email}
+@@ -42,6 +63,7 @@ export default class SignIn extends Component {
+           onChangeText={text => { this.setState({ email: text }); }}
+         />
+         <TextInput
++          testID="password"
+           style={styles.inputContainer}
+           placeholder="Password"
+           value={password}
+@@ -49,6 +71,7 @@ export default class SignIn extends Component {
+           onChangeText={text => { this.setState({ password: text }); }}
+         />
+         <Button
++          testID="signIn"
+           title="Sign In"
+           textColor={colours.white}
+           backgroundColor={colours.accentPrimary}
+diff --git a/frontend/src/styles/base.js b/frontend/src/styles/base.js
+index 480fa3a..c8179c4 100644
+--- a/frontend/src/styles/base.js
++++ b/frontend/src/styles/base.js
+@@ -2,7 +2,7 @@ import { Dimensions } from 'react-native';
+ 
+ export const dimensions = {
+   screenHeight: Dimensions.get('window').height,
+-  fullHeight: Dimensions.get('window').height - 20,
++  fullHeight: Dimensions.get('window').height - 70,
+   fullWidth: Dimensions.get('window').width,
+ };
+ 
+@@ -56,6 +56,11 @@ export const fonts = {
+   extraBold: 'Muli-ExtraBold',
+ };
+ 
++export const sizes = {
++  icon: 25,
++  iconLg: 30,
++};
++
+ export const containers = {
+   fullScreenContainer: {
+     height: dimensions.fullHeight,

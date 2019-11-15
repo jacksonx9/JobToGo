@@ -3,7 +3,7 @@ import nodemailer from 'nodemailer';
 import Logger from 'js-logger';
 
 import Response from '../types';
-import { Users } from '../schema';
+import { Users, Jobs } from '../schema';
 import credentials from '../../credentials/google';
 
 
@@ -53,9 +53,47 @@ class Messenger {
         title: 'Friend request!',
         body: `${userName} wants to add you as a friend.`,
       },
-      data: {
-        friendName: userName,
-        friendId: userId,
+    };
+
+    try {
+      // Send push notification
+      const messageRes = await admin.messaging().send(message);
+      this.logger.info(`Message sent: ${messageRes}`);
+      return new Response(true, '', 200);
+    } catch (e) {
+      this.logger.error(e);
+      return new Response(false, 'Internal server error', 500);
+    }
+  }
+
+  async sendFriendJob(userId, friendId, jobId) {
+    let friend;
+    let user;
+    let job;
+
+    if (!userId || !friendId || !jobId) {
+      return new Response(false, 'Invalid userId or friendId', 400);
+    }
+
+    try {
+      user = await Users.findById(userId).orFail();
+      friend = await Users.findById(friendId).orFail();
+      job = await Jobs.findById(jobId).orFail();
+    } catch (e) {
+      return new Response(false, 'Invalid userId or friendId', 400);
+    }
+
+    // Users don't need access to jobs' keywords
+    delete job.keywords;
+
+    const { userName } = user.credentials;
+    const { jobName } = job.title;
+    const { jobCompany } = job.company;
+    const message = {
+      token: friend.credentials.firebaseToken,
+      notification: {
+        title: 'Friend sent you a job!',
+        body: `${userName} thinks you would be a good fit for ${jobName} at ${jobCompany}!`,
       },
     };
 

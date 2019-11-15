@@ -38,6 +38,7 @@ const userSchema = new mongoose.Schema({
   ],
   friends: [String],
   pendingFriends: [String],
+  friendSuggestedJobs: [String],
   likedJobs: [String],
   seenJobs: [String],
   dailyJobCount: {
