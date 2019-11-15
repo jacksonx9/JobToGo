@@ -11,17 +11,17 @@ class Friend {
     this.messenger = messenger;
 
     app.post('/friends/sendJob', async (req, res) => {
+      this.logger.info(req.body);
       const response = await this.sendJob(req.body.userId, req.body.friendId, req.body.jobId);
       res.status(response.status).send(response);
     });
 
-    // TODO: change request type
     app.post('/friends/confirmJob', async (req, res) => {
       const response = await this.confirmJob(req.body.userId, req.body.jobId);
       res.status(response.status).send(response);
     });
 
-    app.delete('/friends/rejectJob', async (req, res) => {
+    app.post('/friends/rejectJob', async (req, res) => {
       const response = await this.rejectJob(req.body.userId, req.body.jobId);
       res.status(response.status).send(response);
     });
@@ -72,7 +72,7 @@ class Friend {
       // Verify userId is valid
       await Users.findById(userId).orFail();
       // Verify jobId is valid
-      await Jobs.findById(jobId).orFail();
+      const job = await Jobs.findById(jobId).lean().orFail();
 
       // Verify user is not adding itself
       if (userId === friendId) {
@@ -90,7 +90,13 @@ class Friend {
 
       // Send push notification
       const messageResponse = await this.messenger.sendFriendJob(userId, friendId, jobId);
-      return messageResponse;
+      if (!messageResponse.result) {
+        return messageResponse;
+      }
+
+      // user does not need to see job keywords
+      delete job.keywords;
+      return new Response(job, '', 200);
     } catch (e) {
       return new Response(false, 'Invalid userId, friendId, or jobId', 400);
     }
@@ -117,19 +123,24 @@ class Friend {
       // Verify jobId is valid
       await Jobs.findById(jobId).orFail();
 
+
       // Verify jobId is was sent by friend
       const idx = user.friendSuggestedJobs.indexOf(jobId);
+
       if (idx !== -1) {
-        user.friendSuggestedJobs.splice(idx, 1);
-        if (addToLikedJobs) [
-          user.likedJobs.push(job);
-        ]
+        const job = user.friendSuggestedJobs.splice(idx, 1);
+        console.log(user.friendSuggestedJobs);
+        console.log(job);
+
+        if (addToLikedJobs) {
+          user.likedJobs.push(...job);
+        }
         await user.save();
+
+        return new Response(true, '', 200);
       } else {
         return new Response(false, 'User did not get job from friend', 400);
       }
-
-      return new Response(true, '', 200);
     } catch (e) {
       return new Response(false, 'Invalid userId or jobId', 400);
     }
@@ -142,10 +153,9 @@ class Friend {
     }
 
     try {
-      const user = await Users.findById(userId).orFail();
-      const jobs = user.friendSuggestedJobs;
-      // TODO: make sure not
-      this.logger.info(jobs);
+      const user = await Users.findById(userId).lean().orFail();
+      const jobIds = user.friendSuggestedJobs;
+      const jobs = await Jobs.find({ _id: { $in: jobIds }});
 
       return new Response(jobs, '', 200);
     } catch (e) {
