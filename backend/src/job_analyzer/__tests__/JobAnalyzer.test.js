@@ -11,14 +11,20 @@ import * as constants from '../../constants';
 jest.mock('../../job_shortlister');
 
 describe('Friend', () => {
-  let friend;
-  let messenger;
   let app;
   let user1Id;
   let user2Id;
-  let shortLister;
   let invalidUserId;
+  let job1Id;
+  let job2Id;
+  let invalidJobId;
   let allSkills;
+  let shortLister;
+  let jobAnaylzer;
+  let JOBS_PER_SEND;
+  let JOBS_SEARCH_MAX_SIZE;
+  let JOBS_SEARCH_PERCENT_SIZE;
+  let DAILY_JOB_COUNT_LIMIT;
 
   beforeAll(async () => {
     // Connect to the in-memory db
@@ -36,6 +42,12 @@ describe('Friend', () => {
     shortLister.getSeenJobIds = jest.fn(() => ['1', '2', '3']);
 
     jobAnaylzer = new JobAnaylzer(app, shortLister);
+
+    // Save the value of the constant so we can reset it
+    JOBS_PER_SEND = constants.JOBS_PER_SEND;
+    JOBS_SEARCH_MAX_SIZE = constants.JOBS_SEARCH_MAX_SIZE;
+    JOBS_SEARCH_PERCENT_SIZE = constants.JOBS_SEARCH_PERCENT_SIZE;
+    DAILY_JOB_COUNT_LIMIT = constants.DAILY_JOB_COUNT_LIMIT;
   });
 
   afterAll(async () => {
@@ -66,6 +78,42 @@ describe('Friend', () => {
     user1Id = user1._id;
     user2Id = user2._id;
     invalidUserId = invalidUser._id;
+
+    // const job1 = await Jobs.create({
+    //   description: 'C++ sucks. Python is great',
+    //   keywords: [
+    //     {
+    //       name: 'c++',
+    //       tfidf: 50,
+    //       count: 10,
+    //     },
+    //     {
+    //       name: 'python',
+    //       tfidf: 50,
+    //       count: 10,
+    //     },
+    //     {
+    //       name: 'java',
+    //       tfidf: 50,
+    //       count: 10,
+    //     },
+    //   ],
+    // });
+    // const job2 = await Jobs.create({
+    //   credentials: {
+    //     userName: 'user2',
+    //     email: 'user2@mail.com',
+    //   },
+    // });
+    // const invalidJob = await Jobs.create({
+    //   credentials: {
+    //     userName: 'invalidUser',
+    //     email: 'invalidUser@mail.com',
+    //   },
+    // });
+    // job1Id = job1._id;
+    // job2Id = job2._id;
+    // invalidJobId = invalidJob._id;
     // Delete the user to invalidate the id
     await Users.findByIdAndDelete(invalidUserId);
   });
@@ -83,7 +131,7 @@ describe('Friend', () => {
   //   const response = new Response(null, 'Invalid userId', 400);
   //   const usersBefore = await Users.find({});
 
-  //   expect(await friend[func](undefined)).toEqual(response);
+  //   expect(await jobAnaylzer[func](undefined)).toEqual(response);
 
   //   const usersAfter = await Users.find({});
   //   expect(usersBefore).toEqual(usersAfter);
@@ -133,6 +181,36 @@ describe('Friend', () => {
   //   const usersAfter = await Users.find({});
   //   expect(usersBefore).toEqual(usersAfter);
   // };
+
+
+  test('computeJobKeyword: No Keywords', async () => {
+    const job = await Jobs.create({
+      title: 'software peep',
+      company: 'company A',
+      url: 'urlNoKeywords',
+      description: 'C++ sucks. Python is great',
+      keywords: [],
+    });
+    const keywords = [];
+    await jobAnaylzer.computeJobKeywordCount(job, keywords);
+    expect(job.keywords.length).toEqual(0);
+  });
+
+  test('computeJobKeyword: Valid Keywords', async () => {
+    const job = await Jobs.create({
+      title: 'software peep',
+      company: 'company A',
+      url: 'urlValidKeywords',
+      description: 'Rust rust sucks. Python is great',
+      keywords: [],
+    });
+    const keywords = ['rust', 'python', 'java'];
+    await jobAnaylzer.computeJobKeywordCount(job, keywords);
+    expect(job.keywords[0].count).toEqual(2);
+    expect(job.keywords[1].count).toEqual(1);
+    expect(job.keywords[2].count).toEqual(0);
+  });
+
 
   // test('addFriend: Empty Ids', async () => {
   //   await testEmptyIds('addFriend');
