@@ -3,6 +3,7 @@ import scheduler from 'node-schedule';
 import indeed from 'indeed-scraper';
 import axios from 'axios';
 import cheerio from 'cheerio';
+import BottleNeck from 'bottleneck';
 
 import JobSearcher from '..';
 import JobAnalyzer from '../../job_analyzer';
@@ -18,6 +19,7 @@ jest.mock('node-schedule');
 jest.mock('indeed-scraper');
 jest.mock('axios');
 jest.mock('cheerio');
+jest.mock('bottleneck');
 
 // Custom HTTP error for mocking axios
 class HTTPError extends Error {
@@ -64,6 +66,8 @@ describe('Job Searcher', () => {
       }
       return { length: 0 };
     });
+    // Make wrap a simple pass through function
+    BottleNeck.prototype.wrap = jest.fn(f => f);
   };
 
   beforeAll(async () => {
@@ -76,6 +80,7 @@ describe('Job Searcher', () => {
     scheduler.scheduleJob = jest.fn((rule, callback) => {
       callback();
     });
+    mockAPIs();
 
     jobAnalyzer = new JobAnalyzer();
     jobSearcher = new JobSearcher(jobAnalyzer);

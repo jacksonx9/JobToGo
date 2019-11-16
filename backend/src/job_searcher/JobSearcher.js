@@ -3,10 +3,11 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 import Logger from 'js-logger';
 import scheduler from 'node-schedule';
+import BottleNeck from 'bottleneck';
 
 import AllSkills from '../all_skills';
 import { Jobs, Users } from '../schema';
-import { MIN_JOBS_IN_DB } from '../constants';
+import { MIN_JOBS_IN_DB, RATE_LIMIT_CONFIG } from '../constants';
 import jobConfig from './config';
 
 class JobSearcher {
@@ -14,6 +15,7 @@ class JobSearcher {
     this.logger = Logger.get(this.constructor.name);
 
     this.jobAnalyzer = jobAnalyzer;
+    this.limiter = new BottleNeck(RATE_LIMIT_CONFIG);
 
     this.setupDailyUpdateJobStore();
   }
@@ -56,7 +58,7 @@ class JobSearcher {
 
         const jobs = [];
 
-        await Promise.all(queriedJobs.map(async (queriedJob) => {
+        await Promise.all(queriedJobs.map(this.limiter.wrap(async (queriedJob) => {
           try {
             const job = queriedJob;
             // Add description, unique url to each result by scraping the webpage
@@ -78,7 +80,7 @@ class JobSearcher {
             // If we fail to get the job page, just ignore the job
             this.logger.error(e);
           }
-        }));
+        })));
 
         this.logger.info(`Found ${jobs.length} jobs for keyword ${keyphrase}`);
         await this.addToJobStore(jobs);
@@ -110,7 +112,7 @@ class JobSearcher {
     }
 
     const outdatedJobIds = [];
-    await Promise.all(jobs.map(async (job) => {
+    await Promise.all(jobs.map(this.limiter.wrap(async (job) => {
       try {
         const jobPage = await axios.get(job.url);
         const $ = cheerio.load(jobPage.data);
@@ -127,7 +129,7 @@ class JobSearcher {
         // Or else log the error and keep the job
         this.logger.error(e.response.statusText);
       }
-    }));
+    })));
 
     try {
       // TODO: Change this so that jobs do not silently disappear
