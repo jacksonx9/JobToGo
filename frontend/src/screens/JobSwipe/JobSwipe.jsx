@@ -15,6 +15,7 @@ import config from '../../constants/config';
 import styles, { LOGO_SIZE } from './styles';
 import { colours } from '../../styles';
 import images from '../../constants/images';
+import { status } from '../../constants/messages';
 
 export default class JobSwipe extends Component {
   static navigationOptions = {
@@ -179,7 +180,7 @@ export default class JobSwipe extends Component {
           onPress={() => this.toggleSharedJobsView()}
         />
         {jobs.length === 0
-          ? <InfoDisplay message="You currently have no shared jobs." />
+          ? <InfoDisplay message={status.noSharedJobs} />
           : (
             <Swiper
               cards={jobs}
