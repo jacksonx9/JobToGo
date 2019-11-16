@@ -14,6 +14,7 @@ import iconSearch from '../../assets/icon-search.png';
 import iconCross from '../../assets/icon-cross.png';
 import iconInbox from '../../assets/icon-inbox.png';
 import jobSeeker from '../../assets/job-seeker.png';
+import checkingDoc from '../../assets/checking-document.png';
 import imgPlaceholder from '../../assets/img-placeholder.png';
 
 const images = {
@@ -33,6 +34,7 @@ const images = {
   iconCross,
   iconInbox,
   jobSeeker,
+  checkingDoc,
   imgPlaceholder,
 };
 

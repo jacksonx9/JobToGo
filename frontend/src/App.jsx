@@ -3,9 +3,9 @@ import { Platform, Alert } from 'react-native';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
+import Icon from 'react-native-vector-icons/Feather';
 import firebase from 'react-native-firebase';
 import Logger from 'js-logger';
-import Icon from 'react-native-vector-icons/Ionicons';
 
 import SignIn from './screens/SignIn';
 import SignUp from './screens/SignUp/SignUp';
@@ -14,6 +14,7 @@ import JobSwipe from './screens/JobSwipe';
 import SendLikedJobs from './screens/SendLikedJobs/SendLikedJobs';
 import EditFriends from './screens/EditFriends/EditFriends';
 import EditSkills from './screens/EditSkills/EditSkills';
+import { colours, fonts } from './styles';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -92,12 +93,18 @@ const navConfig = {
 };
 
 const tabNavConfig = {
+  initialRouteName: 'Home',
   tabBarOptions: {
-    activeTintColor: 'tomato',
-    inactiveTintColor: 'gray',
-  },
-  style: {
-    backgroundColor: '#42a5f5',
+    style: {
+      height: 52,
+      backgroundColor: colours.white,
+      borderTopColor: 'transparent',
+    },
+    labelStyle: {
+      fontFamily: fonts.bold,
+    },
+    activeTintColor: colours.accentPrimary,
+    inactiveTintColor: colours.lightGray,
   },
 };
 
@@ -108,51 +115,39 @@ const AppStack = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: 'Home',
         tabBarIcon: ({ tintColor }) => (
-          <Icon name="ios-briefcase" color="pink" size={25} />
+          <Icon name="home" color={tintColor} size={25} />
         ),
-      },
-      style: {
-        backgroundColor: '#42a5f5',
       },
     },
     Send: {
       screen: SendLikedJobs,
       navigationOptions: {
-        tabBarLabel: 'Profile',
+        tabBarLabel: 'Liked',
         tabBarIcon: ({ tintColor }) => (
-          <Icon name="ios-home" color="pink" size={25} />
+          <Icon name="heart" color={tintColor} size={25} />
         ),
       },
     },
     Friends: {
       screen: EditFriends,
       navigationOptions: {
-        tabBarLabel: 'Profile',
+        tabBarLabel: 'Friends',
         tabBarIcon: ({ tintColor }) => (
-          <Icon name="ios-person" color="pink" size={25} />
+          <Icon name="users" color={tintColor} size={25} />
         ),
       },
     },
     Resume: {
       screen: EditSkills,
       navigationOptions: {
-        tabBarLabel: 'Profile',
+        tabBarLabel: 'Resume',
         tabBarIcon: ({ tintColor }) => (
-          <Icon name="ios-home" color="pink" size={25} />
+          <Icon name="upload" color={tintColor} size={25} />
         ),
       },
     },
   },
-  {
-    initialRouteName: 'Home',
-    tabBarOptions: {
-      style: {
-        height: 55,
-        backgroundColor: 'white',
-        borderTopColor: 'transparent',
-      },
-    },
-  },
+  tabNavConfig,
 );
 
 const AuthStack = createStackNavigator(
