@@ -13,7 +13,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: padding.md,
   },
   swiperContainer: {
-    backgroundColor: colours.white,
+    height: '100%',
+    width: '100%',
+    flexDirection: 'column',
+    alignItems: 'center',
+    backgroundColor: 'pink'
   },
   overlayDislike: {
     flexDirection: 'column',

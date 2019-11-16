@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-import { padding, dimensions } from '../../styles';
+import { padding, dimensions, colours } from '../../styles';
 
 const styles = StyleSheet.create({
   container: {
@@ -11,6 +11,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: padding.md,
     height: 80,
     width: dimensions.fullWidth,
+    backgroundColor: colours.white,
     zIndex: 1000,
   },
   buttonContainer: {
