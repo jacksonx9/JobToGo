@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
   text: {
     fontFamily: fonts.extraBold,
     color: colours.primary,
-    fontSize: fonts.lg,
+    fontSize: fonts.xl,
   },
 });
 
