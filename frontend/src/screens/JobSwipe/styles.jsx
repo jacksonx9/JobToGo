@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 import {
-  containers, padding, colours, elevation,
+  containers, padding, elevation,
 } from '../../styles';
 
 const LOGO_SIZE = 200;
@@ -11,13 +11,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     paddingHorizontal: padding.md,
-  },
-  swiperContainer: {
-    height: '100%',
-    width: '100%',
-    flexDirection: 'column',
-    alignItems: 'center',
-    backgroundColor: 'pink'
   },
   overlayDislike: {
     flexDirection: 'column',
