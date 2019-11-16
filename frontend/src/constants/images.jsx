@@ -1,6 +1,7 @@
 import logoLight from '../../assets/logo-light.png';
 import logoDark from '../../assets/logo-dark.png';
 import iconLogo from '../../assets/icon-logo.png';
+import iconLogoGray from '../../assets/icon-logo-gray.png';
 import iconSend from '../../assets/icon-send.png';
 import iconSendColoured from '../../assets/icon-send-acc.png';
 import iconMenu from '../../assets/icon-menu.png';
@@ -19,6 +20,7 @@ const images = {
   logoLight,
   logoDark,
   iconLogo,
+  iconLogoGray,
   iconSend,
   iconSendColoured,
   iconMenu,

@@ -13,6 +13,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: padding.lg,
   },
   logo: {
+    marginTop: margin.lg,
     resizeMode: 'contain',
     height: '10%',
   },

@@ -7,6 +7,7 @@ import Swiper from 'react-native-deck-swiper';
 
 import JobCard from '../../components/JobCard';
 import Loader from '../../components/Loader';
+import InfoDisplay from '../../components/InfoDisplay';
 import MainHeader from '../../components/MainHeader';
 import JobShareModal from '../../components/JobShareModal';
 import OverlayLabel from '../../components/OverlayLabel/OverlayLabel';
@@ -67,7 +68,7 @@ export default class JobSwipe extends Component {
     const fetchSharedJobs = (jobType === this.jobTypes.SHARED);
 
     const jobsResp = await axios.get(`${fetchSharedJobs
-      ? config.ENDP_LIKE : config.ENDP_JOBS}${userId}`).catch(e => this.logger.error(e));
+      ? config.ENDP_SHARED_JOBS : config.ENDP_JOBS}${userId}`).catch(e => this.logger.error(e));
     const jobs = jobsResp.data.result;
 
     // Get the logo url of each company
@@ -172,59 +173,66 @@ export default class JobSwipe extends Component {
     if (loading) return <Loader />;
 
     return (
-      <View style={[styles.container]}>
+      <View style={styles.container}>
         <MainHeader
           buttonSource={menuButtonSource}
           onPress={() => this.toggleSharedJobsView()}
         />
-        <Swiper
-          cards={jobs}
-          renderCard={posting => (
-            <JobCard
-              logo={posting.logo}
-              company={posting.company}
-              title={posting.title}
-              location={posting.location}
-              description={posting.description}
-              isShared={posting.isShared}
+        {jobs.length === 0
+          ? <InfoDisplay message="You currently have no shared jobs." />
+          : (
+            <Swiper
+              cards={jobs}
+              renderCard={posting => (
+                <JobCard
+                  logo={posting.logo}
+                  company={posting.company}
+                  title={posting.title}
+                  location={posting.location}
+                  description={posting.description}
+                  isShared={posting.isShared}
+                />
+              )}
+              onSwipedLeft={() => this.swipeJob(jobs, jobIndex, jobType,
+                this.swipeActionTypes.DISLIKE)}
+              onSwipedRight={() => this.swipeJob(jobs, jobIndex, jobType,
+                this.swipeActionTypes.LIKE)}
+              onTapCard={() => this.openJobShareModal()}
+              cardIndex={jobIndex}
+              marginTop={35}
+              backgroundColor={colours.white}
+              stackSize={5}
+              animateOverlayLabelsOpacity
+              overlayLabels={{
+                left: {
+                  title: 'NOPE',
+                  element: <OverlayLabel label="NOPE" color={colours.red} />,
+                  style: {
+                    wrapper: styles.overlayDislike,
+                  },
+                },
+                right: {
+                  title: 'LIKE',
+                  element: <OverlayLabel label="LIKE" color={colours.green} />,
+                  style: {
+                    wrapper: styles.overlayLike,
+                  },
+                },
+              }}
             />
           )}
-          onSwipedLeft={() => this.swipeJob(jobs, jobIndex, jobType, this.swipeActionTypes.LIKE)}
-          onSwipedRight={() => this.swipeJob(jobs, jobIndex, jobType,
-            this.swipeActionTypes.DISLIKE)}
-          onTapCard={() => this.openJobShareModal()}
-          cardIndex={jobIndex}
-          marginTop={35}
-          backgroundColor={colours.white}
-          stackSize={5}
-          animateOverlayLabelsOpacity
-          overlayLabels={{
-            left: {
-              title: 'NOPE',
-              element: <OverlayLabel label="NOPE" color={colours.primary} />,
-              style: {
-                wrapper: styles.overlayDislike,
-              },
-            },
-            right: {
-              title: 'LIKE',
-              element: <OverlayLabel label="LIKE" color={colours.accentPrimary} />,
-              style: {
-                wrapper: styles.overlayLike,
-              },
-            },
-          }}
-        />
-
-        <JobShareModal
-          isVisible={isJobShareModalVisible}
-          onPressExit={() => this.setState({ isJobShareModalVisible: false })}
-          jobTitle={job.title}
-          jobCompany={job.company}
-          jobId={job._id}
-          friends={friends}
-          onPressSend={this.shareJob}
-        />
+        {jobs.length === 0 ? <View />
+          : (
+            <JobShareModal
+              isVisible={isJobShareModalVisible}
+              onPressExit={() => this.setState({ isJobShareModalVisible: false })}
+              jobTitle={job.title}
+              jobCompany={job.company}
+              jobId={job._id}
+              friends={friends}
+              onPressSend={this.shareJob}
+            />
+          )}
       </View>
     );
   }
