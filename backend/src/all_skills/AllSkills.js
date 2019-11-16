@@ -20,7 +20,7 @@ class AllSkills {
 
   /* gets and returns a set containing the collective skills of all the users */
   static async getAll() {
-    const doc = await Skills.findOne({});
+    const doc = await Skills.findOne({}).lean();
     return doc.skills;
   }
 
@@ -45,9 +45,9 @@ class AllSkills {
 
     // Update keyword counts of each job
     const jobs = await Jobs.find({});
-    await forEachAsync(jobs, async (_, jobIdx) => {
-      this.jobAnalyzer.computeJobKeywordCount(jobs[jobIdx], newSkills);
-      await jobs[jobIdx].save();
+    await forEachAsync(jobs, async (job) => {
+      this.jobAnalyzer.computeJobKeywordCount(job, newSkills);
+      await job.save();
     });
 
     // Computes tf idf for newly added skills
