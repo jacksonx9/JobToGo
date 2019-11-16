@@ -49,6 +49,8 @@ const styles = StyleSheet.create({
     color: colours.secondary,
   },
   listContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
     height: '100%',
     width: '100%',
     backgroundColor: colours.white,

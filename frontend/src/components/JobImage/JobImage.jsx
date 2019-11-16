@@ -8,7 +8,7 @@ import styles from './styles';
 const JobImage = ({ logo, sideLength, style }) => {
   let source = { uri: logo };
   if (logo === null) {
-    source = images.iconLogo;
+    source = images.imgPlaceholder;
   }
   return (
     <Image

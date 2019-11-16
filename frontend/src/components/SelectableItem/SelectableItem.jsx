@@ -1,19 +1,23 @@
 import React from 'react';
 import {
-  Text, TouchableOpacity, View, Image,
+  Text, TouchableOpacity, View,
 } from 'react-native';
 import { string, func, bool } from 'prop-types';
 
-import images from '../../constants/images';
+import JobImage from '../JobImage';
 import { colours } from '../../styles';
 import styles from './styles';
 
 const SelectableItem = ({
-  header, subHeader, onPress, actionIcon, disabled, backgroundColor, titleColor, descriptionColor,
+  header, subHeader, onPress, actionIcon, disabled, imageSource,
+  backgroundColor, titleColor, descriptionColor,
 }) => (
   <View style={[styles.container, { backgroundColor }]}>
     <View style={styles.contentContainer}>
-      <Image source={images.jobBackground} style={styles.logo} />
+      <JobImage
+        logo={imageSource}
+        style={styles.logo}
+      />
       <View style={[styles.infoContainer]}>
         <Text
           numberOfLines={1}
@@ -43,6 +47,7 @@ const SelectableItem = ({
 SelectableItem.defaultProps = {
   subHeader: '',
   disabled: false,
+  imageSource: null,
   backgroundColor: colours.white,
   titleColor: colours.primary,
   descriptionColor: colours.gray,
@@ -54,6 +59,7 @@ SelectableItem.propTypes = {
   onPress: func.isRequired,
   actionIcon: string.isRequired,
   disabled: bool,
+  imageSource: string,
   backgroundColor: string,
   titleColor: string,
   descriptionColor: string,

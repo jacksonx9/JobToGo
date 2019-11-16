@@ -37,10 +37,25 @@ export default class SendLikedJobs extends Component {
 
   fetchLikedJobs = async () => {
     const { userId } = global;
-    const likedJobs = await axios.get(`${config.ENDP_LIKE}${userId}`)
+    const likedJobsResp = await axios.get(`${config.ENDP_LIKE}${userId}`)
       .catch(e => this.logger.error(e));
+    const likedJobs = likedJobsResp.data.result;
+
+    // Get the logo url of each company
+    await Promise.all(likedJobs.map(async (job, i) => {
+      const companyInfoResp = await axios.get(
+        `${config.ENDP_COMPANY_API}${job.company}`,
+      );
+      const companyInfo = companyInfoResp.data[0];
+      if (companyInfo) {
+        likedJobs[i].logo = `${companyInfo.logo}?size=${80}`;
+      } else {
+        likedJobs[i].logo = null;
+      }
+    })).catch(e => this.logger.error(e));
+
     this.setState({
-      likedJobs: likedJobs.data.result,
+      likedJobs,
       loading: 0,
     });
   }
@@ -72,11 +87,11 @@ export default class SendLikedJobs extends Component {
     if (loading) return <Loader />;
 
     return (
-      <View style={[styles.container]}>
+      <View style={styles.container}>
         <NavHeader
           title="Liked Jobs"
         />
-        <View style={[styles.buttonSection]}>
+        <View style={styles.buttonSection}>
           <View style={styles.infoContainer}>
             <Text style={styles.bigText}>
             5 jobs
@@ -95,8 +110,9 @@ export default class SendLikedJobs extends Component {
             />
           </View>
         </View>
-        <View style={[styles.listContainer]}>
+        <View style={styles.listContainer}>
           <FlatList
+            showsVerticalScrollIndicator={false}
             data={likedJobs}
             keyExtractor={item => item._id}
             renderItem={({ item, index }) => (
@@ -106,6 +122,7 @@ export default class SendLikedJobs extends Component {
                 subHeader={item.title}
                 onPress={() => this.removeLikedJob(item, index)}
                 actionIcon="x"
+                imageSource={item.logo}
               />
             )}
           />

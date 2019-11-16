@@ -12,7 +12,7 @@ import { colours } from '../../styles';
 import styles from './styles';
 
 const JobShareModal = ({
-  isVisible, onPressExit, jobTitle, jobCompany, jobId, friends, onPressSend,
+  isVisible, onPressExit, jobTitle, jobCompany, jobId, jobLogo, friends, onPressSend,
 }) => (
   <Modal
     isVisible={isVisible}
@@ -30,6 +30,7 @@ const JobShareModal = ({
         onPress={() => {}}
         actionIcon=""
         disabled
+        imageSource={jobLogo}
         backgroundColor={colours.primary}
         titleColor={colours.white}
         descriptionColor={colours.secondary}
@@ -39,6 +40,7 @@ const JobShareModal = ({
       </View>
       <View style={styles.listContainer}>
         <FlatList
+          showsVerticalScrollIndicator={false}
           data={friends}
           keyExtractor={item => item._id}
           renderItem={({ item }) => (

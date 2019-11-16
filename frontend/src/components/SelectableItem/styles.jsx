@@ -12,6 +12,7 @@ const styles = StyleSheet.create({
     width: '95%',
     paddingHorizontal: padding.md,
     margin: margin.xs,
+    marginLeft: margin.xs + 3,
     borderRadius: border.radius,
     elevation: 10,
   },

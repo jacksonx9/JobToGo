@@ -2,7 +2,7 @@ import { Dimensions } from 'react-native';
 
 export const dimensions = {
   screenHeight: Dimensions.get('window').height,
-  fullHeight: Dimensions.get('window').height - 20,
+  fullHeight: Dimensions.get('window').height - 70,
   fullWidth: Dimensions.get('window').width,
 };
 

@@ -230,6 +230,7 @@ export default class JobSwipe extends Component {
               jobTitle={job.title}
               jobCompany={job.company}
               jobId={job._id}
+              jobLogo={job.logo}
               friends={friends}
               onPressSend={this.shareJob}
             />
