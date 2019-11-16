@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { Express } from 'jest-express/lib/express';
 
 import JobAnaylzer from '..';
+import testData from './test_data';
 import JobShortLister from '../../job_shortlister';
 import Response from '../../types';
 import AllSkills from '../../all_skills';
@@ -10,7 +11,7 @@ import * as constants from '../../constants';
 
 jest.mock('../../job_shortlister');
 
-describe('Friend', () => {
+describe('JobAnalyzer', () => {
   let app;
   let user1Id;
   let user2Id;
@@ -35,12 +36,7 @@ describe('Friend', () => {
     });
 
     app = new Express();
-    allSkills = new AllSkills();
-    const testSkills = ['C++', 'C', 'Java'];
-    allSkills.getAll = jest.fn(() => testSkills);
     shortLister = new JobShortLister();
-    shortLister.getSeenJobIds = jest.fn(() => ['1', '2', '3']);
-
     jobAnaylzer = new JobAnaylzer(app, shortLister);
 
     // Save the value of the constant so we can reset it
@@ -55,67 +51,8 @@ describe('Friend', () => {
   });
 
   beforeEach(async () => {
-    // We create all users before each test case instead of test suite so that
-    // the tests can be run in any order
-    const user1 = await Users.create({
-      credentials: {
-        userName: 'user1',
-        email: 'user1@mail.com',
-      },
-    });
-    const user2 = await Users.create({
-      credentials: {
-        userName: 'user2',
-        email: 'user2@mail.com',
-      },
-    });
-    const invalidUser = await Users.create({
-      credentials: {
-        userName: 'invalidUser',
-        email: 'invalidUser@mail.com',
-      },
-    });
-    user1Id = user1._id;
-    user2Id = user2._id;
-    invalidUserId = invalidUser._id;
-
-    // const job1 = await Jobs.create({
-    //   description: 'C++ sucks. Python is great',
-    //   keywords: [
-    //     {
-    //       name: 'c++',
-    //       tfidf: 50,
-    //       count: 10,
-    //     },
-    //     {
-    //       name: 'python',
-    //       tfidf: 50,
-    //       count: 10,
-    //     },
-    //     {
-    //       name: 'java',
-    //       tfidf: 50,
-    //       count: 10,
-    //     },
-    //   ],
-    // });
-    // const job2 = await Jobs.create({
-    //   credentials: {
-    //     userName: 'user2',
-    //     email: 'user2@mail.com',
-    //   },
-    // });
-    // const invalidJob = await Jobs.create({
-    //   credentials: {
-    //     userName: 'invalidUser',
-    //     email: 'invalidUser@mail.com',
-    //   },
-    // });
-    // job1Id = job1._id;
-    // job2Id = job2._id;
-    // invalidJobId = invalidJob._id;
-    // Delete the user to invalidate the id
-    await Users.findByIdAndDelete(invalidUserId);
+    AllSkills.getAll = jest.fn(() => new Promise(resolve => resolve(testData.skills)));
+    shortLister.getSeenJobIds = jest.fn(() => Array.from({length: testData.skills.length}, (_, k) => k+1) );
   });
 
   afterEach(async () => {
@@ -123,99 +60,83 @@ describe('Friend', () => {
     await Users.deleteMany({});
     // Make sure to clear all mock state (e.g. number of times called)
     jest.clearAllMocks();
+    // Reset the constant
+    JOBS_PER_SEND = constants.JOBS_PER_SEND;
+    JOBS_SEARCH_MAX_SIZE = constants.JOBS_SEARCH_MAX_SIZE;
+    JOBS_SEARCH_PERCENT_SIZE = constants.JOBS_SEARCH_PERCENT_SIZE;
+    DAILY_JOB_COUNT_LIMIT = constants.DAILY_JOB_COUNT_LIMIT;
   });
 
-  // // Helper function that tests functions with a single user id as the input
-  // // Tests that an empty id will be rejected
-  // const testEmptyId = async (func) => {
-  //   const response = new Response(null, 'Invalid userId', 400);
-  //   const usersBefore = await Users.find({});
+  // Helper function that tests computeJobScores with different skillsStart
+  // and skillsEnd values.
+  const testComputeJobScoresJobKeywordsStaySame = async (skillsStart, skillsEnd) => {
+    const jobsNoKeywords = [];
+    const offset = skillsStart || 0;
+    const jobsNeedDataRemoved = offset > 0 ? testData.jobs.slice(offset, skillsEnd) : testData.jobs;
 
-  //   expect(await jobAnaylzer[func](undefined)).toEqual(response);
-
-  //   const usersAfter = await Users.find({});
-  //   expect(usersBefore).toEqual(usersAfter);
-  // };
-
-  // // Helper function that tests functions with two user ids as the input
-  // // Tests that one or more empty ids will be rejected
-  // const testEmptyIds = async (func) => {
-  //   const response = new Response(false, 'Invalid userId or friendId', 400);
-  //   const usersBefore = await Users.find({});
-
-  //   expect(await friend[func](undefined, undefined)).toEqual(response);
-  //   expect(await friend[func](user1Id, undefined)).toEqual(response);
-  //   expect(await friend[func](undefined, user2Id)).toEqual(response);
-
-  //   const usersAfter = await Users.find({});
-  //   expect(usersBefore).toEqual(usersAfter);
-  // };
-
-  // // Helper function that tests functions with a single user id as the input
-  // // Tests that an invalid id will be rejected
-  // const testInvalidUser = async (func) => {
-  //   const response = new Response(null, 'Invalid userId', 400);
-  //   const usersBefore = await Users.find({});
-
-  //   expect(await friend[func](invalidUserId)).toEqual(response);
-  //   expect(await friend[func](123)).toEqual(response);
-  //   expect(await friend[func]('test')).toEqual(response);
-  //   expect(await friend[func]({})).toEqual(response);
-
-  //   const usersAfter = await Users.find({});
-  //   expect(usersBefore).toEqual(usersAfter);
-  // };
-
-  // // Helper function that tests functions with two user ids as the input
-  // // Tests that one or more invalid ids will be rejected
-  // const testInvalidUsers = async (func) => {
-  //   const response = new Response(false, 'Invalid userId or friendId', 400);
-  //   const usersBefore = await Users.find({});
-
-  //   expect(await friend[func](user1Id, invalidUserId)).toEqual(response);
-  //   expect(await friend[func](invalidUserId, user2Id)).toEqual(response);
-  //   expect(await friend[func](123, user2Id)).toEqual(response);
-  //   expect(await friend[func]('test', user2Id)).toEqual(response);
-  //   expect(await friend[func]({}, user2Id)).toEqual(response);
-
-  //   const usersAfter = await Users.find({});
-  //   expect(usersBefore).toEqual(usersAfter);
-  // };
-
-
-  test('computeJobKeyword: No Keywords', async () => {
-    const job = await Jobs.create({
-      title: 'software peep',
-      company: 'company A',
-      url: 'urlNoKeywords',
-      description: 'C++ sucks. Python is great',
-      keywords: [],
+    jobsNeedDataRemoved.forEach(job => {
+      const jobNoKeywords = job;
+      jobNoKeywords.keywords = [];
+      jobsNoKeywords.push(jobNoKeywords);
     });
+
+    await Jobs.insertMany([
+      {
+        ...jobsNoKeywords[0],
+      },
+      {
+        ...jobsNoKeywords[1],
+      },
+      {
+        ...jobsNoKeywords[2],
+      },
+      {
+        ...jobsNoKeywords[3],
+      },
+    ]);
+
+    await jobAnaylzer.computeJobScores(skillsStart, skillsEnd);
+    const jobs = await Jobs.find({}).lean();
+    expect(testData.jobs).toEqual(jobs);
+  };
+
+  test('No Keywords', async () => {
     const keywords = [];
+    const job = testData.jobs[0];
+    job.keywords = [];
     await jobAnaylzer.computeJobKeywordCount(job, keywords);
     expect(job.keywords.length).toEqual(0);
   });
 
-  test('computeJobKeyword: Valid Keywords', async () => {
-    const job = await Jobs.create({
-      title: 'software peep',
-      company: 'company A',
-      url: 'urlValidKeywords',
-      description: 'Rust rust sucks. Python is great',
-      keywords: [],
-    });
-    const keywords = ['rust', 'python', 'java'];
-    await jobAnaylzer.computeJobKeywordCount(job, keywords);
+  test('Valid Keywords', async () => {
+    const job = testData.jobs[0];
+    job.keywords = [];
+    await jobAnaylzer.computeJobKeywordCount(job, testData.skills);
     expect(job.keywords[0].count).toEqual(2);
     expect(job.keywords[1].count).toEqual(1);
     expect(job.keywords[2].count).toEqual(0);
   });
 
+  test('computeJobScores: undefined skillsEnd', async () => {
+    await testComputeJobScoresJobKeywordsStaySame(0);
+  });
 
-  // test('addFriend: Empty Ids', async () => {
-  //   await testEmptyIds('addFriend');
-  //   expect(messenger.requestFriend).toHaveBeenCalledTimes(0);
-  // });
+  test('computeJobScores: undefined skillsStart and skillsEnd', async () => {
+  });
+
+  test('computeJobScores: no keywords', async () => {
+  });
+
+  test('computeJobScores: multiple keywords', async () => {
+    // const jobs = await Jobs.insertMany(testData.jobs);
+    // const jobIds = jobs.map(job => job._id.toString());
+  });
+
+  test('computeJobScores: ', async () => {
+  });
+
+  test('computeJobScores: ', async () => {
+  });
 
   // test('addFriend: Invalid Users', async () => {
   //   await testInvalidUsers('addFriend');

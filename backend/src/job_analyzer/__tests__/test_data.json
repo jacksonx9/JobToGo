@@ -1,0 +1,123 @@
+{
+    "jobs": [
+        {
+            "title" : "Real Programmers Only",
+            "url" : "http://www.indeed.com/viewjob?from=appsharedroid&jk=c14a37f847778a31",
+            "company" : "Jobot",
+            "location" : "Cincinnati, OH 45241",
+            "postDate" : "",
+            "salary" : "$60,000 - $80,000 a year",
+            "description" : "Rust rust sucks. Python is great",
+            "keywords": [
+                {
+                    "name": "rust",
+                    "tfidf": 0.1,
+                    "count": 2
+                },
+                {
+                    "name": "python",
+                    "tfidf": 0.1,
+                    "count": 1
+                },
+                {
+                    "name": "java",
+                    "tfidf": 0.1,
+                    "count": 0
+                }
+            ]
+        },
+        {
+            "title" : "GUI Developer",
+            "url" : "http://www.indeed.com/viewjob?from=appsharedroid&jk=5c8da5f9bbcdd50e",
+            "company" : "Convergent Science",
+            "location" : "Madison, WI 53719",
+            "postDate" : "",
+            "salary" : "",
+            "description" : "GUI DEVELOPER in trash rust",
+            "keywords": [
+                {
+                    "name": "rust",
+                    "tfidf": 0,
+                    "count": 1
+                },
+                {
+                    "name": "python",
+                    "tfidf": 0,
+                    "count": 0
+                },
+                {
+                    "name": "java",
+                    "tfidf": 0,
+                    "count": 0
+                }
+            ]
+        },
+        {
+            "title" : "System Safety Engineer",
+            "url" : "http://www.indeed.com/viewjob?from=appsharedroid&jk=569fc33a06b50b45",
+            "company" : "Advanced Logistics Support Corporation",
+            "location" : "Albuquerque, NM 87102 (Barelas area)",
+            "postDate" : "",
+            "salary" : "",
+            "description" : "Senior Java Avionics Systems Safety Engineer Advanced Logistics Support",
+            "keywords": [
+                {
+                    "name": "rust",
+                    "tfidf": 0,
+                    "count": 0
+                },
+                {
+                    "name": "python",
+                    "tfidf": 0,
+                    "count": 0
+                },
+                {
+                    "name": "java",
+                    "tfidf": 1,
+                    "count": 1
+                }
+            ]
+        },
+        {
+            "title" : "PyMOL Engineer",
+            "url" : "http://www.indeed.com/viewjob?from=appsharedroid&jk=f529f96e15869d03",
+            "company" : "Schrödinger",
+            "location" : "New York, NY 10036",
+            "postDate" : "13 days ago",
+            "salary" : "",
+            "description" : "We’re looking to hire a PyMOL Software Engineer to join us in our mission to design drugs that improve human health and materials that increase quality of life!",
+            "keywords": [
+                {
+                    "name": "rust",
+                    "tfidf": 0,
+                    "count": 0
+                },
+                {
+                    "name": "python",
+                    "tfidf": 0,
+                    "count": 0
+                },
+                {
+                    "name": "java",
+                    "tfidf": 0,
+                    "count": 0
+                }
+            ]
+        }
+    ],
+    "skills": ["rust", "python", "java"],
+    "users": [
+        {
+            "credentials": {
+                "userName": "user1",
+                "email": "user1@mail.com"
+            }
+        },
+        {
+            "credentials": {
+                "userName": "user2",
+                "email": "user2@mail.com"
+            }
+        }
+    ]
+}
