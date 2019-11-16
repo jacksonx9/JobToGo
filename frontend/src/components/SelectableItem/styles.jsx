@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
     margin: margin.xs,
     marginLeft: margin.xs + 3,
     borderRadius: border.radius,
-    elevation: 10,
+    elevation: 8,
   },
   logo: {
     height: 50,

@@ -5,6 +5,7 @@ import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 import firebase from 'react-native-firebase';
 import Logger from 'js-logger';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 import SignIn from './screens/SignIn';
 import SignUp from './screens/SignUp/SignUp';
@@ -90,31 +91,6 @@ const navConfig = {
   },
 };
 
-// {
-//   defaultNavigationOptions: ({ navigation }) => ({
-//     tabBarIcon: ({ focused, horizontal, tintColor }) => {
-//       const { routeName } = navigation.state;
-//       let IconComponent = Ionicons;
-//       let iconName;
-//       if (routeName === 'Home') {
-//         iconName = `ios-information-circle${focused ? '' : '-outline'}`;
-//         // Sometimes we want to add badges to some icons.
-//         // You can check the implementation below.
-//         IconComponent = HomeIconWithBadge;
-//       } else if (routeName === 'Settings') {
-//         iconName = `ios-options`;
-//       }
-
-//       // You can return any component that you like here!
-//       return <IconComponent name={iconName} size={25} color={tintColor} />;
-//     },
-//   }),
-//   tabBarOptions: {
-//     activeTintColor: 'tomato',
-//     inactiveTintColor: 'gray',
-//   },
-// }
-
 const tabNavConfig = {
   initialRouteName: 'JobSwipe',
   tabBarOptions: {
@@ -125,12 +101,46 @@ const tabNavConfig = {
 
 const AppStack = createBottomTabNavigator(
   {
-    JobSwipe,
-    SendLikedJobs,
-    EditFriends,
-    EditSkills,
+    Home: {
+      screen: JobSwipe,
+      navigationOptions: {
+        tabBarLabel: 'Home',
+        tabBarIcon: ({ tintColor }) => (
+          <Icon name="ios-home" color="pink" size={25} />
+        ),
+      },
+    },
+    Send: {
+      screen: SendLikedJobs,
+      navigationOptions: {
+        tabBarLabel: 'Profile',
+        tabBarIcon: ({ tintColor }) => (
+          <Icon name="ios-person" color="pink" size={25} />
+        ),
+      },
+    },
+    Friends: {
+      screen: EditFriends,
+      navigationOptions: {
+        tabBarLabel: 'Profile',
+        tabBarIcon: ({ tintColor }) => (
+          <Icon name="ios-person" color="pink" size={25} />
+        ),
+      },
+    },
+    Resume: {
+      screen: EditSkills,
+      navigationOptions: {
+        tabBarLabel: 'Profile',
+        tabBarIcon: ({ tintColor }) => (
+          <Icon name="ios-person" color="pink" size={25} />
+        ),
+      },
+    },
   },
-  tabNavConfig,
+  {
+    initialRouteName: 'Home',
+  },
 );
 
 const AuthStack = createStackNavigator(
