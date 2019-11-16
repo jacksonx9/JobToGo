@@ -80,21 +80,20 @@ class Messenger {
 
     try {
       user = await Users.findById(userId, 'credentials.email').orFail();
-      const jobsResult = await this.shortlister.getLikedJobs(userId);
-
-      if (jobsResult.status !== 200) {
-        return jobsResult;
-      }
-
-      // Construct email message
-      jobsResult.result.forEach((posting) => {
-        const { title, company, url } = posting;
-        emailText += `${title} @ ${company}
-                    ${url}\n\n`;
-      });
     } catch (e) {
       return new Response(false, 'Invalid userId', 400);
     }
+
+    const jobsResult = await this.shortlister.getLikedJobs(userId);
+    if (jobsResult.result.length === 0) {
+      return new Response(false, 'No jobs to email', 400);
+    }
+
+    // Construct email message
+    jobsResult.result.forEach((posting) => {
+      const { title, company, url } = posting;
+      emailText += `${title} @ ${company}\n${url}\n\n`;
+    });
 
     try {
       // TODO: Does not verify email is sent correctly
