@@ -92,10 +92,12 @@ const navConfig = {
 };
 
 const tabNavConfig = {
-  initialRouteName: 'JobSwipe',
   tabBarOptions: {
     activeTintColor: 'tomato',
     inactiveTintColor: 'gray',
+  },
+  style: {
+    backgroundColor: '#42a5f5',
   },
 };
 
@@ -106,8 +108,11 @@ const AppStack = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: 'Home',
         tabBarIcon: ({ tintColor }) => (
-          <Icon name="ios-home" color="pink" size={25} />
+          <Icon name="ios-briefcase" color="pink" size={25} />
         ),
+      },
+      style: {
+        backgroundColor: '#42a5f5',
       },
     },
     Send: {
@@ -115,7 +120,7 @@ const AppStack = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: 'Profile',
         tabBarIcon: ({ tintColor }) => (
-          <Icon name="ios-person" color="pink" size={25} />
+          <Icon name="ios-home" color="pink" size={25} />
         ),
       },
     },
@@ -133,13 +138,20 @@ const AppStack = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: 'Profile',
         tabBarIcon: ({ tintColor }) => (
-          <Icon name="ios-person" color="pink" size={25} />
+          <Icon name="ios-home" color="pink" size={25} />
         ),
       },
     },
   },
   {
     initialRouteName: 'Home',
+    tabBarOptions: {
+      style: {
+        height: 55,
+        backgroundColor: 'white',
+        borderTopColor: 'transparent',
+      },
+    },
   },
 );
 
