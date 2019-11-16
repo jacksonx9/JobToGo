@@ -22,6 +22,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.semiBold,
     fontSize: fonts.lg,
     color: colours.lightGray,
+    textAlign: 'center',
   },
 });
 

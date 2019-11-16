@@ -3,6 +3,7 @@ import { Image, View, Text } from 'react-native';
 import { string, number } from 'prop-types';
 
 import images from '../../constants/images';
+import { errors } from '../../constants/messages';
 
 import styles from './styles';
 
@@ -18,7 +19,7 @@ const InfoDisplay = ({ message, source }) => (
 
 InfoDisplay.defaultProps = {
   source: images.iconLogoGray,
-  message: 'Something went wrong on our end.',
+  message: errors.default,
 };
 
 InfoDisplay.propTypes = {
