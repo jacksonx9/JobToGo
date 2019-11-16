@@ -1,0 +1,18 @@
+{
+    "users": [
+        {
+            "credentials": {
+                "userName": "user1",
+                "email": "user1@mail.com"
+            }
+        },
+        {
+            "credentials": {
+                "userName": "invalidUser",
+                "email": "invalidUser@mail.com"
+            }
+        }
+    ],
+    "parsedResumeText": "this is a resume right -- +right.",
+    "skills": ["skill1", "skill2", "looooooooooooooooonnnnggskill"]
+}
