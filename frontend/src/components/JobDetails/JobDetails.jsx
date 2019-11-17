@@ -31,21 +31,43 @@ class JobDetails extends Component {
       <View style={[styles.container]}>
         <Modal
           animationType="slide"
-          transparent={false}
+          transparent
           visible={modalVisible}
         >
           <View style={styles.detailsContainer}>
+            <ImageButton
+              source={images.iconChevronDown}
+              onPress={() => {
+                this.setModalVisible(false);
+              }}
+            />
             <View style={styles.logoContainer}>
               <JobImage
                 logo={logo}
                 sideLength={50}
               />
+              <Text style={styles.headerDark}>{company}</Text>
             </View>
             <View style={styles.infoContainer}>
+              <View style={[styles.subHeaderContainer]}>
+                <Image
+                  source={images.iconJob}
+                  styles={[styles.icon]}
+                />
+                <Text style={styles.subHeaderDark}>{title}</Text>
+              </View>
+              <View style={[styles.subHeaderContainer]}>
+                <Image
+                  source={images.iconLocation}
+                  styles={[styles.icon]}
+                />
+                <Text style={styles.subHeaderDark}>{location}</Text>
+              </View>
+
 
             </View>
             <ScrollView style={styles.descContainer}>
-              <Text>{description}</Text>
+              <Text style={styles.normalText}>{description}</Text>
             </ScrollView>
           </View>
         </Modal>
