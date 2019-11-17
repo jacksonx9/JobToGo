@@ -14,7 +14,8 @@ import JobSwipe from './screens/JobSwipe';
 import SendLikedJobs from './screens/SendLikedJobs/SendLikedJobs';
 import EditFriends from './screens/EditFriends/EditFriends';
 import EditSkills from './screens/EditSkills/EditSkills';
-import { colours, fonts } from './styles';
+import Search from './screens/Search';
+import { colours, fonts, sizes } from './styles';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -115,7 +116,7 @@ const AppStack = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: 'Home',
         tabBarIcon: ({ tintColor }) => (
-          <Icon name="home" color={tintColor} size={25} />
+          <Icon name="home" color={tintColor} size={sizes.icon} />
         ),
       },
     },
@@ -124,7 +125,7 @@ const AppStack = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: 'Liked',
         tabBarIcon: ({ tintColor }) => (
-          <Icon name="heart" color={tintColor} size={25} />
+          <Icon name="heart" color={tintColor} size={sizes.icon} />
         ),
       },
     },
@@ -133,12 +134,12 @@ const AppStack = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: 'Friends',
         tabBarIcon: ({ tintColor }) => (
-          <Icon name="users" color={tintColor} size={25} />
+          <Icon name="users" color={tintColor} size={sizes.icon} />
         ),
       },
     },
     Resume: {
-      screen: EditSkills,
+      screen: Search,
       navigationOptions: {
         tabBarLabel: 'Resume',
         tabBarIcon: ({ tintColor }) => (

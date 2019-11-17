@@ -7,49 +7,29 @@ import images from '../../constants/images';
 import styles from './styles';
 
 class SearchBar extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      showInput: false,
-    };
-  }
-
   startSearch = () => {
     const { onStartSearch } = this.props;
     onStartSearch();
-    this.setState({ showInput: true });
   }
 
   endSearch = () => {
     const { onEndSearch } = this.props;
     onEndSearch();
-    this.setState({ showInput: false });
   }
 
   render() {
-    const { showInput } = this.state;
     const { value, onChangeText } = this.props;
-    if (showInput) {
-      return (
-        <View style={[styles.container]}>
-          <ImageButton
-            source={images.iconChevronLeft}
-            onPress={this.endSearch}
-          />
-          <TextInput
-            style={styles.input}
-            value={value}
-            onChangeText={onChangeText}
-          />
-        </View>
-      );
-    }
-
     return (
-      <View style={[styles.container]}>
+      <View style={styles.container}>
         <ImageButton
-          source={images.iconSearch}
-          onPress={this.startSearch}
+          source={images.iconChevronLeft}
+          onPress={this.endSearch}
+        />
+        <TextInput
+          placeholder="Search"
+          style={styles.input}
+          value={value}
+          onChangeText={onChangeText}
         />
       </View>
     );

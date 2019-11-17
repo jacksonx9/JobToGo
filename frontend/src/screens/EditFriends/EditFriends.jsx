@@ -118,7 +118,7 @@ export default class EditFriends extends Component {
           buttonOption="search"
           value={addFriendName}
           onChangeText={text => { this.setState({ addFriendName: text }); }}
-          onEndSearch={() => this.addFriend()}
+          onEndSearch={() => {}}
           onStartSearch={() => {}}
         />
         <SwitchableNav

@@ -8,14 +8,14 @@ const styles = StyleSheet.create({
   container: {
     ...containers.fullScreenContainer,
     flexDirection: 'column',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center',
     paddingHorizontal: padding.lg,
   },
   logo: {
     marginTop: margin.lg,
     resizeMode: 'contain',
-    height: '10%',
+    height: '9%',
   },
   image: {
     resizeMode: 'contain',

@@ -56,6 +56,10 @@ export const fonts = {
   extraBold: 'Muli-ExtraBold',
 };
 
+export const sizes = {
+  icon: 25,
+};
+
 export const containers = {
   fullScreenContainer: {
     height: dimensions.fullHeight,

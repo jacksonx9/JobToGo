@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { string, func, oneOf } from 'prop-types';
 
-import SearchBar from '../SeachBar';
+import SearchBar from '../SearchBar';
 import ImageButton from '../ImageButton';
 import images from '../../constants/images';
 import styles from './styles';
@@ -14,11 +14,9 @@ const NavHeader = ({
   let button;
   if (buttonOption === 'search') {
     button = (
-      <SearchBar
-        value={value}
-        onChangeText={onChangeText}
-        onStartSearch={onStartSearch}
-        onEndSearch={onEndSearch}
+      <ImageButton
+        source={images.iconSearch}
+        onPress={onPressButton}
       />
     );
   } else if (buttonOption === 'back') {

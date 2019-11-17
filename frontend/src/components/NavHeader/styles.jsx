@@ -16,11 +16,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: padding.md,
     marginBottom: margin.md,
     backgroundColor: 'transparent',
+    zIndex: 2,
   },
   leftComponentContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
     width: '85%',
+    zIndex: 1,
   },
   componentContainer: {
     flexDirection: 'row',
@@ -31,6 +33,7 @@ const styles = StyleSheet.create({
     paddingTop: padding.md,
     marginBottom: margin.md,
     backgroundColor: 'transparent',
+    zIndex: 1,
   },
   titleContainer: {
     flexDirection: 'row',
@@ -40,6 +43,7 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: padding.xxl,
     backgroundColor: 'transparent',
+    zIndex: 0,
   },
   text: {
     fontFamily: fonts.extraBold,
