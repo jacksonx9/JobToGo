@@ -11,17 +11,17 @@
             "keywords": [
                 {
                     "name": "rust",
-                    "tfidf": 0.1,
+                    "tfidf": 0.46209812037329684,
                     "count": 2
                 },
                 {
                     "name": "python",
-                    "tfidf": 0.1,
+                    "tfidf": 0.46209812037329684,
                     "count": 1
                 },
                 {
                     "name": "java",
-                    "tfidf": 0.1,
+                    "tfidf": 0,
                     "count": 0
                 }
             ]
@@ -37,7 +37,7 @@
             "keywords": [
                 {
                     "name": "rust",
-                    "tfidf": 0,
+                    "tfidf": 0.6931471805599453,
                     "count": 1
                 },
                 {
@@ -73,7 +73,7 @@
                 },
                 {
                     "name": "java",
-                    "tfidf": 1,
+                    "tfidf": 1.3862943611198906,
                     "count": 1
                 }
             ]

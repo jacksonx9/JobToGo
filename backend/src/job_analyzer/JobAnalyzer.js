@@ -58,11 +58,8 @@ class JobAnalyzer {
    */
   async computeJobScores(skillsStart, skillsEnd) {
     this.logger.info('Starting to compute job scores...');
-    console.log(typeof skillsEnd);
-
-    // TODO: figure out why these asserts don't work
-    // assert(skillsStart === undefined || skillsStart >= 0);
-    // assert(skillsStart === undefined || skillsEnd >= 0);
+    assert(skillsStart === undefined || skillsStart >= 0);
+    assert(skillsEnd === undefined || skillsEnd >= 0);
 
     const jobs = await Jobs.find({});
     const offset = skillsStart || 0;
@@ -77,14 +74,13 @@ class JobAnalyzer {
 
       // calculate tf_idf each doc and save it
       await forEachAsync(jobs, async (job, jobIdx) => {
-
-        // TODO: bottom two lines are messed up
         const keywordOccurrences = job.keywords[allKeywordIdx].count;
-        const wordCount = job.description.split(' ').length;
-        const tf = keywordOccurrences / wordCount;
+        const totalKeywords = job.keywords.reduce((sum, keyword) => sum + keyword.count, 0);
+        const tf = totalKeywords !== 0 ? keywordOccurrences / totalKeywords : 0;
         const idf = docCount !== 0 ? Math.log(jobs.length / docCount) : 0;
         const tfidf = tf * idf;
 
+        assert(tfidf >= 0);
         // replace tf_idf score for a keyword for each job
         jobs[jobIdx].keywords[allKeywordIdx].tfidf = tfidf;
 

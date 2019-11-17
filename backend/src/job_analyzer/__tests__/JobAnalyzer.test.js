@@ -1,13 +1,13 @@
 import mongoose from 'mongoose';
 import { Express } from 'jest-express/lib/express';
 
-import JobAnaylzer from '..';
-import testData from './test_data';
+import * as testDataOriginal from './test_data';
 import JobShortLister from '../../job_shortlister';
 import Response from '../../types';
 import AllSkills from '../../all_skills';
 import { Jobs, Users } from '../../schema';
 import * as constants from '../../constants';
+import JobAnalyzer from '../JobAnalyzer';
 
 jest.mock('../../job_shortlister');
 
@@ -21,7 +21,8 @@ describe('JobAnalyzer', () => {
   let invalidJobId;
   let allSkills;
   let shortLister;
-  let jobAnaylzer;
+  let jobAnalyzer;
+  let testData;
   let JOBS_PER_SEND;
   let JOBS_SEARCH_MAX_SIZE;
   let JOBS_SEARCH_PERCENT_SIZE;
@@ -37,13 +38,7 @@ describe('JobAnalyzer', () => {
 
     app = new Express();
     shortLister = new JobShortLister();
-    jobAnaylzer = new JobAnaylzer(app, shortLister);
-
-    // Save the value of the constant so we can reset it
-    JOBS_PER_SEND = constants.JOBS_PER_SEND;
-    JOBS_SEARCH_MAX_SIZE = constants.JOBS_SEARCH_MAX_SIZE;
-    JOBS_SEARCH_PERCENT_SIZE = constants.JOBS_SEARCH_PERCENT_SIZE;
-    DAILY_JOB_COUNT_LIMIT = constants.DAILY_JOB_COUNT_LIMIT;
+    jobAnalyzer = new JobAnalyzer(app, shortLister);
   });
 
   afterAll(async () => {
@@ -52,90 +47,124 @@ describe('JobAnalyzer', () => {
 
   beforeEach(async () => {
     AllSkills.getAll = jest.fn(() => new Promise(resolve => resolve(testData.skills)));
-    shortLister.getSeenJobIds = jest.fn(() => Array.from({length: testData.skills.length}, (_, k) => k+1) );
-  });
-
-  afterEach(async () => {
-    // Delete all users after each test
-    await Users.deleteMany({});
-    // Make sure to clear all mock state (e.g. number of times called)
-    jest.clearAllMocks();
-    // Reset the constant
+    shortLister.getSeenJobIds = jest.fn(() => Array.from({length: testData.skills.length}, (_, k) => k+1));
+    // Set json from constants file
+    testData = JSON.parse(JSON.stringify(testDataOriginal));
+    // Set the constant
     JOBS_PER_SEND = constants.JOBS_PER_SEND;
     JOBS_SEARCH_MAX_SIZE = constants.JOBS_SEARCH_MAX_SIZE;
     JOBS_SEARCH_PERCENT_SIZE = constants.JOBS_SEARCH_PERCENT_SIZE;
     DAILY_JOB_COUNT_LIMIT = constants.DAILY_JOB_COUNT_LIMIT;
   });
 
+  afterEach(async () => {
+    // Delete all users after each test
+    await Users.deleteMany({});
+    await Jobs.deleteMany({});
+    // Make sure to clear all mock state (e.g. number of times called)
+    jest.clearAllMocks();
+  });
+
   // Helper function that tests computeJobScores with different skillsStart
   // and skillsEnd values.
   const testComputeJobScoresJobKeywordsStaySame = async (skillsStart, skillsEnd) => {
-    const jobsNoKeywords = [];
-    const offset = skillsStart || 0;
-    const jobsNeedDataRemoved = offset > 0 ? testData.jobs.slice(offset, skillsEnd) : testData.jobs;
-
-    jobsNeedDataRemoved.forEach(job => {
-      const jobNoKeywords = job;
-      jobNoKeywords.keywords = [];
-      jobsNoKeywords.push(jobNoKeywords);
+    testData.skills.forEach((_, i) => {
+      const delKeywordCond = (skillsStart === undefined || skillsStart <= i) && (skillsEnd === undefined || skillsEnd > i);
+      if (delKeywordCond) {
+        testData.jobs.forEach(job => {
+          delete job.keywords[i].tfidf;
+        });
+      }
     });
 
     await Jobs.insertMany([
       {
-        ...jobsNoKeywords[0],
+        ...testData.jobs[0],
       },
       {
-        ...jobsNoKeywords[1],
+        ...testData.jobs[1],
       },
       {
-        ...jobsNoKeywords[2],
+        ...testData.jobs[2],
       },
       {
-        ...jobsNoKeywords[3],
+        ...testData.jobs[3],
       },
     ]);
 
-    await jobAnaylzer.computeJobScores(skillsStart, skillsEnd);
-    const jobs = await Jobs.find({}).lean();
-    expect(testData.jobs).toEqual(jobs);
+    await jobAnalyzer.computeJobScores(skillsStart, skillsEnd);
+    const jobs = await Jobs.find({}, { _id: 0, 'keywords._id': 0 }).lean();
+    expect(testDataOriginal.jobs[0].keywords).toEqual(jobs[0].keywords);
+    expect(testDataOriginal.jobs[1].keywords).toEqual(jobs[1].keywords);
+    expect(testDataOriginal.jobs[2].keywords).toEqual(jobs[2].keywords);
+    expect(testDataOriginal.jobs[3].keywords).toEqual(jobs[3].keywords);
+  };
+
+  // Helper function that tests functions with a single user id as the input
+  // Tests that an empty id will be rejected
+  const testEmptyId = async (func) => {
+    const response = new Response(null, 'Invalid userId', 400);
+    const usersBefore = await Users.find({});
+
+    expect(await jobAnalyzer[func](undefined)).toEqual(response);
+
+    const usersAfter = await Users.find({});
+    expect(usersBefore).toEqual(usersAfter);
+  };
+
+  // Helper function that tests functions with a single user id as the input
+  // Tests that an invalid id will be rejected
+  const testInvalidUser = async (func) => {
+    const response = new Response(null, 'Invalid userId', 400);
+    const usersBefore = await Users.find({});
+
+    expect(await jobAnalyzer[func](123)).toEqual(response);
+    expect(await jobAnalyzer[func]('test')).toEqual(response);
+    expect(await jobAnalyzer[func]({})).toEqual(response);
+
+    const usersAfter = await Users.find({});
+    expect(usersBefore).toEqual(usersAfter);
   };
 
   test('No Keywords', async () => {
     const keywords = [];
     const job = testData.jobs[0];
     job.keywords = [];
-    await jobAnaylzer.computeJobKeywordCount(job, keywords);
+    await jobAnalyzer.computeJobKeywordCount(job, keywords);
     expect(job.keywords.length).toEqual(0);
   });
 
   test('Valid Keywords', async () => {
     const job = testData.jobs[0];
     job.keywords = [];
-    await jobAnaylzer.computeJobKeywordCount(job, testData.skills);
+    await jobAnalyzer.computeJobKeywordCount(job, testData.skills);
     expect(job.keywords[0].count).toEqual(2);
     expect(job.keywords[1].count).toEqual(1);
     expect(job.keywords[2].count).toEqual(0);
   });
 
   test('computeJobScores: undefined skillsEnd', async () => {
-    await testComputeJobScoresJobKeywordsStaySame(0);
+    await testComputeJobScoresJobKeywordsStaySame(1);
   });
 
   test('computeJobScores: undefined skillsStart and skillsEnd', async () => {
+    await testComputeJobScoresJobKeywordsStaySame();
   });
 
-  test('computeJobScores: no keywords', async () => {
+  test('computeJobScores: some keywords', async () => {
+    await testComputeJobScoresJobKeywordsStaySame(1, 2);
   });
 
-  test('computeJobScores: multiple keywords', async () => {
-    // const jobs = await Jobs.insertMany(testData.jobs);
-    // const jobIds = jobs.map(job => job._id.toString());
+  test('computeJobScores: specify all keywords', async () => {
+    await testComputeJobScoresJobKeywordsStaySame(0, 4);
   });
 
-  test('computeJobScores: ', async () => {
+  test('getRelevantJobs: testEmptyId', async () => {
+    await testEmptyId('getRelevantJobs');
   });
 
-  test('computeJobScores: ', async () => {
+  test('getRelevantJobs: testInvalidUser', async () => {
+    await testInvalidUser('getRelevantJobs');
   });
 
   // test('addFriend: Invalid Users', async () => {
