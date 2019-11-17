@@ -9,7 +9,7 @@ import styles from './styles';
 
 
 const NavHeader = ({
-  title, buttonOption, onPressButton, value, onChangeText, onStartSearch, onEndSearch,
+  title, buttonOption, onPressButton,
 }) => {
   let button;
   if (buttonOption === 'search') {
@@ -54,9 +54,6 @@ NavHeader.defaultProps = {
   buttonOption: 'none',
   onPressButton: () => {},
   value: '',
-  onChangeText: () => {},
-  onStartSearch: () => {},
-  onEndSearch: () => {},
 };
 
 NavHeader.propTypes = {
@@ -64,9 +61,6 @@ NavHeader.propTypes = {
   buttonOption: oneOf(['search', 'back', 'none']),
   onPressButton: func,
   value: string,
-  onChangeText: func,
-  onStartSearch: func,
-  onEndSearch: func,
 };
 
 export default NavHeader;

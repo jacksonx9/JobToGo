@@ -3,6 +3,7 @@ import { View, FlatList } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
 
+import Search from '../Search';
 import SelectableItem from '../../components/SelectableItem';
 import Loader from '../../components/Loader';
 import NavHeader from '../../components/NavHeader';
@@ -23,6 +24,7 @@ export default class EditFriends extends Component {
       addFriendName: '',
       loading: 1,
       showPendingFriends: true,
+      searchInProgress: false,
     };
     this.logger = Logger.get(this.constructor.name);
   }
@@ -105,10 +107,34 @@ export default class EditFriends extends Component {
 
   render() {
     const {
-      loading, addFriendName, pendingFriends, friends, showPendingFriends,
+      loading, addFriendName, pendingFriends, friends, showPendingFriends, searchInProgress,
     } = this.state;
 
     if (loading) return <Loader />;
+    if (searchInProgress) {
+      return (
+        <Search
+          value={addFriendName}
+          onChangeText={text => { this.setState({ addFriendName: text }); }}
+          onEndSearch={() => {}}
+          onStartSearch={() => {}}
+        >
+          <FlatList
+            data={friends}
+            keyExtractor={item => item._id}
+            renderItem={({ item, index }) => (
+              <SelectableItem
+                key={item._id}
+                header={item.userName}
+                subHeader={item.email}
+                onPress={() => this.removeFriend(item, index)}
+                actionIcon="x"
+              />
+            )}
+          />
+        </Search>
+      );
+    }
     return (
       <View
         style={[styles.container]}
@@ -116,10 +142,7 @@ export default class EditFriends extends Component {
         <NavHeader
           title="Friends"
           buttonOption="search"
-          value={addFriendName}
-          onChangeText={text => { this.setState({ addFriendName: text }); }}
-          onEndSearch={() => {}}
-          onStartSearch={() => {}}
+          onPressButton={() => { this.setState({ searchInProgress: true }); }}
         />
         <SwitchableNav
           showNavOption1={showPendingFriends}
