@@ -1,0 +1,24 @@
+{
+    "users": [
+        {
+            "credentials": {
+                "userName": "user1",
+                "email": "user1@mail.com",
+                "firebaseToken": "user1firebaseToken"
+            }
+        },
+        {
+            "credentials": {
+                "userName": "user2",
+                "email": "user2@mail.com",
+                "firebaseToken": "user2firebaseToken"
+            }
+        },
+        {
+            "credentials": {
+                "userName": "invalidUser",
+                "email": "invalidUser@mail.com"
+            }
+        }
+    ]
+}
