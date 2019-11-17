@@ -1,20 +1,22 @@
-import fs from 'fs';
 import pdfparse from 'pdf-parse';
 import stopword from 'stopword';
 import axios from 'axios';
 import multer from 'multer';
 import Logger from 'js-logger';
 
+import { Users } from '../schema';
 import Response from '../types';
-import { MEDIA_ROOT } from '../constants';
 import credentials from '../../credentials/dandelion';
 
 const EXTRACTION_ENDPOINT = 'https://api.dandelion.eu/datatxt/nex/v1/';
 const MIN_CONFIDENCE = 0.8; // Min confidence to accept keyword
-const RESUME_PATH = `${MEDIA_ROOT}/resumes/`;
 const REQUEST_TIMEOUT = 4000;
 const REQUEST_MAX_ATTEMPTS = 3;
 const MAX_KEYWORD_LENGTH = 20;
+// Dandelion API request URI has a maximum length of 4096 characters
+export const MAX_REQUEST_URI_LENGTH = 4096;
+const MAX_REQUEST_TEXT_LENGTH = MAX_REQUEST_URI_LENGTH
+  - (EXTRACTION_ENDPOINT.length + credentials.token.length + String(MIN_CONFIDENCE).length + 29);
 
 class ResumeParser {
   constructor(app, user) {
@@ -41,8 +43,15 @@ class ResumeParser {
       return new Response(false, 'Invalid PDF', 400);
     }
 
+    // Verify user is valid before starting to parse
+    try {
+      await Users.findById(userId).orFail();
+    } catch (e) {
+      return new Response(false, 'Invalid userId or resume', 400);
+    }
+
     // Parse text out of resume
-    const textResult = await this.parse(originalname, buffer);
+    const textResult = await this.parse(buffer);
     if (textResult.status !== 200) {
       return textResult;
     }
@@ -58,8 +67,7 @@ class ResumeParser {
     return updateResult;
   }
 
-  async parse(fileName, buffer) {
-    const outputPath = `${RESUME_PATH + fileName}.txt`;
+  async parse(buffer) {
     let resume;
     try {
       resume = await pdfparse(buffer);
@@ -67,21 +75,14 @@ class ResumeParser {
       return new Response(false, 'Invalid PDF', 400);
     }
 
-    // TODO: Dandelion API request has a maximum length of 4096 characters
     // Remove all non-ascii characters, excess spaces, and stopwords
     const text = stopword.removeStopwords(resume.text
       .replace(/[^ -~]/g, ' ')
       .replace(/[^\w.\-+]/g, ' ')
       .replace(/[ ]{2,}/g, ' ')
+      .trim()
       .toLowerCase()
       .split(' ')).join(' ');
-
-    // Write the standardized text into a file for debugging purposes
-    fs.writeFile(outputPath, text, (err) => {
-      if (err) {
-        this.logger.error(err);
-      }
-    });
 
     return new Response(text, '', 200);
   }
@@ -94,11 +95,12 @@ class ResumeParser {
       }
 
       try {
+        // TODO: Don't just remove all characters over the limit
         // API call to extract keywords
         const res = await axios.get(
           `${EXTRACTION_ENDPOINT}?`
           + `min_confidence=${String(MIN_CONFIDENCE)}&`
-          + `text=${encodeURIComponent(inputText)}&`
+          + `text=${encodeURIComponent(inputText).substring(0, MAX_REQUEST_TEXT_LENGTH)}&`
           + `token=${credentials.token}`,
           { timeout: REQUEST_TIMEOUT },
         );
