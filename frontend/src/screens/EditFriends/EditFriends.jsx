@@ -115,6 +115,35 @@ export default class EditFriends extends Component {
       loading, addFriendName, pendingFriends, friends, showPendingFriends, searchInProgress,
     } = this.state;
 
+    let data;
+    let onPress;
+    if (searchInProgress) {
+      data = friends; // TODO: change to user query results
+      onPress = this.addFriend;
+    } else if (showPendingFriends) {
+      data = pendingFriends;
+      onPress = this.comfirmFriendRequest;
+    } else {
+      data = friends;
+      onPress = this.removeFriend;
+    }
+
+    const userList = (
+      <FlatList
+        data={data}
+        keyExtractor={item => item._id}
+        renderItem={({ item, index }) => (
+          <SelectableItem
+            key={item._id}
+            header={item.userName}
+            subHeader={item.email}
+            onPress={() => onPress(item, index)}
+            actionIcon="x"
+          />
+        )}
+      />
+    );
+
     if (loading) return <Loader />;
     if (searchInProgress) {
       return (
@@ -123,19 +152,7 @@ export default class EditFriends extends Component {
           onChangeText={text => this.searchUsers(text)}
           onEndSearch={() => { this.setState({ addFriendName: '', searchInProgress: false }); }}
         >
-          <FlatList
-            data={friends}
-            keyExtractor={item => item._id}
-            renderItem={({ item, index }) => (
-              <SelectableItem
-                key={item._id}
-                header={item.userName}
-                subHeader={item.email}
-                onPress={() => this.removeFriend(item, index)}
-                actionIcon="x"
-              />
-            )}
-          />
+          {userList}
         </Search>
       );
     }
@@ -156,36 +173,7 @@ export default class EditFriends extends Component {
           onPressNavOption2={() => { this.setState({ showPendingFriends: false }); }}
         />
         <View style={[styles.listContainer]}>
-          {showPendingFriends ? (
-            <FlatList
-              data={pendingFriends}
-              keyExtractor={item => item._id}
-              renderItem={({ item }) => (
-                <SelectableItem
-                  key={item._id}
-                  header={item.userName}
-                  subHeader={item.email}
-                  onPress={() => this.comfirmFriendRequest(item)}
-                  actionIcon="+"
-                />
-              )}
-            />
-          )
-            : (
-              <FlatList
-                data={friends}
-                keyExtractor={item => item._id}
-                renderItem={({ item, index }) => (
-                  <SelectableItem
-                    key={item._id}
-                    header={item.userName}
-                    subHeader={item.email}
-                    onPress={() => this.removeFriend(item, index)}
-                    actionIcon="x"
-                  />
-                )}
-              />
-            )}
+          {userList}
         </View>
       </View>
     );
