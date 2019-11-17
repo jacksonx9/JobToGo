@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-import { colours, fonts } from '../../styles';
+import { colours, fonts, padding, border } from '../../styles';
 
 const styles = StyleSheet.create({
   container: {
@@ -53,6 +53,37 @@ const styles = StyleSheet.create({
   icon: {
     width: 50,
     height: 50,
+  },
+
+  
+  detailsContainer: {
+    height: '92%',
+    width: '100%',
+    flexDirection: 'column',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    padding: padding.md,
+    borderRadius: border.radius,
+    backgroundColor: colours.primary,
+  },
+  logoContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    height: '15%',
+    width: '100%',
+    backgroundColor: 'pink',
+  },
+  infoContainer: {
+    height: '25%',
+    width: '100%',
+    backgroundColor: 'purple',
+    overflow: 'hidden'
+  },
+  descContainer: {
+    height: '60%',
+    width: '100%',
+    backgroundColor: 'white',
+    overflow: 'scroll',
   },
 });
 

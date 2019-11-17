@@ -12,10 +12,6 @@ import styles from './styles';
 import { colours } from '../../styles';
 
 export default class SendLikedJobs extends Component {
-  static navigationOptions = {
-    drawerLabel: 'Liked Jobs',
-  }
-
   constructor(props) {
     super(props);
     this.state = {
@@ -95,7 +91,7 @@ export default class SendLikedJobs extends Component {
         <View style={styles.buttonSection}>
           <View style={styles.infoContainer}>
             <Text style={styles.bigText}>
-            5 jobs
+              {`${likedJobs.length} jobs`}
             </Text>
             <Text style={styles.normalText}>
             are ready to be emailed

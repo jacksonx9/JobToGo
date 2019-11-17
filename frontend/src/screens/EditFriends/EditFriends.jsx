@@ -6,16 +6,14 @@ import Logger from 'js-logger';
 import Search from '../../components/Search';
 import SelectableItem from '../../components/SelectableItem';
 import Loader from '../../components/Loader';
+import InfoDisplay from '../../components/InfoDisplay';
 import NavHeader from '../../components/NavHeader';
 import SwitchableNav from '../../components/SwitchableNav';
 import config from '../../constants/config';
+import { status } from '../../constants/messages';
 import styles from './styles';
 
 export default class EditFriends extends Component {
-  static navigationOptions = {
-    drawerLabel: 'Friends',
-  }
-
   constructor(props) {
     super(props);
     this.state = {
@@ -115,22 +113,28 @@ export default class EditFriends extends Component {
       loading, addFriendName, pendingFriends, friends, showPendingFriends, searchInProgress,
     } = this.state;
 
-    let data;
+    let users;
     let onPress;
+    let noUsersMsg;
     if (searchInProgress) {
-      data = friends; // TODO: change to user query results
+      users = friends; // TODO: change to user query results
       onPress = this.addFriend;
+      noUsersMsg = status.noResults;
     } else if (showPendingFriends) {
-      data = pendingFriends;
+      users = pendingFriends;
       onPress = this.comfirmFriendRequest;
+      noUsersMsg = status.noPendingFriends;
     } else {
-      data = friends;
+      users = friends;
       onPress = this.removeFriend;
+      noUsersMsg = status.noFriends;
     }
+
+    const noUsers = users.length === 0;
 
     const userList = (
       <FlatList
-        data={data}
+        data={users}
         keyExtractor={item => item._id}
         renderItem={({ item, index }) => (
           <SelectableItem
@@ -144,6 +148,10 @@ export default class EditFriends extends Component {
       />
     );
 
+    const noUsersInfo = (
+      <InfoDisplay message={noUsersMsg} />
+    );
+
     if (loading) return <Loader />;
     if (searchInProgress) {
       return (
@@ -152,7 +160,7 @@ export default class EditFriends extends Component {
           onChangeText={text => this.searchUsers(text)}
           onEndSearch={() => { this.setState({ addFriendName: '', searchInProgress: false }); }}
         >
-          {userList}
+          {noUsers ? noUsersInfo : userList}
         </Search>
       );
     }
@@ -173,7 +181,7 @@ export default class EditFriends extends Component {
           onPressNavOption2={() => { this.setState({ showPendingFriends: false }); }}
         />
         <View style={[styles.listContainer]}>
-          {userList}
+          {noUsers ? noUsersInfo : userList}
         </View>
       </View>
     );

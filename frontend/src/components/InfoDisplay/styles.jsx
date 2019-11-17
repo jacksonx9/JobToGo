@@ -12,6 +12,10 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: colours.white,
   },
+  textContainer: {
+    maxHeight: '50%',
+    width: '75%',
+  },
   image: {
     maxHeight: '30%',
     maxWidth: '30%',

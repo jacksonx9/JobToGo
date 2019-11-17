@@ -5,6 +5,7 @@ import {
 import { ScrollView } from 'react-native-gesture-handler';
 import PropTypes from 'prop-types';
 
+import JobImage from '../JobImage';
 import ImageButton from '../ImageButton';
 import images from '../../constants/images';
 import styles from './styles';
@@ -24,7 +25,7 @@ class JobDetails extends Component {
   render() {
     const { modalVisible } = this.state;
     const {
-      company, title, location, description,
+      logo, company, title, location, description,
     } = this.props;
     return (
       <View style={[styles.container]}>
@@ -33,29 +34,17 @@ class JobDetails extends Component {
           transparent={false}
           visible={modalVisible}
         >
-          <View style={[styles.modalContainer]}>
-            <ImageButton
-              source={images.iconChevronDown}
-              onPress={() => {
-                this.setModalVisible(false);
-              }}
-            />
-            <Text style={[styles.header]}>{company}</Text>
-            <View style={[styles.subHeaderContainer]}>
-              <Image
-                source={images.iconJob}
-                styles={[styles.icon]}
+          <View style={styles.detailsContainer}>
+            <View style={styles.logoContainer}>
+              <JobImage
+                logo={logo}
+                sideLength={50}
               />
-              <Text style={[styles.subHeader]}>{title}</Text>
             </View>
-            <View style={[styles.subHeaderContainer]}>
-              <Image
-                source={images.iconLocation}
-                styles={[styles.icon]}
-              />
-              <Text style={[styles.subHeader]}>{location}</Text>
+            <View style={styles.infoContainer}>
+
             </View>
-            <ScrollView style={[styles.scroll]}>
+            <ScrollView style={styles.descContainer}>
               <Text>{description}</Text>
             </ScrollView>
           </View>

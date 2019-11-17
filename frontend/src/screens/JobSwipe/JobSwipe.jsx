@@ -18,10 +18,6 @@ import images from '../../constants/images';
 import { status } from '../../constants/messages';
 
 export default class JobSwipe extends Component {
-  static navigationOptions = {
-    drawerLabel: 'Job Swipe',
-  }
-
   constructor(props) {
     super(props);
     this.state = {

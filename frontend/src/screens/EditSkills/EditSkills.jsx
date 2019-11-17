@@ -12,10 +12,6 @@ import { colours } from '../../styles';
 import images from '../../constants/images';
 
 export default class EditSkills extends Component {
-  static navigationOptions = {
-    drawerLabel: 'Edit Skills',
-  }
-
   constructor(props) {
     super(props);
     this.logger = Logger.get(this.constructor.name);

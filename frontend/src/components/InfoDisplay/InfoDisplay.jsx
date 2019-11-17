@@ -13,7 +13,9 @@ const InfoDisplay = ({ message, source }) => (
       source={source}
       style={styles.image}
     />
-    <Text style={styles.text}>{message}</Text>
+    <View style={styles.textContainer}>
+      <Text style={styles.text}>{message}</Text>
+    </View>
   </View>
 );
 

@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   listContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    height: '100%',
+    height: '85%',
     width: '100%',
     backgroundColor: colours.white,
   },

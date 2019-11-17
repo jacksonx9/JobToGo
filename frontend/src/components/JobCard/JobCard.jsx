@@ -1,6 +1,7 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 import { string, bool } from 'prop-types';
+import { ScrollView } from 'react-native-gesture-handler';
 
 import JobDetails from '../JobDetails';
 import JobImage from '../JobImage';
@@ -14,6 +15,7 @@ const JobCard = ({
       logo={logo}
     />
     <JobDetails
+      logo={logo}
       company={company}
       title={title}
       location={isShared ? 'shared' : location}

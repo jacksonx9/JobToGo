@@ -4,4 +4,7 @@ export const errors = {
 
 export const status = {
   noSharedJobs: 'You currently have no shared jobs.',
+  noPendingFriends: 'You currently have no pending friends.',
+  noFriends: 'You currently have no friends.',
+  noResults: 'No results',
 };

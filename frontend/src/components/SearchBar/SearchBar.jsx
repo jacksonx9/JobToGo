@@ -21,7 +21,6 @@ const SearchBar = ({ value, onChangeText, onEndSearch }) => (
   </View>
 );
 
-
 SearchBar.propTypes = {
   value: string.isRequired,
   onChangeText: func.isRequired,
