@@ -1,3 +1,11 @@
+import Logger from 'js-logger';
+
+export const PORT = 8080;
+export const MONGO_URL = 'mongodb://171.0.0.3:27017/JobToGo';
+export const FIREBASE_URL = 'https://jobtogo-103fd.firebaseio.com';
+export const LOG_LEVEL = Logger.INFO;
+export const DEBUG = true;
+
 export const JOBS_PER_SEND = 20;
 export const JOBS_SEARCH_MAX_SIZE = 2000;
 export const JOBS_SEARCH_PERCENT_SIZE = 0.25;

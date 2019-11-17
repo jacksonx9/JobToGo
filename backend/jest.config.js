@@ -3,4 +3,8 @@ module.exports = {
   testPathIgnorePatterns: [
     'dist/',
   ],
+  collectCoverageFrom: [
+    'src/**/*.js',
+    'src/*.js',
+  ],
 };
