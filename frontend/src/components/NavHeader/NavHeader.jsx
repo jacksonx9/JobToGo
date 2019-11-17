@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { string, func, oneOf } from 'prop-types';
 
-import SearchBar from '../SearchBar';
 import ImageButton from '../ImageButton';
 import images from '../../constants/images';
 import styles from './styles';
@@ -53,14 +52,12 @@ const NavHeader = ({
 NavHeader.defaultProps = {
   buttonOption: 'none',
   onPressButton: () => {},
-  value: '',
 };
 
 NavHeader.propTypes = {
   title: string.isRequired,
   buttonOption: oneOf(['search', 'back', 'none']),
   onPressButton: func,
-  value: string,
 };
 
 export default NavHeader;

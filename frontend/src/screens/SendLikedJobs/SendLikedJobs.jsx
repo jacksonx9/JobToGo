@@ -90,6 +90,7 @@ export default class SendLikedJobs extends Component {
       <View style={styles.container}>
         <NavHeader
           title="Liked Jobs"
+          buttonOption="search"
         />
         <View style={styles.buttonSection}>
           <View style={styles.infoContainer}>

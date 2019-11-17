@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, FlatList } from 'react-native';
 import {
-  string, bool, func, arrayOf,
+  string, bool, func, arrayOf, object,
 } from 'prop-types';
 import Modal from 'react-native-modal';
 
@@ -58,13 +58,18 @@ const JobShareModal = ({
   </Modal>
 );
 
+JobShareModal.defaultProps = {
+  jobLogo: null,
+};
+
 JobShareModal.propTypes = {
   isVisible: bool.isRequired,
   onPressExit: func.isRequired,
   jobTitle: string.isRequired,
   jobCompany: string.isRequired,
   jobId: string.isRequired,
-  friends: arrayOf(string).isRequired,
+  jobLogo: string,
+  friends: arrayOf(object).isRequired,
   onPressSend: func.isRequired,
 };
 

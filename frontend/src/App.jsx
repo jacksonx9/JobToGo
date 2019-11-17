@@ -14,7 +14,6 @@ import JobSwipe from './screens/JobSwipe';
 import SendLikedJobs from './screens/SendLikedJobs/SendLikedJobs';
 import EditFriends from './screens/EditFriends/EditFriends';
 import EditSkills from './screens/EditSkills/EditSkills';
-import Search from './screens/Search';
 import { colours, fonts, sizes } from './styles';
 
 export default class App extends React.Component {
@@ -97,8 +96,7 @@ const tabNavConfig = {
   initialRouteName: 'Home',
   tabBarOptions: {
     style: {
-      height: 52,
-      backgroundColor: colours.white,
+      height: 50,
       borderTopColor: 'transparent',
     },
     labelStyle: {
@@ -139,11 +137,11 @@ const AppStack = createBottomTabNavigator(
       },
     },
     Resume: {
-      screen: Search,
+      screen: EditSkills,
       navigationOptions: {
         tabBarLabel: 'Resume',
         tabBarIcon: ({ tintColor }) => (
-          <Icon name="upload" color={tintColor} size={25} />
+          <Icon name="upload" color={tintColor} size={sizes.icon} />
         ),
       },
     },

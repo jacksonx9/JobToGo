@@ -2,7 +2,7 @@
 import { StyleSheet } from 'react-native';
 
 import {
-  dimensions, padding, margin, colours, fonts,
+  dimensions, padding, colours, fonts,
 } from '../../styles';
 
 const styles = StyleSheet.create({
@@ -14,7 +14,6 @@ const styles = StyleSheet.create({
     width: dimensions.fullWidth,
     paddingTop: padding.lg,
     paddingHorizontal: padding.md,
-    marginBottom: margin.md,
     backgroundColor: 'transparent',
     zIndex: 2,
   },
@@ -31,7 +30,6 @@ const styles = StyleSheet.create({
     height: 40,
     width: '100%',
     paddingTop: padding.md,
-    marginBottom: margin.md,
     backgroundColor: 'transparent',
     zIndex: 1,
   },

@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     width: '50%',
   },
   listContainer: {
-    height: '100%',
+    height: '65%',
     width: '100%',
     backgroundColor: colours.white,
   },

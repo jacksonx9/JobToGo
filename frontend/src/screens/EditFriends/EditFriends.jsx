@@ -3,7 +3,7 @@ import { View, FlatList } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
 
-import Search from '../Search';
+import Search from '../../components/Search';
 import SelectableItem from '../../components/SelectableItem';
 import Loader from '../../components/Loader';
 import NavHeader from '../../components/NavHeader';
@@ -105,6 +105,11 @@ export default class EditFriends extends Component {
     });
   }
 
+  searchUsers = async text => {
+    // TODO: get query response from server
+    this.setState({ addFriendName: text });
+  }
+
   render() {
     const {
       loading, addFriendName, pendingFriends, friends, showPendingFriends, searchInProgress,
@@ -115,9 +120,8 @@ export default class EditFriends extends Component {
       return (
         <Search
           value={addFriendName}
-          onChangeText={text => { this.setState({ addFriendName: text }); }}
-          onEndSearch={() => {}}
-          onStartSearch={() => {}}
+          onChangeText={text => this.searchUsers(text)}
+          onEndSearch={() => { this.setState({ addFriendName: '', searchInProgress: false }); }}
         >
           <FlatList
             data={friends}
