@@ -1,13 +1,13 @@
 import mongoose from 'mongoose';
 import { Express } from 'jest-express/lib/express';
 
+import JobAnalyzer from '..';
 import * as testDataOriginal from './test_data';
 import JobShortLister from '../../job_shortlister';
 import Response from '../../types';
 import AllSkills from '../../all_skills';
 import { Jobs, Users } from '../../schema';
 import * as constants from '../../constants';
-import JobAnalyzer from '../JobAnalyzer';
 
 jest.mock('../../job_shortlister');
 
@@ -55,6 +55,18 @@ describe('JobAnalyzer', () => {
     JOBS_SEARCH_MAX_SIZE = constants.JOBS_SEARCH_MAX_SIZE;
     JOBS_SEARCH_PERCENT_SIZE = constants.JOBS_SEARCH_PERCENT_SIZE;
     DAILY_JOB_COUNT_LIMIT = constants.DAILY_JOB_COUNT_LIMIT;
+    // Insert Users
+    await Users.insertMany([
+      {
+        ...testData.users[0]
+      },
+      {
+        ...testData.users[1]
+      },
+      {
+        ...testData.users[2]
+      }
+    ])
   });
 
   afterEach(async () => {
@@ -109,7 +121,7 @@ describe('JobAnalyzer', () => {
     expect(await jobAnalyzer[func](undefined)).toEqual(response);
 
     const usersAfter = await Users.find({});
-    expect(usersBefore).toEqual(usersAfter);
+    expect(JSON.stringify(usersBefore)).toEqual(JSON.stringify(usersAfter));
   };
 
   // Helper function that tests functions with a single user id as the input
@@ -123,7 +135,7 @@ describe('JobAnalyzer', () => {
     expect(await jobAnalyzer[func]({})).toEqual(response);
 
     const usersAfter = await Users.find({});
-    expect(usersBefore).toEqual(usersAfter);
+    expect(JSON.stringify(usersBefore)).toEqual(JSON.stringify(usersAfter));
   };
 
   test('No Keywords', async () => {
@@ -143,254 +155,46 @@ describe('JobAnalyzer', () => {
     expect(job.keywords[2].count).toEqual(0);
   });
 
-  test('computeJobScores: undefined skillsEnd', async () => {
+  test('computeJobScores: Undefined SkillsEnd', async () => {
     await testComputeJobScoresJobKeywordsStaySame(1);
   });
 
-  test('computeJobScores: undefined skillsStart and skillsEnd', async () => {
+  test('computeJobScores: Undefined SkillsStart and SkillsEnd', async () => {
     await testComputeJobScoresJobKeywordsStaySame();
   });
 
-  test('computeJobScores: some keywords', async () => {
+  test('computeJobScores: Specify Some Keywords', async () => {
     await testComputeJobScoresJobKeywordsStaySame(1, 2);
   });
 
-  test('computeJobScores: specify all keywords', async () => {
+  test('computeJobScores: Specify All Keywords', async () => {
     await testComputeJobScoresJobKeywordsStaySame(0, 4);
   });
 
-  test('getRelevantJobs: testEmptyId', async () => {
+  test('getRelevantJobs: Empty Id', async () => {
     await testEmptyId('getRelevantJobs');
   });
 
-  test('getRelevantJobs: testInvalidUser', async () => {
+  test('getRelevantJobs: Invalid Users', async () => {
     await testInvalidUser('getRelevantJobs');
   });
 
-  // test('addFriend: Invalid Users', async () => {
-  //   await testInvalidUsers('addFriend');
-  //   expect(messenger.requestFriend).toHaveBeenCalledTimes(0);
-  // });
+  // TODO: make users with no, some, all keywords
+  // TODO: relabel global constants
+  test('getRelevantJobs: User has no Keywords', async () => {
+    const userIds = await Users.find({}, '_id').lean();
+    console.log(typeof userIds[0]._id);
+    await jobAnalyzer.getRelevantJobs(userIds[0]._id);
+    expect(jobAnalyzer._getJobsForUserWithNoKeywords).toHaveBeenCalledTimes(1);
+  });
 
-  // test('addFriend: Self', async () => {
-  //   const response = new Response(false, 'Cannot add self as a friend', 400);
-  //   const usersBefore = await Users.find({});
+  test('getRelevantJobs: User has all Keywords', async () => {
+  });
 
-  //   expect(await friend.addFriend(user1Id, user1Id)).toEqual(response);
-  //   expect(await friend.addFriend(user2Id, user2Id)).toEqual(response);
-  //   expect(messenger.requestFriend).toHaveBeenCalledTimes(0);
+  test('getRelevantJobs: User exceeded Max Job Count', async () => {
+  });
 
-  //   const usersAfter = await Users.find({});
-  //   expect(usersBefore).toEqual(usersAfter);
-  // });
+  test('getRelevantJobs: User has some Keywords', async () => {
+  });
 
-  // test('addFriend: Success', async () => {
-  //   const response = new Response(true, '', 200);
-  //   expect(await friend.addFriend(user1Id, user2Id)).toEqual(response);
-  //   expect(messenger.requestFriend).toHaveBeenCalledTimes(1);
-
-  //   const user2 = await Users.findById(user2Id);
-  //   const user1 = await Users.findById(user1Id);
-  //   expect(user1.pendingFriends.length).toBe(0);
-  //   expect(user2.pendingFriends.length).toBe(1);
-  //   expect(JSON.stringify(user2.pendingFriends[0])).toEqual(JSON.stringify(user1Id));
-
-  //   expect(user1.friends.length).toBe(0);
-  //   expect(user2.friends.length).toBe(0);
-  // });
-
-  // test('addFriend: Already Pending', async () => {
-  //   await Users.findByIdAndUpdate(user2Id, {
-  //     $addToSet: {
-  //       pendingFriends: user1Id,
-  //     },
-  //   });
-  //   const response1 = new Response(false, 'Friend has already been added', 400);
-  //   const response2 = new Response(false, 'Friend already a pending friend of user', 400);
-
-  //   const usersBefore = await Users.find({});
-  //   expect(await friend.addFriend(user1Id, user2Id)).toEqual(response1);
-  //   expect(await friend.addFriend(user2Id, user1Id)).toEqual(response2);
-
-  //   const usersAfter = await Users.find({});
-  //   expect(usersBefore).toEqual(usersAfter);
-  // });
-
-  // test('removeFriend: Empty Ids', async () => {
-  //   await testEmptyIds('removeFriend');
-  // });
-
-  // test('removeFriend: Invalid Users', async () => {
-  //   await testInvalidUsers('removeFriend');
-  // });
-
-  // test('removeFriend: Not Friends', async () => {
-  //   const response = new Response(false, 'Not a friend', 400);
-  //   const usersBefore = await Users.find({});
-
-  //   expect(await friend.removeFriend(user1Id, user1Id)).toEqual(response);
-  //   expect(await friend.removeFriend(user2Id, user2Id)).toEqual(response);
-
-  //   const usersAfter = await Users.find({});
-  //   expect(usersBefore).toEqual(usersAfter);
-  // });
-
-  // test('removeFriend: Success', async () => {
-  //   await Users.findByIdAndUpdate(user2Id, {
-  //     $addToSet: {
-  //       friends: user1Id,
-  //     },
-  //   });
-  //   await Users.findByIdAndUpdate(user1Id, {
-  //     $addToSet: {
-  //       friends: user2Id,
-  //     },
-  //   });
-  //   const response = new Response(true, '', 200);
-  //   expect(await friend.removeFriend(user1Id, user2Id)).toEqual(response);
-
-  //   const user1 = await Users.findById(user1Id);
-  //   const user2 = await Users.findById(user2Id);
-  //   expect(user1.friends.length).toBe(0);
-  //   expect(user2.friends.length).toBe(0);
-  // });
-
-  // test('confirmFriend: Empty Ids', async () => {
-  //   await testEmptyIds('confirmFriend');
-  // });
-
-  // test('confirmFriend: Invalid Users', async () => {
-  //   await testInvalidUsers('confirmFriend');
-  // });
-
-  // test('confirmFriend: Not Pending Friend', async () => {
-  //   const response = new Response(false, 'Not a pending friend', 400);
-  //   const usersBefore = await Users.find({});
-
-  //   expect(await friend.confirmFriend(user1Id, user1Id)).toEqual(response);
-  //   expect(await friend.confirmFriend(user2Id, user2Id)).toEqual(response);
-
-  //   const usersAfter = await Users.find({});
-  //   expect(usersBefore).toEqual(usersAfter);
-  // });
-
-  // test('confirmFriend: Success', async () => {
-  //   await Users.findByIdAndUpdate(user1Id, {
-  //     $addToSet: {
-  //       pendingFriends: user2Id,
-  //     },
-  //   });
-  //   const response = new Response(true, '', 200);
-  //   expect(await friend.confirmFriend(user1Id, user2Id)).toEqual(response);
-
-  //   const user1 = await Users.findById(user1Id);
-  //   const user2 = await Users.findById(user2Id);
-  //   expect(user1.friends.length).toBe(1);
-  //   expect(user2.friends.length).toBe(1);
-  //   expect(user1.pendingFriends.length).toBe(0);
-  //   expect(JSON.stringify(user1.friends[0])).toEqual(JSON.stringify(user2Id));
-  //   expect(JSON.stringify(user2.friends[0])).toEqual(JSON.stringify(user1Id));
-  // });
-
-  // test('removePendingFriend: Empty Ids', async () => {
-  //   await testEmptyIds('removePendingFriend');
-  // });
-
-  // test('removePendingFriend: Invalid Users', async () => {
-  //   await testInvalidUsers('removePendingFriend');
-  // });
-
-  // test('removePendingFriend: Not Pending Friend', async () => {
-  //   const response = new Response(false, 'Not a pending friend', 400);
-  //   const usersBefore = await Users.find({});
-
-  //   expect(await friend.removePendingFriend(user1Id, user1Id)).toEqual(response);
-  //   expect(await friend.removePendingFriend(user2Id, user2Id)).toEqual(response);
-
-  //   const usersAfter = await Users.find({});
-  //   expect(usersBefore).toEqual(usersAfter);
-  // });
-
-  // test('removePendingFriend: Success', async () => {
-  //   await Users.findByIdAndUpdate(user1Id, {
-  //     $addToSet: {
-  //       pendingFriends: user2Id,
-  //     },
-  //   });
-  //   const response = new Response(true, '', 200);
-  //   expect(await friend.removePendingFriend(user1Id, user2Id)).toEqual(response);
-
-  //   const user1 = await Users.findById(user1Id);
-  //   const user2 = await Users.findById(user2Id);
-  //   expect(user1.pendingFriends.length).toBe(0);
-  //   expect(user2.pendingFriends.length).toBe(0);
-  // });
-
-  // test('getFriends: Empty Id', async () => {
-  //   await testEmptyId('getFriends');
-  // });
-
-  // test('getFriends: Invalid User', async () => {
-  //   await testInvalidUser('getFriends');
-  // });
-
-  // test('getFriends: No Friends', async () => {
-  //   const response = new Response([], '', 200);
-
-  //   expect(await friend.getFriends(user1Id)).toEqual(response);
-  // });
-
-  // test('getFriends: Has Friends', async () => {
-  //   await Users.findByIdAndUpdate(user2Id, {
-  //     $addToSet: {
-  //       friends: user1Id,
-  //     },
-  //   });
-  //   await Users.findByIdAndUpdate(user1Id, {
-  //     $addToSet: {
-  //       friends: user2Id,
-  //     },
-  //   });
-
-  //   const response1 = new Response([{
-  //     _id: user2Id,
-  //     userName: 'user2',
-  //   }], '', 200);
-  //   const response2 = new Response([{
-  //     _id: user1Id,
-  //     userName: 'user1',
-  //   }], '', 200);
-
-  //   expect(await friend.getFriends(user1Id)).toEqual(response1);
-  //   expect(await friend.getFriends(user2Id)).toEqual(response2);
-  // });
-
-  // test('getPendingFriends: Empty Id', async () => {
-  //   await testEmptyId('getPendingFriends');
-  // });
-
-  // test('getPendingFriends: Invalid User', async () => {
-  //   await testInvalidUser('getPendingFriends');
-  // });
-
-  // test('getPendingFriends: No Pending Friends', async () => {
-  //   const response = new Response([], '', 200);
-
-  //   expect(await friend.getPendingFriends(user1Id)).toEqual(response);
-  // });
-
-  // test('getPendingFriends: Has Pending Friends', async () => {
-  //   await Users.findByIdAndUpdate(user1Id, {
-  //     $addToSet: {
-  //       pendingFriends: user2Id,
-  //     },
-  //   });
-
-  //   const response = new Response([{
-  //     _id: user2Id,
-  //     userName: 'user2',
-  //   }], '', 200);
-
-  //   expect(await friend.getPendingFriends(user1Id)).toEqual(response);
-  // });
 });

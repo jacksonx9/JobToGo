@@ -115,9 +115,55 @@
         },
         {
             "credentials": {
+                "userName": "user1",
+                "email": "user1@mail.com"
+            },
+            "keywords": [
+                {
+                    "name": "rust",
+                    "score": 0,
+                    "jobCount": 0,
+                    "timeStamp": "2019-10-22T21:40:15.127Z"
+                },
+                {
+                    "name": "python",
+                    "score": 0,
+                    "jobCount": 0,
+                    "timeStamp": "2019-10-22T21:40:15.127Z"
+                },
+                {
+                    "name": "java",
+                    "score": 0,
+                    "jobCount": 0,
+                    "timeStamp": "2019-10-22T21:40:15.127Z"
+                }
+            ]
+        },
+        {
+            "credentials": {
                 "userName": "user2",
                 "email": "user2@mail.com"
-            }
+            },
+            "keywords": [
+                {
+                    "name": "rust",
+                    "score": 0,
+                    "jobCount": 0,
+                    "timeStamp": "2019-10-22T21:40:15.127Z"
+                },
+                {
+                    "name": "python",
+                    "score": 0,
+                    "jobCount": 0,
+                    "timeStamp": "2019-10-22T21:40:15.127Z"
+                },
+                {
+                    "name": "java",
+                    "score": 0,
+                    "jobCount": 0,
+                    "timeStamp": "2019-10-22T21:40:15.127Z"
+                }
+            ]
         }
     ]
 }
