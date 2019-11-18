@@ -347,7 +347,7 @@ describe('JobAnalyzer', () => {
       },
       {
         "_id": 1,
-       "keywords": [
+        "keywords": [
           {
               "name": "rust",
               "tfidf": 0.6931471805599453,
