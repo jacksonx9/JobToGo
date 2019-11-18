@@ -74,7 +74,7 @@ describe('JobAnalyzer', () => {
   });
 
   afterEach(async () => {
-    // Delete all users after each test
+    // Delete all users and jobs after each test
     await Users.deleteMany({});
     await Jobs.deleteMany({});
     // Make sure to clear all mock state (e.g. number of times called)
