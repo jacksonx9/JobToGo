@@ -39,7 +39,8 @@ class JobAnalyzer {
     keywords.forEach((keyword) => {
       // TODO: matches "java" with "javascript" from description
       // NOTE: if you map with spaces around it, problems such as "java," being excluded arise
-      const re = new RegExp(keyword, 'g');
+      const keywordRe = keyword.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+      const re = new RegExp(keywordRe, 'g');
       job.keywords.push({
         name: keyword,
         count: (description.match(re) || []).length,
@@ -77,7 +78,6 @@ class JobAnalyzer {
         const tfidf = tf * idf;
 
         // replace tf_idf score for a keyword for each job
-        assert(tfidf >= 0 && tfidf <= 1);
         jobs[jobIdx].keywords[allKeywordIdx].tfidf = tfidf;
 
         await job.save();
