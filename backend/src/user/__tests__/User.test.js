@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 import { Express } from 'jest-express/lib/express';
-import scheduler from 'node-schedule';
 
-import JobShortLister from '..';
+import User from '..';
 import Response from '../../types';
-import { Users, Jobs } from '../../schema';
+import { Users } from '../../schema';
+import credentials from '../../credentials/google';
 import testData from './test_data';
 
 jest.mock('../../messenger');
