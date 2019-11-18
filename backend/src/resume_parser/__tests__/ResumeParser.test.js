@@ -37,6 +37,7 @@ describe('Resume Parser', () => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useFindAndModify: false,
+      useCreateIndex: true,
     });
 
     const app = new Express();

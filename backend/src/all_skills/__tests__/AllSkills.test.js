@@ -17,6 +17,7 @@ describe('AllSkills', () => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useFindAndModify: false,
+      useCreateIndex: true,
     });
 
     jobAnalyzer = new JobAnalyzer();

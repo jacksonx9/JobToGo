@@ -52,6 +52,7 @@ class Server {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useFindAndModify: false,
+        useCreateIndex: true,
       }).then(() => this.logger.info('MongoDB connected.'));
 
       // Setup modules

@@ -24,6 +24,7 @@ describe('JobShortLister', () => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useFindAndModify: false,
+      useCreateIndex: true,
     });
 
     scheduler.scheduleJob = jest.fn((rule, callback) => {
