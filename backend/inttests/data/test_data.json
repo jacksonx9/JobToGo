@@ -4,13 +4,19 @@
             "credentials": {
                 "userName": "user1",
                 "email": "user1@mail.com",
+                "password": "pw",
                 "firebaseToken": "user1firebaseToken"
+            },
+            "userInfo": {
+                "location": "Vancouver",
+                "jobType": "internship"
             }
         },
         {
             "credentials": {
                 "userName": "user2",
                 "email": "user2@mail.com",
+                "password": "pw",
                 "firebaseToken": "user2firebaseToken"
             }
         },

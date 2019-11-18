@@ -4,6 +4,7 @@ import axios from 'axios';
 import stopword from 'stopword';
 import cheerio from 'cheerio';
 import indeed from 'indeed-scraper';
+import { OAuth2Client } from 'google-auth-library';
 
 import jobConfig from '../../src/job_searcher/config';
 import testData from '../data/test_data';
@@ -80,6 +81,16 @@ const mockSearcher = () => {
   });
 };
 
+const mockUser = () => {
+  OAuth2Client.prototype.verifyIdToken = jest.fn(() => new Promise((resolve) => {
+    resolve({
+      payload: {
+        email: testData.users[0].credentials.email,
+      },
+    });
+  }));
+};
+
 export {
-  mockMessenger, mockResume, mockSearcher, send, sendMail,
+  mockMessenger, mockResume, mockSearcher, mockUser, send, sendMail,
 };

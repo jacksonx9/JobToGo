@@ -26,6 +26,7 @@ class User {
     });
 
     app.post('/users', async (req, res) => {
+      // TODO: verify userData contains password
       const response = await User.createUser(req.body.userData);
       res.status(response.status).send(response);
     });
@@ -59,18 +60,6 @@ class User {
       return new Response(user._id, '', 200);
     } catch (e) {
       return new Response(null, 'Malformed userData or user already exists', 400);
-    }
-  }
-
-  // check for existing user in database (via email)
-  async _userExists(userEmail) {
-    try {
-      await Users.findOne({
-        'credentials.email': userEmail,
-      }).orFail();
-      return true;
-    } catch (e) {
-      return false;
     }
   }
 
