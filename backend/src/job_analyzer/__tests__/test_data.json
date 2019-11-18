@@ -115,7 +115,7 @@
         },
         {
             "credentials": {
-                "userName": "user1",
+                "userName": "user2",
                 "email": "user1@mail.com"
             },
             "keywords": [
@@ -127,8 +127,8 @@
                 },
                 {
                     "name": "python",
-                    "score": 0,
-                    "jobCount": 0,
+                    "score": 3,
+                    "jobCount": 1,
                     "timeStamp": "2019-10-22T21:40:15.127Z"
                 },
                 {
@@ -141,16 +141,10 @@
         },
         {
             "credentials": {
-                "userName": "user2",
+                "userName": "user3",
                 "email": "user2@mail.com"
             },
             "keywords": [
-                {
-                    "name": "rust",
-                    "score": 0,
-                    "jobCount": 0,
-                    "timeStamp": "2019-10-22T21:40:15.127Z"
-                },
                 {
                     "name": "python",
                     "score": 0,
@@ -159,8 +153,8 @@
                 },
                 {
                     "name": "java",
-                    "score": 0,
-                    "jobCount": 0,
+                    "score": 7,
+                    "jobCount": 3,
                     "timeStamp": "2019-10-22T21:40:15.127Z"
                 }
             ]

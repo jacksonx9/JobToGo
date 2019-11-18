@@ -132,11 +132,11 @@ class JobAnalyzer {
     return new Response(mostRelevantJobs, '', 200);
   }
 
-  async _getJobsForUserWithNoKeywords(seenJobs, numJobsToSend) {
+  async _getJobsForUserWithNoKeywords(seenJobIds, numJobsToSend) {
     const randomJobs = [];
 
     randomJobs.push(
-      ...await Jobs.find({ _id: { $nin: seenJobs } }).limit(numJobsToSend).lean(),
+      ...await Jobs.find({ _id: { $nin: seenJobIds } }).limit(numJobsToSend).lean(),
     );
 
     this._deleteJobKeywords(randomJobs);
@@ -221,6 +221,7 @@ class JobAnalyzer {
       if (pivot - left === k - 1) {
         return jobs.slice(0, numJobsToSend);
       }
+
       // If pivot is more, recur for left subarray
       if (pivot - left > k - 1) {
         return getKSmallestElements(left, pivot - 1, k);
