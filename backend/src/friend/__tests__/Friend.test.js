@@ -22,6 +22,7 @@ describe('Friend', () => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useFindAndModify: false,
+      useCreateIndex: true,
     });
 
     app = new Express();
