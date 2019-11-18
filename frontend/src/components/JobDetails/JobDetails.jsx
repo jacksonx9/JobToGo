@@ -38,8 +38,10 @@ class JobDetails extends Component {
           visible={modalVisible}
         >
           <View style={styles.detailsContainer}>
-            <ImageButton
-              source={images.iconChevronDown}
+            <IconButton
+              name="chevron-down"
+              color={colours.white}
+              size={sizes.iconLg}
               onPress={() => {
                 this.setModalVisible(false);
               }}
@@ -53,16 +55,18 @@ class JobDetails extends Component {
             </View>
             <View style={styles.infoContainer}>
               <View style={[styles.subHeaderContainer]}>
-                <Image
-                  source={images.iconJob}
-                  styles={[styles.icon]}
+                <Icon
+                  name="briefcase"
+                  color={colours.white}
+                  size={17}
                 />
                 <Text style={styles.subHeaderDark}>{title}</Text>
               </View>
               <View style={[styles.subHeaderContainer]}>
-                <Image
-                  source={images.iconLocation}
-                  styles={[styles.icon]}
+                <Icon
+                  name="map-pin"
+                  color={colours.white}
+                  size={17}
                 />
                 <Text style={styles.subHeaderDark}>{location}</Text>
               </View>

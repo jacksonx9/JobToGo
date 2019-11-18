@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   normalText: {
     fontFamily: fonts.normal,
     fontSize: fonts.md,
-    color: colours.secondary,
+    color: colours.white,
   },
   headerDark: {
     fontFamily: fonts.semiBold,

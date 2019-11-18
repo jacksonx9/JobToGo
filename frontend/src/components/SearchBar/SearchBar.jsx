@@ -2,14 +2,17 @@ import React from 'react';
 import { View, TextInput } from 'react-native';
 import { string, func } from 'prop-types';
 
-import ImageButton from '../ImageButton';
+import IconButton from '../IconButton';
 import images from '../../constants/images';
 import styles from './styles';
+import { colours, sizes } from '../../styles';
 
 const SearchBar = ({ value, onChangeText, onEndSearch }) => (
   <View style={styles.container}>
-    <ImageButton
-      source={images.iconChevronLeft}
+    <IconButton
+      name="chevron-left"
+      color={colours.lightGray}
+      size={sizes.icon}
       onPress={onEndSearch}
     />
     <TextInput

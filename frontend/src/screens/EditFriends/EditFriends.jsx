@@ -116,18 +116,22 @@ export default class EditFriends extends Component {
     let users;
     let onPress;
     let noUsersMsg;
+    let actionIcon;
     if (searchInProgress) {
       users = friends; // TODO: change to user query results
       onPress = this.addFriend;
       noUsersMsg = status.noResults;
+      actionIcon = '+';
     } else if (showPendingFriends) {
       users = pendingFriends;
       onPress = this.comfirmFriendRequest;
       noUsersMsg = status.noPendingFriends;
+      actionIcon = '+';
     } else {
       users = friends;
       onPress = this.removeFriend;
       noUsersMsg = status.noFriends;
+      actionIcon = 'x';
     }
 
     const noUsers = users.length === 0;
@@ -142,7 +146,7 @@ export default class EditFriends extends Component {
             header={item.userName}
             subHeader={item.email}
             onPress={() => onPress(item, index)}
-            actionIcon="x"
+            actionIcon={actionIcon}
           />
         )}
       />
@@ -158,7 +162,10 @@ export default class EditFriends extends Component {
         <Search
           value={addFriendName}
           onChangeText={text => this.searchUsers(text)}
-          onEndSearch={() => { this.setState({ addFriendName: '', searchInProgress: false }); }}
+          onEndSearch={() => {
+            this.setState({ addFriendName: '', searchInProgress: false });
+            this.addFriend(); // TODO: Remove this once user search is implemented
+          }}
         >
           {noUsers ? noUsersInfo : userList}
         </Search>

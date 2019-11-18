@@ -2,9 +2,10 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { string, func, oneOf } from 'prop-types';
 
-import ImageButton from '../ImageButton';
+import IconButton from '../IconButton';
 import images from '../../constants/images';
 import styles from './styles';
+import { colours, sizes } from '../../styles';
 
 
 const NavHeader = ({
@@ -13,15 +14,19 @@ const NavHeader = ({
   let button;
   if (buttonOption === 'search') {
     button = (
-      <ImageButton
-        source={images.iconSearch}
+      <IconButton
+        name="search"
+        color={colours.lightGray}
+        size={sizes.icon}
         onPress={onPressButton}
       />
     );
   } else if (buttonOption === 'back') {
     button = (
-      <ImageButton
-        source={images.iconChevronLeft}
+      <IconButton
+        name="menu"
+        color={colours.lightGray}
+        size={sizes.icon}
         onPress={onPressButton}
       />
     );
@@ -35,8 +40,10 @@ const NavHeader = ({
         <View style={styles.leftComponentContainer}>
           {button}
         </View>
-        <ImageButton
-          source={images.iconMenu}
+        <IconButton
+          name="user"
+          color={colours.lightGray}
+          size={sizes.icon}
           onPress={onPressButton}
         />
       </View>
