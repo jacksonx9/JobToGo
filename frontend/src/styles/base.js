@@ -58,6 +58,7 @@ export const fonts = {
 
 export const sizes = {
   icon: 25,
+  iconLg: 30,
 };
 
 export const containers = {

@@ -1,16 +1,19 @@
 import React from 'react';
 import { View, Image } from 'react-native';
-import { number, func } from 'prop-types';
+import { func } from 'prop-types';
 
-import ImageButton from '../ImageButton';
+import IconButton from '../IconButton';
 import images from '../../constants/images';
 import styles from './styles';
+import { colours, sizes } from '../../styles';
 
-const MainHeader = ({ buttonSource, onPress }) => (
+const MainHeader = ({ onPress }) => (
   <View style={styles.container}>
     <View style={styles.buttonContainer}>
-      <ImageButton
-        source={buttonSource}
+      <IconButton
+        name="inbox"
+        color={colours.lightGray}
+        size={sizes.iconLg}
         onPress={onPress}
       />
     </View>
@@ -21,7 +24,6 @@ const MainHeader = ({ buttonSource, onPress }) => (
 );
 
 MainHeader.propTypes = {
-  buttonSource: number.isRequired,
   onPress: func.isRequired,
 };
 

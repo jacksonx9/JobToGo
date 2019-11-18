@@ -4,11 +4,14 @@ import {
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import PropTypes from 'prop-types';
+import Icon from 'react-native-vector-icons/Feather';
 
 import JobImage from '../JobImage';
 import ImageButton from '../ImageButton';
+import IconButton from '../IconButton';
 import images from '../../constants/images';
 import styles from './styles';
+import { colours, sizes } from '../../styles';
 
 class JobDetails extends Component {
   constructor(props) {
@@ -63,8 +66,6 @@ class JobDetails extends Component {
                 />
                 <Text style={styles.subHeaderDark}>{location}</Text>
               </View>
-
-
             </View>
             <ScrollView style={styles.descContainer}>
               <Text style={styles.normalText}>{description}</Text>
@@ -72,28 +73,34 @@ class JobDetails extends Component {
           </View>
         </Modal>
 
-        <View style={[styles.textContainer]}>
-          <ImageButton
-            source={images.iconChevronUp}
+        <View style={styles.textContainer}>
+          <Text style={styles.header}>{company}</Text>
+          <View style={styles.subHeaderContainer}>
+            <Icon
+              name="briefcase"
+              color={colours.lightGray}
+              size={17}
+            />
+            <Text style={styles.subHeader}>{title}</Text>
+          </View>
+          <View style={styles.subHeaderContainer}>
+            <Icon
+              name="map-pin"
+              color={colours.lightGray}
+              size={17}
+            />
+            <Text style={styles.subHeader}>{location}</Text>
+          </View>
+        </View>
+        <View style={styles.expandBtnContainer}>
+          <IconButton
+            name="info"
+            color={colours.lightGray}
+            size={sizes.icon}
             onPress={() => {
               this.setModalVisible(true);
             }}
           />
-          <Text style={[styles.header]}>{company}</Text>
-          <View style={[styles.subHeaderContainer]}>
-            <Image
-              source={images.iconJob}
-              styles={[styles.icon]}
-            />
-            <Text style={[styles.subHeader]}>{title}</Text>
-          </View>
-          <View style={[styles.subHeaderContainer]}>
-            <Image
-              source={images.iconLocation}
-              styles={[styles.icon]}
-            />
-            <Text style={[styles.subHeader]}>{location}</Text>
-          </View>
         </View>
       </View>
     );

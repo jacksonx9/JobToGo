@@ -187,14 +187,13 @@ export default class JobSwipe extends Component {
                   title={posting.title}
                   location={posting.location}
                   description={posting.description}
-                  isShared={posting.isShared}
+                  onPressShare={() => this.openJobShareModal()}
                 />
               )}
               onSwipedLeft={() => this.swipeJob(jobs, jobIndex, jobType,
                 this.swipeActionTypes.DISLIKE)}
               onSwipedRight={() => this.swipeJob(jobs, jobIndex, jobType,
                 this.swipeActionTypes.LIKE)}
-              onTapCard={() => this.openJobShareModal()}
               cardIndex={jobIndex}
               marginTop={35}
               backgroundColor={colours.white}

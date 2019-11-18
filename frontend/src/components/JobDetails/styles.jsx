@@ -1,23 +1,26 @@
 import { StyleSheet } from 'react-native';
 
-import { colours, fonts, margin, padding, border, elevation } from '../../styles';
+import {
+  colours, fonts, margin, padding, elevation,
+} from '../../styles';
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 15,
-    justifyContent: 'center',
-    height: 150,
-    width: '100%',
-    overflow: 'scroll',
-    backgroundColor: 'white',
-  },
-  textContainer: {
-    paddingVertical: 7,
-    paddingHorizontal: 30,
     flexDirection: 'column',
     justifyContent: 'flex-start',
-    height: 100,
+    alignItems: 'flex-start',
+    height: '55%',
+    width: '100%',
     overflow: 'scroll',
+    backgroundColor: colours.white,
+  },
+  textContainer: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    height: '85%',
+    width: '100%',
+    overflow: 'scroll',
+    backgroundColor: colours.white,
   },
   subHeaderContainer: {
     flexDirection: 'row',
@@ -39,13 +42,13 @@ const styles = StyleSheet.create({
     overflow: 'scroll',
   },
   header: {
-    fontFamily: fonts.semiBold,
-    fontSize: fonts.md,
-    color: colours.white,
-    marginBottom: margin.sm,
+    fontFamily: fonts.bold,
+    fontSize: fonts.lg,
+    color: colours.gray,
+    marginBottom: margin.md,
   },
   subHeader: {
-    fontFamily: fonts.semiBold,
+    fontFamily: fonts.bold,
     fontSize: fonts.md,
     color: colours.gray,
     marginLeft: margin.sm,
@@ -54,8 +57,16 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
   },
+  expandBtnContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+    height: '15%',
+    width: '100%',
+    backgroundColor: colours.pink,
+  },
 
-  
+
   detailsContainer: {
     height: '85%',
     width: '100%',
