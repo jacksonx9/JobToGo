@@ -54,7 +54,7 @@ describe('JobAnalyzer', () => {
       },
       {
         ...testData.users[2],
-      }
+      },
     ]);
     // Insert Jobs
     await Jobs.insertMany([
@@ -92,7 +92,7 @@ describe('JobAnalyzer', () => {
         && (skillsEnd === undefined || skillsEnd > i);
       if (delKeywordCond) {
         testData.jobs.forEach((job) => {
-          delete job.keywords[i].tfidf;
+          job.keywords[i].tfidf = -1;
         });
       }
     });
@@ -274,7 +274,7 @@ describe('JobAnalyzer', () => {
     const jobs = await Jobs.find({}).lean();
     delete jobs[0].keywords;
     await jobAnalyzer._deleteJobKeywords([jobs[0]]);
-    expect(jobs[0]['keywords']).toEqual(undefined);
+    expect(jobs[0].keywords).toEqual(undefined);
   });
 
   test('_deleteJobKeywords: Many Keywords', async () => {
@@ -352,12 +352,12 @@ describe('JobAnalyzer', () => {
           {
             name: 'rust',
             tfidf: 0.6931471805599453,
-            count: 1
+            count: 1,
           },
           {
             name: 'python',
             tfidf: 0,
-            count: 0
+            count: 0,
           },
           {
             name: 'java',
