@@ -2,6 +2,22 @@ import admin from 'firebase-admin';
 import nodemailer from 'nodemailer';
 import axios from 'axios';
 import stopword from 'stopword';
+import cheerio from 'cheerio';
+import indeed from 'indeed-scraper';
+
+import jobConfig from '../../src/job_searcher/config';
+import testData from '../data/test_data';
+
+// Custom HTTP error for mocking axios
+class HTTPError extends Error {
+  constructor(status) {
+    super('');
+    this.response = {
+      status,
+      statusText: '',
+    };
+  }
+}
 
 const send = jest.fn();
 const sendMail = jest.fn();
@@ -32,6 +48,38 @@ const mockResume = () => {
   }));
 };
 
+const mockSearcher = () => {
+  indeed.query = jest.fn(() => new Promise(resolve => resolve(
+    JSON.parse(JSON.stringify(testData.jobs)),
+  )));
+  axios.get = jest.fn(url => new Promise((resolve, reject) => {
+    const jobIdx = testData.jobs.findIndex(job => job.url === url);
+    // Arbitrarily choose the first job to fail
+    if (jobIdx === 0) {
+      reject(new HTTPError(404));
+    } else {
+      resolve({ data: JSON.parse(JSON.stringify(testData.jobs[jobIdx])) });
+    }
+  }));
+  cheerio.load = jest.fn(job => (selector) => {
+    // Mock cheerio for job searching
+    if (selector === jobConfig.indeedJobDescTag) {
+      return { text: () => job.description };
+    }
+    if (selector === jobConfig.indeedJobUrlTag) {
+      return { attr: () => job.url };
+    }
+    // Mock cheerio for job removing
+    if (job.url === testData.jobs[1].url && selector === jobConfig.indeedExpiredTags[0]) {
+      return { length: 1 };
+    }
+    if (job.url === testData.jobs[2].url && selector === jobConfig.indeedExpiredTags[1]) {
+      return { length: 2 };
+    }
+    return { length: 0 };
+  });
+};
+
 export {
-  mockMessenger, mockResume, send, sendMail,
+  mockMessenger, mockResume, mockSearcher, send, sendMail,
 };
