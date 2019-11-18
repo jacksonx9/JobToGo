@@ -92,7 +92,7 @@ describe('JobAnalyzer', () => {
         && (skillsEnd === undefined || skillsEnd > i);
       if (delKeywordCond) {
         testData.jobs.forEach((job) => {
-          job.keywords[i].tfidf = -1;
+          delete job.keywords[i].tfidf;
         });
       }
     });
@@ -372,12 +372,12 @@ describe('JobAnalyzer', () => {
           {
             name: 'rust',
             tfidf: 0,
-            count: 0
+            count: 0,
           },
           {
             name: 'python',
             tfidf: 0,
-            count: 0
+            count: 0,
           },
           {
             name: 'java',
