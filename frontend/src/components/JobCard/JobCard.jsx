@@ -13,11 +13,12 @@ const JobCard = ({
 }) => (
   <View style={styles.container}>
     <View style={styles.shareContainer}>
-      <IconButton 
-      name="share-2" 
-      color={colours.lightGray} 
-      size={sizes.icon} 
-      onPress={onPressShare} />
+      <IconButton
+        name="share-2"
+        color={colours.lightGray}
+        size={sizes.icon}
+        onPress={onPressShare}
+      />
     </View>
     <View style={styles.contentContainer}>
       <JobImage

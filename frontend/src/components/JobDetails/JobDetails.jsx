@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-  Text, View, Image, Modal,
+  Text, View, Modal,
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import PropTypes from 'prop-types';

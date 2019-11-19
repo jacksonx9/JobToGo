@@ -3,7 +3,6 @@ import { View, Text } from 'react-native';
 import { string, func, oneOf } from 'prop-types';
 
 import IconButton from '../IconButton';
-import images from '../../constants/images';
 import styles from './styles';
 import { colours, sizes } from '../../styles';
 
