@@ -1,22 +1,32 @@
 import mongoose from 'mongoose';
 import { Express } from 'jest-express/lib/express';
+import { OAuth2Client } from 'google-auth-library';
 
 import User from '..';
 import Response from '../../types';
 import { Users } from '../../schema';
-import credentials from '../../credentials/google';
 import testData from './test_data';
+import AllSkills from '../../all_skills';
 
-jest.mock('../../messenger');
-jest.mock('node-schedule');
 
-describe('JobShortLister', () => {
-  let jobShortLister;
-  let app;
-  let userId;
-  let invalidUserId;
-  let jobId;
-  let invalidJobId;
+const mockUser = () => {
+  OAuth2Client.prototype.verifyIdToken = jest.fn(({idToken, audience}) => new Promise((resolve) => {
+    if (audience !== null && idToken === 'idToken') {
+      resolve({
+        payload: {
+          email: testData.validUserData.credentials.email,
+        },
+      });
+    } else {
+      throw 'invalid idToken';
+    }
+  }));
+};
+
+describe('User', () => {
+  let user;
+  let user1Id;
+  let allSkills;
 
   beforeAll(async () => {
     // Connect to the in-memory db
@@ -27,12 +37,9 @@ describe('JobShortLister', () => {
       useCreateIndex: true,
     });
 
-    scheduler.scheduleJob = jest.fn((rule, callback) => {
-      callback();
-    });
-
-    app = new Express();
-    jobShortLister = new JobShortLister(app);
+    const app = new Express();
+    allSkills = new AllSkills();
+    user = new User(app, allSkills);
   });
 
   afterAll(async () => {
@@ -40,285 +47,147 @@ describe('JobShortLister', () => {
   });
 
   beforeEach(async () => {
-    // We create all users, jobs before each test case instead of test suite so that
+    // We create all users before each test case instead of test suite so that
     // the tests can be run in any order
-    const user = await Users.create({
-      credentials: {
-        ...testData.users[0].credentials,
-      },
-    });
-    const invalidUser = await Users.create({
-      credentials: {
-        ...testData.users[1].credentials,
-      },
-    });
-    const jobs = await Jobs.insertMany(testData.jobs);
-    userId = user._id;
-    invalidUserId = invalidUser._id;
-    jobId = jobs[0]._id;
-    invalidJobId = jobs[jobs.length - 1]._id;
-    // Delete the user, job to invalidate the id
-    await Users.findByIdAndDelete(invalidUserId);
-    await Jobs.findByIdAndDelete(invalidJobId);
+    const user1 = await Users.create(testData.validUserData);
+    user1Id = user1._id;
 
-    // Add keywords to users and jobs
-    await Users.findByIdAndUpdate(userId, {
-      $push: {
-        keywords: testData.users[0].keywordData,
-      },
-    });
-    await Jobs.findByIdAndUpdate(jobId, {
-      $push: {
-        keywords: testData.jobKeywordData,
-      },
-    });
+    // Mock external APIs
+    mockUser();
+    // Mock external functions
+    allSkills.update = jest.fn(() => null);
   });
 
   afterEach(async () => {
-    // Delete all users, jobs after each test
     await Users.deleteMany({});
-    await Jobs.deleteMany({});
-    // Make sure to clear all mock state (e.g. number of times called)
+    jest.restoreAllMocks();
     jest.clearAllMocks();
   });
 
-  // Helper function that tests functions with a user id as the input
-  // Tests that an empty id will be rejected
-  const testEmptyId = async (func, result) => {
-    const response = new Response(result, 'Invalid userId', 400);
-    const usersBefore = await Users.find({}).lean();
-
-    expect(await jobShortLister[func](undefined)).toEqual(response);
-
-    const usersAfter = await Users.find({}).lean();
-    expect(usersBefore).toEqual(usersAfter);
-  };
-
-  // Helper function that tests functions with user id and job id as the input
+  // Helper function that tests functions with two user ids as the input
   // Tests that one or more empty ids will be rejected
   const testEmptyIds = async (func) => {
-    const response = new Response(false, 'Invalid userId or jobId', 400);
-    const usersBefore = await Users.find({}).lean();
+    const responseStatus = 400;
 
-    expect(await jobShortLister[func](undefined, undefined)).toEqual(response);
-    expect(await jobShortLister[func](userId, undefined)).toEqual(response);
-    expect(await jobShortLister[func](undefined, jobId)).toEqual(response);
-
-    const usersAfter = await Users.find({}).lean();
-    expect(usersBefore).toEqual(usersAfter);
+    let res = await user[func](undefined, undefined);
+    expect(res.status).toEqual(responseStatus);
+    res = await user[func](user1Id, undefined);
+    expect(res.status).toEqual(responseStatus);
+    res = await user[func](undefined, user1Id);
+    expect(res.status).toEqual(responseStatus);
+    res = await user[func]('invalid', 'invalid');
+    expect(res.status).toEqual(responseStatus);
   };
 
-  // Helper function that tests functions with a user id as the input
-  // Tests that an invalid id will be rejected
-  const testInvalidUserJob = async (func, result) => {
-    const response = new Response(result, 'Invalid userId', 400);
-    const usersBefore = await Users.find({}).lean();
-
-    expect(await jobShortLister[func](invalidUserId)).toEqual(response);
-    expect(await jobShortLister[func](123)).toEqual(response);
-    expect(await jobShortLister[func]('test')).toEqual(response);
-    expect(await jobShortLister[func]({})).toEqual(response);
-
-    const usersAfter = await Users.find({}).lean();
-    expect(usersBefore).toEqual(usersAfter);
-  };
-
-  // Helper function that tests functions with user id and job id as the input
-  // Tests that one or more invalid ids will be rejected
-  const testInvalidUserJobs = async (func) => {
-    const response = new Response(false, 'Invalid userId or jobId', 400);
-    const usersBefore = await Users.find({}).lean();
-
-    expect(await jobShortLister[func](userId, invalidJobId)).toEqual(response);
-    expect(await jobShortLister[func](invalidUserId, jobId)).toEqual(response);
-    expect(await jobShortLister[func](123, jobId)).toEqual(response);
-    expect(await jobShortLister[func]('test', jobId)).toEqual(response);
-    expect(await jobShortLister[func]({}, jobId)).toEqual(response);
-    expect(await jobShortLister[func](userId, 123)).toEqual(response);
-    expect(await jobShortLister[func](userId, 'test')).toEqual(response);
-    expect(await jobShortLister[func](userId, {})).toEqual(response);
-
-    const usersAfter = await Users.find({}).lean();
-    expect(usersBefore).toEqual(usersAfter);
-  };
-
-  test('setupDailyUpdateJobStore', async () => {
-    expect(scheduler.scheduleJob).toBeCalledTimes(1);
-    expect(scheduler.scheduleJob.mock.calls[0][0]).toBe('0 0 0 * * *');
+  test('createUser: Undefined User Data', async () => {
+    const expectedRes = new Response(null, 'Invalid userData', 400);
+    expect(await User.createUser(undefined)).toEqual(expectedRes);
   });
 
-  test('getSeenJobIds: Empty Id', () => {
-    expect(jobShortLister.getSeenJobIds(undefined)).rejects.toThrow(mongoose.Error);
+  test('createUser: Invalid User Data', async () => {
+    const expectedRes = new Response(null, 'Malformed userData or user already exists', 400);
+    expect(await User.createUser(testData.invalidUserData)).toEqual(expectedRes);
   });
 
-  test('getSeenJobIds: Invalid Id', () => {
-    expect(jobShortLister.getSeenJobIds(invalidUserId)).rejects.toThrow(mongoose.Error);
+  test('createUser: Valid User Data', async () => {
+    await Users.deleteMany({});
+    const res = await User.createUser(testData.validUserData);
+    expect(res.status).toEqual(200);
   });
 
-  test('getSeenJobIds: Success', async () => {
-    const jobs = await Jobs.find({});
-    const jobIds = jobs.map(job => job._id.toString());
-    await Users.findByIdAndUpdate(userId, { seenJobs: jobIds });
-
-    expect(await jobShortLister.getSeenJobIds(userId)).toEqual(jobIds);
+  test('login: Invalid Inputs', async () => {
+    testEmptyIds('login');
   });
 
-  test('addLikedJobs: Empty Ids', async () => {
-    await testEmptyIds('addLikedJobs');
+  test('login: Success', async () => {
+    const res = await user.login(testData.validUserData.credentials.email,
+      testData.validUserData.credentials.password);
+    expect(res.status).toEqual(200);
   });
 
-  test('addLikedJobs: Invalid Ids', async () => {
-    await testInvalidUserJobs('addLikedJobs');
+  test('loginGoogle: Invalid Inputs', async () => {
+    testEmptyIds('loginGoogle');
   });
 
-  test('addLikedJobs: Already selected job', async () => {
-    await Users.findByIdAndUpdate(userId, {
+  test('loginGoogle: Success', async () => {
+    await Users.deleteMany({});
+    const res = await user.loginGoogle('idToken', testData.validUserData.credentials.firebaseToken);
+    expect(res.status).toEqual(200);
+  });
+
+  test('updateUserInfo: Invalid Inputs', async () => {
+    testEmptyIds('updateUserInfo');
+  });
+
+  test('updateUserInfo: Valid Inputs', async () => {
+    const userData = {
+      location: 'hawaii',
+      jobType: 'internship',
+    };
+    const res = await user.updateUserInfo(user1Id, userData);
+    expect(res.status).toEqual(200);
+    const userRes = await Users.findById(user1Id).lean();
+    expect(userRes.userInfo).toEqual(userData);
+  });
+
+  test('getUser: Invalid Input', async () => {
+    const res = await user.getUser(undefined);
+    expect(res.status).toEqual(404);
+  });
+
+  test('getUser: Valid Username', async () => {
+    const expectResult = {
+      _id: user1Id,
+      userName: testData.validUserData.credentials.userName,
+      email: testData.validUserData.credentials.email,
+    }
+    const res = await user.getUser(testData.validUserData.credentials.userName);
+    expect(res.status).toEqual(200);
+    expect(res.result).toEqual(expectResult);
+  });
+
+  test('updateSkills: Invalid Inputs', async () => {
+    testEmptyIds('updateSkills');
+    expect(allSkills.update).toHaveBeenCalledTimes(0);
+  });
+
+  test('updateSkills: Valid Inputs', async () => {
+    await Users.findByIdAndUpdate(user1Id, {
       $addToSet: {
-        seenJobs: jobId,
+        keywords: {
+          name: 'oldSkill',
+        },
       },
     });
-    const response = new Response(false, 'Job already selected once', 400);
-    const usersBefore = await Users.find({}).lean();
-    expect(await jobShortLister.addLikedJobs(userId, jobId)).toEqual(response);
-
-    const usersAfter = await Users.find({}).lean();
-    expect(usersBefore).toEqual(usersAfter);
+    const keywords = ['newSkill', 'oldSkill'];
+    const res = await user.updateSkills(user1Id, keywords);
+    expect(res.status).toEqual(200);
+    const userRes = await Users.findById(user1Id).lean();
+    expect(userRes.keywords[1].name).toEqual(keywords[0]);
+    expect(allSkills.update).toHaveBeenCalledTimes(1);
   });
 
-  test('addLikedJobs: Success', async () => {
-    const response = new Response(true, '', 200);
-    expect(await jobShortLister.addLikedJobs(userId, jobId)).toEqual(response);
-
-    const user = await Users.findById(userId);
-    expect(user.dailyJobCount).toBe(1);
-    // Score should have increased by job keyword count
-    expect(user.keywords[0].score).toBe(testData.jobKeywordData[0].count);
-    expect(user.keywords[0].jobCount).toBe(1);
+  test('getSkills: Undefined Input', async () => {
+    const res = await user.getSkills(undefined);
+    expect(res.status).toEqual(400);
   });
 
-  test('addDislikedJobs: Empty Ids', async () => {
-    await testEmptyIds('addDislikedJobs');
+  test('getSkills: Invalid Input', async () => {
+    const res = await user.getSkills(123);
+    expect(res.status).toEqual(400);
   });
 
-  test('addDislikedJobs: Invalid Ids', async () => {
-    await testInvalidUserJobs('addDislikedJobs');
-  });
-
-  test('addDislikedJobs: Already selected job', async () => {
-    await Users.findByIdAndUpdate(userId, {
+  test('getSkills: Valid Inputs', async () => {
+    const jobName = 'newSkill';
+    await Users.findByIdAndUpdate(user1Id, {
       $addToSet: {
-        seenJobs: jobId,
+        keywords: {
+          name: jobName,
+        },
       },
     });
-    const response = new Response(false, 'Job already selected once', 400);
-    const usersBefore = await Users.find({}).lean();
-    expect(await jobShortLister.addDislikedJobs(userId, jobId)).toEqual(response);
-
-    const usersAfter = await Users.find({}).lean();
-    expect(usersBefore).toEqual(usersAfter);
-  });
-
-  test('addDislikedJobs: Success', async () => {
-    const response = new Response(true, '', 200);
-    expect(await jobShortLister.addDislikedJobs(userId, jobId)).toEqual(response);
-
-    const user = await Users.findById(userId);
-    expect(user.dailyJobCount).toBe(1);
-    // Score should have decreased by job keyword count
-    expect(user.keywords[0].score).toBe(-testData.jobKeywordData[0].count);
-    expect(user.keywords[0].jobCount).toBe(1);
-  });
-
-  test('removeLikedJob: Empty Ids', async () => {
-    await testEmptyIds('removeLikedJob');
-  });
-
-  test('removeLikedJob: Invalid Ids', async () => {
-    await testInvalidUserJobs('removeLikedJob');
-  });
-
-  test('removeLikedJob: Not a liked job', async () => {
-    const response = new Response(false, 'Not a liked job', 400);
-    const usersBefore = await Users.find({}).lean();
-    expect(await jobShortLister.removeLikedJob(userId, jobId)).toEqual(response);
-
-    const usersAfter = await Users.find({}).lean();
-    expect(usersBefore).toEqual(usersAfter);
-  });
-
-  test('removeLikedJob: Success', async () => {
-    await Users.findByIdAndUpdate(userId, {
-      $addToSet: {
-        likedJobs: jobId,
-      },
-    });
-    const response = new Response(true, '', 200);
-    expect(await jobShortLister.removeLikedJob(userId, jobId)).toEqual(response);
-
-    const user = await Users.findById(userId);
-    expect(user.likedJobs.length).toBe(0);
-  });
-
-  test('getLikedJobs: Empty Id', async () => {
-    await testEmptyId('getLikedJobs', null);
-  });
-
-  test('getLikedJobs: Invalid Id', async () => {
-    await testInvalidUserJob('getLikedJobs', null);
-  });
-
-  test('getLikedJobs: No jobs', async () => {
-    const response = new Response([], '', 200);
-    expect(await jobShortLister.getLikedJobs(userId)).toEqual(response);
-  });
-
-  test('getLikedJobs: Non existing jobs', async () => {
-    const jobs = await Jobs.find({}).lean();
-    const jobIds = jobs.map(job => job._id.toString());
-    await Users.findByIdAndUpdate(userId, {
-      $addToSet: {
-        likedJobs: jobIds,
-      },
-    });
-    await Jobs.deleteMany({});
-    const response = new Response([], '', 200);
-    expect(await jobShortLister.getLikedJobs(userId)).toEqual(response);
-  });
-
-  test('getLikedJobs: Success', async () => {
-    const jobs = await Jobs.find({}).lean();
-    // Job data should not have keywords
-    jobs.forEach((_, jobIdx) => delete jobs[jobIdx].keywords);
-    const jobIds = jobs.map(job => job._id.toString());
-    await Users.findByIdAndUpdate(userId, {
-      $addToSet: {
-        likedJobs: jobIds,
-      },
-    });
-    const response = new Response(jobs, '', 200);
-    expect(await jobShortLister.getLikedJobs(userId)).toEqual(response);
-  });
-
-  test('clearLikedJobs: Empty Id', async () => {
-    await testEmptyId('clearLikedJobs', false);
-  });
-
-  test('clearLikedJobs: Invalid Id', async () => {
-    await testInvalidUserJob('clearLikedJobs', false);
-  });
-
-  test('clearLikedJobs: Success', async () => {
-    const jobs = await Jobs.find({});
-    const jobIds = jobs.map(job => job._id.toString());
-    await Users.findByIdAndUpdate(userId, {
-      $addToSet: {
-        likedJobs: jobIds,
-      },
-    });
-    const response = new Response(true, '', 200);
-    expect(await jobShortLister.clearLikedJobs(userId)).toEqual(response);
-
-    const user = await Users.findById(userId);
-    expect(user.likedJobs.length).toBe(0);
+    const res = await user.getSkills(user1Id);
+    expect(res.status).toEqual(200);
+    expect(res.result).toEqual([jobName]);
   });
 });
