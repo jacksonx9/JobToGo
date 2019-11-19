@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { string, bool, func } from 'prop-types';
+import { string, func } from 'prop-types';
 
 import IconButton from '../IconButton';
 import JobDetails from '../JobDetails';
@@ -13,7 +13,11 @@ const JobCard = ({
 }) => (
   <View style={styles.container}>
     <View style={styles.shareContainer}>
-      <IconButton name="share-2" color={colours.lightGray} size={sizes.icon} onPress={onPressShare} />
+      <IconButton 
+      name="share-2" 
+      color={colours.lightGray} 
+      size={sizes.icon} 
+      onPress={onPressShare} />
     </View>
     <View style={styles.contentContainer}>
       <JobImage

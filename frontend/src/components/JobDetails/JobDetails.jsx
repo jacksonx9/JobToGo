@@ -7,9 +7,7 @@ import PropTypes from 'prop-types';
 import Icon from 'react-native-vector-icons/Feather';
 
 import JobImage from '../JobImage';
-import ImageButton from '../ImageButton';
 import IconButton from '../IconButton';
-import images from '../../constants/images';
 import styles from './styles';
 import { colours, sizes } from '../../styles';
 
@@ -111,11 +109,16 @@ class JobDetails extends Component {
   }
 }
 
+JobDetails.defaultProps = {
+  logo: null,
+};
+
 JobDetails.propTypes = {
   company: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   location: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
+  logo: PropTypes.string,
 };
 
 export default JobDetails;
