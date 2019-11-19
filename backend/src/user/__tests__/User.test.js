@@ -10,7 +10,7 @@ import AllSkills from '../../all_skills';
 
 
 const mockUser = () => {
-  OAuth2Client.prototype.verifyIdToken = jest.fn(({idToken, audience}) => new Promise((resolve) => {
+  OAuth2Client.prototype.verifyIdToken = jest.fn(({ idToken, audience }) => new Promise((resolve) => {
     if (audience !== null && idToken === 'idToken') {
       resolve({
         payload: {
@@ -18,7 +18,7 @@ const mockUser = () => {
         },
       });
     } else {
-      throw 'invalid idToken';
+      throw Error('invalid idToken');
     }
   }));
 };
@@ -140,7 +140,7 @@ describe('User', () => {
       _id: user1Id,
       userName: testData.validUserData.credentials.userName,
       email: testData.validUserData.credentials.email,
-    }
+    };
     const res = await user.getUser(testData.validUserData.credentials.userName);
     expect(res.status).toEqual(200);
     expect(res.result).toEqual(expectResult);
