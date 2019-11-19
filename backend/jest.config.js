@@ -6,5 +6,6 @@ module.exports = {
   collectCoverageFrom: [
     'src/**/*.js',
     'src/*.js',
+    '!src/nonfunc/*.js',
   ],
 };

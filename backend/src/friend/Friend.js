@@ -2,6 +2,7 @@ import assert from 'assert';
 
 import Response from '../types';
 import { Users } from '../schema';
+import { IS_TEST_SERVER } from '../constants';
 
 class Friend {
   constructor(app, messenger) {
@@ -81,6 +82,11 @@ class Friend {
           pendingFriends: userId,
         },
       }).orFail();
+
+      // If testing, ignore push notification
+      if (IS_TEST_SERVER) {
+        return new Response(true, '', 200);
+      }
 
       // Send push notification
       const messageResponse = await this.messenger.requestFriend(userId, friendId);

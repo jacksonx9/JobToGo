@@ -85,7 +85,8 @@ class JobSearcher {
         this.logger.info(`Found ${jobs.length} jobs for keyword ${keyphrase}`);
         await this.addToJobStore(jobs);
       } catch (e) {
-        this.logger.error(e);
+        const { status, statusText } = e.response;
+        this.logger.error(`${status}: ${statusText}`);
       }
     }));
   }

@@ -1,0 +1,68 @@
+version: "3"
+
+services:
+
+  mongodb:
+    container_name: jobtogo_db
+    hostname: jobtogo_db
+    image: mongo:4.2.0
+    volumes: 
+      - ./mongodata:/data/db:Z
+    networks:
+      jobtogo_net:
+        ipv4_address: 171.0.0.3
+    logging:
+      driver: none
+
+  node:
+    container_name: jobtogo_backend
+    hostname: jobtogo_backend
+    build:
+      context: .
+      dockerfile: ./docker/node/Dockerfile
+    image: "jobtogo_backend"
+    command: "npm run dev"
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/jobtogo/backend
+      - /jobtogo/backend/node_modules
+    ports:
+      - "8080:8080"
+    networks:
+      jobtogo_net:
+        ipv4_address: 171.0.0.2
+    depends_on:
+      - mongodb
+
+  node_test:
+    container_name: jobtogo_backend_test
+    hostname: jobtogo_backend_test
+    build:
+      context: .
+      dockerfile: ./docker/node/Dockerfile
+    image: "jobtogo_backend"
+    command: "npm run start"
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/jobtogo/backend
+      - /jobtogo/backend/node_modules
+    ports:
+      - "8090:8090"
+    networks:
+      jobtogo_net:
+        ipv4_address: 171.0.0.4
+    depends_on:
+      - mongodb
+
+# volumes:
+#   mongodata:
+#     driver: local
+
+networks:
+  jobtogo_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 171.0.0.0/16
