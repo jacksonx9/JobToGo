@@ -10,7 +10,8 @@ import AllSkills from '../../all_skills';
 
 
 const mockUser = () => {
-  OAuth2Client.prototype.verifyIdToken = jest.fn(({ idToken, audience }) => new Promise((resolve) => {
+  OAuth2Client.prototype.verifyIdToken = jest.fn(({ idToken, audience }) => new
+  Promise((resolve) => {
     if (audience !== null && idToken === 'idToken') {
       resolve({
         payload: {
