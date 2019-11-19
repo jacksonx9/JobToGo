@@ -14,8 +14,9 @@ import JobAnalyzer from './job_analyzer';
 import Messenger from './messenger';
 import AllSkills from './all_skills';
 import {
-  DEBUG, LOG_LEVEL, PORT, MONGO_URL, FIREBASE_URL,
+  IS_TEST_SERVER, DEBUG, LOG_LEVEL, PORT, MONGO_URL, FIREBASE_URL,
 } from './constants';
+import generateFriends from './nonfunc/FriendLimit';
 import firebaseCredentials from '../credentials/firebase';
 
 class Server {
@@ -69,7 +70,10 @@ class Server {
         await searcher.updateJobStore();
 
         // Start the server
-        this.server = this.app.listen(PORT, () => {
+        this.server = this.app.listen(PORT, async () => {
+          if (IS_TEST_SERVER) {
+            await generateFriends();
+          }
           this.logger.info(`Server running on port ${PORT}`);
           resolve();
         });
