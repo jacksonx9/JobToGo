@@ -49,14 +49,17 @@ class JobAnalyzer {
   }
 
   /**
-   * Computes tf-idf scores for all jobs using all user skills
-   * Optionally specify a range of skills to use
+   * Computes tf-idf scores for all jobs using user skills
+   * Optionally specify a range of skills to use.
+   * Default all skills
    *
-   * @param {Number} skillsStart Index of first skill to use (nullable)
-   * @param {Number} skillsEnd One past the index of the last skill to use (nullable)
+   * @param {Number} skillsStart Index of first skill to update (inclusively and nullable)
+   * @param {Number} skillsEnd Index of the last skill to update (noninclusive and nullable)
    */
   async computeJobScores(skillsStart, skillsEnd) {
     this.logger.info('Starting to compute job scores...');
+    assert(skillsStart === undefined || skillsStart >= 0);
+    assert(skillsEnd === undefined || skillsEnd >= 0);
 
     const jobs = await Jobs.find({});
     const offset = skillsStart || 0;
@@ -72,11 +75,12 @@ class JobAnalyzer {
       // calculate tf_idf each doc and save it
       await forEachAsync(jobs, async (job, jobIdx) => {
         const keywordOccurrences = job.keywords[allKeywordIdx].count;
-        const wordCount = job.description.split(' ').length;
-        const tf = keywordOccurrences / wordCount;
+        const totalKeywords = job.keywords.reduce((sum, keyword) => sum + keyword.count, 0);
+        const tf = totalKeywords !== 0 ? keywordOccurrences / totalKeywords : 0;
         const idf = docCount !== 0 ? Math.log(jobs.length / docCount) : 0;
         const tfidf = tf * idf;
 
+        assert(tfidf >= 0);
         // replace tf_idf score for a keyword for each job
         jobs[jobIdx].keywords[allKeywordIdx].tfidf = tfidf;
 
@@ -128,11 +132,11 @@ class JobAnalyzer {
     return new Response(mostRelevantJobs, '', 200);
   }
 
-  async _getJobsForUserWithNoKeywords(seenJobs, numJobsToSend) {
+  async _getJobsForUserWithNoKeywords(seenJobIds, numJobsToSend) {
     const randomJobs = [];
 
     randomJobs.push(
-      ...await Jobs.find({ _id: { $nin: seenJobs } }).limit(numJobsToSend).lean(),
+      ...await Jobs.find({ _id: { $nin: seenJobIds } }).limit(numJobsToSend).lean(),
     );
 
     this._deleteJobKeywords(randomJobs);
@@ -217,6 +221,7 @@ class JobAnalyzer {
       if (pivot - left === k - 1) {
         return jobs.slice(0, numJobsToSend);
       }
+
       // If pivot is more, recur for left subarray
       if (pivot - left > k - 1) {
         return getKSmallestElements(left, pivot - 1, k);

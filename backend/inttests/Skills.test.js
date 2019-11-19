@@ -139,7 +139,7 @@ describe('Skills', () => {
     // Check most relevant jobs are returned
     response = await request.get(`/jobs/find/${userId}`);
     expect(response.body.result).toMatchObject([
-      testData.jobs[9], testData.jobs[8], testData.jobs[7], testData.jobs[6],
+      testData.jobs[2], testData.jobs[4], testData.jobs[5], testData.jobs[6],
     ]);
 
     // Dislike jobs with c++, python

@@ -71,6 +71,7 @@ describe('Job Searcher', () => {
   };
 
   beforeAll(async () => {
+    // Connect to the in-memory db
     await mongoose.connect(process.env.MONGO_URL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
