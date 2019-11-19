@@ -92,7 +92,7 @@ describe('JobAnalyzer', () => {
         && (skillsEnd === undefined || skillsEnd > i);
       if (delKeywordCond) {
         testData.jobs.forEach((job) => {
-          delete job.keywords[i].tfidf;
+          Object.assign(job.keywords[i].tfidf, null);
         });
       }
     });
