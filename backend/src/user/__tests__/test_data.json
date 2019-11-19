@@ -1,0 +1,39 @@
+{
+    "validUserData": {
+        "credentials": {
+            "userName": "user1",
+            "email": "user1@mail.com",
+            "password": "testPassword",
+            "firebaseToken": "user1firebaseToken"
+        },
+        "keywordData": [
+            {
+                "name": "java",
+                "score": 0,
+                "jobCount": 0,
+                "timeStamp": "2016-05-18T16:00:00Z"
+            }
+        ]
+    },
+    "invalidUserData": {
+        "credentials": {
+            "userName": "invalidUser"
+        }
+    },
+    "jobKeywordData": [
+        {
+            "name": "java",
+            "tfidf": 0.5,
+            "count": 5
+        },
+        {
+            "name": "python",
+            "tfidf": 0.2,
+            "count": 3
+        }
+    ],
+    "allSkills": [
+        "python",
+        "java"
+    ]
+}

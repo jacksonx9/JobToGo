@@ -63,7 +63,6 @@ class User {
     }
   }
 
-  // Returns userId if succeeds, -1 otherwise
   async login(email, password) {
     if (!email || !password) {
       return new Response(null, 'Invalid email or password', 400);
@@ -150,7 +149,7 @@ class User {
     try {
       const user = await Users.findOne({
         'credentials.userName': userName,
-      });
+      }).orFail();
       const userData = {
         _id: user._id,
         userName,
