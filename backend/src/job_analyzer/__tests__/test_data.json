@@ -105,6 +105,183 @@
             ]
         }
     ],
+    "computeScoreJob": {
+        "title": "PyMOL Engineer",
+        "url": "http://www.indeed.com/viewjob?from=appsharedroid&jk=f529f96e15869d03",
+        "company": "Schrödinger",
+        "location": "New York, NY 10036",
+        "postDate": "13 days ago",
+        "salary": "",
+        "description": "We’re looking to hire a PyMOL Software Engineer to join us in our mission to design drugs that improve human health and materials that increase quality of life!",
+        "keywords": [
+            {
+            "name": "jobsDoNotContainThis",
+            "count": 0
+            }
+        ]
+    },
+    "userKeywordsGetMostRelevantJobs": [
+        {
+            "name": "rust",
+            "score": 2,
+            "jobCount": 1,
+            "timeStamp": "2019-10-22T21:40:15.127Z"
+        },
+        {
+            "name": "python",
+            "score": 3,
+            "jobCount": 1,
+            "timeStamp": "2019-10-22T21:40:15.127Z"
+        },
+        {
+            "name": "java",
+            "score": 0,
+            "jobCount": 0,
+            "timeStamp": "2019-10-22T21:40:15.127Z"
+        }
+    ],
+    "jobsGetMostRelevantJobs": [
+        {
+            "_id": 0,
+            "keywords": [
+                {
+                    "name": "rust",
+                    "tfidf": 0,
+                    "count": 0
+                },
+                {
+                    "name": "python",
+                    "tfidf": 0,
+                    "count": 0
+                },
+                {
+                    "name": "java",
+                    "tfidf": 0,
+                    "count": 0
+                }
+            ]
+        },
+        {
+            "_id": 1,
+            "keywords": [
+                {
+                    "name": "rust",
+                    "tfidf": 0.6931471805599453,
+                    "count": 1
+                },
+                {
+                    "name": "python",
+                    "tfidf": 0,
+                    "count": 0
+                },
+                {
+                    "name": "java",
+                    "tfidf": 0,
+                    "count": 0
+                }
+            ]
+        },
+        {
+            "_id": 2,
+            "keywords": [
+                {
+                    "name": "rust",
+                    "tfidf": 0,
+                    "count": 0
+                },
+                {
+                    "name": "python",
+                    "tfidf": 0,
+                    "count": 0
+                },
+                {
+                    "name": "java",
+                    "tfidf": 0,
+                    "count": 0
+                }
+            ]
+        },
+        {
+            "_id": 3,
+            "keywords": [
+                {
+                    "name": "rust",
+                    "tfidf": 0.46209812037329684,
+                    "count": 2
+                },
+                {
+                    "name": "python",
+                    "tfidf": 0.46209812037329684,
+                    "count": 1
+                },
+                {
+                    "name": "java",
+                    "tfidf": 0,
+                    "count": 0
+                }
+            ]
+        },
+        {
+            "_id": 4,
+            "keywords": [
+                {
+                    "name": "rust",
+                    "tfidf": 0,
+                    "count": 0
+                },
+                {
+                    "name": "python",
+                    "tfidf": 0,
+                    "count": 0
+                },
+                {
+                    "name": "java",
+                    "tfidf": 0,
+                    "count": 0
+                }
+            ]
+        },
+        {
+            "_id": 5,
+            "keywords": [
+                {
+                    "name": "rust",
+                    "tfidf": 0.00001,
+                    "count": 1
+                },
+                {
+                    "name": "python",
+                    "tfidf": 0,
+                    "count": 0
+                },
+                {
+                    "name": "java",
+                    "tfidf": 1.3862943611198906,
+                    "count": 1
+                }
+            ]
+        },
+        {
+            "_id": 6,
+            "keywords": [
+                {
+                    "name": "rust",
+                    "tfidf": 0,
+                    "count": 0
+                },
+                {
+                    "name": "python",
+                    "tfidf": 0,
+                    "count": 0
+                },
+                {
+                    "name": "java",
+                    "tfidf": 0,
+                    "count": 0
+                }
+            ]
+        }
+    ],
     "skills": ["rust", "python", "java"],
     "users": [
         {

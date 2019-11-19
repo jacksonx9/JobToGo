@@ -45,32 +45,9 @@ describe('JobAnalyzer', () => {
     constants.JOBS_SEARCH_PERCENT_SIZE = 0.5;
     constants.DAILY_JOB_COUNT_LIMIT = 2;
     // Insert Users
-    await Users.insertMany([
-      {
-        ...testData.users[0],
-      },
-      {
-        ...testData.users[1],
-      },
-      {
-        ...testData.users[2],
-      },
-    ]);
+    await Users.insertMany(testData.users);
     // Insert Jobs
-    await Jobs.insertMany([
-      {
-        ...testData.jobs[0],
-      },
-      {
-        ...testData.jobs[1],
-      },
-      {
-        ...testData.jobs[2],
-      },
-      {
-        ...testData.jobs[3],
-      },
-    ]);
+    await Jobs.insertMany(testData.jobs);
   });
 
   afterEach(async () => {
@@ -97,20 +74,7 @@ describe('JobAnalyzer', () => {
       }
     });
 
-    await Jobs.insertMany([
-      {
-        ...testData.jobs[0],
-      },
-      {
-        ...testData.jobs[1],
-      },
-      {
-        ...testData.jobs[2],
-      },
-      {
-        ...testData.jobs[3],
-      },
-    ]);
+    await Jobs.insertMany(testData.jobs);
 
     await jobAnalyzer.computeJobScores(skillsStart, skillsEnd);
     const jobs = await Jobs.find({}, { _id: 0, 'keywords._id': 0 }).lean();
@@ -166,21 +130,7 @@ describe('JobAnalyzer', () => {
   test('computeJobScores: job docCount is zero', async () => {
     // Delete jobs in database and replace them
     await Jobs.deleteMany({});
-    await Jobs.create({
-      title: 'PyMOL Engineer',
-      url: 'http://www.indeed.com/viewjob?from=appsharedroid&jk=f529f96e15869d03',
-      company: 'Schrödinger',
-      location: 'New York, NY 10036',
-      postDate: '13 days ago',
-      salary: '',
-      description: 'We’re looking to hire a PyMOL Software Engineer to join us in our mission to design drugs that improve human health and materials that increase quality of life!',
-      keywords: [
-        {
-          name: 'jobsDoNotContainThis',
-          count: 0,
-        },
-      ],
-    });
+    await Jobs.create(testData.computeScoreJob);
     AllSkills.getAll = jest.fn(() => new Promise(resolve => resolve(['jobsDoNotContainThis'])));
 
     await jobAnalyzer.computeJobScores();
@@ -305,168 +255,8 @@ describe('JobAnalyzer', () => {
   });
 
   test('_getMostRelevantJobs: Number of Jobs to Send is Less Than Available Jobs', async () => {
-    const userKeywords = [
-      {
-        name: 'rust',
-        score: 2,
-        jobCount: 1,
-        timeStamp: '2019-10-22T21:40:15.127Z',
-      },
-      {
-        name: 'python',
-        score: 3,
-        jobCount: 1,
-        timeStamp: '2019-10-22T21:40:15.127Z',
-      },
-      {
-        name: 'java',
-        score: 0,
-        jobCount: 0,
-        timeStamp: '2019-10-22T21:40:15.127Z',
-      },
-    ];
-    const jobs = [
-      {
-        _id: 0,
-        keywords: [
-          {
-            name: 'rust',
-            tfidf: 0,
-            count: 0,
-          },
-          {
-            name: 'python',
-            tfidf: 0,
-            count: 0,
-          },
-          {
-            name: 'java',
-            tfidf: 0,
-            count: 0,
-          },
-        ],
-      },
-      {
-        _id: 1,
-        keywords: [
-          {
-            name: 'rust',
-            tfidf: 0.6931471805599453,
-            count: 1,
-          },
-          {
-            name: 'python',
-            tfidf: 0,
-            count: 0,
-          },
-          {
-            name: 'java',
-            tfidf: 0,
-            count: 0,
-          },
-        ],
-      },
-      {
-        _id: 2,
-        keywords: [
-          {
-            name: 'rust',
-            tfidf: 0,
-            count: 0,
-          },
-          {
-            name: 'python',
-            tfidf: 0,
-            count: 0,
-          },
-          {
-            name: 'java',
-            tfidf: 0,
-            count: 0,
-          },
-        ],
-      },
-      {
-        _id: 3,
-        keywords: [
-          {
-            name: 'rust',
-            tfidf: 0.46209812037329684,
-            count: 2,
-          },
-          {
-            name: 'python',
-            tfidf: 0.46209812037329684,
-            count: 1,
-          },
-          {
-            name: 'java',
-            tfidf: 0,
-            count: 0,
-          },
-        ],
-      },
-      {
-        _id: 4,
-        keywords: [
-          {
-            name: 'rust',
-            tfidf: 0,
-            count: 0,
-          },
-          {
-            name: 'python',
-            tfidf: 0,
-            count: 0,
-          },
-          {
-            name: 'java',
-            tfidf: 0,
-            count: 0,
-          },
-        ],
-      },
-      {
-        _id: 5,
-        keywords: [
-          {
-            name: 'rust',
-            tfidf: 0.00001,
-            count: 1,
-          },
-          {
-            name: 'python',
-            tfidf: 0,
-            count: 0,
-          },
-          {
-            name: 'java',
-            tfidf: 1.3862943611198906,
-            count: 1,
-          },
-        ],
-      },
-      {
-        _id: 6,
-        keywords: [
-          {
-            name: 'rust',
-            tfidf: 0,
-            count: 0,
-          },
-          {
-            name: 'python',
-            tfidf: 0,
-            count: 0,
-          },
-          {
-            name: 'java',
-            tfidf: 0,
-            count: 0,
-          },
-        ],
-      },
-    ];
+    const userKeywords = testData.userKeywordsGetMostRelevantJobs;
+    const jobs = testData.jobsGetMostRelevantJobs;
 
     const res = await jobAnalyzer._getMostRelevantJobs(userKeywords, jobs, 3);
     expect(res.length).toEqual(3);
