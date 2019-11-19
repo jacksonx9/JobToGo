@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from 'react-navigation-tabs';
 import Icon from 'react-native-vector-icons/Feather';
 import firebase from 'react-native-firebase';
 import Logger from 'js-logger';
+import { string } from 'prop-types';
 
 import SignIn from './screens/SignIn';
 import SignUp from './screens/SignUp/SignUp';
@@ -107,42 +108,50 @@ const tabNavConfig = {
   },
 };
 
+function HomeTabIcon({ tintColor }) {
+  return (<Icon name="home" size={sizes.icon} color={tintColor} />);
+}
+
+function LikedTabIcon({ tintColor }) {
+  return (<Icon name="heart" size={sizes.icon} color={tintColor} />);
+}
+
+function FriendsTabIcon({ tintColor }) {
+  return (<Icon name="users" size={sizes.icon} color={tintColor} />);
+}
+
+function ResumeTabIcon({ tintColor }) {
+  return (<Icon name="upload" size={sizes.icon} color={tintColor} />);
+}
+
 const AppStack = createBottomTabNavigator(
   {
     Home: {
       screen: JobSwipe,
       navigationOptions: {
         tabBarLabel: 'Home',
-        tabBarIcon: ({ tintColor }) => (
-          <Icon name="home" color={tintColor} size={sizes.icon} />
-        ),
+        tabBarIcon: HomeTabIcon,
       },
     },
     Send: {
       screen: SendLikedJobs,
       navigationOptions: {
         tabBarLabel: 'Liked',
-        tabBarIcon: ({ tintColor }) => (
-          <Icon name="heart" color={tintColor} size={sizes.icon} />
-        ),
+        tabBarIcon: LikedTabIcon,
       },
     },
     Friends: {
       screen: EditFriends,
       navigationOptions: {
         tabBarLabel: 'Friends',
-        tabBarIcon: ({ tintColor }) => (
-          <Icon name="users" color={tintColor} size={sizes.icon} />
-        ),
+        tabBarIcon: FriendsTabIcon,
       },
     },
     Resume: {
       screen: EditSkills,
       navigationOptions: {
         tabBarLabel: 'Resume',
-        tabBarIcon: ({ tintColor }) => (
-          <Icon name="upload" color={tintColor} size={sizes.icon} />
-        ),
+        tabBarIcon: ResumeTabIcon,
       },
     },
   },
@@ -169,3 +178,20 @@ const AppContainer = createAppContainer(
     },
   ),
 );
+
+
+HomeTabIcon.propTypes = {
+  tintColor: string.isRequired,
+};
+
+LikedTabIcon.propTypes = {
+  tintColor: string.isRequired,
+};
+
+FriendsTabIcon.propTypes = {
+  tintColor: string.isRequired,
+};
+
+ResumeTabIcon.propTypes = {
+  tintColor: string.isRequired,
+};
