@@ -116,7 +116,7 @@
         {
             "credentials": {
                 "userName": "user2",
-                "email": "user1@mail.com"
+                "email": "user2@mail.com"
             },
             "keywords": [
                 {
@@ -142,7 +142,7 @@
         {
             "credentials": {
                 "userName": "user3",
-                "email": "user2@mail.com"
+                "email": "user3@mail.com"
             },
             "keywords": [
                 {
