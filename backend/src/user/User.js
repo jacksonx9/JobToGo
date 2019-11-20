@@ -54,24 +54,22 @@ class User {
 
   // returns list of users that start with subUserName
   static async searchUser(userId, subUserName) {
-    const potUsers = await Users.find(
-      { 'credentials.userName':
+    const potentialUsers = await Users.find(
+      {
+        'credentials.userName':
         {
           $regex: `^${subUserName}`,
           $options: 'i',
-        }
+        },
       },
       '_id credentials.userName friends',
     ).lean();
-    const users = [];
 
-    potUsers.forEach((_, i) => {
-      users.push({
-        _id: potUsers[i]._id,
-        userName: potUsers[i].credentials.userName,
-        isFriend: potUsers[i].friends.includes(userId),
-      });
-    });
+    const users = potentialUsers.map(user => ({
+      _id: user._id,
+      userName: user.credentials.userName,
+      isFriend: user.friends.includes(userId),
+    }));
 
     return new Response(users, '', 200);
   }
