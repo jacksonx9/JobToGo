@@ -5,8 +5,9 @@ import { IS_TEST_SERVER } from '../constants';
 import { Users, Jobs } from '../schema';
 
 class Friend {
-  constructor(app, messenger) {
+  constructor(app, socket, messenger) {
     this.messenger = messenger;
+    this.socket = socket;
 
     app.post('/friends/sendJob', async (req, res) => {
       const response = await this.sendJob(req.body.userId, req.body.friendId, req.body.jobId);

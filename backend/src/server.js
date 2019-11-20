@@ -4,6 +4,9 @@ import bodyParser from 'body-parser';
 import Logger from 'js-logger';
 import morgan from 'morgan';
 import admin from 'firebase-admin';
+import socketio from 'socket.io';
+import redis from 'redis';
+import bluebird from 'bluebird';
 
 import User from './user';
 import Friend from './friend';
@@ -14,10 +17,12 @@ import JobAnalyzer from './job_analyzer';
 import Messenger from './messenger';
 import AllSkills from './all_skills';
 import {
-  IS_TEST_SERVER, DEBUG, LOG_LEVEL, PORT, MONGO_URL, FIREBASE_URL,
+  IS_TEST_SERVER, DEBUG, LOG_LEVEL, PORT, MONGO_URL, FIREBASE_URL, REDIS_IP,
 } from './constants';
 import generateFriends from './nonfunc/FriendLimit';
 import firebaseCredentials from '../credentials/firebase';
+
+bluebird.promisifyAll(redis);
 
 class Server {
   constructor() {
@@ -37,6 +42,8 @@ class Server {
       this.app.use(morgan(':method :url :status - :response-time ms'));
     }
     this.server = null;
+    this.socket = null;
+    this.redisClient = null;
 
     // Setup firebase
     admin.initializeApp({
@@ -45,16 +52,28 @@ class Server {
     });
   }
 
+  setupDB() {
+    // Connect to mongodb
+    mongoose.connect(MONGO_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useFindAndModify: false,
+      useCreateIndex: true,
+    }).then(() => this.logger.info('MongoDB connected.'));
+
+    // Connect to redis
+    this.redisClient = redis.createClient({
+      host: REDIS_IP,
+    });
+    this.redisClient.on('error', () => {
+      throw new Error('Failed to connect to redis');
+    });
+    this.redisClient.flushall();
+  }
+
   start() {
     return new Promise((resolve) => {
-      // Connect to mongodb
-      // If this fails, just crash the server
-      mongoose.connect(MONGO_URL, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        useFindAndModify: false,
-        useCreateIndex: true,
-      }).then(() => this.logger.info('MongoDB connected.'));
+      this.setupDB();
 
       // Setup modules
       AllSkills.setup().then(async () => {
@@ -64,10 +83,9 @@ class Server {
         const allSkills = new AllSkills(jobAnalyzer);
         const user = new User(this.app, allSkills);
         const searcher = new JobSearcher(jobAnalyzer);
-        new Friend(this.app, messenger);
         new ResumeParser(this.app, user);
 
-        await searcher.updateJobStore();
+        // await searcher.updateJobStore();
 
         // Start the server
         this.server = this.app.listen(PORT, async () => {
@@ -75,8 +93,23 @@ class Server {
             await generateFriends();
           }
           this.logger.info(`Server running on port ${PORT}`);
-          resolve();
         });
+
+        this.socket = socketio(this.server);
+        this.socket.on('connection', (clientSocket) => {
+          clientSocket.on('userId', async (userId) => {
+            await this.redisClient.setAsync(userId, clientSocket.id);
+            await this.redisClient.setAsync(clientSocket.id, userId);
+          });
+          clientSocket.on('disconnect', async () => {
+            const userId = await this.redisClient.getAsync(clientSocket.id);
+            await this.redisClient.del(userId);
+            await this.redisClient.del(clientSocket.id);
+          });
+
+          new Friend(this.app, clientSocket, messenger);
+        });
+        resolve();
       });
     });
   }
@@ -85,6 +118,7 @@ class Server {
     return new Promise((resolve, reject) => {
       mongoose.disconnect().then(() => {
         this.logger.info('MongoDB disconnected.');
+        this.socket.close();
         this.server.close((err) => {
           if (err) {
             reject(err);
