@@ -31,6 +31,8 @@ export default class EditFriends extends Component {
   }
 
   async componentDidMount() {
+    console.log(this.props.friends);
+    console.log(this.props.pendingFriends);
     this.fetchFriends();
     // this.socket.onopen = () => this.socket.send('something');
     // this.socket.onmessage = ({ data }) => {

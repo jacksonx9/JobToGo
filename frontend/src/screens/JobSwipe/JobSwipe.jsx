@@ -46,6 +46,8 @@ export default class JobSwipe extends Component {
     this.logger.info(`User id is: ${userId}`);
     this.fetchJobs(userId, this.jobTypes.MATCHED);
     this.fetchFriends(userId);
+    console.log(this.props.friends);
+    console.log(this.props.sharedJobs);
   }
 
   fetchFriends = async userId => {

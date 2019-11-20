@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import firebase from 'react-native-firebase';
 import Logger from 'js-logger';
 import { string } from 'prop-types';
+import socketIOClient from 'socket.io-client';
 
 import SignIn from './screens/SignIn';
 import SignUp from './screens/SignUp/SignUp';
@@ -23,9 +24,21 @@ export default class App extends React.Component {
     super(props);
     Logger.useDefaults();
     this.logger = Logger.get(this.constructor.name);
+
+    this.state = {
+      sharedJobs: 'shared',
+      pendingFriends: 'pending',
+      friends: 'friends',
+    };
   }
 
   async componentDidMount() {
+    // const socket = socketIOClient(endpoint);
+
+    // socket.on('friend request', data => this.setState({ pendingFriends: data.num }));
+    // socket.on('new friend', data => this.setState({ friends: data.num }));
+    // socket.on('new shared job', data => this.setState({ sharedJobs: data.num }));
+
     if (Platform.OS === 'android') {
       try {
         await firebase.messaging().requestPermission();
@@ -79,6 +92,122 @@ export default class App extends React.Component {
   }
 
   render() {
+    const navConfig = {
+      headerMode: 'none',
+      navigationOptions: {
+        headerVisible: false,
+      },
+    };
+
+    const tabNavConfig = {
+      initialRouteName: 'Home',
+      tabBarOptions: {
+        style: {
+          height: 50,
+          borderTopColor: 'transparent',
+        },
+        labelStyle: {
+          fontFamily: fonts.bold,
+        },
+        activeTintColor: colours.accentPrimary,
+        inactiveTintColor: colours.lightGray,
+      },
+    };
+
+    function HomeTabIcon({ tintColor }) {
+      return (<Icon name="home" size={sizes.icon} color={tintColor} />);
+    }
+
+    function LikedTabIcon({ tintColor }) {
+      return (<Icon name="heart" size={sizes.icon} color={tintColor} />);
+    }
+
+    function FriendsTabIcon({ tintColor }) {
+      return (<Icon name="users" size={sizes.icon} color={tintColor} />);
+    }
+
+    function ResumeTabIcon({ tintColor }) {
+      return (<Icon name="upload" size={sizes.icon} color={tintColor} />);
+    }
+
+    const { friends, pendingFriends, sharedJobs } = this.state;
+    const AppStack = createBottomTabNavigator(
+      {
+        Home: {
+          screen: props => <JobSwipe friends={friends} sharedJobs={sharedJobs} />,
+          navigationOptions: {
+            tabBarLabel: 'Home',
+            tabBarIcon: HomeTabIcon,
+            tabBarTestID: 'home',
+          },
+        },
+        Send: {
+          screen: SendLikedJobs,
+          navigationOptions: {
+            tabBarLabel: 'Liked',
+            tabBarIcon: LikedTabIcon,
+            tabBarTestID: 'liked',
+          },
+        },
+        Friends: {
+          screen: props => <EditFriends friends={friends} pendingFriends={pendingFriends} />,
+          navigationOptions: {
+            tabBarLabel: 'Friends',
+            tabBarIcon: FriendsTabIcon,
+            tabBarTestID: 'friends',
+          },
+        },
+        Resume: {
+          screen: EditSkills,
+          navigationOptions: {
+            tabBarLabel: 'Resume',
+            tabBarIcon: ResumeTabIcon,
+            tabBarTestID: 'resume',
+          },
+        },
+      },
+      tabNavConfig,
+    );
+
+    const AuthStack = createStackNavigator(
+      {
+        AuthLanding,
+        SignIn,
+        SignUp,
+        CreateUsername,
+      },
+      navConfig,
+    );
+
+    const AppContainer = createAppContainer(
+      createSwitchNavigator(
+        {
+          App: AppStack,
+          Auth: AuthStack,
+        },
+        {
+          initialRouteName: 'Auth',
+        },
+      ),
+    );
+
+
+    HomeTabIcon.propTypes = {
+      tintColor: string.isRequired,
+    };
+
+    LikedTabIcon.propTypes = {
+      tintColor: string.isRequired,
+    };
+
+    FriendsTabIcon.propTypes = {
+      tintColor: string.isRequired,
+    };
+
+    ResumeTabIcon.propTypes = {
+      tintColor: string.isRequired,
+    };
+
     return (
       <AppContainer
         styles={[{ flex: 1 }]}
@@ -86,118 +215,3 @@ export default class App extends React.Component {
     );
   }
 }
-
-const navConfig = {
-  headerMode: 'none',
-  navigationOptions: {
-    headerVisible: false,
-  },
-};
-
-const tabNavConfig = {
-  initialRouteName: 'Home',
-  tabBarOptions: {
-    style: {
-      height: 50,
-      borderTopColor: 'transparent',
-    },
-    labelStyle: {
-      fontFamily: fonts.bold,
-    },
-    activeTintColor: colours.accentPrimary,
-    inactiveTintColor: colours.lightGray,
-  },
-};
-
-function HomeTabIcon({ tintColor }) {
-  return (<Icon name="home" size={sizes.icon} color={tintColor} />);
-}
-
-function LikedTabIcon({ tintColor }) {
-  return (<Icon name="heart" size={sizes.icon} color={tintColor} />);
-}
-
-function FriendsTabIcon({ tintColor }) {
-  return (<Icon name="users" size={sizes.icon} color={tintColor} />);
-}
-
-function ResumeTabIcon({ tintColor }) {
-  return (<Icon name="upload" size={sizes.icon} color={tintColor} />);
-}
-
-const AppStack = createBottomTabNavigator(
-  {
-    Home: {
-      screen: JobSwipe,
-      navigationOptions: {
-        tabBarLabel: 'Home',
-        tabBarTestID: 'home',
-        tabBarIcon: HomeTabIcon,
-      },
-    },
-    Send: {
-      screen: SendLikedJobs,
-      navigationOptions: {
-        tabBarLabel: 'Liked',
-        tabBarTestID: 'liked',
-        tabBarIcon: LikedTabIcon,
-      },
-    },
-    Friends: {
-      screen: EditFriends,
-      navigationOptions: {
-        tabBarLabel: 'Friends',
-        tabBarTestID: 'friends',
-        tabBarIcon: FriendsTabIcon,
-      },
-    },
-    Resume: {
-      screen: EditSkills,
-      navigationOptions: {
-        tabBarLabel: 'Resume',
-        tabBarTestID: 'resume',
-        tabBarIcon: ResumeTabIcon,
-      },
-    },
-  },
-  tabNavConfig,
-);
-
-const AuthStack = createStackNavigator(
-  {
-    AuthLanding,
-    SignIn,
-    SignUp,
-    CreateUsername,
-  },
-  navConfig,
-);
-
-const AppContainer = createAppContainer(
-  createSwitchNavigator(
-    {
-      App: AppStack,
-      Auth: AuthStack,
-    },
-    {
-      initialRouteName: 'Auth',
-    },
-  ),
-);
-
-
-HomeTabIcon.propTypes = {
-  tintColor: string.isRequired,
-};
-
-LikedTabIcon.propTypes = {
-  tintColor: string.isRequired,
-};
-
-FriendsTabIcon.propTypes = {
-  tintColor: string.isRequired,
-};
-
-ResumeTabIcon.propTypes = {
-  tintColor: string.isRequired,
-};
