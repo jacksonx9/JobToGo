@@ -54,10 +54,6 @@ class User {
 
   // returns list of users that start with subUserName
   static async searchUser(userId, subUserName) {
-    if (subUserName === '\u0000') {
-      return new Response([], '', 200);
-    }
-
     const potUsers = await Users.find(
       { 'credentials.userName':
         {
