@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "617405875578",
+    "firebase_url": "https://jobtogo-103fd.firebaseio.com",
+    "project_id": "jobtogo-103fd",
+    "storage_bucket": "jobtogo-103fd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:617405875578:android:1612dcf45e4c56d50482c3",
+        "android_client_info": {
+          "package_name": "com.jobtogo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "617405875578-ppsn87c71mvqecp6fpn3ca14scl6u928.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jobtogo",
+            "certificate_hash": "dcd029210262d5e89037eaca79c4891cb7d8f60e"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDyDzdV8l4m_hDpavd_cjW9Kht0GOK5dd4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

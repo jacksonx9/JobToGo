@@ -5,7 +5,8 @@
   "scripts": {
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "postinstall": "npx jetify"
   },
   "dependencies": {
     "axios": "^0.19.0",
