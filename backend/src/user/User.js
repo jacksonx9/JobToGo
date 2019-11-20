@@ -20,8 +20,8 @@ class User {
     });
 
     app.post('/users/login', async (req, res) => {
-      const { email, password } = req.body;
-      const response = await this.login(email, password);
+      const { userName, password } = req.body;
+      const response = await this.login(userName, password);
       res.status(response.status).send(response);
     });
 
@@ -92,6 +92,23 @@ class User {
       return new Response(null, 'Invalid userData', 400);
     }
 
+    if (!userData.credentials.email || !userData.credentials.userName) {
+      return new Response(null, 'Invalid userName or email', 400);
+    }
+
+    // TODO: validation of password strength
+
+    const existingUser = await Users.findOne({
+      $or: [
+        { 'credentials.email': userData.credentials.email },
+        { 'credentials.userName': userData.credentials.userName },
+      ],
+    });
+
+    if (existingUser !== null) {
+      return new Response(null, 'Either username or email is already used', 400);
+    }
+
     try {
       const user = await Users.create(userData);
       return new Response(user._id, '', 200);
@@ -100,19 +117,20 @@ class User {
     }
   }
 
-  async login(email, password) {
-    if (!email || !password) {
-      return new Response(null, 'Invalid email or password', 400);
+  // Returns userId if succeeds, -1 otherwise
+  async login(userName, password) {
+    if (!userName || !password) {
+      return new Response(null, 'Invalid userName or password', 400);
     }
 
     try {
       const user = await Users.findOne({
-        'credentials.email': email,
+        'credentials.userName': userName,
         'credentials.password': password,
       }).orFail();
       return new Response(user._id, '', 200);
     } catch (e) {
-      return new Response(null, 'Invalid email or password', 400);
+      return new Response(null, 'Invalid userName or password', 400);
     }
   }
 
@@ -142,17 +160,16 @@ class User {
     const { email } = ticket.payload;
     const user = await this._getUser(email);
 
-    // If user does not exist, create
+    // user does not exist
     if (user === null) {
-      const userResult = await User.createUser({
+      const userInfo = {
         credentials: {
-          userName: email,
           email,
           idToken: ticket.payload,
           firebaseToken,
         },
-      });
-      return userResult;
+      };
+      return new Response(userInfo, '', 200);
     }
 
     return new Response(user._id, '', 200);
@@ -178,7 +195,7 @@ class User {
 
   // get UserId
   async _getUser(userEmail) {
-    const user = await Users.findOne({ 'credentials.email': userEmail });
+    const user = await Users.findOne({ 'credentials.email': userEmail }).lean();
     return user;
   }
 
