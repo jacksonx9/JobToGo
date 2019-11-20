@@ -10,6 +10,7 @@ import { string } from 'prop-types';
 
 import SignIn from './screens/SignIn';
 import SignUp from './screens/SignUp/SignUp';
+import CreateUsername from './screens/CreateUsername/CreateUsername';
 import AuthLanding from './screens/AuthLanding';
 import JobSwipe from './screens/JobSwipe';
 import SendLikedJobs from './screens/SendLikedJobs/SendLikedJobs';
@@ -167,6 +168,7 @@ const AuthStack = createStackNavigator(
     AuthLanding,
     SignIn,
     SignUp,
+    CreateUsername,
   },
   navConfig,
 );

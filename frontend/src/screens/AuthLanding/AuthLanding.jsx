@@ -35,8 +35,14 @@ export default class AuthLanding extends Component {
           firebaseToken,
         });
 
-      global.userId = ret.data.result;
-      navigation.navigate('App');
+      this.logger.log(typeof (ret.data.result));
+      if (typeof (ret.data.result) === 'string') {
+        global.userId = ret.data.result;
+        navigation.navigate('App');
+      } else { // needs integration
+        global.newId = ret.data.result;
+        navigation.navigate('CreateUsername');
+      }
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         this.logger.warn('Google sign in cancelled');
