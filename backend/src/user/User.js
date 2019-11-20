@@ -25,8 +25,8 @@ class User {
       res.status(response.status).send(response);
     });
 
-    app.get('/users/search/:subUserName', async (req, res) => {
-      const response = await User.searchUser(req.params.subUserName);
+    app.get('/users/search/', async (req, res) => {
+      const response = await User.searchUser(req.query.userId, req.query.subUserName);
       res.status(response.status).send(response);
     });
 
@@ -53,14 +53,23 @@ class User {
   }
 
   // returns list of users that start with subUserName
-  static async searchUser(subUserName) {
-    console.log(subUserName);
+  static async searchUser(userId, subUserName) {
     if (subUserName === '\u0000') {
       return new Response([], '', 200);
     }
 
     const potUsers = await Users.find({ 'credentials.userName': { $regex: `^${subUserName}` } },
-      '_id credentials.userName').lean();
+      '_id credentials.userName friends').lean();
+
+    potUsers.forEach((_, i) => {
+      if (potUsers[i].friends.includes(userId)) {
+        potUsers[i].isFriend = true;
+      } else {
+        potUsers[i].isFriend = false;
+      }
+
+      delete potUsers[i].friends;
+    });
     return new Response(potUsers, '', 200);
   }
 
