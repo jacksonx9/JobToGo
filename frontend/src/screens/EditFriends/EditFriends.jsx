@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { View, FlatList } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
+import SocketIOClient from 'socket.io-client';
 
 import Search from '../../components/Search';
 import SelectableItem from '../../components/SelectableItem';
@@ -19,16 +20,28 @@ export default class EditFriends extends Component {
     this.state = {
       friends: [],
       pendingFriends: [],
+      searchedUsers: [],
       addFriendName: '',
       loading: 1,
       showPendingFriends: true,
       searchInProgress: false,
     };
     this.logger = Logger.get(this.constructor.name);
+    // this.socket = SocketIOClient('http://localhost:80000');
   }
 
   async componentDidMount() {
     this.fetchFriends();
+    // this.socket.onopen = () => this.socket.send('something');
+    // this.socket.onmessage = ({ data }) => {
+    //console.log(data);
+    // if (data === 'blah') {
+    //   this.fetchFriends();
+    // } else if (data === 'blahblah') {
+    //   this.setState({
+    //     searchedUsers: data,
+    //   });
+    // };
   }
 
   async componentDidUpdate(prevState) {
@@ -104,13 +117,23 @@ export default class EditFriends extends Component {
   }
 
   searchUsers = async text => {
-    // TODO: get query response from server
-    this.setState({ addFriendName: text });
+    const { userId } = global;
+    this.setState({
+      searchedUsers: [],
+      addFriendName: text,
+    });
+    const searchedUsers = await axios.get(`${config.ENDP_SEARCH_USERS}?userId=${userId}&subUserName=${text}`)
+      .catch(e => this.logger.error(e));
+
+    this.setState({
+      searchedUsers: searchedUsers.data.result,
+      loading: 0,
+    });
   }
 
   render() {
     const {
-      loading, addFriendName, pendingFriends, friends, showPendingFriends, searchInProgress,
+      loading, addFriendName, pendingFriends, friends, searchedUsers, showPendingFriends, searchInProgress,
     } = this.state;
 
     let users;
@@ -118,7 +141,7 @@ export default class EditFriends extends Component {
     let noUsersMsg;
     let actionIcon;
     if (searchInProgress) {
-      users = friends; // TODO: change to user query results
+      users = searchedUsers; // TODO: change to user query results
       onPress = this.addFriend;
       noUsersMsg = status.noResults;
       actionIcon = '+';
@@ -146,7 +169,7 @@ export default class EditFriends extends Component {
             testID={`userItem${index}`}
             key={item._id}
             header={item.userName}
-            subHeader={item.email}
+            subHeader={item.isFriend ? 'friend' : 'not a friend'}
             onPress={() => onPress(item, index)}
             actionIcon={actionIcon}
           />
@@ -166,7 +189,6 @@ export default class EditFriends extends Component {
           onChangeText={text => this.searchUsers(text)}
           onEndSearch={() => {
             this.setState({ addFriendName: '', searchInProgress: false });
-            this.addFriend(); // TODO: Remove this once user search is implemented
           }}
         >
           {noUsers ? noUsersInfo : userList}
