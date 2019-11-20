@@ -58,6 +58,12 @@ class User {
       return new Response(null, 'Invalid userId', 400);
     }
 
+    try {
+      await Users.findById(userId).orFail();
+    } catch (e) {
+      return new Response(null, 'User does not exist', 400);
+    }
+
     const potentialUsers = await Users.find(
       {
         'credentials.userName':
