@@ -20,13 +20,23 @@ class User {
     });
 
     app.post('/users/login', async (req, res) => {
-      const { email, password } = req.body;
-      const response = await this.login(email, password);
+      const { userName, password } = req.body;
+      const response = await this.login(userName, password);
       res.status(response.status).send(response);
     });
 
     app.post('/users', async (req, res) => {
       const response = await User.createUser(req.body.userData);
+      res.status(response.status).send(response);
+    });
+
+    app.post('/users/edit/userName', async (req, res) => {
+      const response = await User.editUserName(req.body.userId, req.body.userName);
+      res.status(response.status).send(response);
+    });
+
+    app.post('/users/edit/password', async (req, res) => {
+      const response = await User.editPassword(req.body.userId, req.body.password);
       res.status(response.status).send(response);
     });
 
@@ -54,6 +64,23 @@ class User {
       return new Response(null, 'Invalid userData', 400);
     }
 
+    if (!userData.credentials.email || !userData.credentials.userName) {
+      return new Response(null, 'Invalid userName or email', 400);
+    }
+
+    // TODO: validation of password strength
+
+    const existingUser = await Users.findOne({
+      $or: [
+        { 'credentials.email': userData.credentials.email },
+        { 'credentials.userName': userData.credentials.userName },
+      ],
+    });
+
+    if (existingUser !== null) {
+      return new Response(null, 'Either username or email is already used', 400);
+    }
+
     try {
       const user = await Users.create(userData);
       return new Response(user._id, '', 200);
@@ -62,32 +89,42 @@ class User {
     }
   }
 
-  // check for existing user in database (via email)
-  async _userExists(userEmail) {
+  async editPassword(userId, password) {
+    return this._updateCredentials(userId, 'password', password);
+  }
+
+  async editUserName(userId, userName) {
+    return this._updateCredentials(userId, 'userName', userName);
+  }
+
+  async _updateCredentials(userId, credName, credValue) {
+    if (!userId || !credName || !credValue) {
+      return new Response(null, 'Invalid userId or userData', 400);
+    }
+
     try {
-      await Users.findOne({
-        'credentials.email': userEmail,
-      }).orFail();
-      return true;
+      const user = await Users.findById(userId).orFail();
+      Object.assign(user.credentials[credName], credValue);
+      return new Response(null, '', 200);
     } catch (e) {
-      return false;
+      return new Response(null, 'Invalid userData', 400);
     }
   }
 
   // Returns userId if succeeds, -1 otherwise
-  async login(email, password) {
-    if (!email || !password) {
-      return new Response(null, 'Invalid email or password', 400);
+  async login(userName, password) {
+    if (!userName || !password) {
+      return new Response(null, 'Invalid userName or password', 400);
     }
 
     try {
       const user = await Users.findOne({
-        'credentials.email': email,
+        'credentials.userName': userName,
         'credentials.password': password,
       }).orFail();
       return new Response(user._id, '', 200);
     } catch (e) {
-      return new Response(null, 'Invalid email or password', 400);
+      return new Response(null, 'Invalid userName or password', 400);
     }
   }
 
@@ -117,17 +154,16 @@ class User {
     const { email } = ticket.payload;
     const user = await this._getUser(email);
 
-    // If user does not exist, create
+    // user does not exist
     if (user === null) {
-      const userResult = await User.createUser({
+      const userInfo = {
         credentials: {
-          userName: email,
           email,
           idToken: ticket.payload,
           firebaseToken,
         },
-      });
-      return userResult;
+      };
+      return new Response(userInfo, '', 200);
     }
 
     return new Response(user._id, '', 200);
@@ -153,7 +189,7 @@ class User {
 
   // get UserId
   async _getUser(userEmail) {
-    const user = await Users.findOne({ 'credentials.email': userEmail });
+    const user = await Users.findOne({ 'credentials.email': userEmail }).lean();
     return user;
   }
 
