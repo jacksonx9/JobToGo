@@ -35,7 +35,7 @@ class JobAnalyzer {
    */
   computeJobKeywordCount(job, keywords) {
     const description = job.description.replace(/^[a-z ]/gi, ' ');
-    // Add the number of occurance of all keywords in the description
+    // Add the number of occurances of all keywords in the description
     keywords.forEach((keyword) => {
       const re = new RegExp(` ${keyword} `, 'gi');
       job.keywords.push({
