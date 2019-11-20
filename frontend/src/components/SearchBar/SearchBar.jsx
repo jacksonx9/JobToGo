@@ -9,12 +9,14 @@ import { colours, sizes } from '../../styles';
 const SearchBar = ({ value, onChangeText, onEndSearch }) => (
   <View style={styles.container}>
     <IconButton
+      testID="searchBack"
       name="chevron-left"
       color={colours.lightGray}
       size={sizes.icon}
       onPress={onEndSearch}
     />
     <TextInput
+      testID="searchInput"
       placeholder="Search"
       style={styles.input}
       value={value}

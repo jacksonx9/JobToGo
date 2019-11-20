@@ -138,10 +138,12 @@ export default class EditFriends extends Component {
 
     const userList = (
       <FlatList
+        testID="userList"
         data={users}
         keyExtractor={item => item._id}
         renderItem={({ item, index }) => (
           <SelectableItem
+            testID={`userItem${index}`}
             key={item._id}
             header={item.userName}
             subHeader={item.email}
@@ -173,9 +175,11 @@ export default class EditFriends extends Component {
     }
     return (
       <View
+        testID="editFriends"
         style={[styles.container]}
       >
         <NavHeader
+          testID="navHeaderFriends"
           title="Friends"
           buttonOption="search"
           onPressButton={() => { this.setState({ searchInProgress: true }); }}

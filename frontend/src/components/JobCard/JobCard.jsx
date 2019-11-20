@@ -9,11 +9,12 @@ import { colours, sizes } from '../../styles';
 import styles from './styles';
 
 const JobCard = ({
-  logo, company, title, location, description, onPressShare,
+  logo, company, title, location, description, onPressShare, testID,
 }) => (
   <View style={styles.container}>
     <View style={styles.shareContainer}>
       <IconButton
+        testID={testID}
         name="share-2"
         color={colours.lightGray}
         size={sizes.icon}
@@ -25,6 +26,7 @@ const JobCard = ({
         logo={logo}
       />
       <JobDetails
+        testID={testID}
         logo={logo}
         company={company}
         title={title}
@@ -37,6 +39,7 @@ const JobCard = ({
 
 JobCard.defaultProps = {
   logo: null,
+  testID: '',
 };
 
 JobCard.propTypes = {
@@ -46,6 +49,7 @@ JobCard.propTypes = {
   location: string.isRequired,
   description: string.isRequired,
   onPressShare: func.isRequired,
+  testID: string,
 };
 
 export default JobCard;

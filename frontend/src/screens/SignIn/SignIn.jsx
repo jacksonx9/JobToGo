@@ -21,7 +21,13 @@ export default class SignIn extends Component {
 
   signIn = async () => {
     const { navigation } = this.props;
-    global.userId = 'debug_userId';
+    global.userId = '5dd2106bb16a1f002b503255';
+
+    const { email, password } = this.state;
+
+    if (email === 'a' && password === 'a') {
+      global.userId = '5dd399d45085530034b454e2';
+    } 
     navigation.navigate('App');
   }
 
@@ -31,10 +37,12 @@ export default class SignIn extends Component {
     return (
       <View style={styles.container}>
         <Image
+          testID="logoSignin"
           source={images.logoLight}
           style={styles.logo}
         />
         <TextInput
+          testID="email"
           style={styles.inputContainer}
           placeholder="Email"
           value={email}
@@ -42,6 +50,7 @@ export default class SignIn extends Component {
           onChangeText={text => { this.setState({ email: text }); }}
         />
         <TextInput
+          testID="password"
           style={styles.inputContainer}
           placeholder="Password"
           value={password}
@@ -49,6 +58,7 @@ export default class SignIn extends Component {
           onChangeText={text => { this.setState({ password: text }); }}
         />
         <Button
+          testID="signIn"
           title="Sign In"
           textColor={colours.white}
           backgroundColor={colours.accentPrimary}

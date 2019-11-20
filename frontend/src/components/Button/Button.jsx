@@ -5,9 +5,10 @@ import PropTypes from 'prop-types';
 import styles from './styles';
 
 const Button = ({
-  style, backgroundColor, textColor, title, enable, onPress,
+  style, backgroundColor, textColor, title, enable, onPress, testID,
 }) => (
   <TouchableOpacity
+    testID={testID}
     style={[{
       opacity: enable ? 1 : 0.3,
       backgroundColor,
@@ -26,6 +27,7 @@ Button.defaultProps = {
   backgroundColor: 'black',
   textColor: 'white',
   enable: true,
+  testID: '',
 };
 
 Button.propTypes = {
@@ -35,6 +37,7 @@ Button.propTypes = {
   title: PropTypes.string.isRequired,
   enable: PropTypes.bool,
   onPress: PropTypes.func.isRequired,
+  testID: PropTypes.string,
 };
 
 export default Button;
