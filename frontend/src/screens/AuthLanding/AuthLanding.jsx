@@ -62,27 +62,29 @@ export default class AuthLanding extends Component {
           source={images.jobSeeker}
           style={styles.image}
         />
-        <GoogleSigninButton
-          style={styles.googleButton}
-          size={GoogleSigninButton.Size.Wide}
-          color={GoogleSigninButton.Color.Light}
-          onPress={this.googleSignIn}
-          disabled={false}
-        />
-        <Button
-          title="Sign In"
-          textColor={colours.white}
-          backgroundColor={colours.accentPrimary}
-          style={styles.signInButton}
-          onPress={() => navigation.navigate('SignIn')}
-        />
-        <Button
-          title="Sign Up"
-          textColor={colours.accentPrimary}
-          backgroundColor="transparent"
-          style={styles.signUpButton}
-          onPress={() => navigation.navigate('SignUp')}
-        />
+        <View style={styles.buttonSection}>
+          <GoogleSigninButton
+            style={styles.googleButton}
+            size={GoogleSigninButton.Size.Wide}
+            color={GoogleSigninButton.Color.Light}
+            onPress={this.googleSignIn}
+            disabled={false}
+          />
+          <Button
+            title="Sign In"
+            textColor={colours.white}
+            backgroundColor={colours.accentPrimary}
+            style={styles.signInButton}
+            onPress={() => navigation.navigate('SignIn')}
+          />
+          <Button
+            title="Sign Up"
+            textColor={colours.accentPrimary}
+            backgroundColor="transparent"
+            style={styles.signUpButton}
+            onPress={() => navigation.navigate('SignUp')}
+          />
+        </View>
       </View>
     );
   }

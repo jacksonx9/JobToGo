@@ -2,29 +2,30 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { string, func, oneOf } from 'prop-types';
 
-import SearchBar from '../SeachBar';
-import ImageButton from '../ImageButton';
-import images from '../../constants/images';
+import IconButton from '../IconButton';
 import styles from './styles';
+import { colours, sizes } from '../../styles';
 
 
 const NavHeader = ({
-  title, buttonOption, onPressButton, value, onChangeText, onStartSearch, onEndSearch,
+  title, buttonOption, onPressButton,
 }) => {
   let button;
   if (buttonOption === 'search') {
     button = (
-      <SearchBar
-        value={value}
-        onChangeText={onChangeText}
-        onStartSearch={onStartSearch}
-        onEndSearch={onEndSearch}
+      <IconButton
+        name="search"
+        color={colours.lightGray}
+        size={sizes.icon}
+        onPress={onPressButton}
       />
     );
   } else if (buttonOption === 'back') {
     button = (
-      <ImageButton
-        source={images.iconChevronLeft}
+      <IconButton
+        name="menu"
+        color={colours.lightGray}
+        size={sizes.icon}
         onPress={onPressButton}
       />
     );
@@ -38,8 +39,10 @@ const NavHeader = ({
         <View style={styles.leftComponentContainer}>
           {button}
         </View>
-        <ImageButton
-          source={images.iconMenu}
+        <IconButton
+          name="user"
+          color={colours.lightGray}
+          size={sizes.icon}
           onPress={onPressButton}
         />
       </View>
@@ -55,20 +58,12 @@ const NavHeader = ({
 NavHeader.defaultProps = {
   buttonOption: 'none',
   onPressButton: () => {},
-  value: '',
-  onChangeText: () => {},
-  onStartSearch: () => {},
-  onEndSearch: () => {},
 };
 
 NavHeader.propTypes = {
   title: string.isRequired,
   buttonOption: oneOf(['search', 'back', 'none']),
   onPressButton: func,
-  value: string,
-  onChangeText: func,
-  onStartSearch: func,
-  onEndSearch: func,
 };
 
 export default NavHeader;

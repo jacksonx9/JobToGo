@@ -10,6 +10,12 @@ const config = {
   ENDP_JOBS: `${serverIp}/jobs/find/`,
   ENDP_DISLIKE: `${serverIp}/jobs/dislike/`,
   ENDP_LIKE: `${serverIp}/jobs/like/`,
+
+  ENDP_SHARE_JOB: `${serverIp}/friends/sendJob/`,
+  ENDP_SHARED_JOBS: `${serverIp}/friends/recommendedJobs/`,
+  ENDP_LIKE_SHARED: `${serverIp}/friends/confirmJob/`,
+  ENDP_DISLIKE_SHARED: `${serverIp}/friends/rejectJob/`,
+
   ENDP_EMAIL: `${serverIp}/messenger/email/`,
   ENDP_GOOGLE: `${serverIp}/users/googleLogin/`,
   ENDP_USERS: `${serverIp}/users/`,

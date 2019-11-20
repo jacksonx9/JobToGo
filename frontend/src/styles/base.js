@@ -1,7 +1,8 @@
 import { Dimensions } from 'react-native';
 
 export const dimensions = {
-  fullHeight: Dimensions.get('window').height,
+  screenHeight: Dimensions.get('window').height,
+  fullHeight: Dimensions.get('window').height - 70,
   fullWidth: Dimensions.get('window').width,
 };
 
@@ -13,6 +14,8 @@ export const colours = {
   gray: '#696969',
   lightGray: '#a6a6a6',
   lighterGray: '#ededed',
+  red: '#eb5b5b',
+  green: '#4cd971',
 };
 
 export const padding = {
@@ -39,16 +42,23 @@ export const border = {
 
 export const elevation = {
   md: 10,
+  lg: 20,
 };
 
 export const fonts = {
   sm: 12,
-  md: 15,
-  lg: 23,
+  md: 14,
+  lg: 17,
+  xl: 23,
   normal: 'Muli-Regular',
   semiBold: 'Muli-SemiBold',
   bold: 'Muli-Bold',
   extraBold: 'Muli-ExtraBold',
+};
+
+export const sizes = {
+  icon: 25,
+  iconLg: 30,
 };
 
 export const containers = {

@@ -1,23 +1,26 @@
 import { StyleSheet } from 'react-native';
 
-import { colours, fonts } from '../../styles';
+import {
+  colours, fonts, margin, padding, elevation,
+} from '../../styles';
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 15,
-    justifyContent: 'center',
-    height: 150,
-    width: '100%',
-    overflow: 'scroll',
-    backgroundColor: 'white',
-  },
-  textContainer: {
-    paddingVertical: 7,
-    paddingHorizontal: 30,
     flexDirection: 'column',
     justifyContent: 'flex-start',
-    height: 100,
+    alignItems: 'flex-start',
+    height: '55%',
+    width: '100%',
     overflow: 'scroll',
+    backgroundColor: colours.white,
+  },
+  textContainer: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    height: '85%',
+    width: '100%',
+    overflow: 'scroll',
+    backgroundColor: colours.white,
   },
   subHeaderContainer: {
     flexDirection: 'row',
@@ -28,9 +31,9 @@ const styles = StyleSheet.create({
     padding: 30,
     fontFamily: fonts.normal,
     color: colours.darkGray,
-    height: '100%',
+    height: 200,
     fontSize: 12,
-    backgroundColor: 'white',
+    backgroundColor: 'black',
   },
   scroll: {
     marginTop: 30,
@@ -39,20 +42,82 @@ const styles = StyleSheet.create({
     overflow: 'scroll',
   },
   header: {
-    fontSize: 20,
-    color: colours.darkGray,
-    fontFamily: fonts.normal,
-    paddingBottom: 7,
+    fontFamily: fonts.bold,
+    fontSize: fonts.lg,
+    color: colours.gray,
+    marginBottom: margin.md,
   },
   subHeader: {
-    fontSize: 15,
+    fontFamily: fonts.bold,
+    fontSize: fonts.md,
     color: colours.gray,
-    fontFamily: fonts.normal,
-    paddingLeft: 6,
+    marginLeft: margin.sm,
   },
   icon: {
     width: 50,
     height: 50,
+  },
+  expandBtnContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+    height: '15%',
+    width: '100%',
+    backgroundColor: colours.pink,
+  },
+
+
+  detailsContainer: {
+    height: '85%',
+    width: '100%',
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    padding: padding.lg,
+    position: 'absolute',
+    bottom: 0,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    backgroundColor: colours.primary,
+    elevation: elevation.md,
+  },
+  logoContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    height: '15%',
+    width: '100%',
+    backgroundColor: colours.primary,
+  },
+  infoContainer: {
+    maxHeight: '20%',
+    width: '100%',
+    backgroundColor: colours.primary,
+    marginBottom: margin.md,
+  },
+  descContainer: {
+    maxHeight: '70%',
+    width: '100%',
+    backgroundColor: colours.primary,
+    overflow: 'scroll',
+  },
+  normalText: {
+    fontFamily: fonts.normal,
+    fontSize: fonts.md,
+    color: colours.white,
+  },
+  headerDark: {
+    fontFamily: fonts.semiBold,
+    fontSize: fonts.lg,
+    color: colours.white,
+    marginBottom: margin.sm,
+    marginLeft: margin.sm,
+  },
+  subHeaderDark: {
+    fontFamily: fonts.semiBold,
+    fontSize: fonts.md,
+    color: colours.white,
+    marginLeft: margin.sm,
   },
 });
 

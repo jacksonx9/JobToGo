@@ -1,28 +1,33 @@
 import React from 'react';
 import {
-  Text, TouchableOpacity, View, Image,
+  Text, TouchableOpacity, View,
 } from 'react-native';
-import PropTypes from 'prop-types';
+import { string, func, bool } from 'prop-types';
 
-import images from '../../constants/images';
+import JobImage from '../JobImage';
+import { colours } from '../../styles';
 import styles from './styles';
 
 const SelectableItem = ({
-  header, subHeader, onPress, actionIcon,
+  header, subHeader, onPress, actionIcon, disabled, imageSource,
+  backgroundColor, titleColor, descriptionColor,
 }) => (
-  <View style={styles.container}>
+  <View style={[styles.container, { backgroundColor }]}>
     <View style={styles.contentContainer}>
-      <Image source={images.jobBackground} style={styles.logo} />
+      <JobImage
+        logo={imageSource}
+        style={styles.logo}
+      />
       <View style={[styles.infoContainer]}>
         <Text
           numberOfLines={1}
-          style={styles.companyText}
+          style={[styles.descriptionText, { color: titleColor }]}
         >
           {header}
         </Text>
         <Text
           numberOfLines={2}
-          style={styles.titleText}
+          style={[styles.titleText, { color: descriptionColor }]}
         >
           {subHeader}
         </Text>
@@ -32,6 +37,7 @@ const SelectableItem = ({
     <TouchableOpacity
       style={[styles.buttonContainer]}
       onPress={onPress}
+      disabled={disabled}
     >
       <Text style={[styles.button]}>{actionIcon}</Text>
     </TouchableOpacity>
@@ -40,13 +46,23 @@ const SelectableItem = ({
 
 SelectableItem.defaultProps = {
   subHeader: '',
+  disabled: false,
+  imageSource: null,
+  backgroundColor: colours.white,
+  titleColor: colours.primary,
+  descriptionColor: colours.gray,
 };
 
 SelectableItem.propTypes = {
-  header: PropTypes.string.isRequired,
-  subHeader: PropTypes.string,
-  onPress: PropTypes.func.isRequired,
-  actionIcon: PropTypes.string.isRequired,
+  header: string.isRequired,
+  subHeader: string,
+  onPress: func.isRequired,
+  actionIcon: string.isRequired,
+  disabled: bool,
+  imageSource: string,
+  backgroundColor: string,
+  titleColor: string,
+  descriptionColor: string,
 };
 
 export default SelectableItem;

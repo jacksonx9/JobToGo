@@ -3,18 +3,17 @@ import { View, FlatList } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
 
+import Search from '../../components/Search';
 import SelectableItem from '../../components/SelectableItem';
 import Loader from '../../components/Loader';
+import InfoDisplay from '../../components/InfoDisplay';
 import NavHeader from '../../components/NavHeader';
 import SwitchableNav from '../../components/SwitchableNav';
 import config from '../../constants/config';
+import { status } from '../../constants/messages';
 import styles from './styles';
 
 export default class EditFriends extends Component {
-  static navigationOptions = {
-    drawerLabel: 'Friends',
-  }
-
   constructor(props) {
     super(props);
     this.state = {
@@ -23,6 +22,7 @@ export default class EditFriends extends Component {
       addFriendName: '',
       loading: 1,
       showPendingFriends: true,
+      searchInProgress: false,
     };
     this.logger = Logger.get(this.constructor.name);
   }
@@ -103,12 +103,74 @@ export default class EditFriends extends Component {
     });
   }
 
+  searchUsers = async text => {
+    // TODO: get query response from server
+    this.setState({ addFriendName: text });
+  }
+
   render() {
     const {
-      loading, addFriendName, pendingFriends, friends, showPendingFriends,
+      loading, addFriendName, pendingFriends, friends, showPendingFriends, searchInProgress,
     } = this.state;
 
+    let users;
+    let onPress;
+    let noUsersMsg;
+    let actionIcon;
+    if (searchInProgress) {
+      users = friends; // TODO: change to user query results
+      onPress = this.addFriend;
+      noUsersMsg = status.noResults;
+      actionIcon = '+';
+    } else if (showPendingFriends) {
+      users = pendingFriends;
+      onPress = this.comfirmFriendRequest;
+      noUsersMsg = status.noPendingFriends;
+      actionIcon = '+';
+    } else {
+      users = friends;
+      onPress = this.removeFriend;
+      noUsersMsg = status.noFriends;
+      actionIcon = 'x';
+    }
+
+    const noUsers = users.length === 0;
+
+    const userList = (
+      <FlatList
+        data={users}
+        keyExtractor={item => item._id}
+        renderItem={({ item, index }) => (
+          <SelectableItem
+            key={item._id}
+            header={item.userName}
+            subHeader={item.email}
+            onPress={() => onPress(item, index)}
+            actionIcon={actionIcon}
+          />
+        )}
+      />
+    );
+
+    const noUsersInfo = (
+      <InfoDisplay message={noUsersMsg} />
+    );
+
     if (loading) return <Loader />;
+    if (searchInProgress) {
+      return (
+        <Search
+          value={addFriendName}
+          onChangeText={text => this.searchUsers(text)}
+          onEndSearch={() => {
+            this.setState({ addFriendName: '', searchInProgress: false });
+            this.addFriend(); // TODO: Remove this once user search is implemented
+          }}
+        >
+          {noUsers ? noUsersInfo : userList}
+        </Search>
+      );
+    }
     return (
       <View
         style={[styles.container]}
@@ -116,10 +178,7 @@ export default class EditFriends extends Component {
         <NavHeader
           title="Friends"
           buttonOption="search"
-          value={addFriendName}
-          onChangeText={text => { this.setState({ addFriendName: text }); }}
-          onEndSearch={() => this.addFriend()}
-          onStartSearch={() => {}}
+          onPressButton={() => { this.setState({ searchInProgress: true }); }}
         />
         <SwitchableNav
           showNavOption1={showPendingFriends}
@@ -129,36 +188,7 @@ export default class EditFriends extends Component {
           onPressNavOption2={() => { this.setState({ showPendingFriends: false }); }}
         />
         <View style={[styles.listContainer]}>
-          {showPendingFriends ? (
-            <FlatList
-              data={pendingFriends}
-              keyExtractor={item => item._id}
-              renderItem={({ item }) => (
-                <SelectableItem
-                  key={item._id}
-                  header={item.userName}
-                  subHeader={item.email}
-                  onPress={() => this.comfirmFriendRequest(item)}
-                  actionIcon="+"
-                />
-              )}
-            />
-          )
-            : (
-              <FlatList
-                data={friends}
-                keyExtractor={item => item._id}
-                renderItem={({ item, index }) => (
-                  <SelectableItem
-                    key={item._id}
-                    header={item.userName}
-                    subHeader={item.email}
-                    onPress={() => this.removeFriend(item, index)}
-                    actionIcon="x"
-                  />
-                )}
-              />
-            )}
+          {noUsers ? noUsersInfo : userList}
         </View>
       </View>
     );

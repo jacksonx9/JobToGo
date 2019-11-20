@@ -19,13 +19,11 @@ const styles = StyleSheet.create({
   input: {
     height: 50,
     width: '90%',
-    marginVertical: 5,
-    paddingHorizontal: 10,
-    color: colours.gray,
+    marginBottom: margin.sm,
+    paddingHorizontal: padding.sm,
+    borderRadius: border.radius,
+    backgroundColor: colours.lighterGray,
     fontFamily: fonts.normal,
-    fontSize: fonts.md,
-    borderBottomColor: colours.gray,
-    borderBottomWidth: border.inputBorderWidth,
   },
 });
 

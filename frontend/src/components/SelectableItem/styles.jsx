@@ -11,10 +11,10 @@ const styles = StyleSheet.create({
     height: 70,
     width: '95%',
     paddingHorizontal: padding.md,
-    margin: margin.sm,
+    margin: margin.xs,
+    marginLeft: margin.xs + 3,
     borderRadius: border.radius,
-    elevation: 10,
-    backgroundColor: colours.white,
+    elevation: 8,
   },
   logo: {
     height: 50,
@@ -22,15 +22,13 @@ const styles = StyleSheet.create({
     borderRadius: border.radius,
     marginRight: margin.lg,
   },
-  companyText: {
+  descriptionText: {
     fontSize: fonts.md,
     fontFamily: fonts.bold,
-    color: colours.primary,
   },
   titleText: {
     fontSize: fonts.sm,
     fontFamily: fonts.semiBold,
-    color: colours.gray,
   },
   contentContainer: {
     flexDirection: 'row',

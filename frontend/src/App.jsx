@@ -3,8 +3,10 @@ import { Platform, Alert } from 'react-native';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
+import Icon from 'react-native-vector-icons/Feather';
 import firebase from 'react-native-firebase';
 import Logger from 'js-logger';
+import { string } from 'prop-types';
 
 import SignIn from './screens/SignIn';
 import SignUp from './screens/SignUp/SignUp';
@@ -13,6 +15,7 @@ import JobSwipe from './screens/JobSwipe';
 import SendLikedJobs from './screens/SendLikedJobs/SendLikedJobs';
 import EditFriends from './screens/EditFriends/EditFriends';
 import EditSkills from './screens/EditSkills/EditSkills';
+import { colours, fonts, sizes } from './styles';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -90,45 +93,67 @@ const navConfig = {
   },
 };
 
-// {
-//   defaultNavigationOptions: ({ navigation }) => ({
-//     tabBarIcon: ({ focused, horizontal, tintColor }) => {
-//       const { routeName } = navigation.state;
-//       let IconComponent = Ionicons;
-//       let iconName;
-//       if (routeName === 'Home') {
-//         iconName = `ios-information-circle${focused ? '' : '-outline'}`;
-//         // Sometimes we want to add badges to some icons.
-//         // You can check the implementation below.
-//         IconComponent = HomeIconWithBadge;
-//       } else if (routeName === 'Settings') {
-//         iconName = `ios-options`;
-//       }
-
-//       // You can return any component that you like here!
-//       return <IconComponent name={iconName} size={25} color={tintColor} />;
-//     },
-//   }),
-//   tabBarOptions: {
-//     activeTintColor: 'tomato',
-//     inactiveTintColor: 'gray',
-//   },
-// }
-
 const tabNavConfig = {
-  initialRouteName: 'JobSwipe',
+  initialRouteName: 'Home',
   tabBarOptions: {
-    activeTintColor: 'tomato',
-    inactiveTintColor: 'gray',
+    style: {
+      height: 50,
+      borderTopColor: 'transparent',
+    },
+    labelStyle: {
+      fontFamily: fonts.bold,
+    },
+    activeTintColor: colours.accentPrimary,
+    inactiveTintColor: colours.lightGray,
   },
 };
 
+function HomeTabIcon({ tintColor }) {
+  return (<Icon name="home" size={sizes.icon} color={tintColor} />);
+}
+
+function LikedTabIcon({ tintColor }) {
+  return (<Icon name="heart" size={sizes.icon} color={tintColor} />);
+}
+
+function FriendsTabIcon({ tintColor }) {
+  return (<Icon name="users" size={sizes.icon} color={tintColor} />);
+}
+
+function ResumeTabIcon({ tintColor }) {
+  return (<Icon name="upload" size={sizes.icon} color={tintColor} />);
+}
+
 const AppStack = createBottomTabNavigator(
   {
-    JobSwipe,
-    SendLikedJobs,
-    EditFriends,
-    EditSkills,
+    Home: {
+      screen: JobSwipe,
+      navigationOptions: {
+        tabBarLabel: 'Home',
+        tabBarIcon: HomeTabIcon,
+      },
+    },
+    Send: {
+      screen: SendLikedJobs,
+      navigationOptions: {
+        tabBarLabel: 'Liked',
+        tabBarIcon: LikedTabIcon,
+      },
+    },
+    Friends: {
+      screen: EditFriends,
+      navigationOptions: {
+        tabBarLabel: 'Friends',
+        tabBarIcon: FriendsTabIcon,
+      },
+    },
+    Resume: {
+      screen: EditSkills,
+      navigationOptions: {
+        tabBarLabel: 'Resume',
+        tabBarIcon: ResumeTabIcon,
+      },
+    },
   },
   tabNavConfig,
 );
@@ -153,3 +178,20 @@ const AppContainer = createAppContainer(
     },
   ),
 );
+
+
+HomeTabIcon.propTypes = {
+  tintColor: string.isRequired,
+};
+
+LikedTabIcon.propTypes = {
+  tintColor: string.isRequired,
+};
+
+FriendsTabIcon.propTypes = {
+  tintColor: string.isRequired,
+};
+
+ResumeTabIcon.propTypes = {
+  tintColor: string.isRequired,
+};

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View } from 'react-native';
+import { View, Image, Text } from 'react-native';
 import FilePickerManager from 'react-native-file-picker';
 import axios from 'axios';
 import Logger from 'js-logger';
@@ -9,12 +9,9 @@ import NavHeader from '../../components/NavHeader/NavHeader';
 import config from '../../constants/config';
 import styles from './styles';
 import { colours } from '../../styles';
+import images from '../../constants/images';
 
 export default class EditSkills extends Component {
-  static navigationOptions = {
-    drawerLabel: 'Edit Skills',
-  }
-
   constructor(props) {
     super(props);
     this.logger = Logger.get(this.constructor.name);
@@ -53,6 +50,13 @@ export default class EditSkills extends Component {
         <NavHeader
           title="Edit Skills"
         />
+        <Image
+          source={images.checkingDoc}
+          style={styles.image}
+        />
+        <Text style={styles.text}>
+          Get jobs that are tailored to your skills by uploading your resume.
+        </Text>
         <Button
           backgroundColor={colours.accentPrimary}
           title="Upload Resume"

@@ -1,10 +1,11 @@
 import { StyleSheet } from 'react-native';
 
-import { padding, colours, dimensions } from '../../styles';
+import { padding, dimensions, colours } from '../../styles';
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: 'space-between',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     paddingTop: padding.xl,
     paddingHorizontal: padding.md,
@@ -12,6 +13,15 @@ const styles = StyleSheet.create({
     width: dimensions.fullWidth,
     backgroundColor: colours.white,
     zIndex: 1000,
+  },
+  buttonContainer: {
+    height: '100%',
+    width: '25%',
+  },
+  logoContainer: {
+    justifyContent: 'center',
+    height: '100%',
+    width: '50%',
   },
   logo: {
     width: 170,
