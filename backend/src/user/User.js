@@ -64,8 +64,12 @@ class User {
       return new Response(null, 'Invalid userData', 400);
     }
 
-    if (!userData.credentials.email || !userData.credentials.userName) {
-      return new Response(null, 'Invalid userName or email', 400);
+    if (!userData.credentials.email) {
+      return new Response(userData.credentials.email, 'Invalid email', 400);
+    }
+
+    if (!userData.credentials.userName) {
+      return new Response(userData.credentials.userName, 'Invalid username', 400);
     }
 
     // TODO: validation of password strength
