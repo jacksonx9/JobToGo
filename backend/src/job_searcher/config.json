@@ -1,0 +1,35 @@
+{
+    "indeedQuery": {
+        "host": "www.indeed.com",
+        "maxAge": "30",
+        "sort": "relevance",
+        "limit": 50
+    },
+    "indeedExpiredTags": [
+        ".jobsearch-ExpiredJobMetadata",
+        ".jobsearch-JobInfoHeader-expiredHeader"
+    ],
+    "indeedJobUrlTag": "#indeed-share-url",
+    "indeedJobDescTag": "#jobDescriptionText",
+    "keywords": [
+        "software",
+        "software intern",
+        "java",
+        "javascript",
+        "python",
+        "android",
+        "react",
+        "node.js",
+        "nodejs",
+        "mongo",
+        "ios",
+        "gpu",
+        "verilog",
+        "linux",
+        "opengl",
+        "machine learning",
+        "neural networks",
+        "pytorch",
+        "tensorflow"
+    ]
+}

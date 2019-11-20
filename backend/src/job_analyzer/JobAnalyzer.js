@@ -35,12 +35,11 @@ class JobAnalyzer {
    */
   computeJobKeywordCount(job, keywords) {
     // Add the number of occurance of all keywords of the result
-    const description = job.description.toLowerCase();
+    const description = job.description.replace(/^[a-z ]/gi, ' ');
     keywords.forEach((keyword) => {
       // TODO: matches "java" with "javascript" from description
       // NOTE: if you map with spaces around it, problems such as "java," being excluded arise
-      const keywordRe = keyword.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-      const re = new RegExp(keywordRe, 'g');
+      const re = new RegExp(` ${keyword} `, 'gi');
       job.keywords.push({
         name: keyword,
         count: (description.match(re) || []).length,
