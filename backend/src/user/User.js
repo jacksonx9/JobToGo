@@ -58,19 +58,26 @@ class User {
       return new Response([], '', 200);
     }
 
-    const potUsers = await Users.find({ 'credentials.userName': { $regex: `^${subUserName}` } },
-      '_id credentials.userName friends').lean();
+    const potUsers = await Users.find(
+      { 'credentials.userName':
+        {
+          $regex: `^${subUserName}`,
+          $options: 'i',
+        }
+      },
+      '_id credentials.userName friends',
+    ).lean();
+    const users = [];
 
     potUsers.forEach((_, i) => {
-      if (potUsers[i].friends.includes(userId)) {
-        potUsers[i].isFriend = true;
-      } else {
-        potUsers[i].isFriend = false;
-      }
-
-      delete potUsers[i].friends;
+      users.push({
+        _id: potUsers[i]._id,
+        userName: potUsers[i].credentials.userName,
+        isFriend: potUsers[i].friends.includes(userId),
+      });
     });
-    return new Response(potUsers, '', 200);
+
+    return new Response(users, '', 200);
   }
 
   // IMPORTANT: DO NOT initialize friends and pendingFriends
