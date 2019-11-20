@@ -29,7 +29,7 @@ class JobSearcher {
 
   async updateJobStore() {
     // First remove any outdated jobs
-    // await this.removeOutdatedJobs();
+    await this.removeOutdatedJobs();
 
     const count = await Jobs.countDocuments({});
 
@@ -68,10 +68,9 @@ class JobSearcher {
             job.url = $(jobConfig.indeedJobUrlTag).attr('content');
 
             const jobExists = await Jobs.findOne({ url: job.url });
-            // Check if job does not exist in the database already
+            // If new job, compute the number of keywords in the job's description and save to db
             if (!jobExists) {
               job.keywords = [];
-              // Compute count of each keyword in the job
               this.jobAnalyzer.computeJobKeywordCount(job, keywords);
               if (job.keywords.some(keyword => keyword.count > 0)) {
                 jobs.push(job);
