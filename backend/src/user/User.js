@@ -88,7 +88,7 @@ class User {
   // return: userId if succeeds and null otherwise
   static async createUser(userData) {
     if (!userData) {
-      return new Response(null, 'Invalid userId', 400);
+      return new Response(null, 'Invalid userData', 400);
     }
 
     try {
