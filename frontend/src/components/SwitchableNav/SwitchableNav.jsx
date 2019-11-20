@@ -7,8 +7,9 @@ import styles from './styles';
 const SwitchableNav = ({
   showNavOption1, navOption1Title, navOption2Title, onPressNavOption1, onPressNavOption2,
 }) => (
-  <View style={[styles.container]}>
+  <View style={[styles.container]} testID="switchNav">
     <TouchableOpacity
+      testID="switchNavOption1"
       style={styles.navOptionContainer}
       onPress={onPressNavOption1}
     >
@@ -21,6 +22,7 @@ const SwitchableNav = ({
     </TouchableOpacity>
 
     <TouchableOpacity
+      testID="switchNavOption2"
       style={styles.navOptionContainer}
       onPress={onPressNavOption2}
     >

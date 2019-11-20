@@ -26,7 +26,7 @@ class JobDetails extends Component {
   render() {
     const { modalVisible } = this.state;
     const {
-      logo, company, title, location, description,
+      logo, company, title, location, description, testID,
     } = this.props;
     return (
       <View style={[styles.container]}>
@@ -35,8 +35,12 @@ class JobDetails extends Component {
           transparent
           visible={modalVisible}
         >
-          <View style={styles.detailsContainer}>
+          <View
+            style={styles.detailsContainer}
+            testID={`${testID}Description`}
+          >
             <IconButton
+              testID={`${testID}Close`}
               name="chevron-down"
               color={colours.white}
               size={sizes.iconLg}
@@ -96,6 +100,7 @@ class JobDetails extends Component {
         </View>
         <View style={styles.expandBtnContainer}>
           <IconButton
+            testID={`${testID}Open`}
             name="info"
             color={colours.lightGray}
             size={sizes.icon}
@@ -119,6 +124,7 @@ JobDetails.propTypes = {
   location: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
   logo: PropTypes.string,
+  testID: PropTypes.string.isRequired,
 };
 
 export default JobDetails;

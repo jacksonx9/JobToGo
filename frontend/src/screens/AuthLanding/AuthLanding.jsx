@@ -55,15 +55,18 @@ export default class AuthLanding extends Component {
     return (
       <View style={styles.container}>
         <Image
+          testID="logoLight"
           source={images.logoLight}
           style={styles.logo}
         />
         <Image
+          testID="jobSeeker"
           source={images.jobSeeker}
           style={styles.image}
         />
         <View style={styles.buttonSection}>
           <GoogleSigninButton
+            testID="google"
             style={styles.googleButton}
             size={GoogleSigninButton.Size.Wide}
             color={GoogleSigninButton.Color.Light}
@@ -71,6 +74,7 @@ export default class AuthLanding extends Component {
             disabled={false}
           />
           <Button
+            testID="signInAuth"
             title="Sign In"
             textColor={colours.white}
             backgroundColor={colours.accentPrimary}
@@ -78,6 +82,7 @@ export default class AuthLanding extends Component {
             onPress={() => navigation.navigate('SignIn')}
           />
           <Button
+            testID="signUp"
             title="Sign Up"
             textColor={colours.accentPrimary}
             backgroundColor="transparent"

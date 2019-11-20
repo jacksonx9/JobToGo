@@ -18,8 +18,12 @@ const JobShareModal = ({
     isVisible={isVisible}
   >
     <View style={styles.modalContainer}>
-      <View style={styles.exitButtonContainer}>
+      <View
+        style={styles.exitButtonContainer}
+        testID="shareModal"
+      >
         <ImageButton
+          testID="closeShare"
           source={images.iconCross}
           onPress={onPressExit}
         />
