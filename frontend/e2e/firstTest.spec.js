@@ -1,3 +1,5 @@
+/* eslint-env detox/detox, mocha */
+
 beforeEach(async () => {
   await device.reloadReactNative();
   await element(by.id('signInAuth')).tap();
@@ -132,11 +134,12 @@ describe('Friends Screen', () => {
     const NON_FUNC_REQ_FRIEND_COUNT = 100;
     await element(by.id('friends')).tap();
     await element(by.id('switchNavOption2')).tap();
+    const userNums = Array.from(Array(NON_FUNC_REQ_FRIEND_COUNT).keys());
 
-    for (i = 0; i < NON_FUNC_REQ_FRIEND_COUNT; i++) {
-      await waitFor(element(by.id(`userItem${i}`)))
+    await Promise.all(userNums.map(async num => {
+      await waitFor(element(by.id(`userItem${num}`)))
         .toBeVisible().whileElement(by.id('userList')).scroll(300, 'down');
-    }
+    }));
   });
 
   it('Check user search component', async () => {

@@ -27,7 +27,7 @@ export default class SignIn extends Component {
 
     if (email === 'a' && password === 'a') {
       global.userId = '5dd399d45085530034b454e2';
-    } 
+    }
     navigation.navigate('App');
   }
 

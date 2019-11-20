@@ -7,7 +7,7 @@ import { errors } from '../../constants/messages';
 
 import styles from './styles';
 
-const InfoDisplay = ({ message, source, }) => (
+const InfoDisplay = ({ message, source }) => (
   <View style={styles.container} testID="infoDisplay">
     <Image
       source={source}
