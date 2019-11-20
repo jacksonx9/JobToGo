@@ -39,7 +39,9 @@
     "detox": "^14.8.0",
     "eslint": "^6.6.0",
     "eslint-config-airbnb": "^18.0.1",
+    "eslint-plugin-detox": "^1.0.0",
     "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-jasmine": "^4.1.0",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.16.0",
     "eslint-plugin-react-hooks": "^1.7.0",
@@ -63,7 +65,7 @@
         "build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
         "type": "android.emulator",
         "device": {
-          "avdName": "Nexus_5X_API_28"
+          "avdName": "Pixel_API_28"
         }
       }
     }

@@ -4,6 +4,8 @@ module.exports = {
     browser: true,
     es6: true,
     node: true,
+    jest: true,
+    jasmine: true,
   },
   extends: [
     'airbnb',
@@ -21,6 +23,7 @@ module.exports = {
   },
   plugins: [
     'react',
+    'detox'
   ],
   rules: {
     "react/prop-types": ["error", { "ignore": ["navigation"] }],

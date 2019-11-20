@@ -130,7 +130,7 @@ const AppStack = createBottomTabNavigator(
       screen: JobSwipe,
       navigationOptions: {
         tabBarLabel: 'Home',
-        tabBarTestID: "home",
+        tabBarTestID: 'home',
         tabBarIcon: HomeTabIcon,
       },
     },
@@ -138,7 +138,7 @@ const AppStack = createBottomTabNavigator(
       screen: SendLikedJobs,
       navigationOptions: {
         tabBarLabel: 'Liked',
-        tabBarTestID: "liked",
+        tabBarTestID: 'liked',
         tabBarIcon: LikedTabIcon,
       },
     },
@@ -146,7 +146,7 @@ const AppStack = createBottomTabNavigator(
       screen: EditFriends,
       navigationOptions: {
         tabBarLabel: 'Friends',
-        tabBarTestID: "friends",
+        tabBarTestID: 'friends',
         tabBarIcon: FriendsTabIcon,
       },
     },
@@ -154,7 +154,7 @@ const AppStack = createBottomTabNavigator(
       screen: EditSkills,
       navigationOptions: {
         tabBarLabel: 'Resume',
-        tabBarTestID: "resume",
+        tabBarTestID: 'resume',
         tabBarIcon: ResumeTabIcon,
       },
     },
