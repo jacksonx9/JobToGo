@@ -90,6 +90,10 @@ class Friend {
       friend.friendSuggestedJobs.push(jobId);
       await friend.save();
 
+      const friendSocketId = await this.redisClient.getAsync(friendId);
+      this.socket.to(friendSocketId).emit('friends-recommendedJobs',
+        await this.getRecommendedJobs(friendId));
+
       // Send push notification
       const messageResponse = await this.messenger.sendFriendJob(userId, friendId, jobId);
       return new Response(messageResponse, '', 200);
