@@ -35,11 +35,6 @@ class User {
       res.status(response.status).send(response);
     });
 
-    app.post('/users', async (req, res) => {
-      const response = await User.createUser(req.body.userData);
-      res.status(response.status).send(response);
-    });
-
     app.get('/users/:userName', async (req, res) => {
       const response = await this.getUser(req.params.userName);
       res.status(response.status).send(response);
