@@ -89,6 +89,11 @@ export default class SignIn extends Component {
           placeholderTextColor={colours.lightGray}
           onChangeText={text => { this.setState({ password: text, invalidLogin: false }); }}
         />
+        <TouchableOpacity
+          onPress={this.togglePasswordView}
+        >
+          <Text style={styles.link}>{showPasswordText}</Text>
+        </TouchableOpacity>
         <Button
           testID="signIn"
           title="Sign In"
