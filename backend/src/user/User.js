@@ -330,7 +330,7 @@ class User {
       const keywordNames = user.keywords.map(k => k.name);
 
       if (keywordNames.includes(keyword)) {
-        return Response(keyword, 'User already has this keyword', 200);
+        return Response(keyword, 'User already has this keyword', 400);
       }
 
       user.keywords.push({
