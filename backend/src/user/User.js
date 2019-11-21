@@ -87,7 +87,7 @@ class User {
   // IMPORTANT: DO NOT initialize friends and pendingFriends
   // return: userId if succeeds and null otherwise
   async createUser(userData) {
-    if (!userData || !userData.credentials.email || !userData.credentials.userName) {
+    if (!userData || !userData.credentials || !userData.credentials.email || !userData.credentials.userName) {
       return new Response(null, 'Invalid format, email, or userName', 400);
     }
 
@@ -118,7 +118,6 @@ class User {
     }
   }
 
-  // Returns userId if succeeds, -1 otherwise
   async login(userName, password) {
     if (!userName || !password) {
       return new Response(null, 'Invalid userName or password', 400);
