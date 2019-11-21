@@ -87,13 +87,11 @@ class Messenger {
     delete job.keywords;
 
     const { userName } = user.credentials;
-    const { jobName } = job.title;
-    const { jobCompany } = job.company;
     const message = {
       token: friend.credentials.firebaseToken,
       notification: {
         title: 'Friend sent you a job!',
-        body: `${userName} thinks you would be a good fit for ${jobName} at ${jobCompany}!`,
+        body: `${userName} thinks you would be a good fit for ${job.title} at ${job.company}!`,
       },
     };
 
