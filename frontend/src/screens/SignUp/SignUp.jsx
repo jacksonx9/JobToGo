@@ -85,7 +85,8 @@ export default class SignUp extends Component {
 
   render() {
     const {
-      userName, email, password, showPassword, showPasswordText, invalidUserName, invalidEmail, blank,
+      userName, email, password, showPassword, showPasswordText,
+      invalidUserName, invalidEmail, blank,
     } = this.state;
     return (
       <View style={styles.container}>

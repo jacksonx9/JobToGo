@@ -19,6 +19,8 @@ export default class SignIn extends Component {
       password: '',
       invalidLogin: false,
       blank: false,
+      showPassword: true,
+      showPasswordText: this.text.showPassword,
     };
     this.logger = Logger.get(this.constructor.name);
   }
@@ -49,9 +51,18 @@ export default class SignIn extends Component {
     }
   }
 
+  togglePasswordView = () => {
+    const { showPassword } = this.state;
+    this.setState({
+      showPassword: !showPassword,
+      showPasswordText: showPassword
+        ? this.text.hidePassword : this.text.showPassword,
+    });
+  }
+
   render() {
     const {
-      userName, password, invalidLogin, blank,
+      userName, password, invalidLogin, blank, showPassword, showPasswordText,
     } = this.state;
     const { navigation } = this.props;
     return (
