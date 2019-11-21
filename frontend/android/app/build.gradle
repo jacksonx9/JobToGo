@@ -204,6 +204,7 @@ dependencies {
     implementation "com.google.firebase:firebase-core:+"
     implementation "com.google.firebase:firebase-messaging:+"
 
+    compile project(':react-native-file-picker')
 
     if (enableHermes) {
       def hermesPath = "../../node_modules/hermesvm/android/";
