@@ -27,6 +27,11 @@ class User {
       res.status(response.status).send(response);
     });
 
+    app.post('/users/keywords/delete/:userId', async (req, res) => {
+      const response = await this.deleteKeyword(req.params.userId, req.body.keyword);
+      res.status(response.status).send(response);
+    });
+
     app.post('/users', async (req, res) => {
       const response = await this.createUser(req.body.userData);
       res.status(response.status).send(response);
@@ -262,6 +267,29 @@ class User {
       return new Response(true, '', 200);
     } catch (e) {
       return new Response(false, 'Invalid userId or skills', 400);
+    }
+  }
+
+  async deleteKeyword(userId, keyword) {
+    if (!userId || !keyword) {
+      return new Response(null, 'Invalid userId or keyword', 400);
+    }
+
+    try {
+      const user = await Users.findById(userId).orFail();
+      const keywordNames = user.keywords.map(k => k.name);
+      const index = keywordNames.indexOf(keyword);
+
+      if (index === -1) {
+        return Response(keyword, `User does not have keyword: ${keyword}`, 400);
+      }
+
+      // Remove oldKeyword
+      user.keywords.splice(index, 1);
+      await user.save();
+      return Response(null, '', 200);
+    } catch (e) {
+      return new Response(null, 'Invalid userId or keyword', 400);
     }
   }
 
