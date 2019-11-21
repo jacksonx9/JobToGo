@@ -31,7 +31,11 @@ class User {
     });
 
     app.post('/users', async (req, res) => {
-      // TODO: verify userData contains password
+      const response = await this.createUser(req.body.userData);
+      res.status(response.status).send(response);
+    });
+
+    app.post('/users', async (req, res) => {
       const response = await User.createUser(req.body.userData);
       res.status(response.status).send(response);
     });
@@ -87,17 +91,9 @@ class User {
 
   // IMPORTANT: DO NOT initialize friends and pendingFriends
   // return: userId if succeeds and null otherwise
-  static async createUser(userData) {
-    if (!userData) {
-      return new Response(null, 'Invalid userData', 400);
-    }
-
-    if (!userData.credentials.email) {
-      return new Response(userData.credentials.email, 'Invalid email', 400);
-    }
-
-    if (!userData.credentials.userName) {
-      return new Response(userData.credentials.userName, 'Invalid username', 400);
+  async createUser(userData) {
+    if (!userData || !userData.credentials.email || !userData.credentials.userName) {
+      return new Response(null, 'Invalid format, email, or userName', 400);
     }
 
     // TODO: validation of password strength
@@ -110,7 +106,13 @@ class User {
     });
 
     if (existingUser !== null) {
-      return new Response(null, 'Either username or email is already used', 400);
+      if (existingUser.credentials.email === userData.credentials.email) {
+        return new Response('email', 'Either email is already used', 200);
+      }
+      if (existingUser.credentials.userName === userData.credentials.userName) {
+        return new Response('userName', 'Either username is already used', 200);
+      }
+      return new Response(null, 'Malformed userData or user already exists', 400);
     }
 
     try {
@@ -173,6 +175,7 @@ class User {
           firebaseToken,
         },
       };
+
       return new Response(userInfo, '', 200);
     }
 
