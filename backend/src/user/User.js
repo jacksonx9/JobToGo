@@ -27,8 +27,8 @@ class User {
       res.status(response.status).send(response);
     });
 
-    app.post('/users/keywords', async (req, res) => {
-      const response = await this.addKeyword(req.body.userId, req.body.keyword);
+    app.post('/users/keywords/:userId', async (req, res) => {
+      const response = await this.addKeyword(req.params.userId, req.body.keyword);
       res.status(response.status).send(response);
     });
 
