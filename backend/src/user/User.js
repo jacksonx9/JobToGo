@@ -26,8 +26,8 @@ class User {
       res.status(response.status).send(response);
     });
 
-    app.post('/users/edit/password', async (req, res) => {
-      const response = await User.editPassword(req.body.userId, req.body.password);
+    app.post('/users/password/:userId', async (req, res) => {
+      const response = await User.editPassword(req.params.userId, req.body.password);
       res.status(response.status).send(response);
     });
 
