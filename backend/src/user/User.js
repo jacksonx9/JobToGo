@@ -103,10 +103,10 @@ class User {
 
     if (existingUser !== null) {
       if (existingUser.credentials.email === userData.credentials.email) {
-        return new Response('email', 'Either email is already used', 200);
+        return new Response('email', 'Email is already used', 400);
       }
       if (existingUser.credentials.userName === userData.credentials.userName) {
-        return new Response('userName', 'Either username is already used', 200);
+        return new Response('userName', 'Username is already used', 400);
       }
       return new Response(null, 'Malformed userData or user already exists', 400);
     }
