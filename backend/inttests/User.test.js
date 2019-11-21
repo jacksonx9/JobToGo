@@ -59,6 +59,18 @@ describe('User', () => {
       idToken: 'idToken',
       firebaseToken: testData.users[0].credentials.firebaseToken,
     });
+
+    response = await request.post('/users').send({
+      userData: {
+        credentials: {
+          userName: testData.users[0].credentials.userName,
+          email: response.body.result.credentials.email,
+          idToken: response.body.result.credentials.idToken,
+          firebaseToken: response.body.result.credentials.firebaseToken,
+        },
+      },
+    });
+
     const user = await Users.findOne({});
     expect(response.body.result).toEqual(user._id.toString());
 
@@ -70,10 +82,10 @@ describe('User', () => {
     expect(response.body.result).toEqual(user._id.toString());
 
     // User should now be searchable by username (same as email with google)
-    response = await request.get(`/users/${testData.users[0].credentials.email}`);
+    response = await request.get(`/users/${testData.users[0].credentials.userName}`);
     expect(response.body.result).toEqual({
       _id: user._id.toString(),
-      userName: testData.users[0].credentials.email,
+      userName: testData.users[0].credentials.userName,
       email: testData.users[0].credentials.email,
     });
   });
@@ -92,7 +104,7 @@ describe('User', () => {
 
     // Login, should return same userId
     response = await request.post('/users/login').send({
-      email: testData.users[0].credentials.email,
+      userName: testData.users[0].credentials.userName,
       password: testData.users[0].credentials.password,
     });
     expect(response.body.result).toEqual(user._id.toString());
@@ -115,10 +127,29 @@ describe('User', () => {
     response = await request.post('/users/');
     expect(response.body.result).toBeNull();
 
-    // Login with google first time, should create user
+    // Login with google first time, should fail until create user called
     response = await request.post('/users/googleLogin').send({
       idToken: 'idToken',
       firebaseToken: testData.users[0].credentials.firebaseToken,
+    });
+    expect(response.body.result).toEqual({
+      credentials: {
+        email: testData.users[0].credentials.email,
+        idToken: response.body.result.credentials.idToken,
+        firebaseToken: response.body.result.credentials.firebaseToken,
+      },
+    });
+
+    // Create user
+    response = await request.post('/users').send({
+      userData: {
+        credentials: {
+          userName: testData.users[0].credentials.userName,
+          email: response.body.result.credentials.email,
+          idToken: response.body.result.credentials.idToken,
+          firebaseToken: response.body.result.credentials.firebaseToken,
+        },
+      },
     });
     const user = await Users.findOne({});
     expect(response.body.result).toEqual(user._id.toString());
@@ -127,7 +158,7 @@ describe('User', () => {
     response = await request.post('/users/').send({
       userData: testData.users[0],
     });
-    expect(response.body.result).toBeNull();
+    expect(response.body.result).toEqual('email');
 
     // Login with no password, should fail
     response = await request.post('/users/login').send({
@@ -148,6 +179,16 @@ describe('User', () => {
     let response = await request.post('/users/googleLogin').send({
       idToken: 'idToken',
       firebaseToken: testData.users[0].credentials.firebaseToken,
+    });
+    response = await request.post('/users').send({
+      userData: {
+        credentials: {
+          userName: testData.users[0].credentials.userName,
+          email: response.body.result.credentials.email,
+          idToken: response.body.result.credentials.idToken,
+          firebaseToken: response.body.result.credentials.firebaseToken,
+        },
+      },
     });
     const user = await Users.findOne({});
     expect(response.body.result).toEqual(user._id.toString());

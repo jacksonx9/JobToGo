@@ -81,18 +81,18 @@ describe('User', () => {
   };
 
   test('createUser: Undefined User Data', async () => {
-    const expectedRes = new Response(null, 'Invalid userData', 400);
-    expect(await User.createUser(undefined)).toEqual(expectedRes);
+    const expectedRes = new Response(null, 'Invalid format, email, or userName', 400);
+    expect(await user.createUser(undefined)).toEqual(expectedRes);
   });
 
   test('createUser: Invalid User Data', async () => {
-    const expectedRes = new Response(null, 'Malformed userData or user already exists', 400);
-    expect(await User.createUser(testData.invalidUserData)).toEqual(expectedRes);
+    const expectedRes = new Response(null, 'Invalid format, email, or userName', 400);
+    expect(await user.createUser(testData.invalidUserData)).toEqual(expectedRes);
   });
 
   test('createUser: Valid User Data', async () => {
     await Users.deleteMany({});
-    const res = await User.createUser(testData.validUserData);
+    const res = await user.createUser(testData.validUserData);
     expect(res.status).toEqual(200);
   });
 
@@ -101,7 +101,7 @@ describe('User', () => {
   });
 
   test('login: Success', async () => {
-    const res = await user.login(testData.validUserData.credentials.email,
+    const res = await user.login(testData.validUserData.credentials.userName,
       testData.validUserData.credentials.password);
     expect(res.status).toEqual(200);
   });
