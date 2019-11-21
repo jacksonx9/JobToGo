@@ -5,7 +5,7 @@ const testData = {
     host: 'www.indeed.com',
     maxAge: '30',
     sort: 'relevance',
-    limit: IS_TEST_SERVER ? 5 : 30,
+    limit: IS_TEST_SERVER ? 5 : 50,
   },
   indeedExpiredTags: [
     '.jobsearch-ExpiredJobMetadata',
@@ -21,7 +21,6 @@ const testData = {
     'python',
     'android',
     'react',
-    'node.js',
     'nodejs',
     'mongo',
     'ios',
