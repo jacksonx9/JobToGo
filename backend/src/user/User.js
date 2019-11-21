@@ -37,7 +37,7 @@ class User {
       res.status(response.status).send(response);
     });
 
-    app.post('/users/keywords/add', async (req, res) => {
+    app.post('/users/keywords', async (req, res) => {
       const response = await this.addKeyword(req.body.userId, req.body.keyword);
       res.status(response.status).send(response);
     });
