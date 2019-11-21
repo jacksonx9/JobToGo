@@ -125,7 +125,7 @@ class JobSearcher {
       } catch (e) {
         // Unkown error response; keep the job
         if (!e.response) {
-          this.logger.error('Unkown error thrown from indeed scraper... this is okay...');
+          this.logger.error('Unkown error thrown from indeed scraper');
         // If the job url is not found, we assume the job has been taken down
         } else {
           if (e.response.status === 404) {
