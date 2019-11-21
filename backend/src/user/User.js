@@ -25,6 +25,11 @@ class User {
       res.status(response.status).send(response);
     });
 
+    app.get('/users/search/', async (req, res) => {
+      const response = await User.searchUser(req.query.userId, req.query.subUserName);
+      res.status(response.status).send(response);
+    });
+
     app.post('/users', async (req, res) => {
       // TODO: verify userData contains password
       const response = await User.createUser(req.body.userData);
@@ -46,6 +51,38 @@ class User {
       const response = await this.getSkills(req.params.userId);
       res.status(response.status).send(response);
     });
+  }
+
+  // returns list of users that start with subUserName
+  static async searchUser(userId, subUserName) {
+    if (!userId) {
+      return new Response(null, 'Invalid userId', 400);
+    }
+
+    try {
+      await Users.findById(userId).orFail();
+    } catch (e) {
+      return new Response(null, 'Invalid userId', 400);
+    }
+
+    const potentialUsers = await Users.find(
+      {
+        'credentials.userName':
+        {
+          $regex: `^${subUserName}`,
+          $options: 'i',
+        },
+      },
+      '_id credentials.userName friends',
+    ).lean();
+
+    const users = potentialUsers.map(user => ({
+      _id: user._id,
+      userName: user.credentials.userName,
+      isFriend: user.friends.includes(userId),
+    }));
+
+    return new Response(users, '', 200);
   }
 
   // IMPORTANT: DO NOT initialize friends and pendingFriends

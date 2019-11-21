@@ -104,10 +104,6 @@ describe('Messenger', () => {
         title: 'Friend request!',
         body: `${testData.users[0].credentials.userName} wants to add you as a friend.`,
       },
-      data: {
-        friendName: testData.users[0].credentials.userName,
-        friendId: user1Id,
-      },
     });
   });
 
