@@ -12,6 +12,11 @@ import { colours } from '../../styles';
 import styles from './styles';
 
 export default class SignIn extends Component {
+  text = {
+    showPassword: 'Show Password',
+    hidePassword: 'Hide Password',
+  }
+
   constructor(props) {
     super(props);
     this.state = {
@@ -39,7 +44,6 @@ export default class SignIn extends Component {
 
     const ret = await axios.post(`${config.ENDP_LOGIN}`,
       {
-        // firebaseToken,
         userName,
         password,
       }).catch(e => this.logger.log(e));
