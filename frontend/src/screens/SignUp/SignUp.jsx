@@ -45,7 +45,6 @@ export default class SignUp extends Component {
     const { firebaseToken } = global;
     this.logger.info(`Firebase token: ${firebaseToken}`);
 
-    this.logger.log('before');
     const ret = await axios.post(`${config.ENDP_USERS}`,
       {
         userData:
@@ -67,10 +66,9 @@ export default class SignUp extends Component {
           invalidUserName: true,
         });
       } else {
-        this.logger.log(e);
+        this.logger.info(e);
       }
     });
-    this.logger.log(ret);
     if (ret) {
       global.userId = ret.data.result;
       navigation.navigate('App');

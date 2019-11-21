@@ -48,7 +48,7 @@ export default class CreateUsername extends Component {
           invalidUserName: true,
         });
       } else {
-        this.logger.log(e);
+        this.logger.info(e);
       }
     });
     if (ret) {
