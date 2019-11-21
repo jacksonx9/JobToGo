@@ -81,11 +81,9 @@ class Server {
         const messenger = new Messenger(this.app, shortlister);
         const jobAnalyzer = new JobAnalyzer(this.app, shortlister);
         const allSkills = new AllSkills(jobAnalyzer);
-        const user = new User(this.app, allSkills);
         const searcher = new JobSearcher(jobAnalyzer);
-        new ResumeParser(this.app, user);
 
-        // await searcher.updateJobStore();
+        await searcher.updateJobStore();
 
         // Start the server
         this.server = this.app.listen(PORT, async () => {
@@ -97,9 +95,11 @@ class Server {
 
         this.socket = socketio(this.server);
         this.socket.on('connection', (clientSocket) => {
-          clientSocket.on('userId', async (userId) => {
-            await this.redisClient.setAsync(userId, clientSocket.id);
-            await this.redisClient.setAsync(clientSocket.id, userId);
+          this.logger.info(`${clientSocket.id} connected.`);
+
+          clientSocket.use((packet, next) => {
+            this.logger.info(`SOCKET ${packet[0]} ${packet.slice(1)}`);
+            next();
           });
           clientSocket.on('disconnect', async () => {
             const userId = await this.redisClient.getAsync(clientSocket.id);
@@ -107,8 +107,11 @@ class Server {
               await this.redisClient.del(userId);
             }
             await this.redisClient.del(clientSocket.id);
+            this.logger.info(`${clientSocket.id} disconnected.`);
           });
 
+          const user = new User(this.app, this.redisClient, clientSocket, allSkills);
+          new ResumeParser(this.app, user);
           new Friend(this.app, this.redisClient, clientSocket, messenger);
         });
         resolve();

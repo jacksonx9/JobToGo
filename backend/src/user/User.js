@@ -6,12 +6,14 @@ import { Users } from '../schema';
 import credentials from '../../credentials/google';
 
 class User {
-  constructor(app, allSkills) {
+  constructor(app, redisClient, socket, allSkills) {
     this.logger = Logger.get(this.constructor.name);
 
     this.googleAuth = new OAuth2Client(credentials.clientId);
 
     this.allSkills = allSkills;
+    this.redisClient = redisClient;
+    this.socket = socket;
 
     app.post('/users/googleLogin', async (req, res) => {
       const { idToken, firebaseToken } = req.body;
@@ -22,11 +24,6 @@ class User {
     app.post('/users/login', async (req, res) => {
       const { userName, password } = req.body;
       const response = await this.login(userName, password);
-      res.status(response.status).send(response);
-    });
-
-    app.get('/users/search/', async (req, res) => {
-      const response = await User.searchUser(req.query.userId, req.query.subUserName);
       res.status(response.status).send(response);
     });
 
@@ -50,17 +47,31 @@ class User {
       const response = await this.getSkills(req.params.userId);
       res.status(response.status).send(response);
     });
+
+    this.socket.on('users-search', async (subUserName) => {
+      const userId = await this.redisClient.getAsync(this.socket.id);
+      this.socket.emit('users', await User.searchUser(userId, subUserName));
+    });
+
+    this.socket.on('userId', async (userId) => {
+      this.socket.emit('userId', await this.handleUserId(userId));
+    });
+  }
+
+  async handleUserId(userId) {
+    try {
+      await Users.findById(userId).orFail();
+      await this.redisClient.setAsync(userId, this.socket.id);
+      await this.redisClient.setAsync(this.socket.id, userId);
+      return new Response(true, '', 200);
+    } catch (e) {
+      return new Response(false, 'Invalid userId', 400);
+    }
   }
 
   // returns list of users that start with subUserName
   static async searchUser(userId, subUserName) {
     if (!userId) {
-      return new Response(null, 'Invalid userId', 400);
-    }
-
-    try {
-      await Users.findById(userId).orFail();
-    } catch (e) {
       return new Response(null, 'Invalid userId', 400);
     }
 
