@@ -57,18 +57,21 @@ export default class SignUp extends Component {
             password,
           },
         },
-      }).catch(e => this.logger.log(e));
-
-    if (ret.data.result === 'email') {
-      this.setState({
-        invalidEmail: true,
-      });
-    } else if (ret.data.result === 'userName') {
-      this.setState({
-        invalidUserName: true,
-      });
-    } else {
-      this.logger.log('User created, switch to app now');
+      }).catch(e => {
+      if (e.response.data.result === 'email') {
+        this.setState({
+          invalidEmail: true,
+        });
+      } else if (e.response.data.result === 'userName') {
+        this.setState({
+          invalidUserName: true,
+        });
+      } else {
+        this.logger.log(e);
+      }
+    });
+    this.logger.log(ret);
+    if (ret) {
       global.userId = ret.data.result;
       navigation.navigate('App');
     }

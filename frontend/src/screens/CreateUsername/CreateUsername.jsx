@@ -42,13 +42,16 @@ export default class CreateUsername extends Component {
             userName,
           },
         },
-      }).catch(e => this.logger.log(e));
-
-    if (ret.data.result === 'userName') {
-      this.setState({
-        invalidUserName: true,
-      });
-    } else {
+      }).catch(e => {
+      if (e.response.data.result === 'userName') {
+        this.setState({
+          invalidUserName: true,
+        });
+      } else {
+        this.logger.log(e);
+      }
+    });
+    if (ret) {
       global.userId = ret.data.result;
       navigation.navigate('App');
     }

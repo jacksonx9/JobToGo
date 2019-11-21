@@ -46,12 +46,10 @@ export default class SignIn extends Component {
       {
         userName,
         password,
-      }).catch(e => this.logger.log(e));
+      }).catch(() => this.setState({ invalidLogin: true }));
     if (ret) {
       global.userId = ret.data.result;
       navigation.navigate('App');
-    } else {
-      this.setState({ invalidLogin: true });
     }
   }
 

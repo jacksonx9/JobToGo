@@ -35,7 +35,6 @@ export default class AuthLanding extends Component {
           firebaseToken,
         });
 
-      this.logger.log(typeof (ret.data.result));
       if (typeof (ret.data.result) === 'string') {
         global.userId = ret.data.result;
         navigation.navigate('App');
