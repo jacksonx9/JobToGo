@@ -103,11 +103,13 @@ class Server {
           });
           clientSocket.on('disconnect', async () => {
             const userId = await this.redisClient.getAsync(clientSocket.id);
-            await this.redisClient.del(userId);
+            if (userId) {
+              await this.redisClient.del(userId);
+            }
             await this.redisClient.del(clientSocket.id);
           });
 
-          new Friend(this.app, clientSocket, messenger);
+          new Friend(this.app, this.redisClient, clientSocket, messenger);
         });
         resolve();
       });
@@ -116,6 +118,7 @@ class Server {
 
   shutdown() {
     return new Promise((resolve, reject) => {
+      this.redisClient.quit();
       mongoose.disconnect().then(() => {
         this.logger.info('MongoDB disconnected.');
         this.socket.close();
