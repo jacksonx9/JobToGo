@@ -21,56 +21,57 @@ export default class SignUp extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: '',
+      userName: '',
       email: '',
       password: '',
       showPassword: true,
       showPasswordText: this.text.showPassword,
-      invalidUsername: false,
+      invalidUserName: false,
       invalidEmail: false,
       blank: false,
     };
     this.logger = Logger.get(this.constructor.name);
-
   }
 
   onPressSignUp = async () => {
     const { navigation } = this.props;
-    navigation.navigate('CreateUsername'); // temp for debugging
-    const { username, email, password } = this.state;
-    if (username.length === 0 || email.length === 0 || password.length === 0) {
+    const { userName, email, password } = this.state;
+    if (userName.length === 0 || email.length === 0 || password.length === 0) {
       this.setState({ blank: true });
       return;
     }
     this.setState({ blank: false });
 
+    const { firebaseToken } = global;
+    this.logger.info(`Firebase token: ${firebaseToken}`);
+
+    this.logger.log('before');
     const ret = await axios.post(`${config.ENDP_USERS}`,
       {
-        credentials: {
-          email,
-          // idToken: global.newId.idToken,
-          // firebaseToken: global.newId.firebaseToken,
-          username,
-          password,
+        userData:
+        {
+          credentials: {
+            email,
+            firebaseToken,
+            userName,
+            password,
+          },
         },
-      }).catch(e => this.logger(e));
+      }).catch(e => this.logger.log(e));
 
-    // const ret = await axios.post().catch(e => this.logger(e));
-    if (ret.data.status !== '400') { // Username and email are available
-      global.userId = ret.data.result;
-      navigation.navigate('app');
-    }
-    else { // Username or email is not available
+    if (ret.data.result === 'email') {
       this.setState({
-        invalidUsername: ret.body.username,
-        invalidEmail: ret.body.email,
+        invalidEmail: true,
       });
+    } else if (ret.data.result === 'userName') {
+      this.setState({
+        invalidUserName: true,
+      });
+    } else {
+      this.logger.log('User created, switch to app now');
+      global.userId = ret.data.result;
+      navigation.navigate('App');
     }
-
-    this.setState({
-      invalidUsername: true,
-      invalidEmail: true,
-    });
   }
 
   togglePasswordView = () => {
@@ -84,7 +85,7 @@ export default class SignUp extends Component {
 
   render() {
     const {
-      username, email, password, showPassword, showPasswordText, invalidUsername, invalidEmail, blank,
+      userName, email, password, showPassword, showPasswordText, invalidUserName, invalidEmail, blank,
     } = this.state;
     return (
       <View style={styles.container}>
@@ -94,21 +95,21 @@ export default class SignUp extends Component {
         />
         <TextInput
           style={styles.inputContainer}
-          placeholder="Username"
-          value={username}
-          placeholderTextColor={colours.lightGray}
-          onChangeText={text => { this.setState({ username: text, invalidUsername: false }); }}
-        />
-        {invalidUsername ? <Text>{`Username "${username}" already taken`}</Text>
-          : <Text />}
-        <TextInput
-          style={styles.inputContainer}
           placeholder="Email"
           value={email}
           placeholderTextColor={colours.lightGray}
           onChangeText={text => { this.setState({ email: text, invalidEmail: false }); }}
         />
         {invalidEmail ? <Text>{`Email "${email}" already taken`}</Text>
+          : <Text />}
+        <TextInput
+          style={styles.inputContainer}
+          placeholder="Username"
+          value={userName}
+          placeholderTextColor={colours.lightGray}
+          onChangeText={text => { this.setState({ userName: text, invalidUserName: false }); }}
+        />
+        {invalidUserName ? <Text>{`Username "${userName}" already taken`}</Text>
           : <Text />}
         <TextInput
           style={styles.inputContainer}

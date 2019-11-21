@@ -16,44 +16,46 @@ export default class CreateUsername extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: '',
-      invalidUsername: false,
+      userName: '',
+      invalidUserName: false,
       blank: false,
     };
     this.logger = Logger.get(this.constructor.name);
   }
 
   onPressConfirm = async () => {
-    const { username } = this.state;
+    const { userName } = this.state;
     const { navigation } = this.props;
-    if (username.length === 0) {
+    if (userName.length === 0) {
       this.setState({ blank: true });
       return;
     }
     this.setState({ blank: false });
 
-    // // see if username is taken
-    // const ret = await axios.post(`${config.ENDP_USERS}`,
-    //   {
-    //     credentials: {
-    //       email: global.newId.email,
-    //       idToken: global.newId.idToken,
-    //       firebaseToken: global.newId.firebaseToken,
-    //       username,
-    //     },
-    //   }).catch(e => this.logger(e));
+    const ret = await axios.post(`${config.ENDP_USERS}`,
+      {
+        userData: {
+          credentials: {
+            email: global.newId.credentials.email,
+            idToken: global.newId.credentials.idToken,
+            firebaseToken: global.newId.credentials.firebaseToken,
+            userName,
+          },
+        },
+      }).catch(e => this.logger.log(e));
 
-    // if (ret.data.status !== '400') {
-    //   global.userId = ret.data.result;
-    //   navigation.navigate('App');
-    // } else {
-    //   this.setState({ invalidUsername: true });
-    // }
-    this.setState({ invalidUsername: true });
+    if (ret.data.result === 'userName') {
+      this.setState({
+        invalidUserName: true,
+      });
+    } else {
+      global.userId = ret.data.result;
+      navigation.navigate('App');
+    }
   }
 
   render() {
-    const { username, invalidUsername, blank } = this.state;
+    const { userName, invalidUserName, blank } = this.state;
     return (
       <View style={styles.container}>
         <Image
@@ -67,11 +69,11 @@ export default class CreateUsername extends Component {
         <TextInput
           style={styles.inputContainer}
           placeholder="Username"
-          value={username}
+          value={userName}
           placeholderTextColor={colours.lightGray}
-          onChangeText={text => { this.setState({ username: text, invalidUsername: false }); }}
+          onChangeText={text => { this.setState({ userName: text, invalidUserName: false }); }}
         />
-        {invalidUsername ? <Text>{`Username "${username}" already taken`}</Text>
+        {invalidUserName ? <Text>{`Username "${userName}" already taken`}</Text>
           : <Text />}
         <Button
           title="Confirm Username"

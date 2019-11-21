@@ -39,7 +39,7 @@ export default class AuthLanding extends Component {
       if (typeof (ret.data.result) === 'string') {
         global.userId = ret.data.result;
         navigation.navigate('App');
-      } else { // needs integration
+      } else {
         global.newId = ret.data.result;
         navigation.navigate('CreateUsername');
       }

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 import {
   View, TouchableOpacity, Text, TextInput, Image,
 } from 'react-native';
@@ -6,6 +7,7 @@ import Logger from 'js-logger';
 
 import Button from '../../components/Button';
 import images from '../../constants/images';
+import config from '../../constants/config';
 import { colours } from '../../styles';
 import styles from './styles';
 
@@ -13,26 +15,44 @@ export default class SignIn extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      email: '',
+      userName: '',
       password: '',
+      invalidLogin: false,
+      blank: false,
     };
     this.logger = Logger.get(this.constructor.name);
   }
 
   signIn = async () => {
     const { navigation } = this.props;
-    global.userId = '5dd2106bb16a1f002b503255';
-
-    const { email, password } = this.state;
-
-    if (email === 'a' && password === 'a') {
-      global.userId = '5dd399d45085530034b454e2';
+    const { firebaseToken } = global;
+    const { userName, password } = this.state;
+    if (userName.length === 0 || password.length === 0) {
+      this.setState({ blank: true });
+      return;
     }
-    navigation.navigate('App');
+    this.setState({ blank: false });
+
+    this.logger.info(`Firebase token: ${firebaseToken}`);
+
+    const ret = await axios.post(`${config.ENDP_LOGIN}`,
+      {
+        // firebaseToken,
+        userName,
+        password,
+      }).catch(e => this.logger.log(e));
+    if (ret) {
+      global.userId = ret.data.result;
+      navigation.navigate('App');
+    } else {
+      this.setState({ invalidLogin: true });
+    }
   }
 
   render() {
-    const { email, password } = this.state;
+    const {
+      userName, password, invalidLogin, blank,
+    } = this.state;
     const { navigation } = this.props;
     return (
       <View style={styles.container}>
@@ -44,18 +64,19 @@ export default class SignIn extends Component {
         <TextInput
           testID="email"
           style={styles.inputContainer}
-          placeholder="Email"
-          value={email}
+          placeholder="Username"
+          value={userName}
           placeholderTextColor={colours.lightGray}
-          onChangeText={text => { this.setState({ email: text }); }}
+          onChangeText={text => { this.setState({ userName: text, invalidLogin: false }); }}
         />
         <TextInput
           testID="password"
           style={styles.inputContainer}
           placeholder="Password"
           value={password}
+          secureTextEntry={showPassword}
           placeholderTextColor={colours.lightGray}
-          onChangeText={text => { this.setState({ password: text }); }}
+          onChangeText={text => { this.setState({ password: text, invalidLogin: false }); }}
         />
         <Button
           testID="signIn"
@@ -70,6 +91,10 @@ export default class SignIn extends Component {
         >
           <Text style={[styles.link]}>Forgot Password</Text>
         </TouchableOpacity>
+        {invalidLogin ? <Text>Invalid Login</Text>
+          : <Text />}
+        {blank ? <Text>Fields must not be blank</Text>
+          : <Text />}
       </View>
     );
   }
