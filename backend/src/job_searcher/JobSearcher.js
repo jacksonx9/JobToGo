@@ -127,8 +127,11 @@ class JobSearcher {
         if (!e.response) {
           this.logger.error('Unkown error thrown from indeed scraper... this is okay...');
         // If the job url is not found, we assume the job has been taken down
-        } else if (e.response.status === 404) {
-          outdatedJobIds.push(job._id);
+        } else {
+          if (e.response.status === 404) {
+            outdatedJobIds.push(job._id);
+          }
+          // Or else log the error and keep the job
           this.logger.error(e.response.statusText);
         }
       }
