@@ -83,8 +83,9 @@ export default class SendLikedJobs extends Component {
     if (loading) return <Loader />;
 
     return (
-      <View style={styles.container}>
+      <View style={styles.container} testID="sendLikedJobs">
         <NavHeader
+          testID="navHeaderLiked"
           title="Liked Jobs"
           buttonOption="search"
         />
@@ -99,6 +100,7 @@ export default class SendLikedJobs extends Component {
           </View>
           <View styles={[styles.buttonContainer]}>
             <Button
+              testID="sendJobs"
               textColor={colours.white}
               backgroundColor={colours.accentPrimary}
               title="Send Jobs"
@@ -109,11 +111,13 @@ export default class SendLikedJobs extends Component {
         </View>
         <View style={styles.listContainer}>
           <FlatList
+            testID="likedJobs"
             showsVerticalScrollIndicator={false}
             data={likedJobs}
             keyExtractor={item => item._id}
             renderItem={({ item, index }) => (
               <SelectableItem
+                testID={`jobItem${index}`}
                 key={item._id}
                 header={item.company}
                 subHeader={item.title}

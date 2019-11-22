@@ -7,9 +7,10 @@ import styles from './styles';
 import { colours, sizes } from '../../styles';
 
 const IconButton = ({
-  name, color, size, onPress,
+  name, color, size, onPress, testID,
 }) => (
   <TouchableOpacity
+    testID={testID}
     style={[styles.container]}
     onPress={onPress}
   >
@@ -20,6 +21,7 @@ const IconButton = ({
 IconButton.defaultProps = {
   color: colours.gray,
   size: sizes.icon,
+  testID: '',
 };
 
 IconButton.propTypes = {
@@ -27,6 +29,7 @@ IconButton.propTypes = {
   color: string,
   size: number,
   onPress: func.isRequired,
+  testID: string,
 };
 
 export default IconButton;

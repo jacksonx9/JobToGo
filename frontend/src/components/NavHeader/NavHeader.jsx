@@ -8,12 +8,13 @@ import { colours, sizes } from '../../styles';
 
 
 const NavHeader = ({
-  title, buttonOption, onPressButton,
+  title, buttonOption, onPressButton, testID,
 }) => {
   let button;
   if (buttonOption === 'search') {
     button = (
       <IconButton
+        testID="search"
         name="search"
         color={colours.lightGray}
         size={sizes.icon}
@@ -34,12 +35,13 @@ const NavHeader = ({
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID={testID}>
       <View style={styles.componentContainer}>
         <View style={styles.leftComponentContainer}>
           {button}
         </View>
         <IconButton
+          testID="user"
           name="user"
           color={colours.lightGray}
           size={sizes.icon}
@@ -49,7 +51,7 @@ const NavHeader = ({
       <View
         style={styles.titleContainer}
       >
-        <Text style={styles.text}>{title}</Text>
+        <Text style={styles.text} testID="navTitle">{title}</Text>
       </View>
     </View>
   );
@@ -58,12 +60,14 @@ const NavHeader = ({
 NavHeader.defaultProps = {
   buttonOption: 'none',
   onPressButton: () => {},
+  testID: '',
 };
 
 NavHeader.propTypes = {
   title: string.isRequired,
   buttonOption: oneOf(['search', 'back', 'none']),
   onPressButton: func,
+  testID: string,
 };
 
 export default NavHeader;

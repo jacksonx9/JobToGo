@@ -10,9 +10,9 @@ import styles from './styles';
 
 const SelectableItem = ({
   header, subHeader, onPress, actionIcon, disabled, imageSource,
-  backgroundColor, titleColor, descriptionColor,
+  backgroundColor, titleColor, descriptionColor, testID,
 }) => (
-  <View style={[styles.container, { backgroundColor }]}>
+  <View style={[styles.container, { backgroundColor }]} testID={testID}>
     <View style={styles.contentContainer}>
       <JobImage
         logo={imageSource}
@@ -51,6 +51,7 @@ SelectableItem.defaultProps = {
   backgroundColor: colours.white,
   titleColor: colours.primary,
   descriptionColor: colours.gray,
+  testID: '',
 };
 
 SelectableItem.propTypes = {
@@ -63,6 +64,7 @@ SelectableItem.propTypes = {
   backgroundColor: string,
   titleColor: string,
   descriptionColor: string,
+  testID: string,
 };
 
 export default SelectableItem;
