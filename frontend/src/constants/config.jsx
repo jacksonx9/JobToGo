@@ -19,6 +19,7 @@ const config = {
   ENDP_EMAIL: `${serverIp}/messenger/email/`,
   ENDP_GOOGLE: `${serverIp}/users/googleLogin/`,
   ENDP_USERS: `${serverIp}/users/`,
+  ENDP_LOGIN: `${serverIp}/users/login`,
 };
 
 export default config;

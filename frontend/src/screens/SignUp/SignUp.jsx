@@ -2,11 +2,15 @@ import React, { Component } from 'react';
 import {
   View, TouchableOpacity, Text, TextInput, Image,
 } from 'react-native';
+import Logger from 'js-logger';
+import axios from 'axios';
 
 import Button from '../../components/Button';
 import images from '../../constants/images';
+import config from '../../constants/config';
 import { colours } from '../../styles';
 import styles from './styles';
+
 
 export default class SignUp extends Component {
   text = {
@@ -17,18 +21,58 @@ export default class SignUp extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      firstName: '',
-      lastName: '',
+      userName: '',
       email: '',
       password: '',
       showPassword: true,
       showPasswordText: this.text.showPassword,
+      invalidUserName: false,
+      invalidEmail: false,
+      emptyField: false,
     };
+    this.logger = Logger.get(this.constructor.name);
   }
 
-  onPressSignUp = () => {
+  onPressSignUp = async () => {
     const { navigation } = this.props;
-    navigation.navigate('SignIn');
+    const { userName, email, password } = this.state;
+    if (userName.length === 0 || email.length === 0 || password.length === 0) {
+      this.setState({ emptyField: true });
+      return;
+    }
+    this.setState({ emptyField: false });
+
+    const { firebaseToken } = global;
+    this.logger.info(`Firebase token: ${firebaseToken}`);
+
+    try {
+      const ret = await axios.post(`${config.ENDP_USERS}`,
+        {
+          userData:
+          {
+            credentials: {
+              email,
+              firebaseToken,
+              userName,
+              password,
+            },
+          },
+        });
+      global.userId = ret.data.result;
+      navigation.navigate('App');
+    } catch (e) {
+      if (e.response.data.result === 'email') {
+        this.setState({
+          invalidEmail: true,
+        });
+      } else if (e.response.data.result === 'userName') {
+        this.setState({
+          invalidUserName: true,
+        });
+      } else {
+        this.logger.error(e);
+      }
+    }
   }
 
   togglePasswordView = () => {
@@ -42,7 +86,8 @@ export default class SignUp extends Component {
 
   render() {
     const {
-      firstName, lastName, email, password, showPassword, showPasswordText,
+      userName, email, password, showPassword, showPasswordText,
+      invalidUserName, invalidEmail, emptyField,
     } = this.state;
     return (
       <View style={styles.container}>
@@ -52,25 +97,20 @@ export default class SignUp extends Component {
         />
         <TextInput
           style={styles.inputContainer}
-          placeholder="First Name"
-          value={firstName}
-          placeholderTextColor={colours.lightGray}
-          onChangeText={text => { this.setState({ lastName: text }); }}
-        />
-        <TextInput
-          style={styles.inputContainer}
-          placeholder="Last Name"
-          value={lastName}
-          placeholderTextColor={colours.lightGray}
-          onChangeText={text => { this.setState({ lastName: text }); }}
-        />
-        <TextInput
-          style={styles.inputContainer}
           placeholder="Email"
           value={email}
           placeholderTextColor={colours.lightGray}
-          onChangeText={text => { this.setState({ email: text }); }}
+          onChangeText={text => { this.setState({ email: text, invalidEmail: false }); }}
         />
+        <Text>{invalidEmail ? `Email "${email}" already taken` : ''}</Text>
+        <TextInput
+          style={styles.inputContainer}
+          placeholder="Username"
+          value={userName}
+          placeholderTextColor={colours.lightGray}
+          onChangeText={text => { this.setState({ userName: text, invalidUserName: false }); }}
+        />
+        <Text>{invalidUserName ? `Username "${userName}" already taken` : ''}</Text>
         <TextInput
           style={styles.inputContainer}
           placeholder="Password"
@@ -93,6 +133,8 @@ export default class SignUp extends Component {
           style={styles.button}
           onPress={this.onPressSignUp}
         />
+        <Text>{emptyField ? 'Fields must not be empty' : ''}</Text>
+        
       </View>
     );
   }

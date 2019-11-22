@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 import {
   View, TouchableOpacity, Text, TextInput, Image,
 } from 'react-native';
@@ -6,33 +7,72 @@ import Logger from 'js-logger';
 
 import Button from '../../components/Button';
 import images from '../../constants/images';
+import config from '../../constants/config';
 import { colours } from '../../styles';
 import styles from './styles';
 
 export default class SignIn extends Component {
+  text = {
+    showPassword: 'Show Password',
+    hidePassword: 'Hide Password',
+  }
+
   constructor(props) {
     super(props);
     this.state = {
-      email: '',
+      userName: '',
       password: '',
+      invalidLogin: false,
+      emptyField: false,
+      showPassword: true,
+      showPasswordText: this.text.showPassword,
     };
     this.logger = Logger.get(this.constructor.name);
   }
 
   signIn = async () => {
     const { navigation } = this.props;
-    global.userId = '5dd2106bb16a1f002b503255';
-
-    const { email, password } = this.state;
-
-    if (email === 'a' && password === 'a') {
-      global.userId = '5dd399d45085530034b454e2';
+    const { firebaseToken } = global;
+    const { userName, password } = this.state;
+    if (userName.length === 0 || password.length === 0) {
+      this.setState({ emptyField: true });
+      return;
     }
-    navigation.navigate('App');
+    this.setState({ emptyField: false });
+
+    if (userName === 'secretUsername' && password === 'secretPassword') {
+      global.userId = '5dd399d45085530034b454e2';
+      navigation.navigate('App');
+    }
+
+    this.logger.info(`Firebase token: ${firebaseToken}`);
+
+    try {
+      const ret = await axios.post(`${config.ENDP_LOGIN}`,
+        {
+          userName,
+          password,
+        });
+      global.userId = ret.data.result;
+      navigation.navigate('App');
+    } catch (e) {
+      this.setState({ invalidLogin: true });
+    }
+  }
+
+  togglePasswordView = () => {
+    const { showPassword } = this.state;
+    this.setState({
+      showPassword: !showPassword,
+      showPasswordText: showPassword
+        ? this.text.hidePassword : this.text.showPassword,
+    });
   }
 
   render() {
-    const { email, password } = this.state;
+    const {
+      userName, password, invalidLogin, emptyField, showPassword, showPasswordText,
+    } = this.state;
     const { navigation } = this.props;
     return (
       <View style={styles.container}>
@@ -44,19 +84,25 @@ export default class SignIn extends Component {
         <TextInput
           testID="email"
           style={styles.inputContainer}
-          placeholder="Email"
-          value={email}
+          placeholder="Username"
+          value={userName}
           placeholderTextColor={colours.lightGray}
-          onChangeText={text => { this.setState({ email: text }); }}
+          onChangeText={text => { this.setState({ userName: text, invalidLogin: false }); }}
         />
         <TextInput
           testID="password"
           style={styles.inputContainer}
           placeholder="Password"
           value={password}
+          secureTextEntry={showPassword}
           placeholderTextColor={colours.lightGray}
-          onChangeText={text => { this.setState({ password: text }); }}
+          onChangeText={text => { this.setState({ password: text, invalidLogin: false }); }}
         />
+        <TouchableOpacity
+          onPress={this.togglePasswordView}
+        >
+          <Text style={styles.link}>{showPasswordText}</Text>
+        </TouchableOpacity>
         <Button
           testID="signIn"
           title="Sign In"
@@ -70,6 +116,8 @@ export default class SignIn extends Component {
         >
           <Text style={[styles.link]}>Forgot Password</Text>
         </TouchableOpacity>
+        <Text>{invalidLogin ? 'Invalid Login' : ''}</Text>
+        <Text>{emptyField ? 'Fields must not be empty' : ''}</Text>
       </View>
     );
   }
