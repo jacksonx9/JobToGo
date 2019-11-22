@@ -4,6 +4,7 @@ export const IS_TEST_SERVER = process.env.HOSTNAME === 'jobtogo_backend_test';
 
 export const PORT = IS_TEST_SERVER ? 8090 : 8080;
 export const MONGO_URL = `mongodb://171.0.0.3:27017/${IS_TEST_SERVER ? 'Test' : 'JobToGo'}`;
+export const REDIS_IP = '171.0.0.5';
 export const FIREBASE_URL = 'https://jobtogo-103fd.firebaseio.com';
 export const LOG_LEVEL = IS_TEST_SERVER ? Logger.DEBUG : Logger.INFO;
 export const DEBUG = true;

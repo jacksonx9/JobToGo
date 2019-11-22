@@ -5,8 +5,10 @@ import { IS_TEST_SERVER } from '../constants';
 import { Users, Jobs } from '../schema';
 
 class Friend {
-  constructor(app, messenger) {
+  constructor(app, redisClient, socket, messenger) {
     this.messenger = messenger;
+    this.socket = socket;
+    this.redisClient = redisClient;
 
     app.post('/friends/sendJob', async (req, res) => {
       const response = await this.sendJob(req.body.userId, req.body.friendId, req.body.jobId);
@@ -87,6 +89,10 @@ class Friend {
       friend.seenJobs.push(jobId);
       friend.friendSuggestedJobs.push(jobId);
       await friend.save();
+
+      const friendSocketId = await this.redisClient.getAsync(friendId);
+      this.socket.to(friendSocketId).emit('friends-recommendedJobs',
+        await this.getRecommendedJobs(friendId));
 
       // Send push notification
       const messageResponse = await this.messenger.sendFriendJob(userId, friendId, jobId);
@@ -201,6 +207,10 @@ class Friend {
         },
       }).orFail();
 
+      const friendSocketId = await this.redisClient.getAsync(friendId);
+      this.socket.to(friendSocketId).emit('friends-pending',
+        await this.getPendingFriends(friendId));
+
       // If testing, ignore push notification
       if (IS_TEST_SERVER) {
         return new Response(true, '', 200);
@@ -242,6 +252,11 @@ class Friend {
           friends: friendId,
         },
       }).orFail();
+
+      const friendSocketId = await this.redisClient.getAsync(friendId);
+      const userSocketId = await this.redisClient.getAsync(userId);
+      this.socket.to(friendSocketId).emit('friends', await this.getFriends(friendId));
+      this.socket.to(userSocketId).emit('friends', await this.getFriends(userId));
 
       return new Response(true, '', 200);
     } catch (e) {
@@ -294,6 +309,12 @@ class Friend {
         },
       }).orFail();
 
+      const friendSocketId = await this.redisClient.getAsync(friendId);
+      const userSocketId = await this.redisClient.getAsync(userId);
+      this.socket.to(friendSocketId).emit('friends', await this.getFriends(friendId));
+      this.socket.to(userSocketId).emit('friends', await this.getFriends(userId));
+      this.socket.to(userSocketId).emit('friends-pending', await this.getPendingFriends(userId));
+
       return new Response(true, '', 200);
     } catch (e) {
       return new Response(false, 'Invalid userId or friendId', 400);
@@ -327,6 +348,9 @@ class Friend {
         },
       }).orFail();
 
+      const userSocketId = await this.redisClient.getAsync(userId);
+      this.socket.to(userSocketId).emit('friends-pending', await this.getPendingFriends(userId));
+
       return new Response(true, '', 200);
     } catch (e) {
       return new Response(false, 'Invalid userId or friendId', 400);
@@ -358,7 +382,7 @@ class Friend {
 
       // Expose only id and userName to user
       const friendsNameId = friendsData.map(friend => ({
-        _id: friend._id,
+        _id: friend._id.toString(),
         userName: friend.credentials.userName,
       }));
 

@@ -1,12 +1,18 @@
 import mongoose from 'mongoose';
 import { Express } from 'jest-express/lib/express';
+import redis from 'redis';
+import SocketMock from 'socket.io-mock';
+import bluebird from 'bluebird';
 
 import Friend from '..';
 import Messenger from '../../messenger';
 import Response from '../../types';
 import { Users } from '../../schema';
+import { REDIS_IP } from '../../constants';
 
 jest.mock('../../messenger');
+
+bluebird.promisifyAll(redis);
 
 describe('Friend', () => {
   let friend;
@@ -15,6 +21,7 @@ describe('Friend', () => {
   let user1Id;
   let user2Id;
   let invalidUserId;
+  let redisClient;
 
   beforeAll(async () => {
     // Connect to the in-memory db
@@ -28,11 +35,18 @@ describe('Friend', () => {
     app = new Express();
     messenger = new Messenger();
     messenger.requestFriend = jest.fn(() => new Response(true, '', 200));
+    redisClient = redis.createClient({
+      host: REDIS_IP,
+    });
 
-    friend = new Friend(app, messenger);
+    const socket = new SocketMock();
+    SocketMock.prototype.to = jest.fn(() => socket);
+
+    friend = new Friend(app, redisClient, socket, messenger);
   });
 
   afterAll(async () => {
+    redisClient.quit();
     await mongoose.disconnect();
   });
 
@@ -57,9 +71,9 @@ describe('Friend', () => {
         email: 'invalidUser@mail.com',
       },
     });
-    user1Id = user1._id;
-    user2Id = user2._id;
-    invalidUserId = invalidUser._id;
+    user1Id = user1._id.toString();
+    user2Id = user2._id.toString();
+    invalidUserId = invalidUser._id.toString();
     // Delete the user to invalidate the id
     await Users.findByIdAndDelete(invalidUserId);
   });
