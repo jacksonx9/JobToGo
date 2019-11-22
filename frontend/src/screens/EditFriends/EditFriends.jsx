@@ -144,7 +144,7 @@ export default class EditFriends extends Component {
     let noUsersMsg;
     let actionIcon;
     if (searchInProgress) {
-      users = searchedUsers; // TODO: change to user query results
+      users = searchedUsers;
       onPress = this.addFriend;
       noUsersMsg = status.noResults;
       actionIcon = '+';

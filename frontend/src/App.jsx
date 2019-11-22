@@ -33,7 +33,7 @@ export default class App extends React.Component {
   async componentDidMount() {
     YellowBox.ignoreWarnings([
       'Unrecognized WebSocket connection option(s) `agent`, `perMessageDeflate`, '
-      + 'pfx`, `key`, `passphrase`, `cert`, `ca`, `ciphers`, `rejectUnauthorized`. '
+      + '`pfx`, `key`, `passphrase`, `cert`, `ca`, `ciphers`, `rejectUnauthorized`. '
       + 'Did you mean to put these under `headers`?',
     ]);
 
