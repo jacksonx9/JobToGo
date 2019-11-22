@@ -21,6 +21,16 @@ class User {
       res.status(response.status).send(response);
     });
 
+    app.put('/users/userName/:userId', async (req, res) => {
+      const response = await User.editUserName(req.params.userId, req.body.userName);
+      res.status(response.status).send(response);
+    });
+
+    app.put('/users/password/:userId', async (req, res) => {
+      const response = await User.editPassword(req.params.userId, req.body.password);
+      res.status(response.status).send(response);
+    });
+
     app.post('/users/login', async (req, res) => {
       const { userName, password } = req.body;
       const response = await this.login(userName, password);
@@ -190,6 +200,29 @@ class User {
     }
 
     return new Response(user._id, '', 200);
+  }
+
+  async editPassword(userId, password) {
+    return this._updateCredentials(userId, 'password', password);
+  }
+
+  async editUserName(userId, userName) {
+    return this._updateCredentials(userId, 'userName', userName);
+  }
+
+  async _updateCredentials(userId, credName, credValue) {
+    if (!userId || !credName || !credValue) {
+      return new Response(false, 'Invalid userId or userData', 400);
+    }
+
+    try {
+      const user = await Users.findById(userId).orFail();
+      Object.assign(user.credentials[credName], credValue);
+      await user.save();
+      return new Response(true, '', 200);
+    } catch (e) {
+      return new Response(false, 'Invalid userData', 400);
+    }
   }
 
   // Can pass in only fields that need to be updated
