@@ -28,7 +28,7 @@ export default class SignUp extends Component {
       showPasswordText: this.text.showPassword,
       invalidUserName: false,
       invalidEmail: false,
-      blank: false,
+      emptyField: false,
     };
     this.logger = Logger.get(this.constructor.name);
   }
@@ -37,26 +37,30 @@ export default class SignUp extends Component {
     const { navigation } = this.props;
     const { userName, email, password } = this.state;
     if (userName.length === 0 || email.length === 0 || password.length === 0) {
-      this.setState({ blank: true });
+      this.setState({ emptyField: true });
       return;
     }
-    this.setState({ blank: false });
+    this.setState({ emptyField: false });
 
     const { firebaseToken } = global;
     this.logger.info(`Firebase token: ${firebaseToken}`);
 
-    const ret = await axios.post(`${config.ENDP_USERS}`,
-      {
-        userData:
+    try {
+      const ret = await axios.post(`${config.ENDP_USERS}`,
         {
-          credentials: {
-            email,
-            firebaseToken,
-            userName,
-            password,
+          userData:
+          {
+            credentials: {
+              email,
+              firebaseToken,
+              userName,
+              password,
+            },
           },
-        },
-      }).catch(e => {
+        });
+      global.userId = ret.data.result;
+      navigation.navigate('App');
+    } catch (e) {
       if (e.response.data.result === 'email') {
         this.setState({
           invalidEmail: true,
@@ -66,12 +70,8 @@ export default class SignUp extends Component {
           invalidUserName: true,
         });
       } else {
-        this.logger.info(e);
+        this.logger.error(e);
       }
-    });
-    if (ret) {
-      global.userId = ret.data.result;
-      navigation.navigate('App');
     }
   }
 
@@ -87,7 +87,7 @@ export default class SignUp extends Component {
   render() {
     const {
       userName, email, password, showPassword, showPasswordText,
-      invalidUserName, invalidEmail, blank,
+      invalidUserName, invalidEmail, emptyField,
     } = this.state;
     return (
       <View style={styles.container}>
@@ -102,8 +102,7 @@ export default class SignUp extends Component {
           placeholderTextColor={colours.lightGray}
           onChangeText={text => { this.setState({ email: text, invalidEmail: false }); }}
         />
-        {invalidEmail ? <Text>{`Email "${email}" already taken`}</Text>
-          : <Text />}
+        <Text>{invalidEmail ? `Email "${email}" already taken` : ''}</Text>
         <TextInput
           style={styles.inputContainer}
           placeholder="Username"
@@ -111,8 +110,7 @@ export default class SignUp extends Component {
           placeholderTextColor={colours.lightGray}
           onChangeText={text => { this.setState({ userName: text, invalidUserName: false }); }}
         />
-        {invalidUserName ? <Text>{`Username "${userName}" already taken`}</Text>
-          : <Text />}
+        <Text>{invalidUserName ? `Username "${userName}" already taken` : ''}</Text>
         <TextInput
           style={styles.inputContainer}
           placeholder="Password"
@@ -135,8 +133,8 @@ export default class SignUp extends Component {
           style={styles.button}
           onPress={this.onPressSignUp}
         />
-        {blank ? <Text>Fields must not be blank</Text>
-          : <Text />}
+        <Text>{emptyField ? 'Fields must not be empty' : ''}</Text>
+        
       </View>
     );
   }

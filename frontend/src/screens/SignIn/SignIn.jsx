@@ -23,7 +23,7 @@ export default class SignIn extends Component {
       userName: '',
       password: '',
       invalidLogin: false,
-      blank: false,
+      emptyField: false,
       showPassword: true,
       showPasswordText: this.text.showPassword,
     };
@@ -35,21 +35,23 @@ export default class SignIn extends Component {
     const { firebaseToken } = global;
     const { userName, password } = this.state;
     if (userName.length === 0 || password.length === 0) {
-      this.setState({ blank: true });
+      this.setState({ emptyField: true });
       return;
     }
-    this.setState({ blank: false });
+    this.setState({ emptyField: false });
 
     this.logger.info(`Firebase token: ${firebaseToken}`);
 
-    const ret = await axios.post(`${config.ENDP_LOGIN}`,
-      {
-        userName,
-        password,
-      }).catch(() => this.setState({ invalidLogin: true }));
-    if (ret) {
+    try {
+      const ret = await axios.post(`${config.ENDP_LOGIN}`,
+        {
+          userName,
+          password,
+        });
       global.userId = ret.data.result;
       navigation.navigate('App');
+    } catch (e) {
+      this.setState({ invalidLogin: true });
     }
   }
 
@@ -64,7 +66,7 @@ export default class SignIn extends Component {
 
   render() {
     const {
-      userName, password, invalidLogin, blank, showPassword, showPasswordText,
+      userName, password, invalidLogin, emptyField, showPassword, showPasswordText,
     } = this.state;
     const { navigation } = this.props;
     return (
@@ -109,10 +111,8 @@ export default class SignIn extends Component {
         >
           <Text style={[styles.link]}>Forgot Password</Text>
         </TouchableOpacity>
-        {invalidLogin ? <Text>Invalid Login</Text>
-          : <Text />}
-        {blank ? <Text>Fields must not be blank</Text>
-          : <Text />}
+        <Text>{invalidLogin ? 'Invalid Login' : ''}</Text>
+        <Text>{emptyField ? 'Fields must not be empty' : ''}</Text>
       </View>
     );
   }

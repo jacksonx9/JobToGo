@@ -29,18 +29,21 @@ export default class AuthLanding extends Component {
       const { firebaseToken } = global;
       this.logger.info(`Firebase token: ${global.firebaseToken}`);
 
-      const ret = await axios.post(`${config.ENDP_GOOGLE}`,
-        {
-          idToken: userInfo.idToken,
-          firebaseToken,
-        });
-
-      if (typeof (ret.data.result) === 'string') {
+      try {
+        const ret = await axios.post(`${config.ENDP_GOOGLE}`,
+          {
+            idToken: userInfo.idToken,
+            firebaseToken,
+          });
         global.userId = ret.data.result;
         navigation.navigate('App');
-      } else {
-        global.newId = ret.data.result;
-        navigation.navigate('CreateUsername');
+      } catch (e) {
+        if (e.response.data.result) {
+          global.newId = e.response.data.result;
+          navigation.navigate('CreateUsername');
+        } else {
+          this.logger.error(e);
+        }
       }
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
