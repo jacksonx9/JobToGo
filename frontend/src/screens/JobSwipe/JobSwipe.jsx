@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
 import Swiper from 'react-native-deck-swiper';
+import { object } from 'prop-types';
 
 import JobCard from '../../components/JobCard';
 import Loader from '../../components/Loader';
@@ -45,12 +46,12 @@ export default class JobSwipe extends Component {
     const { socket } = this.props;
 
     this.logger.info(`User id is: ${userId}`);
+    socket.emit(config.SOCKET_USERID, userId);
+    socket.on(config.SOCKET_SHARED, data => this.updateSharedJobs(data.result));
+    socket.on(config.SOCKET_FRIENDS, data => this.updateFriends(data.result));
+
     this.fetchJobs(userId, this.jobTypes.MATCHED);
     this.fetchFriends(userId);
-
-    socket.emit('userId', userId);
-    socket.on('friends-recommendedJobs', data => this.updateSharedJobs(data.result));
-    socket.on('friends', data => this.updateFriends(data.result));
   }
 
   fetchFriends = async userId => {
@@ -63,33 +64,21 @@ export default class JobSwipe extends Component {
   }
 
   updateFriends = async friends => {
-    this.logger.info(friends);
+    this.logger.info(`Updating with  ${friends.length} friends`);
     this.setState({
       friends,
     });
   }
 
-  updateSharedJobs = async jobs => {
-    console.log("!!!!!!!!!!!!!!!!!!")
+  updateSharedJobs = async sharedJobs => {
+    this.logger.info(`Updating with  ${sharedJobs.length} shared jobs`);
     this.setState({
       loading: 1,
     });
-    // Get the logo url of each company
-    await Promise.all(jobs.map(async (job, i) => {
-      const companyInfoResp = await axios.get(
-        `${config.ENDP_COMPANY_API}${job.company}`,
-      );
-      const companyInfo = companyInfoResp.data[0];
-      if (companyInfo) {
-        jobs[i].logo = `${companyInfo.logo}?size=${LOGO_SIZE}`;
-      } else {
-        jobs[i].logo = null;
-      }
-    })).catch(e => this.logger.error(e));
 
     this.setState({
       loading: 0,
-      sharedJobs: jobs,
+      sharedJobs: await this.fetchLogos(sharedJobs),
       sharedJobIndex: 0,
     });
   }
@@ -103,6 +92,23 @@ export default class JobSwipe extends Component {
     });
   }
 
+  fetchLogos = async jobs => {
+    const logoJobs = jobs;
+    await Promise.all(logoJobs.map(async (job, i) => {
+      const companyInfoResp = await axios.get(
+        `${config.ENDP_COMPANY_API}${job.company}`,
+      );
+      const companyInfo = companyInfoResp.data[0];
+      if (companyInfo) {
+        logoJobs[i].logo = `${companyInfo.logo}?size=${LOGO_SIZE}`;
+      } else {
+        logoJobs[i].logo = null;
+      }
+    })).catch(e => this.logger.error(e));
+
+    return logoJobs;
+  }
+
   fetchJobs = async (userId, jobType) => {
     this.setState({
       loading: 1,
@@ -112,20 +118,7 @@ export default class JobSwipe extends Component {
 
     const jobsResp = await axios.get(`${fetchSharedJobs
       ? config.ENDP_SHARED_JOBS : config.ENDP_JOBS}${userId}`).catch(e => this.logger.error(e));
-    const jobs = jobsResp.data.result;
-
-    // Get the logo url of each company
-    await Promise.all(jobs.map(async (job, i) => {
-      const companyInfoResp = await axios.get(
-        `${config.ENDP_COMPANY_API}${job.company}`,
-      );
-      const companyInfo = companyInfoResp.data[0];
-      if (companyInfo) {
-        jobs[i].logo = `${companyInfo.logo}?size=${LOGO_SIZE}`;
-      } else {
-        jobs[i].logo = null;
-      }
-    })).catch(e => this.logger.error(e));
+    const jobs = await this.fetchLogos(jobsResp.data.result);
 
     if (fetchSharedJobs) {
       this.setState({
@@ -281,3 +274,7 @@ export default class JobSwipe extends Component {
     );
   }
 }
+
+JobSwipe.propTypes = {
+  socket: object.isRequired, // eslint-disable-line react/forbid-prop-types
+};

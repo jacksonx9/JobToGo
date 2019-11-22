@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { View, FlatList } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
+import { object } from 'prop-types';
 
 import Search from '../../components/Search';
 import SelectableItem from '../../components/SelectableItem';
@@ -30,9 +31,9 @@ export default class EditFriends extends Component {
 
   async componentDidMount() {
     const { socket } = this.props;
-    socket.on('friends-pending', data => this.updatePendingFriends(data.result));
-    socket.on('friends', data => this.updateFriends(data.result));
-    socket.on('users', data => this.updateSearchedUsers(data.result));
+    socket.on(config.SOCKET_PENDING, data => this.updatePendingFriends(data.result));
+    socket.on(config.SOCKET_FRIENDS, data => this.updateFriends(data.result));
+    socket.on(config.SOCKET_GET_SEARCH, data => this.updateSearchedUsers(data.result));
     this.fetchFriends();
   }
 
@@ -51,7 +52,7 @@ export default class EditFriends extends Component {
   }
 
   updateFriends = async friends => {
-    this.logger.info(`Updating with  ${friends.length} pending friends`);
+    this.logger.info(`Updating with  ${friends.length} friends`);
     this.setState({
       friends,
     });
@@ -65,7 +66,7 @@ export default class EditFriends extends Component {
   }
 
   updateSearchedUsers = async searchedUsers => {
-    this.logger.info(searchedUsers);
+    this.logger.info(`Updating with  ${searchedUsers.length} searched users`);
     this.setState({
       searchedUsers,
     });
@@ -124,11 +125,12 @@ export default class EditFriends extends Component {
 
   searchUsers = async text => {
     const { socket } = this.props;
+    socket.emit(config.SOCKET_SEND_SEARCH, text);
+
     this.setState({
       searchedUsers: [],
       addFriendName: text,
     });
-    socket.emit('users-search', text);
   }
 
   render() {
@@ -221,3 +223,7 @@ export default class EditFriends extends Component {
     );
   }
 }
+
+EditFriends.propTypes = {
+  socket: object.isRequired, // eslint-disable-line react/forbid-prop-types
+};

@@ -9,6 +9,7 @@ import Logger from 'js-logger';
 import { string } from 'prop-types';
 import socketIOClient from 'socket.io-client';
 
+import config from './constants/config';
 import SignIn from './screens/SignIn';
 import SignUp from './screens/SignUp/SignUp';
 import CreateUsername from './screens/CreateUsername/CreateUsername';
@@ -31,9 +32,13 @@ export default class App extends React.Component {
 
   async componentDidMount() {
     YellowBox.ignoreWarnings([
-      'Unrecognized WebSocket connection option(s) `agent`, `perMessageDeflate`, `pfx`, `key`, `passphrase`, `cert`, `ca`, `ciphers`, `rejectUnauthorized`. Did you mean to put these under `headers`?',
+      'Unrecognized WebSocket connection option(s) `agent`, `perMessageDeflate`, '
+      + 'pfx`, `key`, `passphrase`, `cert`, `ca`, `ciphers`, `rejectUnauthorized`. '
+      + 'Did you mean to put these under `headers`?',
     ]);
-    this.socket.on('userId', data => console.log(data));
+
+    this.socket.on(config.SOCKET_USERID, data => this.logger.info(data));
+
     if (Platform.OS === 'android') {
       try {
         await firebase.messaging().requestPermission();
@@ -129,7 +134,7 @@ export default class App extends React.Component {
     const AppStack = createBottomTabNavigator(
       {
         Home: {
-          screen: props => <JobSwipe socket={this.socket} />,
+          screen: () => <JobSwipe socket={this.socket} />,
           navigationOptions: {
             tabBarLabel: 'Home',
             tabBarIcon: HomeTabIcon,
@@ -145,7 +150,7 @@ export default class App extends React.Component {
           },
         },
         Friends: {
-          screen: props => <EditFriends socket={this.socket} />,
+          screen: () => <EditFriends socket={this.socket} />,
           navigationOptions: {
             tabBarLabel: 'Friends',
             tabBarIcon: FriendsTabIcon,
