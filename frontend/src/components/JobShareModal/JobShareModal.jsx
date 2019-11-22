@@ -10,6 +10,7 @@ import ImageButton from '../ImageButton';
 import images from '../../constants/images';
 import { colours } from '../../styles';
 import styles from './styles';
+import icons from '../../constants/icons';
 
 const JobShareModal = ({
   isVisible, onPressExit, jobTitle, jobCompany, jobId, jobLogo, friends, onPressSend,
@@ -32,8 +33,7 @@ const JobShareModal = ({
         header={jobTitle}
         subHeader={jobCompany}
         onPress={() => {}}
-        actionIcon=""
-        disabled
+        noButton
         imageSource={jobLogo}
         backgroundColor={colours.primary}
         titleColor={colours.white}
@@ -52,8 +52,8 @@ const JobShareModal = ({
               key={item._id}
               header={item.userName}
               subHeader={item.email}
+              iconName={icons.send}
               onPress={() => onPressSend(item, jobId)}
-              actionIcon="+"
             />
           )}
         />

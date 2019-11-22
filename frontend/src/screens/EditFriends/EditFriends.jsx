@@ -12,6 +12,7 @@ import NavHeader from '../../components/NavHeader';
 import SwitchableNav from '../../components/SwitchableNav';
 import config from '../../constants/config';
 import { status } from '../../constants/messages';
+import icons from '../../constants/icons';
 import styles from './styles';
 
 export default class EditFriends extends Component {
@@ -133,6 +134,20 @@ export default class EditFriends extends Component {
     });
   }
 
+  getSelectableItemIcon = (isFriend, userType) => {
+    if (isFriend) {
+      return icons.x;
+    }
+    switch (userType) {
+      case 'friend':
+        return icons.x;
+      case 'pending':
+        return icons.moreVertical;
+      default:
+        return icons.plus;
+    }
+  };
+
   render() {
     const {
       loading, addFriendName, pendingFriends, friends, searchedUsers,
@@ -142,22 +157,18 @@ export default class EditFriends extends Component {
     let users;
     let onPress;
     let noUsersMsg;
-    let actionIcon;
     if (searchInProgress) {
       users = searchedUsers;
       onPress = this.addFriend;
       noUsersMsg = status.noResults;
-      actionIcon = '+';
     } else if (showPendingFriends) {
       users = pendingFriends;
       onPress = this.comfirmFriendRequest;
       noUsersMsg = status.noPendingFriends;
-      actionIcon = '+';
     } else {
       users = friends;
       onPress = this.removeFriend;
       noUsersMsg = status.noFriends;
-      actionIcon = 'x';
     }
 
     const noUsers = users.length === 0;
@@ -174,7 +185,7 @@ export default class EditFriends extends Component {
             header={item.userName}
             subHeader={item.isFriend ? 'friend' : 'not a friend'}
             onPress={() => onPress(item, index)}
-            actionIcon={actionIcon}
+            iconName={this.getSelectableItemIcon(item.friend, userType)}
           />
         )}
       />
