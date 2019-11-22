@@ -34,13 +34,13 @@ class JobAnalyzer {
    * @param {Job} job
    */
   computeJobKeywordCount(job, keywords) {
-    const description = job.description.replace(/^[a-z ]/gi, ' ');
+    const description = job.description.split(/[^a-z]/i).filter(Boolean);
+
     // Add the number of occurances of all keywords in the description
     keywords.forEach((keyword) => {
-      const re = new RegExp(` ${keyword} `, 'gi');
       job.keywords.push({
         name: keyword,
-        count: (description.match(re) || []).length,
+        count: description.filter(w => w === keyword).length,
       });
     });
   }
