@@ -212,16 +212,16 @@ class User {
 
   async _updateCredentials(userId, credName, credValue) {
     if (!userId || !credName || !credValue) {
-      return new Response(null, 'Invalid userId or userData', 400);
+      return new Response(false, 'Invalid userId or userData', 400);
     }
 
     try {
       const user = await Users.findById(userId).orFail();
       Object.assign(user.credentials[credName], credValue);
       await user.save();
-      return new Response(null, '', 200);
+      return new Response(true, '', 200);
     } catch (e) {
-      return new Response(null, 'Invalid userData', 400);
+      return new Response(false, 'Invalid userData', 400);
     }
   }
 
