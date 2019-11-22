@@ -109,9 +109,9 @@ class Server {
             // Delete userId, socketId mappings
             const userId = await this.redisClient.getAsync(clientSocket.id);
             if (userId) {
-              await this.redisClient.del(userId);
+              await this.redisClient.delAsync(userId);
             }
-            await this.redisClient.del(clientSocket.id);
+            await this.redisClient.delAsync(clientSocket.id);
             this.logger.info(`${clientSocket.id} disconnected.`);
           });
         });
