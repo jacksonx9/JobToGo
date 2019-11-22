@@ -68,6 +68,9 @@ class Server {
     this.redisClient.on('error', () => {
       throw new Error('Failed to connect to redis');
     });
+    this.redisClient.on('connect', () => {
+      this.logger.info('Redis connected.');
+    });
     this.redisClient.flushall();
   }
 
@@ -98,10 +101,12 @@ class Server {
           this.logger.info(`${clientSocket.id} connected.`);
 
           clientSocket.use((packet, next) => {
+            // Log socket endpoints
             this.logger.info(`SOCKET ${packet[0]} ${packet.slice(1)}`);
             next();
           });
           clientSocket.on('disconnect', async () => {
+            // Delete userId, socketId mappings
             const userId = await this.redisClient.getAsync(clientSocket.id);
             if (userId) {
               await this.redisClient.del(userId);
@@ -109,11 +114,11 @@ class Server {
             await this.redisClient.del(clientSocket.id);
             this.logger.info(`${clientSocket.id} disconnected.`);
           });
-
-          const user = new User(this.app, this.redisClient, clientSocket, allSkills);
-          new ResumeParser(this.app, user);
-          new Friend(this.app, this.redisClient, clientSocket, messenger);
         });
+
+        const user = new User(this.app, this.redisClient, this.socket, allSkills);
+        new ResumeParser(this.app, user);
+        new Friend(this.app, this.redisClient, this.socket, messenger);
         resolve();
       });
     });
@@ -121,7 +126,11 @@ class Server {
 
   shutdown() {
     return new Promise((resolve, reject) => {
-      this.redisClient.quit();
+      if (this.redisClient.quit()) {
+        this.logger.info('Redis disconnected.');
+      } else {
+        this.logger.error('Redis failed to disconnect.');
+      }
       mongoose.disconnect().then(() => {
         this.logger.info('MongoDB disconnected.');
         this.socket.close();

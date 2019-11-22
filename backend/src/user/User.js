@@ -48,21 +48,25 @@ class User {
       res.status(response.status).send(response);
     });
 
-    this.socket.on('users-search', async (subUserName) => {
-      const userId = await this.redisClient.getAsync(this.socket.id);
-      this.socket.emit('users', await User.searchUser(userId, subUserName));
-    });
+    this.socket.on('connection', (clientSocket) => {
+      clientSocket.on('users-search', async (subUserName) => {
+        const userId = await this.redisClient.getAsync(clientSocket.id);
+        clientSocket.emit('users', await User.searchUser(userId, subUserName));
+      });
 
-    this.socket.on('userId', async (userId) => {
-      this.socket.emit('userId', await this.handleUserId(userId));
+      // Register userId
+      clientSocket.on('userId', async (userId) => {
+        clientSocket.emit('userId', await this.handleUserId(userId, clientSocket.id));
+      });
     });
   }
 
-  async handleUserId(userId) {
+  async handleUserId(userId, socketId) {
     try {
       await Users.findById(userId).orFail();
-      await this.redisClient.setAsync(userId, this.socket.id);
-      await this.redisClient.setAsync(this.socket.id, userId);
+      // Set mappings for both userId and socketId so we can retrieve both ways
+      await this.redisClient.setAsync(userId, socketId);
+      await this.redisClient.setAsync(socketId, userId);
       return new Response(true, '', 200);
     } catch (e) {
       return new Response(false, 'Invalid userId', 400);

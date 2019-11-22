@@ -46,6 +46,7 @@
     "jest": "^24.9.0",
     "jest-express": "^1.10.1",
     "nodemon": "^1.9.2",
+    "socket.io-mock": "^1.2.3",
     "supertest": "^4.0.2"
   }
 }

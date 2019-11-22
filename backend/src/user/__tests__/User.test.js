@@ -1,13 +1,18 @@
 import mongoose from 'mongoose';
 import { Express } from 'jest-express/lib/express';
 import { OAuth2Client } from 'google-auth-library';
+import redis from 'redis';
+import SocketMock from 'socket.io-mock';
+import bluebird from 'bluebird';
 
 import User from '..';
 import Response from '../../types';
 import { Users } from '../../schema';
 import testData from './test_data';
 import AllSkills from '../../all_skills';
+import { REDIS_IP } from '../../constants';
 
+bluebird.promisifyAll(redis);
 
 const mockUser = () => {
   OAuth2Client.prototype.verifyIdToken = jest.fn(({ idToken, audience }) => new
@@ -28,6 +33,7 @@ describe('User', () => {
   let user;
   let user1Id;
   let allSkills;
+  let redisClient;
 
   beforeAll(async () => {
     // Connect to the in-memory db
@@ -37,13 +43,20 @@ describe('User', () => {
       useFindAndModify: false,
       useCreateIndex: true,
     });
+    redisClient = redis.createClient({
+      host: REDIS_IP,
+    });
+
+    const socket = new SocketMock();
+    SocketMock.prototype.to = jest.fn(() => socket);
 
     const app = new Express();
     allSkills = new AllSkills();
-    user = new User(app, allSkills);
+    user = new User(app, redisClient, socket, allSkills);
   });
 
   afterAll(async () => {
+    redisClient.quit();
     await mongoose.disconnect();
   });
 

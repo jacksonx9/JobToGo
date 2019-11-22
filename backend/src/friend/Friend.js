@@ -382,7 +382,7 @@ class Friend {
 
       // Expose only id and userName to user
       const friendsNameId = friendsData.map(friend => ({
-        _id: friend._id,
+        _id: friend._id.toString(),
         userName: friend.credentials.userName,
       }));
 

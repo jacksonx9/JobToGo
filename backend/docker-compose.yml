@@ -10,6 +10,8 @@ services:
     networks:
       jobtogo_net:
         ipv4_address: 171.0.0.5
+    logging:
+      driver: none
 
   mongodb:
     container_name: jobtogo_db
