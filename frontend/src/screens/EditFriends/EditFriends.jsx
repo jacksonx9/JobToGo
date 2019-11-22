@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { View, FlatList } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
-import SocketIOClient from 'socket.io-client';
 
 import Search from '../../components/Search';
 import SelectableItem from '../../components/SelectableItem';
@@ -27,29 +26,14 @@ export default class EditFriends extends Component {
       searchInProgress: false,
     };
     this.logger = Logger.get(this.constructor.name);
-    // this.socket = SocketIOClient('http://localhost:80000');
   }
 
   async componentDidMount() {
-    console.log(this.props.friends);
-    console.log(this.props.pendingFriends);
+    const { socket } = this.props;
+    socket.on('friends-pending', data => this.updatePendingFriends(data.result));
+    socket.on('friends', data => this.updateFriends(data.result));
+    socket.on('users', data => this.updateSearchedUsers(data.result));
     this.fetchFriends();
-    // this.socket.onopen = () => this.socket.send('something');
-    // this.socket.onmessage = ({ data }) => {
-    //console.log(data);
-    // if (data === 'blah') {
-    //   this.fetchFriends();
-    // } else if (data === 'blahblah') {
-    //   this.setState({
-    //     searchedUsers: data,
-    //   });
-    // };
-  }
-
-  async componentDidUpdate(prevState) {
-    if (prevState !== this.state) {
-      // this.fetchFriends();
-    }
   }
 
   fetchFriends = async () => {
@@ -66,10 +50,30 @@ export default class EditFriends extends Component {
     });
   }
 
-  addFriend = async () => {
-    const { addFriendName } = this.state;
+  updateFriends = async friends => {
+    this.logger.info(`Updating with  ${friends.length} pending friends`);
+    this.setState({
+      friends,
+    });
+  }
+
+  updatePendingFriends = async pendingFriends => {
+    this.logger.info(`Updating with  ${pendingFriends.length} pending friends`);
+    this.setState({
+      pendingFriends,
+    });
+  }
+
+  updateSearchedUsers = async searchedUsers => {
+    this.logger.info(searchedUsers);
+    this.setState({
+      searchedUsers,
+    });
+  }
+
+  addFriend = async item => {
     const { userId } = global;
-    const friend = await axios.get(`${config.ENDP_USERS}${addFriendName}`)
+    const friend = await axios.get(`${config.ENDP_USERS}${item.userName}`)
       .catch(e => this.logger.error(e));
 
     await axios.post(config.ENDP_FRIENDS, {
@@ -119,23 +123,18 @@ export default class EditFriends extends Component {
   }
 
   searchUsers = async text => {
-    const { userId } = global;
+    const { socket } = this.props;
     this.setState({
       searchedUsers: [],
       addFriendName: text,
     });
-    const searchedUsers = await axios.get(`${config.ENDP_SEARCH_USERS}?userId=${userId}&subUserName=${text}`)
-      .catch(e => this.logger.error(e));
-
-    this.setState({
-      searchedUsers: searchedUsers.data.result,
-      loading: 0,
-    });
+    socket.emit('users-search', text);
   }
 
   render() {
     const {
-      loading, addFriendName, pendingFriends, friends, searchedUsers, showPendingFriends, searchInProgress,
+      loading, addFriendName, pendingFriends, friends, searchedUsers,
+      showPendingFriends, searchInProgress,
     } = this.state;
 
     let users;

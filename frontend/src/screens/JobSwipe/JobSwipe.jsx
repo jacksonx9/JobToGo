@@ -14,7 +14,6 @@ import OverlayLabel from '../../components/OverlayLabel/OverlayLabel';
 import config from '../../constants/config';
 import styles, { LOGO_SIZE } from './styles';
 import { colours } from '../../styles';
-import images from '../../constants/images';
 import { status } from '../../constants/messages';
 
 export default class JobSwipe extends Component {
@@ -43,11 +42,56 @@ export default class JobSwipe extends Component {
 
   async componentDidMount() {
     const { userId } = global;
+    const { socket } = this.props;
+
     this.logger.info(`User id is: ${userId}`);
     this.fetchJobs(userId, this.jobTypes.MATCHED);
     this.fetchFriends(userId);
-    console.log(this.props.friends);
-    console.log(this.props.sharedJobs);
+
+    socket.emit('userId', userId);
+    socket.on('friends-recommendedJobs', data => this.updateSharedJobs(data.result));
+    socket.on('friends', data => this.updateFriends(data.result));
+  }
+
+  fetchFriends = async userId => {
+    const friends = await axios.get(`${config.ENDP_FRIENDS}${userId}`)
+      .catch(e => this.logger.error(e));
+
+    this.setState({
+      friends: friends.data.result,
+    });
+  }
+
+  updateFriends = async friends => {
+    this.logger.info(friends);
+    this.setState({
+      friends,
+    });
+  }
+
+  updateSharedJobs = async jobs => {
+    console.log("!!!!!!!!!!!!!!!!!!")
+    this.setState({
+      loading: 1,
+    });
+    // Get the logo url of each company
+    await Promise.all(jobs.map(async (job, i) => {
+      const companyInfoResp = await axios.get(
+        `${config.ENDP_COMPANY_API}${job.company}`,
+      );
+      const companyInfo = companyInfoResp.data[0];
+      if (companyInfo) {
+        jobs[i].logo = `${companyInfo.logo}?size=${LOGO_SIZE}`;
+      } else {
+        jobs[i].logo = null;
+      }
+    })).catch(e => this.logger.error(e));
+
+    this.setState({
+      loading: 0,
+      sharedJobs: jobs,
+      sharedJobIndex: 0,
+    });
   }
 
   fetchFriends = async userId => {
@@ -103,9 +147,8 @@ export default class JobSwipe extends Component {
   }
 
   toggleSharedJobsView = () => {
-    const { userId } = global;
     const { isSharedJobsView } = this.state;
-    this.fetchJobs(userId, this.jobTypes.SHARED);
+    this.fetchJobs(global.userId, this.jobTypes.SHARED);
     this.setState({ isSharedJobsView: !isSharedJobsView });
   }
 
@@ -121,6 +164,7 @@ export default class JobSwipe extends Component {
 
   swipeJob = async (jobs, jobIndex, jobType, swipeAction) => {
     this.logger.info(`${swipeAction} ${jobType} job`);
+    this.logger.info(`${jobs.length} jobs`);
 
     const { userId } = global;
     const isSharedJob = (jobType === this.jobTypes.SHARED);
@@ -167,14 +211,14 @@ export default class JobSwipe extends Component {
     const jobIndex = isSharedJobsView ? sharedJobIndex : matchedJobIndex;
     const jobType = isSharedJobsView ? this.jobTypes.SHARED : this.jobTypes.MATCHED;
     const job = jobs[jobIndex];
-    const menuButtonSource = isSharedJobsView ? images.iconChevronLeft : images.iconInbox;
+    const buttonIcon = isSharedJobsView ? 'chevron-left' : 'inbox';
 
     if (loading) return <Loader />;
 
     return (
       <View style={styles.container} testID="jobSwipe">
         <MainHeader
-          buttonSource={menuButtonSource}
+          buttonIcon={buttonIcon}
           onPress={() => this.toggleSharedJobsView()}
         />
         {jobs.length === 0

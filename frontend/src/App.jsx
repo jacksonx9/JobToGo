@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, Alert } from 'react-native';
+import { Platform, Alert, YellowBox } from 'react-native';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
@@ -18,27 +18,22 @@ import SendLikedJobs from './screens/SendLikedJobs/SendLikedJobs';
 import EditFriends from './screens/EditFriends/EditFriends';
 import EditSkills from './screens/EditSkills/EditSkills';
 import { colours, fonts, sizes } from './styles';
+import { serverIp } from '../credentials/credentials';
+
 
 export default class App extends React.Component {
   constructor(props) {
     super(props);
     Logger.useDefaults();
     this.logger = Logger.get(this.constructor.name);
-
-    this.state = {
-      sharedJobs: 'shared',
-      pendingFriends: 'pending',
-      friends: 'friends',
-    };
+    this.socket = socketIOClient(serverIp);
   }
 
   async componentDidMount() {
-    // const socket = socketIOClient(endpoint);
-
-    // socket.on('friend request', data => this.setState({ pendingFriends: data.num }));
-    // socket.on('new friend', data => this.setState({ friends: data.num }));
-    // socket.on('new shared job', data => this.setState({ sharedJobs: data.num }));
-
+    YellowBox.ignoreWarnings([
+      'Unrecognized WebSocket connection option(s) `agent`, `perMessageDeflate`, `pfx`, `key`, `passphrase`, `cert`, `ca`, `ciphers`, `rejectUnauthorized`. Did you mean to put these under `headers`?',
+    ]);
+    this.socket.on('userId', data => console.log(data));
     if (Platform.OS === 'android') {
       try {
         await firebase.messaging().requestPermission();
@@ -91,6 +86,7 @@ export default class App extends React.Component {
     });
   }
 
+
   render() {
     const navConfig = {
       headerMode: 'none',
@@ -130,11 +126,10 @@ export default class App extends React.Component {
       return (<Icon name="upload" size={sizes.icon} color={tintColor} />);
     }
 
-    const { friends, pendingFriends, sharedJobs } = this.state;
     const AppStack = createBottomTabNavigator(
       {
         Home: {
-          screen: props => <JobSwipe friends={friends} sharedJobs={sharedJobs} />,
+          screen: props => <JobSwipe socket={this.socket} />,
           navigationOptions: {
             tabBarLabel: 'Home',
             tabBarIcon: HomeTabIcon,
@@ -150,7 +145,7 @@ export default class App extends React.Component {
           },
         },
         Friends: {
-          screen: props => <EditFriends friends={friends} pendingFriends={pendingFriends} />,
+          screen: props => <EditFriends socket={this.socket} />,
           navigationOptions: {
             tabBarLabel: 'Friends',
             tabBarIcon: FriendsTabIcon,
@@ -182,15 +177,14 @@ export default class App extends React.Component {
     const AppContainer = createAppContainer(
       createSwitchNavigator(
         {
-          App: AppStack,
           Auth: AuthStack,
+          App: AppStack,
         },
         {
           initialRouteName: 'Auth',
         },
       ),
     );
-
 
     HomeTabIcon.propTypes = {
       tintColor: string.isRequired,
