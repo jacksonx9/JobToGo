@@ -171,7 +171,7 @@ class User {
         },
       };
 
-      return new Response(userInfo, '', 200);
+      return new Response(userInfo, '', 400);
     }
 
     return new Response(user._id, '', 200);
