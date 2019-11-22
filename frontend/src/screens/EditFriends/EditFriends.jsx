@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { View, FlatList } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
+import { object } from 'prop-types';
 
 import Search from '../../components/Search';
 import SelectableItem from '../../components/SelectableItem';
@@ -19,6 +20,7 @@ export default class EditFriends extends Component {
     this.state = {
       friends: [],
       pendingFriends: [],
+      searchedUsers: [],
       addFriendName: '',
       loading: 1,
       showPendingFriends: true,
@@ -28,13 +30,11 @@ export default class EditFriends extends Component {
   }
 
   async componentDidMount() {
+    const { socket } = this.props;
+    socket.on(config.SOCKET_PENDING, data => this.updatePendingFriends(data.result));
+    socket.on(config.SOCKET_FRIENDS, data => this.updateFriends(data.result));
+    socket.on(config.SOCKET_GET_SEARCH, data => this.updateSearchedUsers(data.result));
     this.fetchFriends();
-  }
-
-  async componentDidUpdate(prevState) {
-    if (prevState !== this.state) {
-      // this.fetchFriends();
-    }
   }
 
   fetchFriends = async () => {
@@ -51,10 +51,30 @@ export default class EditFriends extends Component {
     });
   }
 
-  addFriend = async () => {
-    const { addFriendName } = this.state;
+  updateFriends = async friends => {
+    this.logger.info(`Updating with  ${friends.length} friends`);
+    this.setState({
+      friends,
+    });
+  }
+
+  updatePendingFriends = async pendingFriends => {
+    this.logger.info(`Updating with  ${pendingFriends.length} pending friends`);
+    this.setState({
+      pendingFriends,
+    });
+  }
+
+  updateSearchedUsers = async searchedUsers => {
+    this.logger.info(`Updating with  ${searchedUsers.length} searched users`);
+    this.setState({
+      searchedUsers,
+    });
+  }
+
+  addFriend = async item => {
     const { userId } = global;
-    const friend = await axios.get(`${config.ENDP_USERS}${addFriendName}`)
+    const friend = await axios.get(`${config.ENDP_USERS}${item.userName}`)
       .catch(e => this.logger.error(e));
 
     await axios.post(config.ENDP_FRIENDS, {
@@ -104,13 +124,19 @@ export default class EditFriends extends Component {
   }
 
   searchUsers = async text => {
-    // TODO: get query response from server
-    this.setState({ addFriendName: text });
+    const { socket } = this.props;
+    socket.emit(config.SOCKET_SEND_SEARCH, text);
+
+    this.setState({
+      searchedUsers: [],
+      addFriendName: text,
+    });
   }
 
   render() {
     const {
-      loading, addFriendName, pendingFriends, friends, showPendingFriends, searchInProgress,
+      loading, addFriendName, pendingFriends, friends, searchedUsers,
+      showPendingFriends, searchInProgress,
     } = this.state;
 
     let users;
@@ -118,7 +144,7 @@ export default class EditFriends extends Component {
     let noUsersMsg;
     let actionIcon;
     if (searchInProgress) {
-      users = friends; // TODO: change to user query results
+      users = searchedUsers;
       onPress = this.addFriend;
       noUsersMsg = status.noResults;
       actionIcon = '+';
@@ -146,7 +172,7 @@ export default class EditFriends extends Component {
             testID={`userItem${index}`}
             key={item._id}
             header={item.userName}
-            subHeader={item.email}
+            subHeader={item.isFriend ? 'friend' : 'not a friend'}
             onPress={() => onPress(item, index)}
             actionIcon={actionIcon}
           />
@@ -166,7 +192,6 @@ export default class EditFriends extends Component {
           onChangeText={text => this.searchUsers(text)}
           onEndSearch={() => {
             this.setState({ addFriendName: '', searchInProgress: false });
-            this.addFriend(); // TODO: Remove this once user search is implemented
           }}
         >
           {noUsers ? noUsersInfo : userList}
@@ -198,3 +223,7 @@ export default class EditFriends extends Component {
     );
   }
 }
+
+EditFriends.propTypes = {
+  socket: object.isRequired, // eslint-disable-line react/forbid-prop-types
+};
