@@ -110,7 +110,7 @@ describe('User', () => {
     testEmptyIds('loginGoogle');
   });
 
-  test('loginGoogle: Firt Time User Logs In', async () => {
+  test('loginGoogle: First Time User Logs In', async () => {
     await Users.deleteMany({});
     const res = await user.loginGoogle('idToken', testData.validUserData.credentials.firebaseToken);
     expect(res.status).toEqual(400);
