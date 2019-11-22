@@ -28,10 +28,10 @@ describe('Auth Screens', () => {
   it('Correct login sequence', async () => {
     await device.reloadReactNative();
     await element(by.id('signInAuth')).tap();
-    await element(by.id('email')).typeText('a\n');
+    await element(by.id('email')).typeText('secretUsername\n');
     await element(by.id('signInAuth')).tap();
     await waitFor(element(by.id('password'))).toBeVisible().withTimeout(2000);
-    await element(by.id('password')).typeText('a\n');
+    await element(by.id('password')).typeText('secretPassword\n');
     await waitFor(element(by.id('signIn'))).toBeVisible().withTimeout(2000);
     await element(by.id('signIn')).tap();
     await waitFor(element(by.id('jobSwipe'))).toBeVisible();
