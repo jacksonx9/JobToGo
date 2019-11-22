@@ -21,7 +21,7 @@ class User {
       res.status(response.status).send(response);
     });
 
-    app.post('/users/userName/:userId', async (req, res) => {
+    app.put('/users/userName/:userId', async (req, res) => {
       const response = await User.editUserName(req.params.userId, req.body.userName);
       res.status(response.status).send(response);
     });
