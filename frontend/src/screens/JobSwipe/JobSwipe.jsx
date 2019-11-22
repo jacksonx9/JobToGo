@@ -170,7 +170,7 @@ export default class JobSwipe extends Component {
     if (loading) return <Loader />;
 
     return (
-      <View style={styles.container}>
+      <View style={styles.container} testID="jobSwipe">
         <MainHeader
           buttonSource={menuButtonSource}
           onPress={() => this.toggleSharedJobsView()}
@@ -182,6 +182,7 @@ export default class JobSwipe extends Component {
               cards={jobs}
               renderCard={posting => (
                 <JobCard
+                  testID={`card${matchedJobs.indexOf(posting)}`}
                   logo={posting.logo}
                   company={posting.company}
                   title={posting.title}

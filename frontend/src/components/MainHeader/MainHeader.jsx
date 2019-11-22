@@ -8,9 +8,10 @@ import styles from './styles';
 import { colours, sizes } from '../../styles';
 
 const MainHeader = ({ onPress }) => (
-  <View style={styles.container}>
+  <View style={styles.container} testID="mainHeader">
     <View style={styles.buttonContainer}>
       <IconButton
+        testID="inbox"
         name="inbox"
         color={colours.lightGray}
         size={sizes.iconLg}

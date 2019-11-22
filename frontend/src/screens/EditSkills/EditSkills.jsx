@@ -46,18 +46,21 @@ export default class EditSkills extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <View style={styles.container} testID="editSkills">
         <NavHeader
+          testID="navHeaderSkills"
           title="Edit Skills"
         />
         <Image
+          testID="checkingDoc"
           source={images.checkingDoc}
           style={styles.image}
         />
-        <Text style={styles.text}>
+        <Text style={styles.text} testID="textSkills">
           Get jobs that are tailored to your skills by uploading your resume.
         </Text>
         <Button
+          testID="uploadResume"
           backgroundColor={colours.accentPrimary}
           title="Upload Resume"
           textColor={colours.white}
