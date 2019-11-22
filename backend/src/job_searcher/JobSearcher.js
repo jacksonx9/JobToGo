@@ -57,6 +57,7 @@ class JobSearcher {
         });
 
         const jobs = [];
+        const baseKeywords = jobConfig.keywords.map(k => k.toLowerCase());
 
         await Promise.all(queriedJobs.map(this.limiter.wrap(async (queriedJob) => {
           try {
@@ -66,6 +67,7 @@ class JobSearcher {
             const $ = cheerio.load(jobPage.data);
             job.description = $(jobConfig.indeedJobDescTag).text();
             job.url = $(jobConfig.indeedJobUrlTag).attr('content');
+            const lowerCaseDescription = job.description.toLowerCase();
 
             const jobExists = await Jobs.findOne({ url: job.url });
             // If new job, compute the number of keywords in the job's description and save to db
@@ -73,7 +75,7 @@ class JobSearcher {
               job.keywords = [];
               this.jobAnalyzer.computeJobKeywordCount(job, keywords);
               if (job.keywords.some(keyword => keyword.count > 0)
-              || jobConfig.keywords.some(k => job.description.includes(k))) {
+              || baseKeywords.some(k => lowerCaseDescription.includes(k))) {
                 jobs.push(job);
               }
             }

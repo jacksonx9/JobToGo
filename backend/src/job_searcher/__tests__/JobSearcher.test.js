@@ -135,7 +135,7 @@ describe('Job Searcher', () => {
     const expectedJobs = testData.jobs.slice(1).sort((a, b) => a.url.localeCompare(b.url));
     await Jobs.insertMany(testData.jobs);
     await jobSearcher.updateJobStore();
-    const jobs = await Jobs.find({}).lean();
+    const jobs = await Jobs.find({}, { _id: 0 }).lean();
     expect(jobs.sort((a, b) => a.url.localeCompare(b.url))).toMatchObject(expectedJobs);
   });
 
