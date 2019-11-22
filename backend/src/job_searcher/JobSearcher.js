@@ -72,7 +72,8 @@ class JobSearcher {
             if (!jobExists) {
               job.keywords = [];
               this.jobAnalyzer.computeJobKeywordCount(job, keywords);
-              if (job.keywords.some(keyword => keyword.count > 0)) {
+              if (job.keywords.some(keyword => keyword.count > 0)
+              || jobConfig.keywords.some(k => job.description.includes(k))) {
                 jobs.push(job);
               }
             }
