@@ -22,13 +22,9 @@ export default class SendLikedJobs extends Component {
   }
 
   async componentDidMount() {
+    const { navigation } = this.props;
     this.fetchLikedJobs();
-  }
-
-  async componentDidUpdate(prevProps) {
-    if (prevProps !== this.props) {
-      // this.fetchLikedJobs();
-    }
+    navigation.addListener('willFocus', () => this.fetchLikedJobs());
   }
 
   fetchLikedJobs = async () => {
@@ -75,7 +71,14 @@ export default class SendLikedJobs extends Component {
   }
 
   removeLikedJob = (item, index) => {
-    this.logger.info(`${item.company}: ${index}`);
+    const { likedJobs } = this.state;
+    const updatedLikedJobs = [...likedJobs];
+    updatedLikedJobs.splice(index, 1);
+    this.setState({ likedJobs: updatedLikedJobs });
+
+    // TODO: Connect endpoint for job removal
+
+    this.logger.info(`Removed ${item.company}: ${index} from liked jobs`);
   }
 
   render() {
