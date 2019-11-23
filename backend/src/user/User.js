@@ -22,12 +22,12 @@ class User {
     });
 
     app.put('/users/userName/:userId', async (req, res) => {
-      const response = await User.editUserName(req.params.userId, req.body.userName);
+      const response = await this.editUserName(req.params.userId, req.body.userName);
       res.status(response.status).send(response);
     });
 
     app.put('/users/password/:userId', async (req, res) => {
-      const response = await User.editPassword(req.params.userId, req.body.password);
+      const response = await this.editPassword(req.params.userId, req.body.password);
       res.status(response.status).send(response);
     });
 
