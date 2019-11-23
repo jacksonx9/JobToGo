@@ -34,10 +34,12 @@ class JobAnalyzer {
    * @param {Job} job
    */
   computeJobKeywordCount(job, keywords) {
-    const description = job.description.split(/[^a-z]/i).filter(Boolean);
+    const description = job.description.toLowerCase().split(/[^a-z]/).filter(Boolean);
+    const lowerCaseKeywords = keywords.map(k => k.toLowerCase());
+
 
     // Add the number of occurances of all keywords in the description
-    keywords.forEach((keyword) => {
+    lowerCaseKeywords.forEach((keyword) => {
       job.keywords.push({
         name: keyword,
         count: description.filter(w => w === keyword).length,
