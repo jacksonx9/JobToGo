@@ -13,7 +13,7 @@ import styles from './styles';
 import icons from '../../constants/icons';
 
 const JobShareModal = ({
-  isVisible, onPressExit, jobTitle, jobCompany, jobId, jobLogo, friends, onPressSend,
+  isVisible, onPressExit, jobTitle, jobCompany, jobId, jobLogo, friends, onPressSend, extraData,
 }) => (
   <Modal
     isVisible={isVisible}
@@ -46,14 +46,16 @@ const JobShareModal = ({
         <FlatList
           showsVerticalScrollIndicator={false}
           data={friends}
+          extraData={friends}
           keyExtractor={item => item._id}
-          renderItem={({ item }) => (
+          extraData={extraData}
+          renderItem={({ item, index }) => (
             <SelectableItem
               key={item._id}
               header={item.userName}
-              subHeader={item.email}
+              subHeader={item.sharedJob ? 'shared' : 'not shared'}
               iconName={icons.send}
-              onPress={() => onPressSend(item, jobId)}
+              onPress={() => onPressSend(item, jobId, index)}
             />
           )}
         />
