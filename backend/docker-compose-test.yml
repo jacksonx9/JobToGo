@@ -17,6 +17,8 @@ services:
     container_name: jobtogo_db
     hostname: jobtogo_db
     image: mongo:4.2.0
+    ports:
+      - "27017:27017"
     volumes: 
       - ./mongodata:/data/db:Z
     networks:
