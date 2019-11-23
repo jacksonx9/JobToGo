@@ -283,6 +283,7 @@ export default class EditFriends extends Component {
           title="Friends"
           buttonOption="search"
           onPressButton={() => { this.setState({ searchInProgress: true }); }}
+          navigation={navigation}
         />
         <SwitchableNav
           showNavOption1={showPendingFriends}

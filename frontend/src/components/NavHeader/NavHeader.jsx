@@ -6,9 +6,8 @@ import IconButton from '../IconButton';
 import styles from './styles';
 import { colours, sizes } from '../../styles';
 
-
 const NavHeader = ({
-  title, buttonOption, onPressButton, testID,
+  title, buttonOption, onPressButton, navigation, testID,
 }) => {
   let button;
   if (buttonOption === 'search') {
@@ -45,7 +44,7 @@ const NavHeader = ({
           name="user"
           color={colours.lightGray}
           size={sizes.icon}
-          onPress={onPressButton}
+          onPress={ () => navigation.navigate('Profile')}
         />
       </View>
       <View

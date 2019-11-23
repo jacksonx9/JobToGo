@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { View, Image, Text } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
+import { GoogleSignin } from 'react-native-google-signin';
 
 import Button from '../../components/Button';
 import NavHeader from '../../components/NavHeader/NavHeader';
@@ -23,10 +24,10 @@ export default class Profile extends Component {
         <NavHeader
           title="Account"
         />
-        <Image
+        {/* <Image
           source={images.checkingDoc}
           style={styles.image}
-        />
+        /> */}
         <Text style={styles.text}>
           Change your account settings
         </Text>
@@ -43,6 +44,13 @@ export default class Profile extends Component {
           textColor={colours.white}
           style={styles.button}
           onPress={() => navigation.navigate('UpdatePassword')}
+        />
+        <Button
+          backgroundColor={colours.accentPrimary}
+          title="Log Out"
+          textColor={colours.white}
+          style={styles.button}
+          onPress={async () => { await GoogleSignin.signOut(); navigation.navigate('Auth'); }}
         />
       </View>
     );

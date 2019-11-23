@@ -45,11 +45,14 @@ export default class EditSkills extends Component {
   }
 
   render() {
+    const { navigation } = this.props;
     return (
       <View style={styles.container} testID="editSkills">
         <NavHeader
           testID="navHeaderSkills"
           title="Edit Skills"
+          // onPressButton={() => navigation.navigate('Profile')}
+          navigation={navigation}
         />
         <Image
           testID="checkingDoc"

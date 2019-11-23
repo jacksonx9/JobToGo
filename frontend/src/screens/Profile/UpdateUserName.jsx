@@ -12,7 +12,7 @@ import styles from './styles';
 import { colours } from '../../styles';
 import images from '../../constants/images';
 
-export default class Profile extends Component {
+export default class UpdateUserName extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -23,21 +23,30 @@ export default class Profile extends Component {
     this.logger = Logger.get(this.constructor.name);
   }
 
-  onPressUpdate = () => {
+  onPressUpdate = async () => {
+    const { navigation } = this.props;
     const { userName } = this.state;
+    const { userId } = global;
     if (userName.length === 0) {
       this.setState({ blank: true });
       return;
     }
     this.setState({ blank: false });
-    axios.post(`${config.ENDP_UPDATE_USERNAME}`, {
-      userId: global.userId,
-      userName,
-    }).catch(this.setState({ invalidUserName: true }));
+
+    try {
+      this.logger.info(global.userId);
+      await axios.put(`${config.ENDP_UPDATE_USERNAME}${userId}`, {
+        userName,
+      });
+      this.logger.info('actually didnt fail');
+      navigation.navigate('Profile');
+    } catch (e) {
+      this.setState({ invalidUserName: true });
+      this.logger.error(e);
+    }
   }
 
   render() {
-    const { navigation } = this.props;
     const { userName, invalidUserName, blank } = this.state;
     return (
       <View style={styles.container}>
