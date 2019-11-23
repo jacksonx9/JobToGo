@@ -16,13 +16,11 @@ const testData = {
   keywords: [
     'software',
     'software intern',
-    'c++',
     'java',
     'javascript',
     'python',
     'android',
     'react',
-    'node.js',
     'nodejs',
     'mongo',
     'ios',

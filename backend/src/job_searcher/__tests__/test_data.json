@@ -7,7 +7,7 @@
             "location" : "Madison, WI 53719",
             "postDate" : "",
             "salary" : "",
-            "description" : "GUI DEVELOPER"
+            "description" : "Python GUI DEVELOPER"
         },
         {
             "title" : "System Safety Engineer",
@@ -16,7 +16,7 @@
             "location" : "Albuquerque, NM 87102 (Barelas area)",
             "postDate" : "",
             "salary" : "",
-            "description" : "Senior Avionics Systems Safety Engineer Advanced Logistics Support"
+            "description" : "Senior Python Avionics Systems Safety Engineer Advanced Logistics Support"
         },
         {
             "title" : "PyMOL Engineer",
@@ -25,7 +25,7 @@
             "location" : "New York, NY 10036",
             "postDate" : "13 days ago",
             "salary" : "",
-            "description" : "We’re looking to hire a PyMOL Software Engineer to join us in our mission to design drugs that improve human health and materials that increase quality of life!"
+            "description" : "We’re looking to hire a Python PyMOL Software Engineer to join us in our mission to design drugs that improve human health and materials that increase quality of life!"
         },
         {
             "title" : ".NET Developer",
@@ -34,7 +34,7 @@
             "location" : "Cincinnati, OH 45241",
             "postDate" : "",
             "salary" : "$60,000 - $80,000 a year",
-            "description" : "Job Details"
+            "description" : "Python Job Details"
         }
     ],
     "invalidJobs": [

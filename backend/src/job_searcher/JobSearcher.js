@@ -57,6 +57,7 @@ class JobSearcher {
         });
 
         const jobs = [];
+        const baseKeywords = jobConfig.keywords.map(k => k.toLowerCase());
 
         await Promise.all(queriedJobs.map(this.limiter.wrap(async (queriedJob) => {
           try {
@@ -66,16 +67,18 @@ class JobSearcher {
             const $ = cheerio.load(jobPage.data);
             job.description = $(jobConfig.indeedJobDescTag).text();
             job.url = $(jobConfig.indeedJobUrlTag).attr('content');
+            const lowerCaseDescription = job.description.toLowerCase();
 
             const jobExists = await Jobs.findOne({ url: job.url });
-            // Check if job exists in the database already
+            // If new job, compute the number of keywords in the job's description and save to db
             if (!jobExists) {
               job.keywords = [];
-              // Compute count of each keyword in the job
               this.jobAnalyzer.computeJobKeywordCount(job, keywords);
+              if (job.keywords.some(keyword => keyword.count > 0)
+              || baseKeywords.some(k => lowerCaseDescription.includes(k))) {
+                jobs.push(job);
+              }
             }
-
-            jobs.push(job);
           } catch (e) {
             // If we fail to get the job page, just ignore the job
             this.logger.error(e);
@@ -123,12 +126,17 @@ class JobSearcher {
           outdatedJobIds.push(job._id);
         }
       } catch (e) {
+        // Unkown error response; keep the job
+        if (!e.response) {
+          this.logger.error('Unkown error thrown from indeed scraper');
         // If the job url is not found, we assume the job has been taken down
-        if (e.response.status === 404) {
-          outdatedJobIds.push(job._id);
+        } else {
+          if (e.response.status === 404) {
+            outdatedJobIds.push(job._id);
+          }
+          // Or else log the error and keep the job
+          this.logger.error(e.response.statusText);
         }
-        // Or else log the error and keep the job
-        this.logger.error(e.response.statusText);
       }
     })));
 

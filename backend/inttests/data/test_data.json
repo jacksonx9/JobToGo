@@ -27,7 +27,7 @@
             }
         }
     ],
-    "skills": ["c++", "python", "java"],
+    "skills": ["c", "python", "java"],
     "jobs": [
         {
             "title" : "GUI Developer",
@@ -36,7 +36,7 @@
             "location" : "Madison, WI 53719",
             "postDate" : "",
             "salary" : "",
-            "description" : "GUI DEVELOPER Boeing Phantom Works is seeking an FPGA Design Engineer to provide design expertise to the Space Systems organization in the greater Puget Sound area.Boeing Phantom Works is seeking an FPGA Design Engineer to provide design expertise to the Space Systems organization in the greater Puget Sound area.Boeing Phantom Works is seeking an FPGA Design Engineer to provide design expertise to the Space Systems organization in the greater Puget Sound area"
+            "description" : "Java GUI DEVELOPER Boeing Phantom Works is seeking an FPGA Design Engineer to provide design expertise to the Space Systems organization in the greater Puget Sound area.Boeing Phantom Works is seeking an FPGA Design Engineer to provide design expertise to the Space Systems organization in the greater Puget Sound area.Boeing Phantom Works is seeking an FPGA Design Engineer to provide design expertise to the Space Systems organization in the greater Puget Sound area"
         },
         {
             "title" : "System Safety Engineer",
@@ -45,7 +45,7 @@
             "location" : "Albuquerque, NM 87102 (Barelas area)",
             "postDate" : "",
             "salary" : "",
-            "description" : "Senior Avionics Systems Safety Engineer Advanced Logistics Support"
+            "description" : "Senior Avionics Software Systems Safety Engineer Advanced Logistics Support"
         },
         {
             "title" : "PyMOL Engineer",
@@ -63,7 +63,7 @@
             "location" : "Cincinnati, OH 45241",
             "postDate" : "",
             "salary" : "$60,000 - $80,000 a year",
-            "description" : "Job Details"
+            "description" : "Software Job Details"
         },
         {
             "title" : "FPGA Design Engineer",
@@ -72,7 +72,7 @@
             "location" : "Tukwila, WA",
             "postDate" : "2 days ago",
             "salary" : "",
-            "description" : "Boeing Phantom Works is seeking an FPGA Design Engineer to provide design expertise to the Space Systems organization in the greater Puget Sound area.Boeing Phantom Works is seeking an FPGA Design Engineer to provide design expertise to the Space Systems organization in the greater Puget Sound area.Boeing Phantom Works is seeking an FPGA Design Engineer to provide design expertise to the Space Systems organization in the greater Puget Sound area. c++"
+            "description" : "Boeing Software Phantom Works is seeking an FPGA Design Engineer to provide design expertise to the Space Systems organization in the greater Puget Sound area.Boeing Phantom Works is seeking an FPGA Design Engineer to provide design expertise to the Space Systems organization in the greater Puget Sound area.Boeing Phantom Works is seeking an FPGA Design Engineer to provide design expertise to the Space Systems organization in the greater Puget Sound area. c++"
         },
         {
             "title" : "Firmware Engineer",
@@ -81,7 +81,7 @@
             "location" : "Twinsburg, OH 44087",
             "postDate" : "2 days ago",
             "salary" : "",
-            "description" : "Summary/objective: The Firmware Engineer focuses on development, testing, coding and research of firmware for systems.Essential Functions:Summary/objective: The Firmware Engineer focuses on development, testing, coding and research of firmware for systems.Essential Functions:Summary/objective: The Firmware Engineer focuses on development, testing, coding and research of firmware for systems.Essential Functions:Summary/objective: The Firmware Engineer focuses on development, testing, coding and research of firmware for systems.Essential Functions java"
+            "description" : "Summary/objective: The Software Firmware Engineer focuses on development, testing, coding and research of firmware for systems.Essential Functions:Summary/objective: The Firmware Engineer focuses on development, testing, coding and research of firmware for systems.Essential Functions:Summary/objective: The Firmware Engineer focuses on development, testing, coding and research of firmware for systems.Essential Functions:Summary/objective: The Firmware Engineer focuses on development, testing, coding and research of firmware for systems.Essential Functions java"
         },
         {
             "title" : "Engineering Managers for Microelectronics R&D Teams",
@@ -90,7 +90,7 @@
             "location" : "Tukwila, WA",
             "postDate" : "1 day ago",
             "salary" : "",
-            "description" : "At Boeing, we are all innovators on a mission to connect, protect, explore and inspire. From the seabed to outer space, you’ll learn and grow, contributing to work that shapes the Find your future with us. c++. java"
+            "description" : "At Boeing, we are all Software innovators on a mission to connect, protect, explore and inspire. From the seabed to outer space, you’ll learn and grow, contributing to work that shapes the Find your future with us. c++. java"
         },
         {
             "title" : "5G & Small Cell Software Intern - FPGA",
@@ -108,7 +108,7 @@
             "location" : "Chicago, IL",
             "postDate" : "1 day ago",
             "salary" : "",
-            "description" : "ing Phantom Works is seeking an FPGA Design Engineer to provide design expertise to the Space Systems organization in the greater Puget Sound area.Boeing Phantom Works is seeking an FPGA Design Engineer to provide design expertise to the Space Systems organization java java java java"
+            "description" : "ing Phantom Works is seeking an Software FPGA Design Engineer to provide design expertise to the Space Systems organization in the greater Puget Sound area.Boeing Phantom Works is seeking an FPGA Design Engineer to provide design expertise to the Space Systems organization java java java java"
         },
         {
             "title" : "System Validation Engineer Internship",
@@ -117,7 +117,7 @@
             "location" : "Austin, TX 78746",
             "postDate" : "Today",
             "salary" : "",
-            "description" : "c++ c++ c++ python c++ c++"
+            "description" : "c++ c++ c++ python c++ c++ Software"
         }
     ]
 }
