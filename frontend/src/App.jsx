@@ -132,7 +132,7 @@ export default class App extends React.Component {
       return (<Icon name="upload" size={sizes.icon} color={tintColor} />);
     }
 
-    const TabNav = createBottomTabNavigator(
+    const TabStack = createBottomTabNavigator(
       {
         Home: {
           screen: () => <JobSwipe socket={this.socket} />,
@@ -151,7 +151,7 @@ export default class App extends React.Component {
           },
         },
         Friends: {
-          screen: () => <EditFriends socket={this.socket} />,
+          screen: props => <EditFriends {...props} socket={this.socket} />,
           navigationOptions: {
             tabBarLabel: 'Friends',
             tabBarIcon: FriendsTabIcon,
@@ -191,7 +191,7 @@ export default class App extends React.Component {
 
     const AppStack = createStackNavigator(
       {
-        TabNav,
+        TabStack,
         ProfileStack,
       },
       navConfig,

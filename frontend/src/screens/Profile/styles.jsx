@@ -30,7 +30,6 @@ const styles = StyleSheet.create({
   button: {
     width: '90%',
     marginTop: margin.md,
-    // marginBottom: margin.sm,
   },
   link: {
     fontFamily: fonts.normal,

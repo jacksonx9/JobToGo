@@ -47,11 +47,14 @@ export default class UpdateUserName extends Component {
   }
 
   render() {
+    const { navigation } = this.props;
     const { userName, invalidUserName, blank } = this.state;
     return (
       <View style={styles.container}>
         <NavHeader
           title="Update Username"
+          leftButtonOption="back"
+          onPressLeftButton={() => navigation.goBack()}
         />
         <Image
           source={images.checkingDoc}
@@ -67,7 +70,7 @@ export default class UpdateUserName extends Component {
           placeholderTextColor={colours.lightGray}
           onChangeText={text => { this.setState({ userName: text, invalidUserName: false }); }}
         />
-        {invalidUserName ? <Text>{`Username "${userName}" already taken`}</Text>
+        {invalidUserName ? <text style={styles.text}>{`Username "${userName}" already taken`}</Text>
           : <Text />}
         <Button
           backgroundColor={colours.accentPrimary}
@@ -76,7 +79,7 @@ export default class UpdateUserName extends Component {
           style={styles.button}
           onPress={() => this.onPressUpdate()}
         />
-        {blank ? <Text>Fields must not be blank</Text>
+        {blank ? <text style={styles.text}>Fields must not be blank</Text>
           : <Text />}
       </View>
     );

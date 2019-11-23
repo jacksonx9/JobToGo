@@ -7,45 +7,57 @@ import styles from './styles';
 import { colours, sizes } from '../../styles';
 
 const NavHeader = ({
-  title, buttonOption, onPressButton, navigation, testID,
+  title, leftButtonOption, onPressLeftButton, rightButtonOption,
+  onPressRightButton, testID,
 }) => {
-  let button;
-  if (buttonOption === 'search') {
-    button = (
+  let leftButton;
+  if (leftButtonOption === 'search') {
+    leftButton = (
       <IconButton
         testID="search"
         name="search"
         color={colours.lightGray}
         size={sizes.icon}
-        onPress={onPressButton}
+        onPress={onPressLeftButton}
       />
     );
-  } else if (buttonOption === 'back') {
-    button = (
+  } else if (leftButtonOption === 'back') {
+    leftButton = (
       <IconButton
-        name="menu"
+        name="chevron-left"
         color={colours.lightGray}
         size={sizes.icon}
-        onPress={onPressButton}
+        onPress={onPressLeftButton}
       />
     );
   } else {
-    button = null;
+    leftButton = null;
+  }
+
+  let rightButton;
+  if (rightButtonOption === 'menu') {
+    rightButton = (
+      <IconButton
+        testID="menu"
+        name="menu"
+        color={colours.lightGray}
+        size={sizes.icon}
+        onPress={onPressRightButton}
+      />
+    );
+  } else {
+    rightButton = null;
   }
 
   return (
     <View style={styles.container} testID={testID}>
       <View style={styles.componentContainer}>
         <View style={styles.leftComponentContainer}>
-          {button}
+          {leftButton}
         </View>
-        <IconButton
-          testID="user"
-          name="user"
-          color={colours.lightGray}
-          size={sizes.icon}
-          onPress={ () => navigation.navigate('Profile')}
-        />
+        <View>
+          {rightButton}
+        </View>
       </View>
       <View
         style={styles.titleContainer}
@@ -57,15 +69,19 @@ const NavHeader = ({
 };
 
 NavHeader.defaultProps = {
-  buttonOption: 'none',
-  onPressButton: () => {},
+  leftButtonOption: 'none',
+  onPressLeftButton: () => {},
+  rightButtonOption: 'none',
+  onPressRightButton: () => {},
   testID: '',
 };
 
 NavHeader.propTypes = {
   title: string.isRequired,
-  buttonOption: oneOf(['search', 'back', 'none']),
-  onPressButton: func,
+  leftButtonOption: oneOf(['search', 'back', 'none']),
+  onPressLeftButton: func,
+  rightButtonOption: oneOf(['menu', 'none']),
+  onPressRightButton: func,
   testID: string,
 };
 

@@ -109,9 +109,8 @@ export default class SendLikedJobs extends Component {
         <NavHeader
           testID="navHeaderLiked"
           title="Liked Jobs"
-          buttonOption="search"
-          // onPressButton={() => navigation.navigate('Profile')}
-          navigation={navigation}
+          rightButtonOption="menu"
+          onPressRightButton={() => navigation.navigate('Profile')}
         />
         <View style={styles.buttonSection}>
           <View style={styles.infoContainer}>

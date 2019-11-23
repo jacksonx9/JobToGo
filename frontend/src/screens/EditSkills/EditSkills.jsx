@@ -51,8 +51,8 @@ export default class EditSkills extends Component {
         <NavHeader
           testID="navHeaderSkills"
           title="Edit Skills"
-          // onPressButton={() => navigation.navigate('Profile')}
-          navigation={navigation}
+          rightButtonOption="menu"
+          onPressRightButton={() => navigation.navigate('Profile')}
         />
         <Image
           testID="checkingDoc"
