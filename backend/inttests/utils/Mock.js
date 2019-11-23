@@ -8,6 +8,7 @@ import { OAuth2Client } from 'google-auth-library';
 
 import jobConfig from '../../src/job_searcher/config';
 import testData from '../data/test_data';
+import AllSkills from '../../src/all_skills';
 
 // Custom HTTP error for mocking axios
 class HTTPError extends Error {

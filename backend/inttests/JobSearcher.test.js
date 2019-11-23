@@ -64,6 +64,8 @@ describe('Job Searching', () => {
   test('Find searched jobs', async () => {
     // Check there are jobs in the store
     const response = await request.get(`/jobs/find/${userId}`);
-    expect(response.body.result).toMatchObject(testData.jobs.slice(1));
+    const receivedJobs = response.body.result;
+    receivedJobs.forEach((_, i) => delete receivedJobs[i]._id);
+    expect(receivedJobs).toMatchObject(testData.jobs.slice(1));
   });
 });
