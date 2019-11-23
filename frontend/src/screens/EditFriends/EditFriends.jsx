@@ -8,6 +8,7 @@ import Search from '../../components/Search';
 import SelectableItem from '../../components/SelectableItem';
 import Loader from '../../components/Loader';
 import InfoDisplay from '../../components/InfoDisplay';
+import OptionsModal from '../../components/OptionsModal';
 import NavHeader from '../../components/NavHeader';
 import SwitchableNav from '../../components/SwitchableNav';
 import config from '../../constants/config';
@@ -22,10 +23,12 @@ export default class EditFriends extends Component {
       friends: [],
       pendingFriends: [],
       searchedUsers: [],
+      pendingFriendsIndex: 0,
       searchText: '',
       loading: 1,
       showPendingFriends: true,
       searchInProgress: false,
+      optionsModalIsVisible: false,
     };
     this.logger = Logger.get(this.constructor.name);
   }
@@ -84,21 +87,26 @@ export default class EditFriends extends Component {
     }).catch(e => this.logger.error(e));
   }
 
-  comfirmFriendRequest = async (item, index) => {
+  openOptionsModal = index => {
+    this.setState({
+      optionsModalIsVisible: true,
+      pendingFriendsIndex: index,
+    });
+  }
+
+  comfirmFriendRequest = async index => {
     const { userId } = global;
     const { pendingFriends } = this.state;
 
     try {
       await axios.post(config.ENDP_CONFIRM_FRIENDS, {
         userId,
-        friendId: item._id,
+        friendId: pendingFriends[index]._id,
       }).catch(e => this.logger.error(e));
 
       const updatedPendingFriends = [...pendingFriends];
-      if (index > -1) {
-        updatedPendingFriends.splice(index, 1);
-        this.setState({ pendingFriends: updatedPendingFriends });
-      }
+      updatedPendingFriends.splice(index, 1);
+      this.setState({ pendingFriends: updatedPendingFriends });
     } catch (e) {
       this.logger.error(e);
     }
@@ -117,10 +125,8 @@ export default class EditFriends extends Component {
       });
 
       const updatedFriends = [...friends];
-      if (index > -1) {
-        updatedFriends.splice(index, 1);
-        this.setState({ friends: updatedFriends });
-      }
+      updatedFriends.splice(index, 1);
+      this.setState({ friends: updatedFriends });
     } catch (e) {
       this.logger.error(e);
     }
@@ -136,63 +142,86 @@ export default class EditFriends extends Component {
     });
   }
 
-  getSelectableItemIcon = isFriend =>
-    // if (isFriend) {
-    //   return icons.x;
-    // }
-    // switch (userType) {
-    //   case 'friend':
-    //     return icons.x;
-    //   case 'pending':
-    //     return icons.moreVertical;
-    //   default:
-    //     return icons.plus;
-    // }
-    icons.plus
-  ;
+  searchableUserList = users => (
+    <FlatList
+      testID="userList"
+      data={users}
+      keyExtractor={item => item._id}
+      renderItem={({ item, index }) => (
+        <SelectableItem
+          testID={`userItem${index}`}
+          key={item._id}
+          header={item.userName}
+          subHeader={item.email}
+          noBanner={!item.isFriend}
+          bannerText="friend"
+          onPress={item.isFriend
+            ? () => this.removeFriend(item, index) : () => this.addFriend(item, index)}
+          iconName={item.isFriend ? icons.x : icons.plus}
+        />
+      )}
+    />
+  );
+
+  pendingFriendsList = pendingFriends => (
+    <FlatList
+      testID="userList"
+      data={pendingFriends}
+      keyExtractor={item => item._id}
+      renderItem={({ item, index }) => (
+        <SelectableItem
+          testID={`userItem${index}`}
+          key={item._id}
+          header={item.userName}
+          subHeader={item.email}
+          onPress={() => this.openOptionsModal(index)}
+          iconName={icons.moreVertical}
+        />
+      )}
+    />
+  );
+
+
+  friendsList = friends => (
+    <FlatList
+      testID="userList"
+      data={friends}
+      keyExtractor={item => item._id}
+      renderItem={({ item, index }) => (
+        <SelectableItem
+          testID={`userItem${index}`}
+          key={item._id}
+          header={item.userName}
+          subHeader={item.email}
+          onPress={() => this.removeFriend(item, index)}
+          iconName={icons.x}
+        />
+      )}
+    />
+  );
 
   render() {
     const {
       loading, searchText, pendingFriends, friends, searchedUsers,
-      showPendingFriends, searchInProgress,
+      showPendingFriends, searchInProgress, pendingFriendsIndex, optionsModalIsVisible,
     } = this.state;
 
-    let users;
-    let onPress;
+    let userList;
     let noUsersMsg;
+    let noUsers;
     if (searchInProgress) {
-      users = searchedUsers;
-      onPress = this.addFriend;
+      userList = this.searchableUserList(searchedUsers);
       noUsersMsg = status.noResults;
+      noUsers = searchedUsers.length === 0;
     } else if (showPendingFriends) {
-      users = pendingFriends;
-      onPress = this.comfirmFriendRequest;
+      userList = this.pendingFriendsList(pendingFriends);
       noUsersMsg = status.noPendingFriends;
+      noUsers = pendingFriends.length === 0;
     } else {
-      users = friends;
-      onPress = this.removeFriend;
+      userList = this.friendsList(friends);
       noUsersMsg = status.noFriends;
+      noUsers = friends.length === 0;
     }
-
-    const noUsers = users.length === 0;
-
-    const userList = (
-      <FlatList
-        testID="userList"
-        data={users}
-        keyExtractor={item => item._id}
-        renderItem={({ item, index }) => (
-          <SelectableItem
-            testID={`userItem${index}`}
-            key={item._id}
-            header={item.userName}
-            subHeader={item.isFriend ? 'friend' : 'not a friend'}
-            onPress={() => onPress(item, index)}
-            iconName={this.getSelectableItemIcon(item)} // TODO: change this :(
-          />
-        )}
-      />
-    );
 
     const noUsersInfo = (
       <InfoDisplay message={noUsersMsg} />
@@ -232,6 +261,15 @@ export default class EditFriends extends Component {
         />
         <View style={[styles.listContainer]}>
           {noUsers ? noUsersInfo : userList}
+          <OptionsModal
+            option1="Confirm"
+            option2="Ignore"
+            onPress1={this.comfirmFriendRequest}
+            onPress2={this.comfirmFriendRequest}
+            onPressExit={() => { this.setState({ optionsModalIsVisible: false }); }}
+            isVisible={optionsModalIsVisible}
+            index={pendingFriendsIndex}
+          />
         </View>
       </View>
     );

@@ -182,7 +182,7 @@ export default class JobSwipe extends Component {
     if (jobs.length === (oldIndex + 1)) {
       // No need to fetch more shared jobs since websockets will take care of this.
       // We simply wait for the sharedJobIndex array to be refilled.
-      this.setState({ sharedJobIndex: [] });
+      this.setState({ sharedJobs: [] });
     }
   };
 

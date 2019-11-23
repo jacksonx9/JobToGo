@@ -5,6 +5,10 @@ import { string, number } from 'prop-types';
 import images from '../../constants/images';
 import styles from './styles';
 
+// getPlaceholder = () => {
+//   return Math.random() * 
+// }
+
 const JobImage = ({ logo, sideLength, style }) => {
   let source = { uri: logo };
   if (logo === null) {
