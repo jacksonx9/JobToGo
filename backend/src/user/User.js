@@ -328,7 +328,7 @@ class User {
 
   async addKeyword(userId, keyword) {
     if (!userId || !keyword) {
-      return new Response(null, 'Invalid userId or keyword', 400);
+      return new Response(false, 'Invalid userId or keyword', 400);
     }
 
     try {
@@ -337,7 +337,7 @@ class User {
 
 
       if (keywordNames.has(keyword)) {
-        return new Response(keyword, 'User already has this keyword', 400);
+        return new Response(true, 'User already has this keyword', 400);
       }
 
       user.keywords.push({
@@ -348,9 +348,9 @@ class User {
       });
 
       await user.save();
-      return new Response(null, '', 200);
+      return new Response(true, '', 200);
     } catch (e) {
-      return new Response(null, 'Invalid userId or keyword sss', 400);
+      return new Response(false, 'Invalid userId or keyword sss', 400);
     }
   }
 
