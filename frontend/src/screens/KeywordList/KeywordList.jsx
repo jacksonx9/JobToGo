@@ -1,14 +1,18 @@
 import React, { Component } from 'react';
-import { View, FlatList, Text, TextInput } from 'react-native';
+import {
+  View, FlatList, Text, TextInput,
+} from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
 
+import ErrorDisplay from '../../components/ErrorDisplay';
 import SelectableItem from '../../components/SelectableItem';
 import Loader from '../../components/Loader';
 import NavHeader from '../../components/NavHeader';
 import Button from '../../components/Button';
 import config from '../../constants/config';
 import icons from '../../constants/icons';
+import { errors } from '../../constants/messages';
 import styles from './styles';
 import { colours } from '../../styles';
 
@@ -20,6 +24,8 @@ export default class KeywordList extends Component {
       newSkill: '',
       loading: 1,
       response: '',
+      showErrorDisplay: false,
+      errorDisplayText: errors.default,
     };
     this.logger = Logger.get(this.constructor.name);
   }
@@ -40,7 +46,11 @@ export default class KeywordList extends Component {
         loading: 0,
       });
     } catch (e) {
-      this.logger.error(e);
+      this.setState({
+        loading: 0,
+        showErrorDisplay: true,
+        errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
+      });
     }
   }
 
@@ -65,11 +75,14 @@ export default class KeywordList extends Component {
         keywords: updatedKeywords, newSkill: '', response: 'Successfully added Skill',
       });
     } catch (e) {
-      this.logger.info(e.response.data);
-      if (e.response.data.result && e.response.data.status === 400) {
-        this.setState({ response: `Skill "${newSkill}" already added` });
+      if (!e.response || !e.response.data
+          || !e.response.data.result || e.response.data.status !== 400) {
+        this.setState({
+          showErrorDisplay: true,
+          errorDisplayText: errors.default,
+        });
       } else {
-        this.logger.error(e);
+        this.setState({ response: `Skill "${newSkill}" already added` });
       }
     }
   }
@@ -92,13 +105,17 @@ export default class KeywordList extends Component {
 
       this.logger.info(`Removed ${item}: ${index} from keywords`);
     } catch (e) {
-      this.logger.error(e);
+      this.setState({
+        loading: false,
+        showErrorDisplay: true,
+        errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
+      });
     }
   }
 
   render() {
     const {
-      loading, keywords, newSkill, response,
+      loading, keywords, newSkill, response, showErrorDisplay, errorDisplayText,
     } = this.state;
     const { navigation } = this.props;
     if (loading) return <Loader />;
@@ -110,6 +127,12 @@ export default class KeywordList extends Component {
           title="Keywords"
           leftButtonOption="back"
           onPressRightButton={() => navigation.navigate('TabStack')}
+        />
+        <ErrorDisplay
+          showDisplay={showErrorDisplay}
+          setShowDisplay={show => this.setState({ showErrorDisplay: show })}
+          displayText={errorDisplayText}
+          style={styles.errorDisplay}
         />
         <TextInput
           testID="keywordInput"

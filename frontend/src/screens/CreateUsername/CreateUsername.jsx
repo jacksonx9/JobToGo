@@ -5,9 +5,11 @@ import {
 import axios from 'axios';
 import Logger from 'js-logger';
 
+import ErrorDisplay from '../../components/ErrorDisplay';
 import Button from '../../components/Button';
 import config from '../../constants/config';
 import images from '../../constants/images';
+import { errors } from '../../constants/messages';
 import { colours } from '../../styles';
 import styles from './styles';
 
@@ -19,6 +21,8 @@ export default class CreateUsername extends Component {
       userName: '',
       invalidUserName: false,
       emptyField: false,
+      showErrorDisplay: false,
+      errorDisplayText: errors.default,
     };
     this.logger = Logger.get(this.constructor.name);
   }
@@ -47,23 +51,31 @@ export default class CreateUsername extends Component {
       global.userId = ret.data.result;
       navigation.navigate('App');
     } catch (e) {
-      if (e.response.data.result === 'userName') {
+      if (!e.response || e.response.data.result !== 'userName') {
         this.setState({
-          invalidUserName: true,
+          showErrorDisplay: true,
+          errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
         });
       } else {
-        this.logger.error(e);
+        this.setState({ invalidUserName: true });
       }
     }
   }
 
   render() {
-    const { userName, invalidUserName, emptyField } = this.state;
+    const {
+      userName, invalidUserName, emptyField, showErrorDisplay, errorDisplayText,
+    } = this.state;
     return (
       <View style={styles.container}>
         <Image
           source={images.logoLight}
           style={styles.logo}
+        />
+        <ErrorDisplay
+          showDisplay={showErrorDisplay}
+          setShowDisplay={show => this.setState({ showErrorDisplay: show })}
+          displayText={errorDisplayText}
         />
         <Image
           source={images.jobSeeker}
@@ -76,7 +88,9 @@ export default class CreateUsername extends Component {
           placeholderTextColor={colours.lightGray}
           onChangeText={text => { this.setState({ userName: text, invalidUserName: false }); }}
         />
-        <Text style={styles.warning}>{invalidUserName ? `Username "${userName}" already taken` : ''}</Text>
+        <Text style={styles.warning}>
+          { invalidUserName ? `Username "${userName}" already taken` : '' }
+        </Text>
         <Button
           title="Confirm Username"
           textColor={colours.white}

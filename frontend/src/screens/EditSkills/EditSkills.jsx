@@ -3,6 +3,7 @@ import { View, Image, Text } from 'react-native';
 import FilePickerManager from 'react-native-file-picker';
 import axios from 'axios';
 import Logger from 'js-logger';
+import Toast from 'react-native-simple-toast';
 
 import Button from '../../components/Button';
 import ErrorDisplay from '../../components/ErrorDisplay';
@@ -11,7 +12,7 @@ import config from '../../constants/config';
 import styles from './styles';
 import { colours } from '../../styles';
 import images from '../../constants/images';
-import { errors } from '../../constants/messages';
+import { errors, status } from '../../constants/messages';
 
 export default class EditSkills extends Component {
   constructor(props) {
@@ -48,6 +49,7 @@ export default class EditSkills extends Component {
                 'Content-Type': 'multipart/form-data',
               },
             });
+          Toast.show(status.resumeUploaded);
         } catch (e) {
           this.setState({
             showErrorDisplay: true,

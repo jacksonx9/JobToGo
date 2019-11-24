@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 import {
-  colours, fonts, padding, margin,
+  colours, fonts, padding,
 } from '../../styles';
 
 const styles = StyleSheet.create({
@@ -17,6 +17,7 @@ const styles = StyleSheet.create({
   textContainer: {
     maxHeight: '50%',
     width: '75%',
+    marginBottom: '15%',
   },
   image: {
     maxHeight: '30%',
@@ -32,7 +33,6 @@ const styles = StyleSheet.create({
   },
   button: {
     width: '75%',
-    marginTop: margin.xl,
   },
 });
 

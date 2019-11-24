@@ -7,8 +7,16 @@ import { errors } from '../../constants/messages';
 
 import styles from './styles';
 
-const InfoDisplay = ({ message, source, button }) => (
-  <View style={styles.container} testID="infoDisplay">
+const InfoDisplay = ({
+  message, source, button, style,
+}) => (
+  <View
+    style={{
+      ...styles.container,
+      ...style,
+    }}
+    testID="infoDisplay"
+  >
     <Image
       source={source}
       style={styles.image}
@@ -26,6 +34,7 @@ InfoDisplay.defaultProps = {
   source: images.iconLogoGray,
   message: errors.default,
   button: null,
+  style: {},
 };
 
 InfoDisplay.propTypes = {
@@ -33,6 +42,7 @@ InfoDisplay.propTypes = {
   message: string,
   /* eslint-disable react/forbid-prop-types */
   button: object,
+  style: object,
 };
 
 export default InfoDisplay;

@@ -5,9 +5,11 @@ import {
 import axios from 'axios';
 import Logger from 'js-logger';
 
+import ErrorDisplay from '../../components/ErrorDisplay';
 import Button from '../../components/Button';
 import NavHeader from '../../components/NavHeader/NavHeader';
 import config from '../../constants/config';
+import { errors } from '../../constants/messages';
 import styles from './styles';
 import { colours } from '../../styles';
 import images from '../../constants/images';
@@ -19,6 +21,8 @@ export default class UpdateUserName extends Component {
       userName: '',
       invalidUserName: false,
       blank: false,
+      showErrorDisplay: false,
+      errorDisplayText: errors.default,
     };
     this.logger = Logger.get(this.constructor.name);
   }
@@ -41,19 +45,34 @@ export default class UpdateUserName extends Component {
       this.logger.info('actually didnt fail');
       navigation.navigate('Profile');
     } catch (e) {
-      this.setState({ invalidUserName: true });
+      if (!e.response || e.response.data.status !== 400) {
+        this.setState({
+          showErrorDisplay: true,
+          errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
+        });
+      } else {
+        this.setState({ invalidUserName: true });
+      }
     }
   }
 
   render() {
     const { navigation } = this.props;
-    const { userName, invalidUserName, blank } = this.state;
+    const {
+      userName, invalidUserName, blank, showErrorDisplay, errorDisplayText,
+    } = this.state;
     return (
       <View style={styles.container}>
         <NavHeader
           title="Update Username"
           leftButtonOption="back"
           onPressLeftButton={() => navigation.goBack()}
+        />
+        <ErrorDisplay
+          showDisplay={showErrorDisplay}
+          setShowDisplay={show => this.setState({ showErrorDisplay: show })}
+          displayText={errorDisplayText}
+          style={styles.errorDisplay}
         />
         <Image
           source={images.checkingDoc}
@@ -69,7 +88,8 @@ export default class UpdateUserName extends Component {
           placeholderTextColor={colours.lightGray}
           onChangeText={text => { this.setState({ userName: text, invalidUserName: false }); }}
         />
-        {invalidUserName ? <Text style={styles.warning}>{`Username "${userName}" already taken`}</Text>
+        {invalidUserName
+          ? <Text style={styles.warning}>{`Username "${userName}" already taken`}</Text>
           : <Text />}
         <Button
           backgroundColor={colours.accentPrimary}

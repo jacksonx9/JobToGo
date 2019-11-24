@@ -25,7 +25,6 @@ const styles = StyleSheet.create({
     width: '100%',
     transform: [{ scale: 0.65 }],
     marginTop: 100,
-    marginBottom: 50,
   },
   button: {
     width: '90%',
@@ -41,6 +40,9 @@ const styles = StyleSheet.create({
     fontFamily: fonts.normal,
     fontSize: fonts.lg,
     color: colours.red,
+  },
+  divider: {
+    height: 50,
   },
 });
 
