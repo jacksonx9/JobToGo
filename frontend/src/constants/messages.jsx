@@ -7,4 +7,5 @@ export const status = {
   noPendingFriends: 'You currently have no friend requests.',
   noFriends: 'You currently have no friends.',
   noResults: 'No results',
+  noLikedJobs: 'You currently have no liked jobs.',
 };
