@@ -1,6 +1,8 @@
 import { StyleSheet } from 'react-native';
 
-import { colours, fonts, padding } from '../../styles';
+import {
+  colours, fonts, padding, margin,
+} from '../../styles';
 
 const styles = StyleSheet.create({
   container: {
@@ -27,6 +29,10 @@ const styles = StyleSheet.create({
     fontSize: fonts.lg,
     color: colours.lightGray,
     textAlign: 'center',
+  },
+  button: {
+    width: '75%',
+    marginTop: margin.xl,
   },
 });
 
