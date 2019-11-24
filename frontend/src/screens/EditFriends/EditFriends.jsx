@@ -233,11 +233,11 @@ export default class EditFriends extends Component {
   );
 
   render() {
-    this.logger.info(this.props);
     const {
       loading, searchText, pendingFriends, friends, searchedUsers,
       showPendingFriends, searchInProgress, pendingFriendsIndex, optionsModalIsVisible,
     } = this.state;
+    const { navigation } = this.props;
 
     let userList;
     let noUsersMsg;
