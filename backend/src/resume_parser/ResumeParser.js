@@ -8,6 +8,7 @@ import vision from '@google-cloud/vision';
 import { Users } from '../schema';
 import Response from '../types';
 import credentials from '../../credentials/dandelion';
+import firebaseCredentials from '../../credentials/firebase';
 
 const EXTRACTION_ENDPOINT = 'https://api.dandelion.eu/datatxt/nex/v1/';
 const MIN_CONFIDENCE = 0.8; // Min confidence to accept keyword
@@ -23,7 +24,9 @@ class ResumeParser {
   constructor(app, user) {
     this.logger = Logger.get(this.constructor.name);
     this.user = user;
-    this.client = new vision.ImageAnnotatorClient();
+    this.client = new vision.ImageAnnotatorClient({
+      credentials: firebaseCredentials,
+    });
 
     // Upload resume as multipart form data
     const upload = multer();
@@ -90,15 +93,12 @@ class ResumeParser {
       image: buffer,
     };
 
-    this.client
-      .safeSearchDetection(request)
-      .then(response => {
-        return this._removeStopWords(response);
-      })
-      .catch(err => {
-        console.error(err);
-        return new Response(false, 'Invalid Image', 400);
-      });
+    try {
+      const [result] = await this.client.textDetection(request);
+      return this._removeStopWords(result.fullTextAnnotation.text);
+    } catch (e) {
+      return new Response(false, 'Invalid Image', 400);
+    }
   }
 
   // Remove all non-ascii characters, excess spaces, and stopwords
@@ -107,6 +107,7 @@ class ResumeParser {
       .replace(/[^ -~]/g, ' ')
       .replace(/[^\w.\-+]/g, ' ')
       .replace(/[ ]{2,}/g, ' ')
+      .replace(/[\r\n]/g, ' ')
       .trim()
       .toLowerCase()
       .split(' ')).join(' ');
@@ -120,14 +121,18 @@ class ResumeParser {
       if (attempts >= REQUEST_MAX_ATTEMPTS) {
         return null;
       }
-
       try {
+        let encodeURI = encodeURIComponent(inputText).substring(0, MAX_REQUEST_TEXT_LENGTH);
+        while (encodeURI[encodeURI.length - 1] === '%' || encodeURI[encodeURI.length - 2] === '%') {
+          encodeURI = encodeURI.slice(0, -1);
+        }
+
         // TODO: Don't just remove all characters over the limit
         // API call to extract keywords
         const res = await axios.get(
           `${EXTRACTION_ENDPOINT}?`
           + `min_confidence=${String(MIN_CONFIDENCE)}&`
-          + `text=${encodeURIComponent(inputText).substring(0, MAX_REQUEST_TEXT_LENGTH)}&`
+          + `text=${encodeURI}&`
           + `token=${credentials.token}`,
           { timeout: REQUEST_TIMEOUT },
         );

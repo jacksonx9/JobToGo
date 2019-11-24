@@ -29,7 +29,7 @@ class JobSearcher {
 
   async updateJobStore() {
     // First remove any outdated jobs
-    await this.removeOutdatedJobs();
+    // await this.removeOutdatedJobs();
 
     const count = await Jobs.countDocuments({});
 
