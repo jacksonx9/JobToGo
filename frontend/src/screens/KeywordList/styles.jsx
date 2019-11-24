@@ -65,6 +65,11 @@ const styles = StyleSheet.create({
     backgroundColor: colours.lighterGray,
     fontFamily: fonts.normal,
   },
+  warning: {
+    fontFamily: fonts.normal,
+    fontSize: fonts.lg,
+    color: colours.red,
+  },
 });
 
 export default styles;

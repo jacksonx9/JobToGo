@@ -20,6 +20,8 @@ export default class KeywordList extends Component {
       keywords: [],
       newSkill: '',
       loading: 1,
+      duplicate: false,
+      added: false,
     };
     this.logger = Logger.get(this.constructor.name);
   }
@@ -51,14 +53,14 @@ export default class KeywordList extends Component {
     try {
       await axios.post(config.ENDP_KEYWORDS, {
         userId,
-        newSkill,
+        keyword: newSkill,
       });
 
       const updatedKeywords = [...keywords];
       updatedKeywords.push(newSkill);
-      this.setState({ keywords: updatedKeywords });
+      this.setState({ keywords: updatedKeywords, newSkill: '', added: true });
     } catch (e) {
-      this.logger.error(e);
+      this.setState({ duplicate: true });
     }
   }
 
@@ -85,8 +87,11 @@ export default class KeywordList extends Component {
   }
 
   render() {
-    const { loading, keywords, newSkill } = this.state;
+    const {
+      loading, keywords, newSkill, duplicate, added,
+    } = this.state;
     const { navigation } = this.props;
+    const addedMessage = added ? 'Skill Added' : '';
     if (loading) return <Loader />;
 
     return (
@@ -103,8 +108,9 @@ export default class KeywordList extends Component {
           placeholder="Add a Skill"
           value={newSkill}
           placeholderTextColor={colours.lightGray}
-          onChangeText={text => { this.setState({ newSkill: text }); }}
+          onChangeText={text => { this.setState({ newSkill: text, duplicate: false, added: false }); }}
         />
+        <Text style={styles.warning}>{duplicate ? `Skill "${newSkill}" already added` : addedMessage}</Text>
         <Button
           testID="submitKeyword"
           title="Add"
