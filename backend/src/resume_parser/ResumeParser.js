@@ -52,7 +52,7 @@ class ResumeParser {
       return new Response(false, 'Invalid userId or resume', 400);
     }
 
-    // Parse text out of resume
+    // If valid input, parse text out of resume
     if (mimetype === 'application/pdf') {
       textResult = await this.parsePdf(buffer);
     } else if (mimetype.startsWith('image')) {
