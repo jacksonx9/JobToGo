@@ -365,13 +365,12 @@ class User {
     }
 
     try {
-      console.log(await Users.findById(userId, 'keywords.name'));
       await Users.findByIdAndUpdate(
         userId,
         { $pull: { keywords: { name: keyword } } },
       ).orFail();
 
-      return Response(true, '', 200);
+      return new Response(true, '', 200);
     } catch (e) {
       return new Response(false, 'Invalid userId or keyword', 400);
     }
