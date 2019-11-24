@@ -22,13 +22,9 @@ export default class SendLikedJobs extends Component {
   }
 
   async componentDidMount() {
+    const { navigation } = this.props;
     this.fetchLikedJobs();
-  }
-
-  async componentDidUpdate(prevProps) {
-    if (prevProps !== this.props) {
-      // this.fetchLikedJobs();
-    }
+    navigation.addListener('willFocus', () => this.fetchLikedJobs());
   }
 
   fetchLikedJobs = async () => {
@@ -58,24 +54,49 @@ export default class SendLikedJobs extends Component {
 
   sendLikedJobs = async () => {
     const { userId } = global;
-    await axios.post(`${config.ENDP_EMAIL}`,
-      {
-        userId,
-      }).catch(e => this.logger.error(e));
+    try {
+      await axios.post(`${config.ENDP_EMAIL}`,
+        {
+          userId,
+        }).catch(e => this.logger.error(e));
 
-    const likedJobs = await axios.get(`${config.ENDP_LIKE}${userId}`)
-      .catch(e => this.logger.error(e));
+      await axios.delete(config.ENDP_JOBS_ALL, {
+        data: {
+          userId,
+        },
+      });
 
-    this.setState({
-      likedJobs: likedJobs.data.result,
-      loading: 0,
-    });
+      this.setState({
+        likedJobs: [],
+        loading: 0,
+      });
 
-    this.logger.info('Sent liked jobs to your email');
+      this.logger.info('Sent liked jobs to your email');
+    } catch (e) {
+      this.logger.error(e);
+    }
   }
 
-  removeLikedJob = (item, index) => {
-    this.logger.info(`${item.company}: ${index}`);
+  removeLikedJob = async (item, index) => {
+    const { likedJobs } = this.state;
+    const { userId } = global;
+
+    try {
+      await axios.delete(config.ENDP_JOBS, {
+        data: {
+          userId,
+          jobId: item._id,
+        },
+      });
+
+      const updatedLikedJobs = [...likedJobs];
+      updatedLikedJobs.splice(index, 1);
+      this.setState({ likedJobs: updatedLikedJobs });
+
+      this.logger.info(`Removed ${item.company}: ${index} from liked jobs`);
+    } catch (e) {
+      this.logger.error(e);
+    }
   }
 
   render() {

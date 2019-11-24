@@ -11,6 +11,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     height: '55%',
     width: '100%',
+    padding: padding.md,
     overflow: 'scroll',
     backgroundColor: colours.white,
   },
@@ -48,7 +49,7 @@ const styles = StyleSheet.create({
     marginBottom: margin.md,
   },
   subHeader: {
-    fontFamily: fonts.bold,
+    fontFamily: fonts.semiBold,
     fontSize: fonts.md,
     color: colours.gray,
     marginLeft: margin.sm,
@@ -63,7 +64,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     height: '15%',
     width: '100%',
-    backgroundColor: colours.pink,
   },
 
 

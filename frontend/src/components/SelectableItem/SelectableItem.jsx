@@ -1,15 +1,17 @@
 import React from 'react';
-import {
-  Text, TouchableOpacity, View,
-} from 'react-native';
+import { Text, View } from 'react-native';
 import { string, func, bool } from 'prop-types';
 
+import IconButton from '../IconButton';
 import JobImage from '../JobImage';
 import { colours } from '../../styles';
+import icons from '../../constants/icons';
 import styles from './styles';
 
 const SelectableItem = ({
-  header, subHeader, onPress, actionIcon, disabled, imageSource,
+  header, subHeader, onPress,
+  iconName, bannerText, // TODO: Possibly add buttonType, buttonText
+  noButton, noBanner, imageSource,
   backgroundColor, titleColor, descriptionColor, testID,
 }) => (
   <View style={[styles.container, { backgroundColor }]} testID={testID}>
@@ -18,13 +20,30 @@ const SelectableItem = ({
         logo={imageSource}
         style={styles.logo}
       />
-      <View style={[styles.infoContainer]}>
-        <Text
-          numberOfLines={1}
-          style={[styles.descriptionText, { color: titleColor }]}
-        >
-          {header}
-        </Text>
+      <View style={styles.infoContainer}>
+        <View style={styles.topLineContainer}>
+
+          <View style={styles.titleContainer}>
+            <Text
+              numberOfLines={1}
+              style={[styles.descriptionText, { color: titleColor }]}
+            >
+              {header}
+            </Text>
+          </View>
+          {noBanner
+            ? <View />
+            : (
+              <View style={styles.banner}>
+                <Text
+                  numberOfLines={1}
+                  style={styles.bannerText}
+                >
+                  {bannerText}
+                </Text>
+              </View>
+            )}
+        </View>
         <Text
           numberOfLines={2}
           style={[styles.titleText, { color: descriptionColor }]}
@@ -33,20 +52,28 @@ const SelectableItem = ({
         </Text>
       </View>
     </View>
-
-    <TouchableOpacity
-      style={[styles.buttonContainer]}
-      onPress={onPress}
-      disabled={disabled}
-    >
-      <Text style={[styles.button]}>{actionIcon}</Text>
-    </TouchableOpacity>
+    {noButton ? <View />
+      : (
+        <View
+          style={styles.buttonContainer}
+        >
+          <IconButton
+            name={iconName}
+            color={colours.lightGray}
+            size={icons.sm}
+            onPress={onPress}
+          />
+        </View>
+      )}
   </View>
 );
 
 SelectableItem.defaultProps = {
   subHeader: '',
-  disabled: false,
+  iconName: icons.x,
+  bannerText: '',
+  noButton: false,
+  noBanner: true,
   imageSource: null,
   backgroundColor: colours.white,
   titleColor: colours.primary,
@@ -58,8 +85,10 @@ SelectableItem.propTypes = {
   header: string.isRequired,
   subHeader: string,
   onPress: func.isRequired,
-  actionIcon: string.isRequired,
-  disabled: bool,
+  iconName: string,
+  bannerText: string,
+  noButton: bool,
+  noBanner: bool,
   imageSource: string,
   backgroundColor: string,
   titleColor: string,

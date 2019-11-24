@@ -8,10 +8,12 @@ import Search from '../../components/Search';
 import SelectableItem from '../../components/SelectableItem';
 import Loader from '../../components/Loader';
 import InfoDisplay from '../../components/InfoDisplay';
+import OptionsModal from '../../components/OptionsModal';
 import NavHeader from '../../components/NavHeader';
 import SwitchableNav from '../../components/SwitchableNav';
 import config from '../../constants/config';
 import { status } from '../../constants/messages';
+import icons from '../../constants/icons';
 import styles from './styles';
 
 export default class EditFriends extends Component {
@@ -21,10 +23,12 @@ export default class EditFriends extends Component {
       friends: [],
       pendingFriends: [],
       searchedUsers: [],
-      addFriendName: '',
+      pendingFriendsIndex: 0,
+      searchText: '',
       loading: 1,
       showPendingFriends: true,
       searchInProgress: false,
+      optionsModalIsVisible: false,
     };
     this.logger = Logger.get(this.constructor.name);
   }
@@ -83,44 +87,81 @@ export default class EditFriends extends Component {
     }).catch(e => this.logger.error(e));
   }
 
-  comfirmFriendRequest = async item => {
-    const { userId } = global;
-    await axios.post(config.ENDP_CONFIRM_FRIENDS, {
-      userId,
-      friendId: item._id,
-    }).catch(e => this.logger.error(e));
-
-    const friends = await axios.get(`${config.ENDP_FRIENDS}${userId}`)
-      .catch(e => this.logger.error(e));
-    const pendingFriends = await axios.get(`${config.ENDP_PENDING_FRIENDS}${userId}`)
-      .catch(e => this.logger.error(e));
-
+  openOptionsModal = index => {
     this.setState({
-      friends: friends.data.result,
-      pendingFriends: pendingFriends.data.result,
-      loading: 0,
+      optionsModalIsVisible: true,
+      pendingFriendsIndex: index,
     });
   }
 
-  removeFriend = async item => {
+  comfirmFriendRequest = async index => {
     const { userId } = global;
-    await axios.delete(config.ENDP_FRIENDS, {
-      data: {
+    const { pendingFriends, friends } = this.state;
+
+    try {
+      await axios.post(config.ENDP_CONFIRM_FRIEND_REQ, {
         userId,
-        friendId: item._id,
-      },
-    }).catch(e => this.logger.error(e));
+        friendId: pendingFriends[index]._id,
+      }).catch(e => this.logger.error(e));
 
-    const friends = await axios.get(`${config.ENDP_FRIENDS}${userId}`)
-      .catch(e => this.logger.error(e));
-    const pendingFriends = await axios.get(`${config.ENDP_PENDING_FRIENDS}${userId}`)
-      .catch(e => this.logger.error(e));
+      const updatedFriends = [...friends];
+      const updatedPendingFriends = [...pendingFriends];
 
-    this.setState({
-      friends: friends.data.result,
-      pendingFriends: pendingFriends.data.result,
-      loading: 0,
-    });
+      updatedFriends.push(pendingFriends[index]);
+      updatedPendingFriends.splice(index, 1);
+
+      this.setState({
+        pendingFriends: updatedPendingFriends,
+        friends: updatedFriends,
+        optionsModalIsVisible: false,
+      });
+    } catch (e) {
+      this.logger.error(e);
+    }
+  }
+
+  removeFriendRequest = async index => {
+    const { userId } = global;
+    const { pendingFriends } = this.state;
+
+    try {
+      await axios.delete(config.ENDP_PENDING_FRIENDS, {
+        data: {
+          userId,
+          friendId: pendingFriends[index]._id,
+        },
+      }).catch(e => this.logger.error(e));
+
+      const updatedPendingFriends = [...pendingFriends];
+      updatedPendingFriends.splice(index, 1);
+
+      this.setState({
+        pendingFriends: updatedPendingFriends,
+        optionsModalIsVisible: false,
+      });
+    } catch (e) {
+      this.logger.error(e);
+    }
+  }
+
+  removeFriend = async (item, index) => {
+    const { userId } = global;
+    const { friends } = this.state;
+
+    try {
+      await axios.delete(config.ENDP_FRIENDS, {
+        data: {
+          userId,
+          friendId: item._id,
+        },
+      });
+
+      const updatedFriends = [...friends];
+      updatedFriends.splice(index, 1);
+      this.setState({ friends: updatedFriends });
+    } catch (e) {
+      this.logger.error(e);
+    }
   }
 
   searchUsers = async text => {
@@ -129,56 +170,90 @@ export default class EditFriends extends Component {
 
     this.setState({
       searchedUsers: [],
-      addFriendName: text,
+      searchText: text,
     });
   }
 
+  searchableUserList = users => (
+    <FlatList
+      testID="userList"
+      data={users}
+      keyExtractor={item => item._id}
+      renderItem={({ item, index }) => (
+        <SelectableItem
+          testID={`userItem${index}`}
+          key={item._id}
+          header={item.userName}
+          subHeader={item.email}
+          noBanner={!item.isFriend}
+          bannerText="friend"
+          onPress={item.isFriend
+            ? () => this.removeFriend(item, index) : () => this.addFriend(item, index)}
+          iconName={item.isFriend ? icons.x : icons.plus}
+        />
+      )}
+    />
+  );
+
+  pendingFriendsList = pendingFriends => (
+    <FlatList
+      testID="userList"
+      data={pendingFriends}
+      keyExtractor={item => item._id}
+      renderItem={({ item, index }) => (
+        <SelectableItem
+          testID={`userItem${index}`}
+          key={item._id}
+          header={item.userName}
+          subHeader={item.email}
+          onPress={() => this.openOptionsModal(index)}
+          iconName={icons.moreVertical}
+        />
+      )}
+    />
+  );
+
+
+  friendsList = friends => (
+    <FlatList
+      testID="userList"
+      data={friends}
+      keyExtractor={item => item._id}
+      renderItem={({ item, index }) => (
+        <SelectableItem
+          testID={`userItem${index}`}
+          key={item._id}
+          header={item.userName}
+          subHeader={item.email}
+          onPress={() => this.removeFriend(item, index)}
+          iconName={icons.x}
+        />
+      )}
+    />
+  );
+
   render() {
     const {
-      loading, addFriendName, pendingFriends, friends, searchedUsers,
-      showPendingFriends, searchInProgress,
+      loading, searchText, pendingFriends, friends, searchedUsers,
+      showPendingFriends, searchInProgress, pendingFriendsIndex, optionsModalIsVisible,
     } = this.state;
 
-    let users;
-    let onPress;
+    let userList;
     let noUsersMsg;
-    let actionIcon;
+    let noUsers;
     if (searchInProgress) {
-      users = searchedUsers;
-      onPress = this.addFriend;
+      userList = this.searchableUserList(searchedUsers);
       noUsersMsg = status.noResults;
-      actionIcon = '+';
+      noUsers = searchedUsers.length === 0;
     } else if (showPendingFriends) {
-      users = pendingFriends;
-      onPress = this.comfirmFriendRequest;
+      userList = this.pendingFriendsList(pendingFriends);
       noUsersMsg = status.noPendingFriends;
-      actionIcon = '+';
+      noUsers = pendingFriends.length === 0;
     } else {
-      users = friends;
-      onPress = this.removeFriend;
+      userList = this.friendsList(friends);
       noUsersMsg = status.noFriends;
-      actionIcon = 'x';
+      noUsers = friends.length === 0;
     }
-
-    const noUsers = users.length === 0;
-
-    const userList = (
-      <FlatList
-        testID="userList"
-        data={users}
-        keyExtractor={item => item._id}
-        renderItem={({ item, index }) => (
-          <SelectableItem
-            testID={`userItem${index}`}
-            key={item._id}
-            header={item.userName}
-            subHeader={item.isFriend ? 'friend' : 'not a friend'}
-            onPress={() => onPress(item, index)}
-            actionIcon={actionIcon}
-          />
-        )}
-      />
-    );
 
     const noUsersInfo = (
       <InfoDisplay message={noUsersMsg} />
@@ -188,10 +263,10 @@ export default class EditFriends extends Component {
     if (searchInProgress) {
       return (
         <Search
-          value={addFriendName}
+          value={searchText}
           onChangeText={text => this.searchUsers(text)}
           onEndSearch={() => {
-            this.setState({ addFriendName: '', searchInProgress: false });
+            this.setState({ searchText: '', searchInProgress: false });
           }}
         >
           {noUsers ? noUsersInfo : userList}
@@ -211,13 +286,22 @@ export default class EditFriends extends Component {
         />
         <SwitchableNav
           showNavOption1={showPendingFriends}
-          navOption1Title="Pending Friends"
+          navOption1Title="Friends Requests"
           navOption2Title="Your Friends"
           onPressNavOption1={() => { this.setState({ showPendingFriends: true }); }}
           onPressNavOption2={() => { this.setState({ showPendingFriends: false }); }}
         />
         <View style={[styles.listContainer]}>
           {noUsers ? noUsersInfo : userList}
+          <OptionsModal
+            option1="Confirm"
+            option2="Ignore"
+            onPress1={this.comfirmFriendRequest}
+            onPress2={this.removeFriendRequest}
+            onPressExit={() => { this.setState({ optionsModalIsVisible: false }); }}
+            isVisible={optionsModalIsVisible}
+            index={pendingFriendsIndex}
+          />
         </View>
       </View>
     );

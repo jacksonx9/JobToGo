@@ -23,12 +23,38 @@ const styles = StyleSheet.create({
     marginRight: margin.lg,
   },
   descriptionText: {
-    fontSize: fonts.md,
+    fontSize: fonts.sm,
     fontFamily: fonts.bold,
+  },
+  topLineContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    width: '100%',
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    marginRight: margin.sm,
+
   },
   titleText: {
     fontSize: fonts.sm,
     fontFamily: fonts.semiBold,
+  },
+  banner: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '25%',
+    backgroundColor: colours.secondary,
+    borderRadius: border.radius,
+  },
+  bannerText: {
+    fontSize: fonts.xs,
+    fontFamily: fonts.bold,
+    color: colours.white,
   },
   contentContainer: {
     flexDirection: 'row',

@@ -46,6 +46,7 @@ export const elevation = {
 };
 
 export const fonts = {
+  xs: 10,
   sm: 12,
   md: 14,
   lg: 17,

@@ -8,6 +8,7 @@ const styles = StyleSheet.create({
   container: {
     ...containers.fullScreenContainer,
     flexDirection: 'column',
+    justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: padding.md,
   },
@@ -38,6 +39,8 @@ const styles = StyleSheet.create({
   listContainer: {
     height: '65%',
     width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: colours.white,
   },
 });

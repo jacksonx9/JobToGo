@@ -10,9 +10,10 @@ import ImageButton from '../ImageButton';
 import images from '../../constants/images';
 import { colours } from '../../styles';
 import styles from './styles';
+import icons from '../../constants/icons';
 
 const JobShareModal = ({
-  isVisible, onPressExit, jobTitle, jobCompany, jobId, jobLogo, friends, onPressSend,
+  isVisible, onPressExit, jobTitle, jobCompany, jobId, jobLogo, friends, onPressSend, extraData,
 }) => (
   <Modal
     isVisible={isVisible}
@@ -32,8 +33,7 @@ const JobShareModal = ({
         header={jobTitle}
         subHeader={jobCompany}
         onPress={() => {}}
-        actionIcon=""
-        disabled
+        noButton
         imageSource={jobLogo}
         backgroundColor={colours.primary}
         titleColor={colours.white}
@@ -47,13 +47,15 @@ const JobShareModal = ({
           showsVerticalScrollIndicator={false}
           data={friends}
           keyExtractor={item => item._id}
-          renderItem={({ item }) => (
+          extraData={extraData}
+          renderItem={({ item, index }) => (
             <SelectableItem
               key={item._id}
               header={item.userName}
-              subHeader={item.email}
-              onPress={() => onPressSend(item, jobId)}
-              actionIcon="+"
+              subHeader={item.sharedJob ? 'shared' : 'not shared'}
+              iconName={icons.send}
+              onPress={() => onPressSend(item, jobId, index)}
+              noButton={item.sharedJob}
             />
           )}
         />
@@ -75,6 +77,7 @@ JobShareModal.propTypes = {
   jobLogo: string,
   friends: arrayOf(object).isRequired,
   onPressSend: func.isRequired,
+  extraData: object.isRequired, // eslint-disable-line react/forbid-prop-types
 };
 
 export default JobShareModal;
