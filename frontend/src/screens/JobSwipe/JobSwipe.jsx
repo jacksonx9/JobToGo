@@ -28,7 +28,8 @@ export default class JobSwipe extends Component {
       sharedJobIndex: 0,
       friends: [],
       loading: 1,
-      isSharedJobsView: false,
+      showSharedJobsView: false,
+      showJobDetails: false,
       isJobShareModalVisible: false,
     };
     this.logger = Logger.get(this.constructor.name);
@@ -51,8 +52,8 @@ export default class JobSwipe extends Component {
     socket.on(config.SOCKET_SHARED, data => this.updateSharedJobs(data.result));
     socket.on(config.SOCKET_FRIENDS, data => this.updateFriends(data.result));
 
-    this.fetchMatchedJobs(userId);
     this.fetchSharedJobs(userId);
+    this.fetchMatchedJobs(userId);
     this.fetchFriends(userId);
   }
 
@@ -114,22 +115,22 @@ export default class JobSwipe extends Component {
 
     this.setState({
       loading: 0,
-      matchedJobs: jobs,
+      matchedJobs: jobs.map(job => ({ ...job, showDetails: false })),
       matchedJobIndex: 0,
     });
   }
 
   fetchSharedJobs = async userId => {
-    this.setState({
-      loading: 1,
-    });
+    // this.setState({
+    //   loading: 1,
+    // });
     const jobsResp = await axios.get(`${config.ENDP_SHARED_JOBS}${userId}`)
       .catch(e => this.logger.error(e));
     const jobs = await this.fetchLogos(jobsResp.data.result);
 
     this.setState({
-      loading: 0,
-      sharedJobs: jobs,
+      // loading: 0,
+      sharedJobs: jobs.map(job => ({ ...job, showDetails: false })),
       sharedJobIndex: 0,
     });
   }
@@ -141,11 +142,11 @@ export default class JobSwipe extends Component {
   }
 
   toggleSharedJobsView = () => {
-    const { isSharedJobsView } = this.state;
+    const { showSharedJobsView } = this.state;
     const { userId } = global;
-    this.fetchSharedJobs(userId);
+    // this.fetchSharedJobs(userId);
     this.setState({
-      isSharedJobsView: !isSharedJobsView,
+      showSharedJobsView: !showSharedJobsView,
     });
   }
 
@@ -235,17 +236,36 @@ export default class JobSwipe extends Component {
     return this.swipeMatchedJob(jobs, jobIndex, swipeAction, userId);
   }
 
+  flipCard = (jobs, jobIndex, jobType) => {
+    const { showDetails } = this.state;
+
+    const updatedJobs = JSON.parse(JSON.stringify(jobs));
+    updatedJobs[jobIndex].showDetails = !updatedJobs[jobIndex].showDetails;
+
+    if (jobType === this.jobTypes.MATCHED) {
+      this.setState({
+        matchedJobs: updatedJobs,
+        showDetails: !showDetails,
+      });
+    } else {
+      this.setState({
+        sharedJobs: updatedJobs,
+        showDetails: !showDetails,
+      });
+    }
+  }
+
   render() {
     const {
-      loading, isSharedJobsView, isJobShareModalVisible, matchedJobs, matchedJobIndex,
-      sharedJobs, sharedJobIndex, friends, 
+      loading, showSharedJobsView, isJobShareModalVisible, matchedJobs, matchedJobIndex,
+      sharedJobs, sharedJobIndex, friends, showJobDetails,
     } = this.state;
-    const jobs = isSharedJobsView ? sharedJobs : matchedJobs;
-    const jobIndex = isSharedJobsView ? sharedJobIndex : matchedJobIndex;
-    const jobType = isSharedJobsView ? this.jobTypes.SHARED : this.jobTypes.MATCHED;
+    const jobs = showSharedJobsView ? sharedJobs : matchedJobs;
+    const jobIndex = showSharedJobsView ? sharedJobIndex : matchedJobIndex;
+    const jobType = showSharedJobsView ? this.jobTypes.SHARED : this.jobTypes.MATCHED;
     const job = jobs[jobIndex];
-    const buttonIcon = isSharedJobsView ? icons.chevronLeft : icons.inbox;
-    const showInboxBadge = sharedJobs.length > 0 && !isSharedJobsView;
+    const buttonIcon = showSharedJobsView ? icons.chevronLeft : icons.inbox;
+    const showInboxBadge = sharedJobs.length > 0 && !showSharedJobsView;
 
     if (loading) return <Loader />;
 
@@ -256,11 +276,14 @@ export default class JobSwipe extends Component {
           onPress={() => this.toggleSharedJobsView()}
           showBadge={showInboxBadge}
         />
-        {jobs.length === 0
+        {(jobs.length === 0 && showSharedJobsView)
           ? <InfoDisplay message={status.noSharedJobs} />
           : (
             <Swiper
+              horizontalSwipe={!showJobDetails}
+              verticalSwipe={!showJobDetails}
               cards={jobs}
+              onTapCard={() => this.flipCard(jobs, jobIndex, jobType)}
               renderCard={posting => (
                 <JobCard
                   testID={`card${matchedJobs.indexOf(posting)}`}
@@ -269,7 +292,9 @@ export default class JobSwipe extends Component {
                   title={posting.title}
                   location={posting.location}
                   description={posting.description}
+                  showDetails={posting.showDetails}
                   onPressShare={() => this.openJobShareModal()}
+                  onPressInfo={() => this.flipCard(jobs, jobIndex, jobType)}
                 />
               )}
               onSwipedLeft={() => this.swipeJob(jobs, jobIndex, jobType,

@@ -10,6 +10,10 @@ const icons = {
   chevronLeft: 'chevron-left',
   inbox: 'inbox',
   check: 'check',
+  share: 'share-2',
+  job: 'briefcase',
+  map: 'map-pin',
+  info: 'info',
 };
 
 export default icons;
