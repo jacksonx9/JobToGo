@@ -15,8 +15,17 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   buttonContainer: {
+    flexDirection: 'row',
     height: '100%',
     width: '25%',
+  },
+  badge: {
+    height: 15,
+    width: 15,
+    borderRadius: 50,
+    left: -11,
+    top: -3,
+    backgroundColor: colours.accentPrimary,
   },
   logoContainer: {
     justifyContent: 'center',
