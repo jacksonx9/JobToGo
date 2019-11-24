@@ -231,6 +231,7 @@ export default class JobSwipe extends Component {
       loading, isSharedJobsView, isJobShareModalVisible, matchedJobs, matchedJobIndex,
       sharedJobs, sharedJobIndex, friends,
     } = this.state;
+    const { navigation } = this.props;
     const jobs = isSharedJobsView ? sharedJobs : matchedJobs;
     const jobIndex = isSharedJobsView ? sharedJobIndex : matchedJobIndex;
     const jobType = isSharedJobsView ? this.jobTypes.SHARED : this.jobTypes.MATCHED;
@@ -243,7 +244,8 @@ export default class JobSwipe extends Component {
       <View style={styles.container} testID="jobSwipe">
         <MainHeader
           buttonIcon={buttonIcon}
-          onPress={() => this.toggleSharedJobsView()}
+          onPressLeft={() => this.toggleSharedJobsView()}
+          onPressRight={() => navigation.navigate('Profile')}
         />
         {jobs.length === 0
           ? <InfoDisplay message={status.noSharedJobs} />

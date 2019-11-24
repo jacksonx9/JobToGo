@@ -7,25 +7,33 @@ import images from '../../constants/images';
 import styles from './styles';
 import { colours, sizes } from '../../styles';
 
-const MainHeader = ({ onPress, buttonIcon }) => (
+const MainHeader = ({ onPressLeft, onPressRight, buttonIcon }) => (
   <View style={styles.container} testID="mainHeader">
-    <View style={styles.buttonContainer}>
+    <View style={styles.mainContainer}>
       <IconButton
         testID="inbox"
         name={buttonIcon}
         color={colours.lightGray}
         size={sizes.iconLg}
-        onPress={onPress}
+        onPress={onPressLeft}
       />
-    </View>
-    <View style={styles.logoContainer}>
-      <Image source={images.logoLight} style={styles.logo} />
+      <View style={styles.logoContainer}>
+        <Image source={images.logoLight} style={styles.logo} />
+      </View>
+      <IconButton
+        testID="Profile"
+        name="menu"
+        color={colours.lightGray}
+        size={sizes.iconLg}
+        onPress={onPressRight}
+      />
     </View>
   </View>
 );
 
 MainHeader.propTypes = {
-  onPress: func.isRequired,
+  onPressLeft: func.isRequired,
+  onPressRight: func.isRequired,
   buttonIcon: string.isRequired,
 
 };
