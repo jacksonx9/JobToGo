@@ -26,7 +26,6 @@ export default class KeywordList extends Component {
 
   async componentDidMount() {
     const { navigation } = this.props;
-    this.fetchKeywords();
     navigation.addListener('willFocus', () => this.fetchKeywords());
   }
 
@@ -112,7 +111,7 @@ export default class KeywordList extends Component {
           textColor={colours.white}
           backgroundColor={colours.accentPrimary}
           style={styles.button}
-          onPress={this.addKeyword()}
+          onPress={() => this.addKeyword()}
         />
         <View style={styles.listContainer}>
           <FlatList
