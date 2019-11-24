@@ -365,10 +365,13 @@ class User {
     }
 
     try {
-      await Users.findByIdAndUpdate(
-        userId,
-        { $pull: { keywords: { name: keyword } } },
-      ).orFail();
+      await Users.findByIdAndUpdate(userId, {
+        $pull: {
+          keywords: {
+            name: keyword,
+          },
+        },
+      }).orFail();
 
       return new Response(true, '', 200);
     } catch (e) {
