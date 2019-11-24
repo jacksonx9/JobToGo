@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
-import { View, FlatList, Text } from 'react-native';
+import {
+  View, FlatList, Text, TouchableOpacity,
+} from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
 import Toast from 'react-native-simple-toast';
+import Icon from 'react-native-vector-icons/Feather';
 
 import ErrorDisplay from '../../components/ErrorDisplay';
 import SelectableItem from '../../components/SelectableItem';
@@ -13,6 +16,7 @@ import config from '../../constants/config';
 import { errors, status } from '../../constants/messages';
 import styles from './styles';
 import { colours } from '../../styles';
+import icons from '../../constants/icons';
 
 export default class SendLikedJobs extends Component {
   constructor(props) {
@@ -144,26 +148,20 @@ export default class SendLikedJobs extends Component {
           setShowDisplay={show => this.setState({ showErrorDisplay: show })}
           displayText={errorDisplayText}
         />
-        <View style={styles.buttonSection}>
-          <View style={styles.infoContainer}>
-            <Text style={styles.bigText}>
-              {`${likedJobs.length} jobs`}
-            </Text>
-            <Text style={styles.normalText}>
-            are ready to be emailed
-            </Text>
-          </View>
-          <View styles={[styles.buttonContainer]}>
-            <Button
-              testID="sendJobs"
-              textColor={colours.white}
-              backgroundColor={colours.accentPrimary}
-              title="Send Jobs"
-              style={[styles.button]}
-              onPress={this.sendLikedJobs}
-            />
-          </View>
-        </View>
+        <TouchableOpacity
+          style={styles.buttonSection}
+          testID="sendJobs"
+          onPress={this.sendLikedJobs}
+        >
+          <Text style={styles.bigText}>
+            {`${likedJobs.length}`}
+          </Text>
+          <Icon
+            name={icons.send}
+            color={colours.white}
+            size={icons.lg}
+          />
+        </TouchableOpacity>
         <View style={styles.listContainer}>
           <FlatList
             testID="likedJobs"
