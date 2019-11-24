@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import { View, FlatList, Text } from 'react-native';
+import { View, FlatList, Text, TextInput } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
 
-import { TextInput } from 'react-native-gesture-handler';
 import SelectableItem from '../../components/SelectableItem';
 import Loader from '../../components/Loader';
 import NavHeader from '../../components/NavHeader';
@@ -20,8 +19,7 @@ export default class KeywordList extends Component {
       keywords: [],
       newSkill: '',
       loading: 1,
-      duplicate: false,
-      added: false,
+      response: '',
     };
     this.logger = Logger.get(this.constructor.name);
   }
@@ -50,6 +48,11 @@ export default class KeywordList extends Component {
     const { keywords, newSkill } = this.state;
     const { userId } = global;
 
+    if (newSkill.length === 0) {
+      this.setState({ response: 'Fields must not be empty' });
+      return;
+    }
+
     try {
       await axios.post(config.ENDP_KEYWORDS, {
         userId,
@@ -58,9 +61,16 @@ export default class KeywordList extends Component {
 
       const updatedKeywords = [...keywords];
       updatedKeywords.push(newSkill);
-      this.setState({ keywords: updatedKeywords, newSkill: '', added: true });
+      this.setState({
+        keywords: updatedKeywords, newSkill: '', response: 'Successfully added Skill',
+      });
     } catch (e) {
-      this.setState({ duplicate: true });
+      this.logger.info(e.response.data);
+      if (e.response.data.result && e.response.data.status === 400) {
+        this.setState({ response: `Skill "${newSkill}" already added` });
+      } else {
+        this.logger.error(e);
+      }
     }
   }
 
@@ -88,10 +98,9 @@ export default class KeywordList extends Component {
 
   render() {
     const {
-      loading, keywords, newSkill, duplicate, added,
+      loading, keywords, newSkill, response,
     } = this.state;
     const { navigation } = this.props;
-    const addedMessage = added ? 'Skill Added' : '';
     if (loading) return <Loader />;
 
     return (
@@ -108,9 +117,13 @@ export default class KeywordList extends Component {
           placeholder="Add a Skill"
           value={newSkill}
           placeholderTextColor={colours.lightGray}
-          onChangeText={text => { this.setState({ newSkill: text, duplicate: false, added: false }); }}
+          onChangeText={text => {
+            this.setState({
+              newSkill: text, response: '',
+            });
+          }}
         />
-        <Text style={styles.warning}>{duplicate ? `Skill "${newSkill}" already added` : addedMessage}</Text>
+        <Text style={styles.warning}>{ response }</Text>
         <Button
           testID="submitKeyword"
           title="Add"
