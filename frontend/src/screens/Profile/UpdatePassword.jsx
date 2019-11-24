@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-  View, Image, Text, TextInput,
+  View, Image, Text, TextInput, TouchableOpacity,
 } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
@@ -13,12 +13,19 @@ import { colours } from '../../styles';
 import images from '../../constants/images';
 
 export default class UpdatePassword extends Component {
+  text = {
+    showPassword: 'Show Password',
+    hidePassword: 'Hide Password',
+  }
+
   constructor(props) {
     super(props);
     this.state = {
       password: '',
       invalidPassword: false,
       blank: false,
+      showPassword: true,
+      showPasswordText: this.text.showPassword,
     };
     this.logger = Logger.get(this.constructor.name);
   }
@@ -43,9 +50,20 @@ export default class UpdatePassword extends Component {
     }
   }
 
+  togglePasswordView = () => {
+    const { showPassword } = this.state;
+    this.setState({
+      showPassword: !showPassword,
+      showPasswordText: showPassword
+        ? this.text.hidePassword : this.text.showPassword,
+    });
+  }
+
   render() {
     const { navigation } = this.props;
-    const { password, invalidPassword, blank } = this.state;
+    const {
+      password, invalidPassword, blank, showPassword, showPasswordText,
+    } = this.state;
     return (
       <View style={styles.container}>
         <NavHeader
@@ -63,10 +81,15 @@ export default class UpdatePassword extends Component {
         <TextInput
           style={styles.inputContainer}
           placeholder="New password"
-          value={password}
+          secureTextEntry={showPassword}
           placeholderTextColor={colours.lightGray}
           onChangeText={text => { this.setState({ password: text, invalidPassword: false }); }}
         />
+        <TouchableOpacity
+          onPress={this.togglePasswordView}
+        >
+          <Text style={styles.link}>{showPasswordText}</Text>
+        </TouchableOpacity>
         {invalidPassword ? <Text style={styles.warning}>{`password "${password}" already taken`}</Text>
           : <Text />}
         <Button
