@@ -4,6 +4,7 @@ import Logger from 'js-logger';
 import Response from '../types';
 import { Users } from '../schema';
 import credentials from '../../credentials/google';
+import { tsConstructSignatureDeclaration } from '@babel/types';
 
 class User {
   constructor(app, redisClient, socket, allSkills) {
@@ -309,7 +310,7 @@ class User {
             name: skill,
             score: 0,
             jobCount: 0,
-            timestamp: Date.now(),
+            timeStamp: Date.now(),
           });
         }
       });
@@ -332,23 +333,24 @@ class User {
 
     try {
       const user = await Users.findById(userId).orFail();
-      const keywordNames = user.keywords.map(k => k.name);
+      const keywordNames = new Set(user.keywords.map(k => k.name));
 
-      if (keywordNames.includes(keyword)) {
-        return Response(keyword, 'User already has this keyword', 400);
+
+      if (keywordNames.has(keyword)) {
+        return new Response(keyword, 'User already has this keyword', 400);
       }
 
       user.keywords.push({
         name: keyword,
         score: 0,
         jobCount: 0,
-        timestamp: Date.now(),
+        timeStamp: Date.now(),
       });
 
       await user.save();
-      return Response(null, '', 200);
+      return new Response(null, '', 200);
     } catch (e) {
-      return new Response(null, 'Invalid userId or keyword', 400);
+      return new Response(null, 'Invalid userId or keyword sss', 400);
     }
   }
 
