@@ -101,6 +101,7 @@ export default class SendLikedJobs extends Component {
 
   render() {
     const { loading, likedJobs } = this.state;
+    const { navigation } = this.props;
     if (loading) return <Loader />;
 
     return (
@@ -108,7 +109,8 @@ export default class SendLikedJobs extends Component {
         <NavHeader
           testID="navHeaderLiked"
           title="Liked Jobs"
-          buttonOption="search"
+          rightButtonOption="menu"
+          onPressRightButton={() => navigation.navigate('Profile')}
         />
         <View style={styles.buttonSection}>
           <View style={styles.infoContainer}>

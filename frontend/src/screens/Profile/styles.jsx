@@ -30,12 +30,15 @@ const styles = StyleSheet.create({
   button: {
     width: '90%',
     marginTop: margin.md,
-    marginBottom: margin.sm,
   },
   link: {
     fontFamily: fonts.normal,
     fontSize: fonts.sm,
     color: colours.gray,
+  },
+  image: {
+    resizeMode: 'contain',
+    maxHeight: '45%',
   },
   warning: {
     fontFamily: fonts.normal,

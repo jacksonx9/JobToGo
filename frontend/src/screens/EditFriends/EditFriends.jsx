@@ -233,6 +233,7 @@ export default class EditFriends extends Component {
   );
 
   render() {
+    this.logger.info(this.props);
     const {
       loading, searchText, pendingFriends, friends, searchedUsers,
       showPendingFriends, searchInProgress, pendingFriendsIndex, optionsModalIsVisible,
@@ -281,8 +282,10 @@ export default class EditFriends extends Component {
         <NavHeader
           testID="navHeaderFriends"
           title="Friends"
-          buttonOption="search"
-          onPressButton={() => { this.setState({ searchInProgress: true }); }}
+          leftButtonOption="search"
+          onPressLeftButton={() => { this.setState({ searchInProgress: true }); }}
+          rightButtonOption="menu"
+          onPressRightButton={() => navigation.navigate('Profile')}
         />
         <SwitchableNav
           showNavOption1={showPendingFriends}

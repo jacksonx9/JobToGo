@@ -18,6 +18,7 @@ import JobSwipe from './screens/JobSwipe';
 import SendLikedJobs from './screens/SendLikedJobs/SendLikedJobs';
 import EditFriends from './screens/EditFriends/EditFriends';
 import EditSkills from './screens/EditSkills/EditSkills';
+import { Profile, UpdateUserName, UpdatePassword } from './screens/Profile';
 import { colours, fonts, sizes } from './styles';
 import { serverIp } from '../credentials/credentials';
 
@@ -131,7 +132,7 @@ export default class App extends React.Component {
       return (<Icon name="upload" size={sizes.icon} color={tintColor} />);
     }
 
-    const AppStack = createBottomTabNavigator(
+    const TabStack = createBottomTabNavigator(
       {
         Home: {
           screen: () => <JobSwipe socket={this.socket} />,
@@ -150,7 +151,7 @@ export default class App extends React.Component {
           },
         },
         Friends: {
-          screen: () => <EditFriends socket={this.socket} />,
+          screen: props => <EditFriends {...props} socket={this.socket} />,
           navigationOptions: {
             tabBarLabel: 'Friends',
             tabBarIcon: FriendsTabIcon,
@@ -175,6 +176,23 @@ export default class App extends React.Component {
         SignIn,
         SignUp,
         CreateUsername,
+      },
+      navConfig,
+    );
+
+    const ProfileStack = createStackNavigator(
+      {
+        Profile,
+        UpdateUserName,
+        UpdatePassword,
+      },
+      navConfig,
+    );
+
+    const AppStack = createStackNavigator(
+      {
+        TabStack,
+        ProfileStack,
       },
       navConfig,
     );
