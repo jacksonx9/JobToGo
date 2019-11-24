@@ -22,6 +22,7 @@ const config = {
   ENDP_LOGIN: `${serverIp}/users/login`,
   ENDP_UPDATE_USERNAME: `${serverIp}/users/userName/`,
   ENDP_UPDATE_PASSWORD: `${serverIp}/users/password/`,
+  ENDP_USER_INFO: `${serverIp}/users/userInfo/`,
 
   SOCKET_FRIENDS: 'friends',
   SOCKET_USERID: 'userId',

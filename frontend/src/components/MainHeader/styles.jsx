@@ -14,9 +14,11 @@ const styles = StyleSheet.create({
     backgroundColor: colours.white,
     zIndex: 1000,
   },
-  buttonContainer: {
+  mainContainer: {
     height: '100%',
-    width: '25%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
   },
   logoContainer: {
     justifyContent: 'center',
