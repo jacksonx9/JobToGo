@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     backgroundColor: colours.accentPrimary,
     zIndex: 4,
-    elevation: elevation.lg,
+    elevation: elevation.md,
   },
   infoContainer: {
     width: '50%',

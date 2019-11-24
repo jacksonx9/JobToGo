@@ -11,4 +11,5 @@ export const status = {
   resumeUploaded: 'Resume uploaded!',
   passwordUpdated: 'Password updated successfully!',
   friendRequestSent: 'Friend request sent!',
+  noLikedJobs: 'You currently have no liked jobs.',
 };

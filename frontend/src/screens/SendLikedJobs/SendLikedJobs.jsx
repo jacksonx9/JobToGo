@@ -9,14 +9,15 @@ import Icon from 'react-native-vector-icons/Feather';
 
 import ErrorDisplay from '../../components/ErrorDisplay';
 import SelectableItem from '../../components/SelectableItem';
+import InfoDisplay from '../../components/InfoDisplay';
 import Loader from '../../components/Loader';
 import NavHeader from '../../components/NavHeader';
-import Button from '../../components/Button';
 import config from '../../constants/config';
 import { errors, status } from '../../constants/messages';
 import styles from './styles';
 import { colours } from '../../styles';
 import icons from '../../constants/icons';
+import { status } from '../../constants/messages';
 
 export default class SendLikedJobs extends Component {
   constructor(props) {
@@ -163,23 +164,26 @@ export default class SendLikedJobs extends Component {
           />
         </TouchableOpacity>
         <View style={styles.listContainer}>
-          <FlatList
-            testID="likedJobs"
-            showsVerticalScrollIndicator={false}
-            data={likedJobs}
-            keyExtractor={item => item._id}
-            renderItem={({ item, index }) => (
-              <SelectableItem
-                testID={`jobItem${index}`}
-                key={item._id}
-                header={item.company}
-                subHeader={item.title}
-                onPress={() => this.removeLikedJob(item, index)}
-                actionIcon="x"
-                imageSource={item.logo}
+          {likedJobs.length === 0 ? <InfoDisplay message={status.noLikedJobs} />
+            : (
+              <FlatList
+                testID="likedJobs"
+                showsVerticalScrollIndicator={false}
+                data={likedJobs}
+                keyExtractor={item => item._id}
+                renderItem={({ item, index }) => (
+                  <SelectableItem
+                    testID={`jobItem${index}`}
+                    key={item._id}
+                    header={item.company}
+                    subHeader={item.title}
+                    onPress={() => this.removeLikedJob(item, index)}
+                    actionIcon="x"
+                    imageSource={item.logo}
+                  />
+                )}
               />
             )}
-          />
         </View>
       </View>
     );
