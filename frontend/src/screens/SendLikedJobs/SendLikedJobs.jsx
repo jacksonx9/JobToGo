@@ -17,7 +17,6 @@ import { errors, status } from '../../constants/messages';
 import styles from './styles';
 import { colours } from '../../styles';
 import icons from '../../constants/icons';
-import { status } from '../../constants/messages';
 
 export default class SendLikedJobs extends Component {
   constructor(props) {

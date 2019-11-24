@@ -20,6 +20,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
   },
+  badge: {
+    height: 15,
+    width: 15,
+    borderRadius: 50,
+    left: -11,
+    top: -3,
+    backgroundColor: colours.accentPrimary,
+  },
   logoContainer: {
     justifyContent: 'center',
     height: '100%',

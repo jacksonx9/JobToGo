@@ -34,7 +34,6 @@ const styles = StyleSheet.create({
     color: colours.darkGray,
     height: 200,
     fontSize: 12,
-    backgroundColor: 'black',
   },
   scroll: {
     marginTop: 30,
@@ -65,8 +64,6 @@ const styles = StyleSheet.create({
     height: '15%',
     width: '100%',
   },
-
-
   detailsContainer: {
     height: '85%',
     width: '100%',
