@@ -9,6 +9,7 @@ const icons = {
   moreVertical: 'more-vertical',
   chevronLeft: 'chevron-left',
   inbox: 'inbox',
+  check: 'check',
 };
 
 export default icons;
