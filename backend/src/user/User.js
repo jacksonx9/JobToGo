@@ -365,9 +365,10 @@ class User {
     }
 
     try {
-      await Users.findOneAndUpdate(
-        { _id: userId },
-        { $pull: { keywords: { name: { $eq: keyword } } } },
+      console.log(await Users.findById(userId, 'keywords.name'));
+      await Users.findByIdAndUpdate(
+        userId,
+        { $pull: { keywords: { name: keyword } } },
       ).orFail();
 
       return Response(true, '', 200);
@@ -383,7 +384,7 @@ class User {
     }
 
     try {
-      const user = await Users.findById(userId).orFail();
+      const user = await Users.findById(userId, 'keywords').orFail();
       const skills = user.keywords.map(keyword => keyword.name);
 
       return new Response(skills, '', 200);
