@@ -19,6 +19,7 @@ const SelectableItem = ({
       <JobImage
         logo={imageSource}
         style={styles.logo}
+        code={header}
       />
       <View style={styles.infoContainer}>
         <View style={styles.topLineContainer}>
