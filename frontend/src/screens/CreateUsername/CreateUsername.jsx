@@ -76,7 +76,7 @@ export default class CreateUsername extends Component {
           placeholderTextColor={colours.lightGray}
           onChangeText={text => { this.setState({ userName: text, invalidUserName: false }); }}
         />
-        <text style={styles.text}>{invalidUserName ? `Username "${userName}" already taken` : ''}</Text>
+        <Text style={styles.warning}>{invalidUserName ? `Username "${userName}" already taken` : ''}</Text>
         <Button
           title="Confirm Username"
           textColor={colours.white}
@@ -84,7 +84,7 @@ export default class CreateUsername extends Component {
           style={styles.button}
           onPress={this.onPressConfirm}
         />
-        <text style={styles.text}>{emptyField ? 'Fields must not be empty' : ''}</Text>
+        <Text style={styles.warning}>{emptyField ? 'Fields must not be empty' : ''}</Text>
       </View>
     );
   }

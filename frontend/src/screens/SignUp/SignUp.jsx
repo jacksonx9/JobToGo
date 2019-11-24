@@ -102,7 +102,7 @@ export default class SignUp extends Component {
           placeholderTextColor={colours.lightGray}
           onChangeText={text => { this.setState({ email: text, invalidEmail: false }); }}
         />
-        <text style={styles.text}>{invalidEmail ? `Email "${email}" already taken` : ''}</Text>
+        <Text style={styles.warning}>{invalidEmail ? `Email "${email}" already taken` : ''}</Text>
         <TextInput
           style={styles.inputContainer}
           placeholder="Username"
@@ -110,7 +110,7 @@ export default class SignUp extends Component {
           placeholderTextColor={colours.lightGray}
           onChangeText={text => { this.setState({ userName: text, invalidUserName: false }); }}
         />
-        <text style={styles.text}>{invalidUserName ? `Username "${userName}" already taken` : ''}</Text>
+        <Text style={styles.warning}>{invalidUserName ? `Username "${userName}" already taken` : ''}</Text>
         <TextInput
           style={styles.inputContainer}
           placeholder="Password"
@@ -133,8 +133,7 @@ export default class SignUp extends Component {
           style={styles.button}
           onPress={this.onPressSignUp}
         />
-        <text style={styles.text}>{emptyField ? 'Fields must not be empty' : ''}</Text>
-        
+        <Text style={styles.warning}>{emptyField ? 'Fields must not be empty' : ''}</Text>
       </View>
     );
   }

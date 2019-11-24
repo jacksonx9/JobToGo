@@ -67,7 +67,7 @@ export default class UpdatePassword extends Component {
           placeholderTextColor={colours.lightGray}
           onChangeText={text => { this.setState({ password: text, invalidPassword: false }); }}
         />
-        {invalidPassword ? <Text style={styles.text}>{`password "${password}" already taken`}</Text>
+        {invalidPassword ? <Text style={styles.warning}>{`password "${password}" already taken`}</Text>
           : <Text />}
         <Button
           backgroundColor={colours.accentPrimary}
@@ -76,7 +76,7 @@ export default class UpdatePassword extends Component {
           style={styles.button}
           onPress={() => this.onPressUpdate()}
         />
-        {blank ? <text style={styles.text}>Fields must not be blank</Text>
+        {blank ? <Text style={styles.warning}>Fields must not be blank</Text>
           : <Text />}
       </View>
     );

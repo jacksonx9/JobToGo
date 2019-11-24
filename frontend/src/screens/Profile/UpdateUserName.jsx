@@ -70,7 +70,7 @@ export default class UpdateUserName extends Component {
           placeholderTextColor={colours.lightGray}
           onChangeText={text => { this.setState({ userName: text, invalidUserName: false }); }}
         />
-        {invalidUserName ? <text style={styles.text}>{`Username "${userName}" already taken`}</Text>
+        {invalidUserName ? <Text style={styles.warning}>{`Username "${userName}" already taken`}</Text>
           : <Text />}
         <Button
           backgroundColor={colours.accentPrimary}
@@ -79,7 +79,7 @@ export default class UpdateUserName extends Component {
           style={styles.button}
           onPress={() => this.onPressUpdate()}
         />
-        {blank ? <text style={styles.text}>Fields must not be blank</Text>
+        {blank ? <Text style={styles.warning}>Fields must not be blank</Text>
           : <Text />}
       </View>
     );

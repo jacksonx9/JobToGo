@@ -40,12 +40,10 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     maxHeight: '45%',
   },
-  text: {
-    fontFamily: fonts.semiBold,
-    fontSize: fonts.md,
-    color: colours.lightGray,
-    textAlign: 'center',
-    marginBottom: '1%',
+  warning: {
+    fontFamily: fonts.normal,
+    fontSize: fonts.lg,
+    color: colours.red,
   },
 });
 

@@ -39,6 +39,11 @@ const styles = StyleSheet.create({
     fontSize: fonts.sm,
     color: colours.gray,
   },
+  warning: {
+    fontFamily: fonts.normal,
+    fontSize: fonts.lg,
+    color: colours.red,
+  },
 });
 
 export default styles;

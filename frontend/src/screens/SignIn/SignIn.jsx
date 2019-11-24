@@ -116,8 +116,8 @@ export default class SignIn extends Component {
         >
           <Text style={[styles.link]}>Forgot Password</Text>
         </TouchableOpacity>
-        <text style={styles.text}>{invalidLogin ? 'Invalid Login' : ''}</Text>
-        <text style={styles.text}>{emptyField ? 'Fields must not be empty' : ''}</Text>
+        <Text style={styles.warning}>{invalidLogin ? 'Invalid Login' : ''}</Text>
+        <Text style={styles.warning}>{emptyField ? 'Fields must not be empty' : ''}</Text>
       </View>
     );
   }
