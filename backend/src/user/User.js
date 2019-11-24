@@ -4,7 +4,6 @@ import Logger from 'js-logger';
 import Response from '../types';
 import { Users } from '../schema';
 import credentials from '../../credentials/google';
-import { tsConstructSignatureDeclaration } from '@babel/types';
 
 class User {
   constructor(app, redisClient, socket, allSkills) {
