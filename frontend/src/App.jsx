@@ -135,7 +135,7 @@ export default class App extends React.Component {
     const TabStack = createBottomTabNavigator(
       {
         Home: {
-          screen: () => <JobSwipe socket={this.socket} />,
+          screen: props => <JobSwipe {...props} socket={this.socket} />,
           navigationOptions: {
             tabBarLabel: 'Home',
             tabBarIcon: HomeTabIcon,
