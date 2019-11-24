@@ -42,6 +42,11 @@ class User {
       res.status(response.status).send(response);
     });
 
+    app.get('/users/userInfo/:userId', async (req, res) => {
+      const response = await this.getUserInfo(req.params.userId);
+      res.status(response.status).send(response);
+    });
+
     app.get('/users/:userName', async (req, res) => {
       const response = await this.getUser(req.params.userName);
       res.status(response.status).send(response);
@@ -78,6 +83,18 @@ class User {
       await this.redisClient.setAsync(userId, socketId);
       await this.redisClient.setAsync(socketId, userId);
       return new Response(true, '', 200);
+    } catch (e) {
+      return new Response(false, 'Invalid userId', 400);
+    }
+  }
+
+  async getUserInfo(userId) {
+    try {
+      const user = await Users.findById(userId, 'credentials').orFail();
+      delete user.credentials.password;
+      delete user.credentials.idToken;
+      delete user.credentials.firebaseToken;
+      return new Response(user, '', 200);
     } catch (e) {
       return new Response(false, 'Invalid userId', 400);
     }
