@@ -24,6 +24,7 @@ const JobCard = ({
     <View style={styles.contentContainer}>
       <JobImage
         logo={logo}
+        code={company}
       />
       <JobDetails
         testID={testID}

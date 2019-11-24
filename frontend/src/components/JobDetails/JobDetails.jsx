@@ -52,6 +52,7 @@ class JobDetails extends Component {
               <JobImage
                 logo={logo}
                 sideLength={50}
+                code={company}
               />
               <Text style={styles.headerDark}>{company}</Text>
             </View>

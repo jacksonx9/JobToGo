@@ -52,7 +52,7 @@ const JobShareModal = ({
             <SelectableItem
               key={item._id}
               header={item.userName}
-              subHeader={item.sharedJob ? 'shared' : 'not shared'}
+              subHeader={item.sharedJob ? 'Shared' : 'Not shared'}
               iconName={icons.send}
               onPress={() => onPressSend(item, jobId, index)}
               noButton={item.sharedJob}
