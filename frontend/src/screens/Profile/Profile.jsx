@@ -4,8 +4,10 @@ import Logger from 'js-logger';
 import axios from 'axios';
 import { GoogleSignin } from 'react-native-google-signin';
 
+import Loader from '../../components/Loader';
 import Button from '../../components/Button';
 import NavHeader from '../../components/NavHeader/NavHeader';
+import config from '../../constants/config';
 import styles from './styles';
 import { colours } from '../../styles';
 
@@ -15,22 +17,23 @@ export default class Profile extends Component {
     this.state = {
       userName: '',
       email: '',
+      loading: 1,
     };
     this.logger = Logger.get(this.constructor.name);
   }
 
-  async componentWillMount() {
+  async componentDidMount() {
     const { navigation } = this.props;
-    this.fetchAccountInfo();
+    // this.fetchAccountInfo();
     navigation.addListener('willFocus', () => this.fetchAccountInfo());
   }
 
   fetchAccountInfo = async () => {
     const { userId } = global;
     try {
-      const ret = await axios.get(`ENDP_USER_INFO${userId}`);
-      const { userName, email } = ret.data.result;
-      this.setState({ userName, email });
+      const ret = await axios.get(`${config.ENDP_USER_INFO}${userId}`);
+      const { userName, email } = ret.data.result.credentials;
+      this.setState({ userName, email, loading: 0, });
     } catch (e) {
       this.logger.error(e);
     }
@@ -38,8 +41,9 @@ export default class Profile extends Component {
 
   render() {
     const { navigation } = this.props;
-    const { userName, email } = this.state;
+    const { userName, email, loading } = this.state;
 
+    if (loading) return <Loader />;
     return (
       <View style={styles.container}>
         <NavHeader
@@ -47,9 +51,6 @@ export default class Profile extends Component {
           leftButtonOption="back"
           onPressLeftButton={() => navigation.navigate('TabStack')}
         />
-        <Text style={styles.text}>
-          Change your account settings
-        </Text>
         <Text style={styles.text}>
           {userName}
         </Text>
@@ -70,6 +71,9 @@ export default class Profile extends Component {
           style={styles.button}
           onPress={() => navigation.navigate('UpdatePassword')}
         />
+        <Text style={styles.text}>
+          Change your account settings
+        </Text>
         <Button
           backgroundColor={colours.accentPrimary}
           title="Log Out"

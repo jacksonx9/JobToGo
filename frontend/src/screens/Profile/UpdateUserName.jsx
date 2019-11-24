@@ -42,7 +42,6 @@ export default class UpdateUserName extends Component {
       navigation.navigate('Profile');
     } catch (e) {
       this.setState({ invalidUserName: true });
-      this.logger.error(e);
     }
   }
 

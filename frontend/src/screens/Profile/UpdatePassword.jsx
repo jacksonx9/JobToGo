@@ -46,7 +46,6 @@ export default class UpdatePassword extends Component {
       navigation.navigate('Profile');
     } catch (e) {
       this.setState({ invalidPassword: true });
-      this.logger.error(e);
     }
   }
 
