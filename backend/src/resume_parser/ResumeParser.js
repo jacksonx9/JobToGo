@@ -7,7 +7,7 @@ import vision from '@google-cloud/vision';
 
 import { Users } from '../schema';
 import Response from '../types';
-import credentials from '../../credentials/dandelion';
+import dandelionCredentials from '../../credentials/dandelion';
 import firebaseCredentials from '../../credentials/firebase';
 
 const EXTRACTION_ENDPOINT = 'https://api.dandelion.eu/datatxt/nex/v1/';
@@ -18,7 +18,7 @@ const MAX_KEYWORD_LENGTH = 20;
 // Dandelion API request URI has a maximum length of 4096 characters
 export const MAX_REQUEST_URI_LENGTH = 4096;
 const MAX_REQUEST_TEXT_LENGTH = MAX_REQUEST_URI_LENGTH
-  - (EXTRACTION_ENDPOINT.length + credentials.token.length + String(MIN_CONFIDENCE).length + 29);
+  - (EXTRACTION_ENDPOINT.length + dandelionCredentials.token.length + String(MIN_CONFIDENCE).length + 29);
 
 class ResumeParser {
   constructor(app, user) {
@@ -52,8 +52,8 @@ class ResumeParser {
       return new Response(false, 'Invalid userId or resume', 400);
     }
 
+    // Parse text out of resume
     if (mimetype === 'application/pdf') {
-      // Parse text out of resume
       textResult = await this.parsePdf(buffer);
     } else if (mimetype.startsWith('image')) {
       textResult = await this.parseImage(buffer);
@@ -103,9 +103,9 @@ class ResumeParser {
 
   // Remove all non-ascii characters, excess spaces, and stopwords
   _removeStopWords(text) {
+    // TODO: make it in one pass; don't trim, just remove empty strings
     const parsedText = stopword.removeStopwords(text
-      .replace(/[^ -~]/g, ' ')
-      .replace(/[^\w.\-+]/g, ' ')
+      .replace(/[^ -~\w.\-+]/g, ' ')
       .replace(/[ ]{2,}/g, ' ')
       .replace(/[\r\n]/g, ' ')
       .trim()
@@ -133,7 +133,7 @@ class ResumeParser {
           `${EXTRACTION_ENDPOINT}?`
           + `min_confidence=${String(MIN_CONFIDENCE)}&`
           + `text=${encodeURI}&`
-          + `token=${credentials.token}`,
+          + `token=${dandelionCredentials.token}`,
           { timeout: REQUEST_TIMEOUT },
         );
         return res.data;
