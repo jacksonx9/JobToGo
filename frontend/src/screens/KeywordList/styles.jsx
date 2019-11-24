@@ -36,7 +36,8 @@ const styles = StyleSheet.create({
     width: '50%',
   },
   button: {
-    width: 100,
+    width: '90%',
+    marginBottom: margin.sm,
   },
   bigText: {
     fontSize: fonts.md,
@@ -54,6 +55,15 @@ const styles = StyleSheet.create({
     height: '65%',
     width: '100%',
     backgroundColor: colours.white,
+  },
+  inputContainer: {
+    height: 50,
+    width: '90%',
+    marginBottom: margin.sm,
+    paddingHorizontal: padding.sm,
+    borderRadius: border.radius,
+    backgroundColor: colours.lighterGray,
+    fontFamily: fonts.normal,
   },
 });
 

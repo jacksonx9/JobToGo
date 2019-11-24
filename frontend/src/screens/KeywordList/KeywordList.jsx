@@ -114,13 +114,6 @@ export default class KeywordList extends Component {
           style={styles.button}
           onPress={this.addKeyword()}
         />
-        <View style={styles.buttonSection}>
-          <View style={styles.infoContainer}>
-            <Text style={styles.bigText}>
-              {`${keywords.length} skills`}
-            </Text>
-          </View>
-        </View>
         <View style={styles.listContainer}>
           <FlatList
             testID="keywords"
