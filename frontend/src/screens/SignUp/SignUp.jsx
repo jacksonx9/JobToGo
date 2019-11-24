@@ -102,6 +102,7 @@ export default class SignUp extends Component {
           placeholderTextColor={colours.lightGray}
           onChangeText={text => { this.setState({ email: text, invalidEmail: false }); }}
         />
+
         <Text style={styles.warning}>{invalidEmail ? `Email "${email}" already taken` : ''}</Text>
         <TextInput
           style={styles.inputContainer}

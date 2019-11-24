@@ -42,8 +42,15 @@ const styles = StyleSheet.create({
   },
   warning: {
     fontFamily: fonts.normal,
-    fontSize: fonts.lg,
+    fontSize: fonts.sm,
     color: colours.red,
+  },
+  text: {
+    marginTop: margin.xl,
+    fontFamily: fonts.bold,
+    fontSize: fonts.md,
+    marginBottom: margin.sm,
+    color: colours.gray,
   },
 });
 

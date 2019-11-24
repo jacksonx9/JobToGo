@@ -24,7 +24,7 @@ export default class Profile extends Component {
           onPressLeftButton={() => navigation.navigate('TabStack')}
         />
         <Text style={styles.text}>
-          Change your account settings
+          Temporary Account Page
         </Text>
         <Button
           backgroundColor={colours.accentPrimary}
