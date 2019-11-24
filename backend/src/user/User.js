@@ -217,7 +217,7 @@ class User {
 
     try {
       const user = await Users.findById(userId).orFail();
-      Object.assign(user.credentials[credName], credValue);
+      user.credentials[credName] = credValue;
       await user.save();
       return new Response(true, '', 200);
     } catch (e) {
