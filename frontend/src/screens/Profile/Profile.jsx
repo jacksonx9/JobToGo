@@ -24,7 +24,6 @@ export default class Profile extends Component {
 
   async componentDidMount() {
     const { navigation } = this.props;
-    // this.fetchAccountInfo();
     navigation.addListener('willFocus', () => this.fetchAccountInfo());
   }
 
