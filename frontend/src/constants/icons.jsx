@@ -7,6 +7,8 @@ const icons = {
   plus: 'plus',
   send: 'send',
   moreVertical: 'more-vertical',
+  chevronLeft: 'chevron-left',
+  inbox: 'inbox',
 };
 
 export default icons;

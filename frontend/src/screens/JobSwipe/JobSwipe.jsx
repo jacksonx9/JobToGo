@@ -16,6 +16,7 @@ import config from '../../constants/config';
 import styles, { LOGO_SIZE } from './styles';
 import { colours } from '../../styles';
 import { status } from '../../constants/messages';
+import icons from '../../constants/icons';
 
 export default class JobSwipe extends Component {
   constructor(props) {
@@ -109,7 +110,7 @@ export default class JobSwipe extends Component {
     const fetchSharedJobs = (jobType === this.jobTypes.SHARED);
 
     const jobsResp = await axios.get(`${fetchSharedJobs
-      ? config.ENDP_SHARED_JOBS : config.ENDP_JOBS}${userId}`).catch(e => this.logger.error(e));
+      ? config.ENDP_SHARED_JOBS : config.ENDP_JOBS_FIND}${userId}`).catch(e => this.logger.error(e));
     const jobs = await this.fetchLogos(jobsResp.data.result);
 
     if (fetchSharedJobs) {
@@ -234,7 +235,7 @@ export default class JobSwipe extends Component {
     const jobIndex = isSharedJobsView ? sharedJobIndex : matchedJobIndex;
     const jobType = isSharedJobsView ? this.jobTypes.SHARED : this.jobTypes.MATCHED;
     const job = jobs[jobIndex];
-    const buttonIcon = isSharedJobsView ? 'chevron-left' : 'inbox';
+    const buttonIcon = isSharedJobsView ? icons.chevronLeft : icons.inbox;
 
     if (loading) return <Loader />;
 

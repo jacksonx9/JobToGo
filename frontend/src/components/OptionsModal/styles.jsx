@@ -6,11 +6,11 @@ import {
 
 const styles = StyleSheet.create({
   modalContainer: {
-    height: '32%',
+    maxHeight: '32%',
     width: '98%',
     backgroundColor: colours.white,
     flexDirection: 'column',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     borderRadius: border.radius,
     zIndex: 1000,

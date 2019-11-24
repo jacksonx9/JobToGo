@@ -96,17 +96,49 @@ export default class EditFriends extends Component {
 
   comfirmFriendRequest = async index => {
     const { userId } = global;
-    const { pendingFriends } = this.state;
+    const { pendingFriends, friends } = this.state;
 
     try {
-      await axios.post(config.ENDP_CONFIRM_FRIENDS, {
+      await axios.post(config.ENDP_CONFIRM_FRIEND_REQ, {
         userId,
         friendId: pendingFriends[index]._id,
       }).catch(e => this.logger.error(e));
 
+      const updatedFriends = [...friends];
+      const updatedPendingFriends = [...pendingFriends];
+
+      updatedFriends.push(pendingFriends[index]);
+      updatedPendingFriends.splice(index, 1);
+
+      this.setState({
+        pendingFriends: updatedPendingFriends,
+        friends: updatedFriends,
+        optionsModalIsVisible: false,
+      });
+    } catch (e) {
+      this.logger.error(e);
+    }
+  }
+
+  removeFriendRequest = async index => {
+    const { userId } = global;
+    const { pendingFriends } = this.state;
+
+    try {
+      await axios.delete(config.ENDP_PENDING_FRIENDS, {
+        data: {
+          userId,
+          friendId: pendingFriends[index]._id,
+        },
+      }).catch(e => this.logger.error(e));
+
       const updatedPendingFriends = [...pendingFriends];
       updatedPendingFriends.splice(index, 1);
-      this.setState({ pendingFriends: updatedPendingFriends });
+
+      this.setState({
+        pendingFriends: updatedPendingFriends,
+        optionsModalIsVisible: false,
+      });
     } catch (e) {
       this.logger.error(e);
     }
@@ -265,7 +297,7 @@ export default class EditFriends extends Component {
             option1="Confirm"
             option2="Ignore"
             onPress1={this.comfirmFriendRequest}
-            onPress2={this.comfirmFriendRequest}
+            onPress2={this.removeFriendRequest}
             onPressExit={() => { this.setState({ optionsModalIsVisible: false }); }}
             isVisible={optionsModalIsVisible}
             index={pendingFriendsIndex}

@@ -46,7 +46,6 @@ const JobShareModal = ({
         <FlatList
           showsVerticalScrollIndicator={false}
           data={friends}
-          extraData={friends}
           keyExtractor={item => item._id}
           extraData={extraData}
           renderItem={({ item, index }) => (
@@ -56,6 +55,7 @@ const JobShareModal = ({
               subHeader={item.sharedJob ? 'shared' : 'not shared'}
               iconName={icons.send}
               onPress={() => onPressSend(item, jobId, index)}
+              noButton={item.sharedJob}
             />
           )}
         />
@@ -77,6 +77,7 @@ JobShareModal.propTypes = {
   jobLogo: string,
   friends: arrayOf(object).isRequired,
   onPressSend: func.isRequired,
+  extraData: object.isRequired, // eslint-disable-line react/forbid-prop-types
 };
 
 export default JobShareModal;

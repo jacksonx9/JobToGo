@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import {
-  string, bool, func, arrayOf, object,
+  string, bool, func, number,
 } from 'prop-types';
 import Modal from 'react-native-modal';
 
@@ -42,19 +42,14 @@ const OptionsModal = ({
   </Modal>
 );
 
-OptionsModal.defaultProps = {
-  jobLogo: null,
-};
-
 OptionsModal.propTypes = {
+  option1: string.isRequired,
+  option2: string.isRequired,
+  onPress1: func.isRequired,
+  onPress2: func.isRequired,
   isVisible: bool.isRequired,
   onPressExit: func.isRequired,
-  jobTitle: string.isRequired,
-  jobCompany: string.isRequired,
-  jobId: string.isRequired,
-  jobLogo: string,
-  friends: arrayOf(object).isRequired,
-  onPressSend: func.isRequired,
+  index: number.isRequired,
 };
 
 export default OptionsModal;
