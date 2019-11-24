@@ -90,7 +90,7 @@ class User {
 
   async getUserInfo(userId) {
     try {
-      const user = await Users.findById(userId, 'credentials').orFail();
+      const user = await Users.findById(userId, 'credentials').lean().orFail();
       delete user.credentials.password;
       delete user.credentials.idToken;
       delete user.credentials.firebaseToken;
