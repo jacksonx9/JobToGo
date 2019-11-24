@@ -3,6 +3,7 @@ import stopword from 'stopword';
 import axios from 'axios';
 import multer from 'multer';
 import Logger from 'js-logger';
+import vision from '@google-cloud/vision';
 
 import { Users } from '../schema';
 import Response from '../types';
@@ -22,6 +23,7 @@ class ResumeParser {
   constructor(app, user) {
     this.logger = Logger.get(this.constructor.name);
     this.user = user;
+    this.client = new vision.ImageAnnotatorClient();
 
     // Upload resume as multipart form data
     const upload = multer();
@@ -32,16 +34,13 @@ class ResumeParser {
   }
 
   async handleResume(userId, resume) {
+    let textResult;
     if (!userId || !resume) {
       return new Response(false, 'Invalid userId or resume', 400);
     }
 
     const { originalname, buffer, mimetype } = resume;
     this.logger.info(`Received: ${originalname}`);
-
-    if (mimetype !== 'application/pdf') {
-      return new Response(false, 'Invalid PDF', 400);
-    }
 
     // Verify user is valid before starting to parse
     try {
@@ -50,8 +49,15 @@ class ResumeParser {
       return new Response(false, 'Invalid userId or resume', 400);
     }
 
-    // Parse text out of resume
-    const textResult = await this.parse(buffer);
+    if (mimetype === 'application/pdf') {
+      // Parse text out of resume
+      textResult = await this.parsePdf(buffer);
+    } else if (mimetype.startsWith('image')) {
+      textResult = await this.parseImage(buffer);
+    } else {
+      return new Response(false, 'Invalid PDF', 400);
+    }
+
     if (textResult.status !== 200) {
       return textResult;
     }
@@ -67,16 +73,37 @@ class ResumeParser {
     return updateResult;
   }
 
-  async parse(buffer) {
+  async parsePdf(buffer) {
     let resume;
+
     try {
       resume = await pdfparse(buffer);
     } catch (e) {
       return new Response(false, 'Invalid PDF', 400);
     }
 
-    // Remove all non-ascii characters, excess spaces, and stopwords
-    const text = stopword.removeStopwords(resume.text
+    return this._removeStopWords(resume.text);
+  }
+
+  async parseImage(buffer) {
+    const request = {
+      image: buffer,
+    };
+
+    this.client
+      .safeSearchDetection(request)
+      .then(response => {
+        return this._removeStopWords(response);
+      })
+      .catch(err => {
+        console.error(err);
+        return new Response(false, 'Invalid Image', 400);
+      });
+  }
+
+  // Remove all non-ascii characters, excess spaces, and stopwords
+  _removeStopWords(text) {
+    const parsedText = stopword.removeStopwords(text
       .replace(/[^ -~]/g, ' ')
       .replace(/[^\w.\-+]/g, ' ')
       .replace(/[ ]{2,}/g, ' ')
@@ -84,7 +111,7 @@ class ResumeParser {
       .toLowerCase()
       .split(' ')).join(' ');
 
-    return new Response(text, '', 200);
+    return new Response(parsedText, '', 200);
   }
 
   async extract(text) {
