@@ -141,7 +141,7 @@ export default class SendLikedJobs extends Component {
           testID="navHeaderLiked"
           title="Liked Jobs"
           rightButtonOption="menu"
-          onPressRightButton={() => navigation.navigate('Profile')}
+          onPressRightButton={() => navigation.openDrawer()}
         />
         <ErrorDisplay
           showDisplay={showErrorDisplay}

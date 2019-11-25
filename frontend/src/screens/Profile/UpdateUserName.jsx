@@ -41,8 +41,7 @@ export default class UpdateUserName extends Component {
       await axios.put(`${config.ENDP_UPDATE_USERNAME}${userId}`, {
         userName,
       });
-      this.logger.info('actually didnt fail');
-      navigation.navigate('Profile');
+      navigation.goBack();
     } catch (e) {
       if (!e.response || e.response.data.status !== 400) {
         this.setState({
