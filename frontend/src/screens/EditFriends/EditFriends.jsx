@@ -376,7 +376,7 @@ export default class EditFriends extends Component {
             searchText: '',
           })}
           rightButtonOption="menu"
-          onPressRightButton={() => navigation.navigate('Profile')}
+          onPressRightButton={() => navigation.openDrawer()}
         />
         <SwitchableNav
           showNavOption1={showPendingFriends}

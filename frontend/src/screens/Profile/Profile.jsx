@@ -58,7 +58,7 @@ export default class Profile extends Component {
         <NavHeader
           title="Account"
           leftButtonOption="back"
-          onPressLeftButton={() => navigation.navigate('TabStack')}
+          onPressLeftButton={() => navigation.goBack()}
         />
         <ErrorDisplay
           showDisplay={showErrorDisplay}

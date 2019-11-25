@@ -48,7 +48,7 @@ export default class UpdatePassword extends Component {
         password,
       });
       Toast.show(status.passwordUpdated);
-      navigation.navigate('Profile');
+      navigation.goBack();
     } catch (e) {
       if (!e.response || e.response.data.status !== 400) {
         this.setState({

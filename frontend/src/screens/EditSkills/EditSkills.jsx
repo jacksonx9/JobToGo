@@ -70,7 +70,7 @@ export default class EditSkills extends Component {
           testID="navHeaderSkills"
           title="Edit Skills"
           rightButtonOption="menu"
-          onPressRightButton={() => navigation.navigate('Profile')}
+          onPressRightButton={() => navigation.openDrawer()}
         />
         <ErrorDisplay
           showDisplay={showErrorDisplay}

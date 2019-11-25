@@ -355,7 +355,7 @@ export default class JobSwipe extends Component {
         <MainHeader
           buttonIcon={buttonIcon}
           onPressLeft={() => this.toggleSharedJobsView()}
-          onPressRight={() => navigation.navigate('Profile')}
+          onPressRight={() => navigation.openDrawer()}
           showBadge={showInboxBadge}
         />
         <ErrorDisplay
