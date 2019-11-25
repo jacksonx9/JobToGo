@@ -162,7 +162,7 @@ export default class JobSwipe extends Component {
     });
 
     try {
-      const jobsResp = await axios.get(`${config.ENDP_JOBS_FIND}${userId}`)
+      const jobsResp = await axios.get(`${config.ENDP_SHARED_JOBS}${userId}`)
         .catch(e => this.logger.error(e));
       const jobs = await this.fetchLogos(jobsResp.data.result);
 

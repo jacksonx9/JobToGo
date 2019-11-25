@@ -1,13 +1,15 @@
 import { StyleSheet } from 'react-native';
 
-import { padding, colours } from '../../styles';
+import { padding, colours, dimensions } from '../../styles';
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     paddingTop: padding.xl,
     height: 80,
-    width: '100%',
+    paddingHorizontal: padding.md,
+    width: dimensions.fullWidth,
+    backgroundColor: colours.white,
     zIndex: 1000,
   },
   mainContainer: {

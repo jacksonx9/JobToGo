@@ -8,7 +8,7 @@ import Toast from 'react-native-simple-toast';
 import Icon from 'react-native-vector-icons/Feather';
 
 import ErrorDisplay from '../../components/ErrorDisplay';
-import SelectableItem from '../../components/SelectableItem';
+import { SelectableItemLong } from '../../components/SelectableItem';
 import InfoDisplay from '../../components/InfoDisplay';
 import Loader from '../../components/Loader';
 import NavHeader from '../../components/NavHeader';
@@ -171,7 +171,7 @@ export default class SendLikedJobs extends Component {
                 data={likedJobs}
                 keyExtractor={item => item._id}
                 renderItem={({ item, index }) => (
-                  <SelectableItem
+                  <SelectableItemLong
                     testID={`jobItem${index}`}
                     key={item._id}
                     header={item.company}

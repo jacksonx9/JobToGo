@@ -4,9 +4,10 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
+import Toast from 'react-native-simple-toast';
 
 import ErrorDisplay from '../../components/ErrorDisplay';
-import SelectableItem from '../../components/SelectableItem';
+import { SelectableItemShort } from '../../components/SelectableItem';
 import Loader from '../../components/Loader';
 import NavHeader from '../../components/NavHeader';
 import Button from '../../components/Button';
@@ -72,8 +73,9 @@ export default class KeywordList extends Component {
       const updatedKeywords = [...keywords];
       updatedKeywords.push(newSkill);
       this.setState({
-        keywords: updatedKeywords, newSkill: '', response: 'Successfully added Skill',
+        keywords: updatedKeywords, newSkill: '',
       });
+      Toast.show('Successfully added Skill');
     } catch (e) {
       if (!e.response || !e.response.data
           || !e.response.data.result || e.response.data.status !== 400) {
@@ -134,35 +136,38 @@ export default class KeywordList extends Component {
           displayText={errorDisplayText}
           style={styles.errorDisplay}
         />
-        <TextInput
-          testID="keywordInput"
-          style={styles.inputContainer}
-          placeholder="Add a Skill"
-          value={newSkill}
-          placeholderTextColor={colours.lightGray}
-          onChangeText={text => {
-            this.setState({
-              newSkill: text, response: '',
-            });
-          }}
-        />
+        <View style={styles.addSkillSection}>
+          <TextInput
+            testID="keywordInput"
+            style={styles.inputContainer}
+            placeholder="Add a Skill"
+            value={newSkill}
+            placeholderTextColor={colours.lightGray}
+            onChangeText={text => {
+              this.setState({
+                newSkill: text, response: '',
+              });
+            }}
+          />
+          <Button
+            testID="submitKeyword"
+            title="Add"
+            textColor={colours.white}
+            backgroundColor={colours.accentPrimary}
+            style={styles.button}
+            onPress={() => this.addKeyword()}
+          />
+        </View>
         <Text style={styles.warning}>{ response }</Text>
-        <Button
-          testID="submitKeyword"
-          title="Add"
-          textColor={colours.white}
-          backgroundColor={colours.accentPrimary}
-          style={styles.button}
-          onPress={() => this.addKeyword()}
-        />
         <View style={styles.listContainer}>
           <FlatList
             testID="keywords"
+            numColumns={2}
             showsVerticalScrollIndicator={false}
             data={keywords}
             keyExtractor={item => item}
             renderItem={({ item, index }) => (
-              <SelectableItem
+              <SelectableItemShort
                 testID={`keyword${index}`}
                 key={item}
                 header={item}

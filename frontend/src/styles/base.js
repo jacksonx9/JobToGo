@@ -42,6 +42,7 @@ export const border = {
 };
 
 export const elevation = {
+  sm: 6,
   md: 10,
   lg: 20,
 };
