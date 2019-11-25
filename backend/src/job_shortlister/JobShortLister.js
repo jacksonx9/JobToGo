@@ -29,7 +29,13 @@ class JobShortLister {
 
     app.delete('/jobs', async (req, res) => {
       const { userId, jobId } = req.body;
-      const response = await this.removeLikedJob(userId, jobId);
+      const response = await this.removeJob(userId, jobId, false);
+      res.status(response.status).send(response);
+    });
+
+    app.post('/jobs/unseenJob', async (req, res) => {
+      const { userId, jobId } = req.body;
+      const response = await this.unseenJob(userId, jobId);
       res.status(response.status).send(response);
     });
 
@@ -62,14 +68,6 @@ class JobShortLister {
     // Throws if userId is invalid
     const user = await Users.findById(userId, 'seenJobs').lean().orFail();
     return user.seenJobs;
-  }
-
-  async addLikedJobs(userId, jobId) {
-    return this._addLikedDislikedJobs(userId, jobId, 'likedJobs');
-  }
-
-  async addDislikedJobs(userId, jobId) {
-    return this._addLikedDislikedJobs(userId, jobId, 'dislikedJobs');
   }
 
   async getLikedJobs(userId) {
@@ -108,7 +106,49 @@ class JobShortLister {
     return new Response(jobsData, '', 200);
   }
 
-  async removeLikedJob(userId, jobId) {
+  async unseenJob(userId, jobId) {
+    if (!userId || !jobId) {
+      return new Response(false, 'Invalid userId or jobId', 400);
+    }
+
+    try {
+      const job = await Jobs.findById(jobId).orFail();
+      const user = await Users.findById(userId).orFail();
+
+      if (!user.seenJobs.includes(jobId)) {
+        return new Response(false, 'Not a seen job', 400);
+      }
+
+      const isLikedJob = user.likedJobs.includes(job._id.toString());
+
+      // Unincrement and undecrement the user's keywords' score
+      job.keywords.forEach((jobKeywordData) => {
+        const userKeywordIdx = user.keywords.findIndex(userKeywordData => (
+          jobKeywordData.name === userKeywordData.name
+        ));
+
+        if (userKeywordIdx !== -1) {
+          if (isLikedJob) {
+            user.keywords[userKeywordIdx].score -= jobKeywordData.count;
+          } else {
+            user.keywords[userKeywordIdx].score += jobKeywordData.count;
+          }
+          user.keywords[userKeywordIdx].jobCount -= 1;
+        }
+      });
+
+      user.dailyJobCount -= 1;
+
+      await user.save();
+
+      return await this.removeJob(userId, jobId, true);
+    } catch (e) {
+      return new Response(false, 'Invalid userId or jobId', 400);
+    }
+  }
+
+  async removeJob(userId, jobId, removeFromSeen) {
+    assert(removeFromSeen === true || removeFromSeen === false);
     if (!userId || !jobId) {
       return new Response(false, 'Invalid userId or jobId', 400);
     }
@@ -117,15 +157,25 @@ class JobShortLister {
       const user = await Users.findById(userId).orFail();
       await Jobs.findById(jobId).orFail();
 
-      if (!user.likedJobs.includes(jobId)) {
-        return new Response(false, 'Not a liked job', 400);
+      if (!user.seenJobs.includes(jobId)) {
+        return new Response(false, 'Not a seen job', 400);
       }
 
-      await Users.findByIdAndUpdate(userId, {
-        $pull: {
-          likedJobs: jobId,
-        },
-      }).orFail();
+      if (user.likedJobs.includes(jobId)) {
+        await Users.findByIdAndUpdate(userId, {
+          $pull: {
+            likedJobs: jobId,
+          },
+        }).orFail();
+      }
+
+      if (removeFromSeen) {
+        await Users.findByIdAndUpdate(userId, {
+          $pull: {
+            seenJobs: jobId,
+          },
+        }).orFail();
+      }
 
       return new Response(true, '', 200);
     } catch (e) {
@@ -147,6 +197,14 @@ class JobShortLister {
     } catch (e) {
       return new Response(false, 'Invalid userId', 400);
     }
+  }
+
+  async addLikedJobs(userId, jobId) {
+    return this._addLikedDislikedJobs(userId, jobId, 'likedJobs');
+  }
+
+  async addDislikedJobs(userId, jobId) {
+    return this._addLikedDislikedJobs(userId, jobId, 'dislikedJobs');
   }
 
   async _addLikedDislikedJobs(userId, jobId, type) {
