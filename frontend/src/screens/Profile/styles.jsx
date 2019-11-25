@@ -42,14 +42,12 @@ const styles = StyleSheet.create({
   },
   warning: {
     fontFamily: fonts.normal,
-    fontSize: fonts.sm,
+    fontSize: fonts.lg,
     color: colours.red,
   },
   text: {
-    marginTop: margin.xl,
-    fontFamily: fonts.bold,
-    fontSize: fonts.md,
-    marginBottom: margin.sm,
+    fontFamily: fonts.normal,
+    fontSize: fonts.lg,
     color: colours.gray,
   },
   errorDisplay: {

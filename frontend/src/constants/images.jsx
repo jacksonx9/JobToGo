@@ -17,12 +17,6 @@ import iconInbox from '../../assets/icon-inbox.png';
 import jobSeeker from '../../assets/job-seeker.png';
 import checkingDoc from '../../assets/checking-document.png';
 import imgPlaceholder from '../../assets/img-placeholder.png';
-import logoBlue from '../../assets/logo-blue.png';
-import logoGreen from '../../assets/logo-green.png';
-import logoPink from '../../assets/logo-pink.png';
-import logoPurple from '../../assets/logo-purple.png';
-import logoOrange from '../../assets/logo-orange.png';
-import logoYellow from '../../assets/logo-yellow.png';
 
 const images = {
   logoLight,
@@ -44,12 +38,6 @@ const images = {
   jobSeeker,
   checkingDoc,
   imgPlaceholder,
-  logoBlue,
-  logoGreen,
-  logoPink,
-  logoPurple,
-  logoOrange,
-  logoYellow,
 };
 
 export default images;

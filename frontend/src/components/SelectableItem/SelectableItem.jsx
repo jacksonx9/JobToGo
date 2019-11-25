@@ -11,7 +11,7 @@ import styles from './styles';
 const SelectableItem = ({
   header, subHeader, onPress,
   iconName, bannerText, // TODO: Possibly add buttonType, buttonText
-  noButton, noBanner, imageSource, enableButton2, iconName2, onPress2,
+  noButton, noBanner, imageSource,
   backgroundColor, titleColor, descriptionColor, testID,
 }) => (
   <View style={[styles.container, { backgroundColor }]} testID={testID}>
@@ -19,7 +19,6 @@ const SelectableItem = ({
       <JobImage
         logo={imageSource}
         style={styles.logo}
-        code={header}
       />
       <View style={styles.infoContainer}>
         <View style={styles.topLineContainer}>
@@ -64,15 +63,6 @@ const SelectableItem = ({
             size={icons.sm}
             onPress={onPress}
           />
-          {enableButton2
-            ? (
-              <IconButton
-                name={iconName2}
-                color={colours.lightGray}
-                size={icons.sm}
-                onPress={onPress2}
-              />
-            ) : <View />}
         </View>
       )}
   </View>
@@ -82,9 +72,6 @@ SelectableItem.defaultProps = {
   subHeader: '',
   iconName: icons.x,
   bannerText: '',
-  enableButton2: false,
-  iconName2: '',
-  onPress2: () => {},
   noButton: false,
   noBanner: true,
   imageSource: null,
@@ -102,9 +89,6 @@ SelectableItem.propTypes = {
   bannerText: string,
   noButton: bool,
   noBanner: bool,
-  enableButton2: bool,
-  iconName2: string,
-  onPress2: func,
   imageSource: string,
   backgroundColor: string,
   titleColor: string,

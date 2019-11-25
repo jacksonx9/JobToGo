@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     marginRight: margin.lg,
   },
   descriptionText: {
-    fontSize: fonts.md,
+    fontSize: fonts.sm,
     fontFamily: fonts.bold,
   },
   topLineContainer: {

@@ -1,13 +1,17 @@
 import { StyleSheet } from 'react-native';
 
-import { padding, colours } from '../../styles';
+import { padding, dimensions, colours } from '../../styles';
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
     paddingTop: padding.xl,
+    paddingHorizontal: padding.md,
     height: 80,
-    width: '100%',
+    width: dimensions.fullWidth,
+    backgroundColor: colours.white,
     zIndex: 1000,
   },
   mainContainer: {
@@ -15,19 +19,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    backgroundColor: colours.white,
-  },
-  badge: {
-    height: 15,
-    width: 15,
-    borderRadius: 50,
-    left: 20,
-    top: -4,
-    position: 'absolute',
   },
   logoContainer: {
-    maxHeight: '100%',
-    maxWidth: '50%',
+    justifyContent: 'center',
+    height: '100%',
+    width: '50%',
   },
   logo: {
     width: 170,

@@ -14,6 +14,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     height: 50,
     width: '90%',
+    marginBottom: margin.sm,
     paddingHorizontal: padding.sm,
     borderRadius: border.radius,
     backgroundColor: colours.lighterGray,
@@ -37,7 +38,7 @@ const styles = StyleSheet.create({
   },
   warning: {
     fontFamily: fonts.normal,
-    fontSize: fonts.sm,
+    fontSize: fonts.lg,
     color: colours.red,
   },
   divider: {

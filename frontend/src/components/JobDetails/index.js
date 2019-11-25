@@ -1,4 +1,3 @@
 import JobDetails from './JobDetails';
-import JobDetailsExpanded from './JobDetailsExpanded';
 
-export { JobDetails, JobDetailsExpanded };
+export default JobDetails;

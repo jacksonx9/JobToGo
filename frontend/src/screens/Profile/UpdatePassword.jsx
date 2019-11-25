@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-  View, Text, TextInput, TouchableOpacity,
+  View, Image, Text, TextInput, TouchableOpacity,
 } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
@@ -13,6 +13,7 @@ import config from '../../constants/config';
 import { status, errors } from '../../constants/messages';
 import styles from './styles';
 import { colours } from '../../styles';
+import images from '../../constants/images';
 
 export default class UpdatePassword extends Component {
   text = {
@@ -89,8 +90,12 @@ export default class UpdatePassword extends Component {
           displayText={errorDisplayText}
           style={styles.errorDisplay}
         />
+        <Image
+          source={images.checkingDoc}
+          style={styles.image}
+        />
         <Text style={styles.text}>
-          Enter a new password
+          Change your account settings
         </Text>
         <TextInput
           style={styles.inputContainer}

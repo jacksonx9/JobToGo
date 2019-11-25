@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
   },
   warning: {
     fontFamily: fonts.normal,
-    fontSize: fonts.sm,
+    fontSize: fonts.lg,
     color: colours.red,
   },
   divider: {
