@@ -12,6 +12,7 @@ const config = {
   ENDP_JOBS_ALL: `${serverIp}/jobs/all/`,
   ENDP_DISLIKE: `${serverIp}/jobs/dislike/`,
   ENDP_LIKE: `${serverIp}/jobs/like/`,
+  ENDP_REVERT: `${serverIp}/jobs/unseenJob/`,
   ENDP_SHARE_JOB: `${serverIp}/friends/sendJob/`,
   ENDP_SHARED_JOBS: `${serverIp}/friends/recommendedJobs/`,
   ENDP_LIKE_SHARED: `${serverIp}/friends/confirmJob/`,

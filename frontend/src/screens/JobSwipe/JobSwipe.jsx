@@ -297,6 +297,29 @@ export default class JobSwipe extends Component {
     return this.swipeMatchedJob(jobs, jobIndex, swipeAction, userId);
   }
 
+  revertJob = async (jobs, jobIndex) => {
+    const { userId } = global;
+    const oldIndex = jobIndex;
+    if (oldIndex > 0) {
+      this.setState({
+        matchedJobIndex: jobIndex - 1,
+      });
+      this.logger.info(`Reverted job with company ${jobs[oldIndex - 1].company}`);
+
+      try {
+        await axios.post(config.ENDP_REVERT, {
+          userId,
+          jobId: jobs[oldIndex - 1]._id,
+        });
+      } catch (e) {
+        this.setState({
+          showErrorDisplay: true,
+          errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
+        });
+      }
+    }
+  }
+
   showJobDetails = (jobs, jobIndex, jobType) => {
     const { showJobDetails } = this.state;
     if (!showJobDetails) {
@@ -337,7 +360,7 @@ export default class JobSwipe extends Component {
   render() {
     const {
       loading, isJobShareModalVisible, matchedJobs, matchedJobIndex,
-      sharedJobs, sharedJobIndex, friends, showJobDetails, showSharedJobsView,
+      sharedJobs, sharedJobIndex, friends, showSharedJobsView,
       showErrorDisplay, errorDisplayText,
     } = this.state;
     const { navigation } = this.props;
@@ -370,6 +393,9 @@ export default class JobSwipe extends Component {
             <Swiper
               // horizontalSwipe={!showJobDetails} TODO: Fix car locking bug
               // verticalSwipe={!showJobDetails}
+              goBackToPreviousCardOnSwipeBottom={jobIndex > 0 && !showSharedJobsView}
+              disableBottomSwipe={jobIndex === 0 || showSharedJobsView}
+              disableTopSwipe
               cards={jobs}
               onTapCard={() => this.showJobDetails(jobs, jobIndex, jobType)}
               renderCard={posting => (
@@ -386,9 +412,10 @@ export default class JobSwipe extends Component {
                   onPressHide={() => this.hideJobDetails(jobs, jobIndex, jobType)}
                 />
               )}
-              onSwipedLeft={() => this.swipeJob(jobs, jobIndex, jobType,
+              onSwipedBottom={index => this.revertJob(jobs, index)}
+              onSwipedLeft={index => this.swipeJob(jobs, index, jobType,
                 this.swipeActionTypes.DISLIKE)}
-              onSwipedRight={() => this.swipeJob(jobs, jobIndex, jobType,
+              onSwipedRight={index => this.swipeJob(jobs, index, jobType,
                 this.swipeActionTypes.LIKE)}
               cardIndex={jobIndex}
               marginTop={35}
