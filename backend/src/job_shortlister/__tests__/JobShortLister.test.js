@@ -100,9 +100,12 @@ describe('JobShortLister', () => {
     const response = new Response(false, 'Invalid userId or jobId', 400);
     const usersBefore = await Users.find({}).lean();
 
-    expect(await jobShortLister[func](undefined, undefined)).toEqual(response);
-    expect(await jobShortLister[func](userId, undefined)).toEqual(response);
-    expect(await jobShortLister[func](undefined, jobId)).toEqual(response);
+    expect(await jobShortLister[func](undefined, undefined, false)).toEqual(response);
+    expect(await jobShortLister[func](userId, undefined, false)).toEqual(response);
+    expect(await jobShortLister[func](undefined, jobId, false)).toEqual(response);
+    expect(await jobShortLister[func](undefined, undefined, true)).toEqual(response);
+    expect(await jobShortLister[func](userId, undefined, true)).toEqual(response);
+    expect(await jobShortLister[func](undefined, jobId, true)).toEqual(response);
 
     const usersAfter = await Users.find({}).lean();
     expect(usersBefore).toEqual(usersAfter);
@@ -129,14 +132,14 @@ describe('JobShortLister', () => {
     const response = new Response(false, 'Invalid userId or jobId', 400);
     const usersBefore = await Users.find({}).lean();
 
-    expect(await jobShortLister[func](userId, invalidJobId)).toEqual(response);
-    expect(await jobShortLister[func](invalidUserId, jobId)).toEqual(response);
-    expect(await jobShortLister[func](123, jobId)).toEqual(response);
-    expect(await jobShortLister[func]('test', jobId)).toEqual(response);
-    expect(await jobShortLister[func]({}, jobId)).toEqual(response);
-    expect(await jobShortLister[func](userId, 123)).toEqual(response);
-    expect(await jobShortLister[func](userId, 'test')).toEqual(response);
-    expect(await jobShortLister[func](userId, {})).toEqual(response);
+    expect(await jobShortLister[func](userId, invalidJobId, false)).toEqual(response);
+    expect(await jobShortLister[func](invalidUserId, jobId, false)).toEqual(response);
+    expect(await jobShortLister[func](123, jobId, false)).toEqual(response);
+    expect(await jobShortLister[func]('test', jobId, false)).toEqual(response);
+    expect(await jobShortLister[func]({}, jobId, false)).toEqual(response);
+    expect(await jobShortLister[func](userId, 123, false)).toEqual(response);
+    expect(await jobShortLister[func](userId, 'test', false)).toEqual(response);
+    expect(await jobShortLister[func](userId, {}, false)).toEqual(response);
 
     const usersAfter = await Users.find({}).lean();
     expect(usersBefore).toEqual(usersAfter);
@@ -229,31 +232,32 @@ describe('JobShortLister', () => {
     expect(user.keywords[0].jobCount).toBe(1);
   });
 
-  test('removeLikedJob: Empty Ids', async () => {
-    await testEmptyIds('removeLikedJob');
+  test('removeJob: Empty Ids', async () => {
+    await testEmptyIds('removeJob');
   });
 
-  test('removeLikedJob: Invalid Ids', async () => {
-    await testInvalidUserJobs('removeLikedJob');
+  test('removeJob: Invalid Ids', async () => {
+    await testInvalidUserJobs('removeJob');
   });
 
-  test('removeLikedJob: Not a liked job', async () => {
-    const response = new Response(false, 'Not a liked job', 400);
+  test('removeJob: Not a liked job', async () => {
+    const response = new Response(false, 'Not a seen job', 400);
     const usersBefore = await Users.find({}).lean();
-    expect(await jobShortLister.removeLikedJob(userId, jobId)).toEqual(response);
+    expect(await jobShortLister.removeJob(userId, jobId, false)).toEqual(response);
 
     const usersAfter = await Users.find({}).lean();
     expect(usersBefore).toEqual(usersAfter);
   });
 
-  test('removeLikedJob: Success', async () => {
+  test('removeJob: Success', async () => {
     await Users.findByIdAndUpdate(userId, {
       $addToSet: {
         likedJobs: jobId,
+        seenJobs: jobId,
       },
     });
     const response = new Response(true, '', 200);
-    expect(await jobShortLister.removeLikedJob(userId, jobId)).toEqual(response);
+    expect(await jobShortLister.removeJob(userId, jobId, true)).toEqual(response);
 
     const user = await Users.findById(userId);
     expect(user.likedJobs.length).toBe(0);
