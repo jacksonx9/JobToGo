@@ -29,7 +29,7 @@ export default class Profile extends Component {
 
   async componentDidMount() {
     const { navigation } = this.props;
-    navigation.addListener('willFocus', () => this.fetchAccountInfo());
+    navigation.addListener('didFocus', () => this.fetchAccountInfo());
   }
 
   fetchAccountInfo = async () => {

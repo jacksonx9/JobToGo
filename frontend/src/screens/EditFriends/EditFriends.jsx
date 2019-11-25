@@ -7,7 +7,7 @@ import Toast from 'react-native-simple-toast';
 
 import ErrorDisplay from '../../components/ErrorDisplay';
 import Search from '../../components/Search';
-import {SelectableItemLong} from '../../components/SelectableItem';
+import { SelectableItemLong } from '../../components/SelectableItem';
 import Loader from '../../components/Loader';
 import InfoDisplay from '../../components/InfoDisplay';
 import OptionsModal from '../../components/OptionsModal';
@@ -143,6 +143,8 @@ export default class EditFriends extends Component {
     const { userId } = global;
     const { pendingFriends, friends } = this.state;
 
+    this.logger.info(`Comfirming friend request from ${pendingFriends[index].userName}`);
+
     try {
       await axios.post(config.ENDP_CONFIRM_FRIEND_REQ, {
         userId,
@@ -172,6 +174,8 @@ export default class EditFriends extends Component {
   removeFriendRequest = async index => {
     const { userId } = global;
     const { pendingFriends } = this.state;
+
+    this.logger.info(`Removing friend request from ${pendingFriends[index].userName}`);
 
     try {
       await axios.delete(config.ENDP_PENDING_FRIENDS, {
@@ -272,11 +276,11 @@ export default class EditFriends extends Component {
           key={item._id}
           header={item.userName}
           subHeader={item.email}
-          onPress={() => this.comfirmFriendRequest(item, index)}
+          onPress={() => this.comfirmFriendRequest(index)}
           iconName={icons.check}
           enableButton2
           iconName2={icons.x}
-          onPress2={() => this.removeFriendRequest(item, index)}
+          onPress2={() => this.removeFriendRequest(index)}
         />
       )}
     />

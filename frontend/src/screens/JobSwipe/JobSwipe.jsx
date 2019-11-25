@@ -138,8 +138,7 @@ export default class JobSwipe extends Component {
     });
 
     try {
-      const jobsResp = await axios.get(`${config.ENDP_JOBS_FIND}${userId}`)
-        .catch(e => this.logger.error(e));
+      const jobsResp = await axios.get(`${config.ENDP_JOBS_FIND}${userId}`);
       const jobs = await this.fetchLogos(jobsResp.data.result);
 
       this.setState({
@@ -162,8 +161,7 @@ export default class JobSwipe extends Component {
     });
 
     try {
-      const jobsResp = await axios.get(`${config.ENDP_SHARED_JOBS}${userId}`)
-        .catch(e => this.logger.error(e));
+      const jobsResp = await axios.get(`${config.ENDP_SHARED_JOBS}${userId}`);
       const jobs = await this.fetchLogos(jobsResp.data.result);
 
       this.setState({
@@ -321,28 +319,24 @@ export default class JobSwipe extends Component {
   }
 
   showJobDetails = (jobs, jobIndex, jobType) => {
-    const { showJobDetails } = this.state;
-    if (!showJobDetails) {
-      const updatedJobs = JSON.parse(JSON.stringify(jobs));
-      updatedJobs[jobIndex].showDetails = true;
+    const updatedJobs = JSON.parse(JSON.stringify(jobs));
+    updatedJobs[jobIndex].showDetails = true;
 
-      if (jobType === this.jobTypes.MATCHED) {
-        this.setState({
-          matchedJobs: updatedJobs,
-          showJobDetails: !showJobDetails,
-        });
-      } else {
-        this.setState({
-          sharedJobs: updatedJobs,
-          showJobDetails: true,
-        });
-      }
+    if (jobType === this.jobTypes.MATCHED) {
+      this.setState({
+        matchedJobs: updatedJobs,
+        showJobDetails: true,
+      });
+    } else {
+      this.setState({
+        sharedJobs: updatedJobs,
+        showJobDetails: true,
+      });
     }
   }
 
-  hideJobDetails = (jobs, jobIndex, jobType) => {
-    const updatedJobs = JSON.parse(JSON.stringify(jobs));
-    updatedJobs[jobIndex].showDetails = false;
+  hideJobDetails = (jobs, jobType) => {
+    const updatedJobs = jobs.map(job => ({ ...job, showDetails: false }));
 
     if (jobType === this.jobTypes.MATCHED) {
       this.setState({
@@ -361,7 +355,7 @@ export default class JobSwipe extends Component {
     const {
       loading, isJobShareModalVisible, matchedJobs, matchedJobIndex,
       sharedJobs, sharedJobIndex, friends, showSharedJobsView,
-      showErrorDisplay, errorDisplayText,
+      showErrorDisplay, errorDisplayText, showJobDetails,
     } = this.state;
     const { navigation } = this.props;
     const jobs = showSharedJobsView ? sharedJobs : matchedJobs;
@@ -391,11 +385,11 @@ export default class JobSwipe extends Component {
           ? <InfoDisplay message={status.noSharedJobs} />
           : (
             <Swiper
-              // horizontalSwipe={!showJobDetails} TODO: Fix car locking bug
-              // verticalSwipe={!showJobDetails}
-              goBackToPreviousCardOnSwipeBottom={jobIndex > 0 && !showSharedJobsView}
-              disableBottomSwipe={jobIndex === 0 || showSharedJobsView}
-              disableTopSwipe
+              horizontalSwipe={!showJobDetails}
+              verticalSwipe={!showJobDetails}
+              goBackToPreviousCardOnSwipeTop={jobIndex > 0 && !showSharedJobsView}
+              disableTopSwipe={jobIndex === 0 || showSharedJobsView}
+              disableBottomSwipe
               cards={jobs}
               onTapCard={() => this.showJobDetails(jobs, jobIndex, jobType)}
               renderCard={posting => (
@@ -409,10 +403,10 @@ export default class JobSwipe extends Component {
                   showDetails={posting.showDetails}
                   onPressShare={() => this.openJobShareModal()}
                   onPressInfo={() => this.showJobDetails(jobs, jobIndex, jobType)}
-                  onPressHide={() => this.hideJobDetails(jobs, jobIndex, jobType)}
+                  onPressHide={() => this.hideJobDetails(jobs, jobType)}
                 />
               )}
-              onSwipedBottom={index => this.revertJob(jobs, index)}
+              onSwipedTop={index => this.revertJob(jobs, index)}
               onSwipedLeft={index => this.swipeJob(jobs, index, jobType,
                 this.swipeActionTypes.DISLIKE)}
               onSwipedRight={index => this.swipeJob(jobs, index, jobType,
