@@ -9,6 +9,7 @@ import Icon from 'react-native-vector-icons/Feather';
 
 import ErrorDisplay from '../../components/ErrorDisplay';
 import { SelectableItemLong } from '../../components/SelectableItem';
+import { JobDetailsExpanded } from '../../components/JobDetails';
 import InfoDisplay from '../../components/InfoDisplay';
 import Loader from '../../components/Loader';
 import NavHeader from '../../components/NavHeader';
@@ -23,6 +24,8 @@ export default class SendLikedJobs extends Component {
     super(props);
     this.state = {
       likedJobs: [],
+      likedJobIndex: 0,
+      showJobDetails: false,
       loading: true,
       showErrorDisplay: false,
       errorDisplayText: errors.default,
@@ -130,9 +133,10 @@ export default class SendLikedJobs extends Component {
 
   render() {
     const {
-      loading, likedJobs, showErrorDisplay, errorDisplayText,
+      loading, likedJobs, likedJobIndex, showErrorDisplay, errorDisplayText, showJobDetails,
     } = this.state;
     const { navigation } = this.props;
+
     if (loading) return <Loader />;
 
     return (
@@ -162,6 +166,19 @@ export default class SendLikedJobs extends Component {
             size={icons.lg}
           />
         </TouchableOpacity>
+        {likedJobs.length !== 0
+          ? (
+            <JobDetailsExpanded
+              testID="likedJobDescription"
+              logo={likedJobs[likedJobIndex].logo}
+              company={likedJobs[likedJobIndex].company}
+              title={likedJobs[likedJobIndex].title}
+              location={likedJobs[likedJobIndex].location}
+              description={likedJobs[likedJobIndex].description}
+              isVisible={showJobDetails}
+              onPressHide={() => this.setState({ showJobDetails: false })}
+            />
+          ) : <View />}
         <View style={styles.listContainer}>
           {likedJobs.length === 0 ? <InfoDisplay message={status.noLikedJobs} />
             : (
@@ -177,7 +194,7 @@ export default class SendLikedJobs extends Component {
                     header={item.company}
                     subHeader={item.title}
                     onPress={() => this.removeLikedJob(item, index)}
-                    actionIcon="x"
+                    onSelect={() => this.setState({ likedJobIndex: index, showJobDetails: true })}
                     imageSource={item.logo}
                   />
                 )}

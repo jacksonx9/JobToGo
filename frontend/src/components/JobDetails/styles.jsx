@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   },
 
   detailsContainer: {
-    height: '87%',
+    height: '89%',
     width: '100%',
     flexDirection: 'column',
     justifyContent: 'flex-start',
