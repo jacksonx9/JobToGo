@@ -121,7 +121,7 @@ class ResumeParser {
       }
       try {
         let encodeURI = encodeURIComponent(inputText).substring(0, MAX_REQUEST_TEXT_LENGTH);
-        while (encodeURI[encodeURI.length - 1] === '%' || encodeURI[encodeURI.length - 2] === '%') {
+        while (encodeURI.length >= 2 && encodeURI[encodeURI.length - 1] === '%' || encodeURI[encodeURI.length - 2] === '%') {
           encodeURI = encodeURI.slice(0, -1);
         }
 
