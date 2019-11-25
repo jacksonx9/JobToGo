@@ -46,6 +46,7 @@ const styles = StyleSheet.create({
     fontSize: fonts.lg,
     color: colours.gray,
     marginBottom: margin.md,
+    marginLeft: margin.sm,
   },
   subHeader: {
     fontFamily: fonts.semiBold,
@@ -64,8 +65,9 @@ const styles = StyleSheet.create({
     height: '15%',
     width: '100%',
   },
+
   detailsContainer: {
-    height: '85%',
+    height: '87%',
     width: '100%',
     flexDirection: 'column',
     justifyContent: 'flex-start',
@@ -75,7 +77,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    backgroundColor: colours.primary,
+    backgroundColor: colours.white,
     elevation: elevation.md,
   },
   logoContainer: {
@@ -84,37 +86,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: '15%',
     width: '100%',
-    backgroundColor: colours.primary,
+    backgroundColor: colours.white,
   },
   infoContainer: {
     maxHeight: '20%',
     width: '100%',
-    backgroundColor: colours.primary,
+    backgroundColor: colours.white,
     marginBottom: margin.md,
   },
   descContainer: {
     maxHeight: '70%',
     width: '100%',
-    backgroundColor: colours.primary,
+    backgroundColor: colours.white,
     overflow: 'scroll',
   },
   normalText: {
     fontFamily: fonts.normal,
     fontSize: fonts.md,
-    color: colours.white,
-  },
-  headerDark: {
-    fontFamily: fonts.semiBold,
-    fontSize: fonts.lg,
-    color: colours.white,
-    marginBottom: margin.sm,
-    marginLeft: margin.sm,
-  },
-  subHeaderDark: {
-    fontFamily: fonts.semiBold,
-    fontSize: fonts.md,
-    color: colours.white,
-    marginLeft: margin.sm,
+    color: colours.gray,
   },
 });
 
