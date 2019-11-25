@@ -5,9 +5,11 @@ import {
 } from 'react-native';
 import Logger from 'js-logger';
 
+import ErrorDisplay from '../../components/ErrorDisplay';
 import Button from '../../components/Button';
 import images from '../../constants/images';
 import config from '../../constants/config';
+import { errors } from '../../constants/messages';
 import { colours } from '../../styles';
 import styles from './styles';
 
@@ -26,6 +28,8 @@ export default class SignIn extends Component {
       emptyField: false,
       showPassword: true,
       showPasswordText: this.text.showPassword,
+      showErrorDisplay: false,
+      errorDisplayText: errors.default,
     };
     this.logger = Logger.get(this.constructor.name);
   }
@@ -56,7 +60,16 @@ export default class SignIn extends Component {
       global.userId = ret.data.result;
       navigation.navigate('App');
     } catch (e) {
-      this.setState({ invalidLogin: true });
+      if (!e.response) {
+        this.setState({
+          showErrorDisplay: true,
+          errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
+        });
+      } else {
+        this.setState({
+          invalidLogin: true,
+        });
+      }
     }
   }
 
@@ -72,6 +85,7 @@ export default class SignIn extends Component {
   render() {
     const {
       userName, password, invalidLogin, emptyField, showPassword, showPasswordText,
+      showErrorDisplay, errorDisplayText,
     } = this.state;
     const { navigation } = this.props;
     return (
@@ -81,6 +95,12 @@ export default class SignIn extends Component {
           source={images.logoLight}
           style={styles.logo}
         />
+        <ErrorDisplay
+          showDisplay={showErrorDisplay}
+          setShowDisplay={show => this.setState({ showErrorDisplay: show })}
+          displayText={errorDisplayText}
+        />
+        <View style={styles.divider} />
         <TextInput
           testID="email"
           style={styles.inputContainer}

@@ -5,6 +5,7 @@ import {
 } from 'prop-types';
 import Modal from 'react-native-modal';
 
+import ErrorDisplay from '../ErrorDisplay';
 import SelectableItem from '../SelectableItem';
 import ImageButton from '../ImageButton';
 import images from '../../constants/images';
@@ -14,10 +15,16 @@ import icons from '../../constants/icons';
 
 const JobShareModal = ({
   isVisible, onPressExit, jobTitle, jobCompany, jobId, jobLogo, friends, onPressSend, extraData,
-}) => (
-  <Modal
-    isVisible={isVisible}
-  >
+  showErrorDisplay, setShowErrorDisplay, errorDisplayText,
+}) => {
+  const modalContent = showErrorDisplay ? (
+    <ErrorDisplay
+      showDisplay={showErrorDisplay}
+      setShowDisplay={setShowErrorDisplay}
+      displayText={errorDisplayText}
+      style={styles.errorDisplay}
+    />
+  ) : (
     <View style={styles.modalContainer}>
       <View
         style={styles.exitButtonContainer}
@@ -61,8 +68,18 @@ const JobShareModal = ({
         />
       </View>
     </View>
-  </Modal>
-);
+  );
+
+  return (
+    <Modal
+      isVisible={isVisible}
+    >
+      <View style={styles.modalContainer}>
+        { modalContent }
+      </View>
+    </Modal>
+  );
+};
 
 JobShareModal.defaultProps = {
   jobLogo: null,
@@ -78,6 +95,9 @@ JobShareModal.propTypes = {
   friends: arrayOf(object).isRequired,
   onPressSend: func.isRequired,
   extraData: object.isRequired, // eslint-disable-line react/forbid-prop-types
+  showErrorDisplay: bool.isRequired,
+  setShowErrorDisplay: func.isRequired,
+  errorDisplayText: string.isRequired,
 };
 
 export default JobShareModal;

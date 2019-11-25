@@ -49,7 +49,10 @@ const styles = StyleSheet.create({
     fontFamily: fonts.normal,
     fontSize: fonts.lg,
     color: colours.gray,
-  }
+  },
+  errorDisplay: {
+    height: '90%',
+  },
 });
 
 export default styles;

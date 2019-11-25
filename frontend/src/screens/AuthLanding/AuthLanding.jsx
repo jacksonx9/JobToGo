@@ -4,9 +4,11 @@ import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-goog
 import axios from 'axios';
 import Logger from 'js-logger';
 
+import ErrorDisplay from '../../components/ErrorDisplay';
 import Button from '../../components/Button';
 import images from '../../constants/images';
 import config from '../../constants/config';
+import { errors } from '../../constants/messages';
 import { colours } from '../../styles';
 import styles from './styles';
 
@@ -14,6 +16,11 @@ export default class AuthLanding extends Component {
   constructor(props) {
     super(props);
     this.logger = Logger.get(this.constructor.name);
+
+    this.state = {
+      showErrorDisplay: false,
+      errorDisplayText: errors.default,
+    };
   }
 
   googleSignIn = async () => {
@@ -38,11 +45,14 @@ export default class AuthLanding extends Component {
         global.userId = ret.data.result;
         navigation.navigate('App');
       } catch (e) {
-        if (e.response.data.result) {
+        if (!e.response || !e.response.data.result) {
+          this.setState({
+            showErrorDisplay: true,
+            errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
+          });
+        } else {
           global.newId = e.response.data.result;
           navigation.navigate('CreateUsername');
-        } else {
-          this.logger.error(e);
         }
       }
     } catch (error) {
@@ -51,15 +61,22 @@ export default class AuthLanding extends Component {
       } else if (error.code === statusCodes.IN_PROGRESS) {
         this.logger.warn('Google sign in in progress already');
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        this.logger.error('Google Play service not available');
+        this.setState({
+          showErrorDisplay: true,
+          errorDisplayText: 'Google Play service not available',
+        });
       } else {
-        this.logger.error(error);
+        this.setState({
+          showErrorDisplay: true,
+          errorDisplayText: errors.default,
+        });
       }
     }
   }
 
   render() {
     const { navigation } = this.props;
+    const { showErrorDisplay, errorDisplayText } = this.state;
     return (
       <View style={styles.container}>
         <Image
@@ -71,6 +88,12 @@ export default class AuthLanding extends Component {
           testID="jobSeeker"
           source={images.jobSeeker}
           style={styles.image}
+        />
+        <ErrorDisplay
+          showDisplay={showErrorDisplay}
+          setShowDisplay={show => this.setState({ showErrorDisplay: show })}
+          displayText={errorDisplayText}
+          style={styles.errorDisplay}
         />
         <View style={styles.buttonSection}>
           <GoogleSigninButton

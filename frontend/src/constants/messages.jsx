@@ -7,4 +7,8 @@ export const status = {
   noPendingFriends: 'You currently have no friend requests.',
   noFriends: 'You currently have no friends.',
   noResults: 'No results',
+  emailSent: 'Email sent!',
+  resumeUploaded: 'Resume uploaded!',
+  passwordUpdated: 'Password updated successfully!',
+  friendRequestSent: 'Friend request sent!',
 };
