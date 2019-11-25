@@ -3,18 +3,26 @@ import { View, Image, Text } from 'react-native';
 import FilePickerManager from 'react-native-file-picker';
 import axios from 'axios';
 import Logger from 'js-logger';
+import Toast from 'react-native-simple-toast';
 
 import Button from '../../components/Button';
+import ErrorDisplay from '../../components/ErrorDisplay';
 import NavHeader from '../../components/NavHeader/NavHeader';
 import config from '../../constants/config';
 import styles from './styles';
 import { colours } from '../../styles';
 import images from '../../constants/images';
+import { errors, status } from '../../constants/messages';
 
 export default class EditSkills extends Component {
   constructor(props) {
     super(props);
     this.logger = Logger.get(this.constructor.name);
+
+    this.state = {
+      showErrorDisplay: false,
+      errorDisplayText: errors.default,
+    };
   }
 
   onPressUpload = () => {
@@ -34,18 +42,28 @@ export default class EditSkills extends Component {
           name: response.fileName,
         });
 
-        await axios.post(`${config.ENDP_RESUME}`,
-          data, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          }).catch(e => this.logger.error(e));
+        try {
+          await axios.post(`${config.ENDP_RESUME}`,
+            data, {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+              },
+            });
+          Toast.show(status.resumeUploaded);
+        } catch (e) {
+          this.setState({
+            showErrorDisplay: true,
+            errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
+          });
+        }
       }
     });
   }
 
   render() {
     const { navigation } = this.props;
+    const { showErrorDisplay, errorDisplayText } = this.state;
+
     return (
       <View style={styles.container} testID="editSkills">
         <NavHeader
@@ -53,6 +71,11 @@ export default class EditSkills extends Component {
           title="Edit Skills"
           rightButtonOption="menu"
           onPressRightButton={() => navigation.navigate('Profile')}
+        />
+        <ErrorDisplay
+          showDisplay={showErrorDisplay}
+          setShowDisplay={show => this.setState({ showErrorDisplay: show })}
+          displayText={errorDisplayText}
         />
         <Image
           testID="checkingDoc"

@@ -70,6 +70,9 @@ const styles = StyleSheet.create({
     fontSize: fonts.lg,
     color: colours.red,
   },
+  errorDisplay: {
+    height: '90%',
+  },
 });
 
 export default styles;

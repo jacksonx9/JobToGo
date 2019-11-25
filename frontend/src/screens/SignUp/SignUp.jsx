@@ -5,9 +5,11 @@ import {
 import Logger from 'js-logger';
 import axios from 'axios';
 
+import ErrorDisplay from '../../components/ErrorDisplay';
 import Button from '../../components/Button';
 import images from '../../constants/images';
 import config from '../../constants/config';
+import { errors } from '../../constants/messages';
 import { colours } from '../../styles';
 import styles from './styles';
 
@@ -29,6 +31,8 @@ export default class SignUp extends Component {
       invalidUserName: false,
       invalidEmail: false,
       emptyField: false,
+      showErrorDisplay: false,
+      errorDisplayText: errors.default,
     };
     this.logger = Logger.get(this.constructor.name);
   }
@@ -61,16 +65,20 @@ export default class SignUp extends Component {
       global.userId = ret.data.result;
       navigation.navigate('App');
     } catch (e) {
-      if (e.response.data.result === 'email') {
+      if (!e.response || !e.response.data
+          || (e.response.data.result !== 'email' && e.response.data.result !== 'userName')) {
+        this.setState({
+          showErrorDisplay: true,
+          errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
+        });
+      } else if (e.response.data.result === 'email') {
         this.setState({
           invalidEmail: true,
         });
-      } else if (e.response.data.result === 'userName') {
+      } else {
         this.setState({
           invalidUserName: true,
         });
-      } else {
-        this.logger.error(e);
       }
     }
   }
@@ -87,7 +95,7 @@ export default class SignUp extends Component {
   render() {
     const {
       userName, email, password, showPassword, showPasswordText,
-      invalidUserName, invalidEmail, emptyField,
+      invalidUserName, invalidEmail, emptyField, showErrorDisplay, errorDisplayText,
     } = this.state;
     return (
       <View style={styles.container}>
@@ -95,6 +103,12 @@ export default class SignUp extends Component {
           source={images.logoLight}
           style={styles.logo}
         />
+        <ErrorDisplay
+          showDisplay={showErrorDisplay}
+          setShowDisplay={show => this.setState({ showErrorDisplay: show })}
+          displayText={errorDisplayText}
+        />
+        <View style={styles.divider} />
         <TextInput
           style={styles.inputContainer}
           placeholder="Email"
@@ -110,7 +124,9 @@ export default class SignUp extends Component {
           placeholderTextColor={colours.lightGray}
           onChangeText={text => { this.setState({ userName: text, invalidUserName: false }); }}
         />
-        <Text style={styles.warning}>{invalidUserName ? `Username "${userName}" already taken` : ''}</Text>
+        <Text style={styles.warning}>
+          {invalidUserName ? `Username "${userName}" already taken` : ''}
+        </Text>
         <TextInput
           style={styles.inputContainer}
           placeholder="Password"

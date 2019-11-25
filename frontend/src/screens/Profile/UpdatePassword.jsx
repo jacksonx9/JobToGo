@@ -4,10 +4,13 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
+import Toast from 'react-native-simple-toast';
 
+import ErrorDisplay from '../../components/ErrorDisplay';
 import Button from '../../components/Button';
 import NavHeader from '../../components/NavHeader/NavHeader';
 import config from '../../constants/config';
+import { status, errors } from '../../constants/messages';
 import styles from './styles';
 import { colours } from '../../styles';
 import images from '../../constants/images';
@@ -26,6 +29,8 @@ export default class UpdatePassword extends Component {
       blank: false,
       showPassword: true,
       showPasswordText: this.text.showPassword,
+      showErrorDisplay: false,
+      errorDisplayText: errors.default,
     };
     this.logger = Logger.get(this.constructor.name);
   }
@@ -43,9 +48,17 @@ export default class UpdatePassword extends Component {
       await axios.put(`${config.ENDP_UPDATE_PASSWORD}${userId}`, {
         password,
       });
+      Toast.show(status.passwordUpdated);
       navigation.navigate('Profile');
     } catch (e) {
-      this.setState({ invalidPassword: true });
+      if (!e.response || e.response.data.status !== 400) {
+        this.setState({
+          showErrorDisplay: true,
+          errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
+        });
+      } else {
+        this.setState({ invalidPassword: true });
+      }
     }
   }
 
@@ -62,6 +75,7 @@ export default class UpdatePassword extends Component {
     const { navigation } = this.props;
     const {
       password, invalidPassword, blank, showPassword, showPasswordText,
+      showErrorDisplay, errorDisplayText,
     } = this.state;
     return (
       <View style={styles.container}>
@@ -69,6 +83,12 @@ export default class UpdatePassword extends Component {
           title="Update Password"
           leftButtonOption="back"
           onPressLeftButton={() => navigation.goBack()}
+        />
+        <ErrorDisplay
+          showDisplay={showErrorDisplay}
+          setShowDisplay={show => this.setState({ showErrorDisplay: show })}
+          displayText={errorDisplayText}
+          style={styles.errorDisplay}
         />
         <Image
           source={images.checkingDoc}
@@ -89,7 +109,8 @@ export default class UpdatePassword extends Component {
         >
           <Text style={styles.link}>{showPasswordText}</Text>
         </TouchableOpacity>
-        {invalidPassword ? <Text style={styles.warning}>{`password "${password}" already taken`}</Text>
+        {invalidPassword
+          ? <Text style={styles.warning}>{`password "${password}" already taken`}</Text>
           : <Text />}
         <Button
           backgroundColor={colours.accentPrimary}

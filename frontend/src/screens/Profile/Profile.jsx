@@ -4,10 +4,12 @@ import Logger from 'js-logger';
 import axios from 'axios';
 import { GoogleSignin } from 'react-native-google-signin';
 
+import ErrorDisplay from '../../components/ErrorDisplay';
 import Loader from '../../components/Loader';
 import Button from '../../components/Button';
 import NavHeader from '../../components/NavHeader/NavHeader';
 import config from '../../constants/config';
+import { errors } from '../../constants/messages';
 import styles from './styles';
 import { colours } from '../../styles';
 
@@ -17,7 +19,9 @@ export default class Profile extends Component {
     this.state = {
       userName: '',
       email: '',
-      loading: 1,
+      loading: true,
+      showErrorDisplay: false,
+      errorDisplayText: errors.default,
     };
     this.logger = Logger.get(this.constructor.name);
   }
@@ -32,15 +36,21 @@ export default class Profile extends Component {
     try {
       const ret = await axios.get(`${config.ENDP_USER_INFO}${userId}`);
       const { userName, email } = ret.data.result.credentials;
-      this.setState({ userName, email, loading: 0, });
+      this.setState({ userName, email, loading: false });
     } catch (e) {
-      this.logger.error(e);
+      this.setState({
+        loading: false,
+        showErrorDisplay: true,
+        errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
+      });
     }
   }
 
   render() {
     const { navigation } = this.props;
-    const { userName, email, loading } = this.state;
+    const {
+      userName, email, loading, showErrorDisplay, errorDisplayText,
+    } = this.state;
 
     if (loading) return <Loader />;
     return (
@@ -49,6 +59,11 @@ export default class Profile extends Component {
           title="Account"
           leftButtonOption="back"
           onPressLeftButton={() => navigation.navigate('TabStack')}
+        />
+        <ErrorDisplay
+          showDisplay={showErrorDisplay}
+          setShowDisplay={show => this.setState({ showErrorDisplay: show })}
+          displayText={errorDisplayText}
         />
         <Text style={styles.text}>
           {userName}

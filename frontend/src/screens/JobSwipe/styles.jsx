@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 import {
-  containers, padding, elevation,
+  containers, padding, elevation, border,
 } from '../../styles';
 
 const LOGO_SIZE = 200;
@@ -27,6 +27,11 @@ const styles = StyleSheet.create({
     marginTop: 30,
     marginLeft: 30,
     elevation: elevation.lg,
+  },
+  errorDisplay: {
+    zIndex: 10,
+    borderRadius: border.radius,
+    elevation: elevation.md,
   },
 });
 

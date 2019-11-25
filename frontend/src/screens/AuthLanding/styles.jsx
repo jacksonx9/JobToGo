@@ -43,6 +43,10 @@ const styles = StyleSheet.create({
     borderColor: colours.accentPrimary,
     borderWidth: 2,
   },
+  errorDisplay: {
+    position: 'absolute',
+    zIndex: 10,
+  },
 });
 
 export default styles;

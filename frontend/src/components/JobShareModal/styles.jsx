@@ -41,6 +41,10 @@ const styles = StyleSheet.create({
     fontSize: fonts.lg,
     color: colours.primary,
   },
+  errorDisplay: {
+    height: '100%',
+    borderRadius: border.radius,
+  },
 });
 
 export default styles;

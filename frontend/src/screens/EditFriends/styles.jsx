@@ -43,6 +43,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colours.white,
   },
+  errorDisplay: {
+    position: 'absolute',
+  },
 });
 
 export default styles;

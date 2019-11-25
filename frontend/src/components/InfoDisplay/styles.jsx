@@ -1,6 +1,8 @@
 import { StyleSheet } from 'react-native';
 
-import { colours, fonts, padding } from '../../styles';
+import {
+  colours, fonts, padding,
+} from '../../styles';
 
 const styles = StyleSheet.create({
   container: {
@@ -15,6 +17,7 @@ const styles = StyleSheet.create({
   textContainer: {
     maxHeight: '50%',
     width: '75%',
+    marginBottom: '15%',
   },
   image: {
     maxHeight: '30%',
@@ -27,6 +30,9 @@ const styles = StyleSheet.create({
     fontSize: fonts.lg,
     color: colours.lightGray,
     textAlign: 'center',
+  },
+  button: {
+    width: '75%',
   },
 });
 
