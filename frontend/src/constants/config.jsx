@@ -20,6 +20,11 @@ const config = {
   ENDP_GOOGLE: `${serverIp}/users/googleLogin/`,
   ENDP_USERS: `${serverIp}/users/`,
   ENDP_LOGIN: `${serverIp}/users/login`,
+  ENDP_UPDATE_USERNAME: `${serverIp}/users/userName/`,
+  ENDP_UPDATE_PASSWORD: `${serverIp}/users/password/`,
+  ENDP_USER_INFO: `${serverIp}/users/userInfo/`,
+  ENDP_GET_KEYWORDS: `${serverIp}/users/skills/`,
+  ENDP_KEYWORDS: `${serverIp}/users/keywords/`,
 
   SOCKET_FRIENDS: 'friends',
   SOCKET_USERID: 'userId',

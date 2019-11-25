@@ -37,8 +37,23 @@ class User {
       res.status(response.status).send(response);
     });
 
+    app.post('/users/keywords', async (req, res) => {
+      const response = await this.addKeyword(req.body.userId, req.body.keyword);
+      res.status(response.status).send(response);
+    });
+
+    app.delete('/users/keywords', async (req, res) => {
+      const response = await this.deleteKeyword(req.body.userId, req.body.keyword);
+      res.status(response.status).send(response);
+    });
+
     app.post('/users', async (req, res) => {
       const response = await this.createUser(req.body.userData);
+      res.status(response.status).send(response);
+    });
+
+    app.get('/users/userInfo/:userId', async (req, res) => {
+      const response = await this.getUserInfo(req.params.userId);
       res.status(response.status).send(response);
     });
 
@@ -83,6 +98,18 @@ class User {
     }
   }
 
+  async getUserInfo(userId) {
+    try {
+      const user = await Users.findById(userId, 'credentials').lean().orFail();
+      delete user.credentials.password;
+      delete user.credentials.idToken;
+      delete user.credentials.firebaseToken;
+      return new Response(user, '', 200);
+    } catch (e) {
+      return new Response(false, 'Invalid userId', 400);
+    }
+  }
+
   // returns list of users that start with subUserName
   static async searchUser(userId, subUserName) {
     if (!userId) {
@@ -100,11 +127,17 @@ class User {
       '_id credentials.userName friends',
     ).lean();
 
-    const users = potentialUsers.map(user => ({
-      _id: user._id,
-      userName: user.credentials.userName,
-      isFriend: user.friends.includes(userId),
-    }));
+    const users = potentialUsers.reduce((otherUsers, user) => {
+      if (user._id.toString() !== userId) {
+        otherUsers.push({
+          _id: user._id,
+          userName: user.credentials.userName,
+          isFriend: user.friends.includes(userId),
+        });
+      }
+
+      return otherUsers;
+    }, []);
 
     return new Response(users, '', 200);
   }
@@ -282,7 +315,7 @@ class User {
             name: skill,
             score: 0,
             jobCount: 0,
-            timestamp: Date.now(),
+            timeStamp: Date.now(),
           });
         }
       });
@@ -298,6 +331,54 @@ class User {
     }
   }
 
+  async addKeyword(userId, keyword) {
+    if (!userId || !keyword) {
+      return new Response(false, 'Invalid userId or keyword', 400);
+    }
+
+    try {
+      const user = await Users.findById(userId).orFail();
+      const keywordNames = new Set(user.keywords.map(k => k.name));
+
+
+      if (keywordNames.has(keyword)) {
+        return new Response(true, 'User already has this keyword', 400);
+      }
+
+      user.keywords.push({
+        name: keyword,
+        score: 0,
+        jobCount: 0,
+        timeStamp: Date.now(),
+      });
+
+      await user.save();
+      return new Response(true, '', 200);
+    } catch (e) {
+      return new Response(false, 'Invalid userId or keyword', 400);
+    }
+  }
+
+  async deleteKeyword(userId, keyword) {
+    if (!userId || !keyword) {
+      return new Response(false, 'Invalid userId or keyword', 400);
+    }
+
+    try {
+      await Users.findByIdAndUpdate(userId, {
+        $pull: {
+          keywords: {
+            name: keyword,
+          },
+        },
+      }).orFail();
+
+      return new Response(true, '', 200);
+    } catch (e) {
+      return new Response(false, 'Invalid userId or keyword', 400);
+    }
+  }
+
   // Array[strings]
   async getSkills(userId) {
     if (!userId) {
@@ -305,7 +386,7 @@ class User {
     }
 
     try {
-      const user = await Users.findById(userId).orFail();
+      const user = await Users.findById(userId, 'keywords').orFail();
       const skills = user.keywords.map(keyword => keyword.name);
 
       return new Response(skills, '', 200);

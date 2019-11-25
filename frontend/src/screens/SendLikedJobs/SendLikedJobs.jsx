@@ -2,12 +2,15 @@ import React, { Component } from 'react';
 import { View, FlatList, Text } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
+import Toast from 'react-native-simple-toast';
 
+import ErrorDisplay from '../../components/ErrorDisplay';
 import SelectableItem from '../../components/SelectableItem';
 import Loader from '../../components/Loader';
 import NavHeader from '../../components/NavHeader';
 import Button from '../../components/Button';
 import config from '../../constants/config';
+import { errors, status } from '../../constants/messages';
 import styles from './styles';
 import { colours } from '../../styles';
 
@@ -16,7 +19,9 @@ export default class SendLikedJobs extends Component {
     super(props);
     this.state = {
       likedJobs: [],
-      loading: 1,
+      loading: true,
+      showErrorDisplay: false,
+      errorDisplayText: errors.default,
     };
     this.logger = Logger.get(this.constructor.name);
   }
@@ -29,26 +34,40 @@ export default class SendLikedJobs extends Component {
 
   fetchLikedJobs = async () => {
     const { userId } = global;
-    const likedJobsResp = await axios.get(`${config.ENDP_LIKE}${userId}`)
-      .catch(e => this.logger.error(e));
-    const likedJobs = likedJobsResp.data.result;
+    let likedJobs;
+
+    try {
+      const likedJobsResp = await axios.get(`${config.ENDP_LIKE}${userId}`);
+      likedJobs = likedJobsResp.data.result;
+    } catch (e) {
+      this.setState({
+        loading: false,
+        showErrorDisplay: true,
+        errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
+      });
+      return;
+    }
 
     // Get the logo url of each company
     await Promise.all(likedJobs.map(async (job, i) => {
-      const companyInfoResp = await axios.get(
-        `${config.ENDP_COMPANY_API}${job.company}`,
-      );
-      const companyInfo = companyInfoResp.data[0];
-      if (companyInfo) {
-        likedJobs[i].logo = `${companyInfo.logo}?size=${80}`;
-      } else {
+      try {
+        const companyInfoResp = await axios.get(
+          `${config.ENDP_COMPANY_API}${job.company}`,
+        );
+        const companyInfo = companyInfoResp.data[0];
+        if (companyInfo) {
+          likedJobs[i].logo = `${companyInfo.logo}?size=${80}`;
+        } else {
+          likedJobs[i].logo = null;
+        }
+      } catch (e) {
         likedJobs[i].logo = null;
       }
-    })).catch(e => this.logger.error(e));
+    }));
 
     this.setState({
       likedJobs,
-      loading: 0,
+      loading: false,
     });
   }
 
@@ -58,7 +77,7 @@ export default class SendLikedJobs extends Component {
       await axios.post(`${config.ENDP_EMAIL}`,
         {
           userId,
-        }).catch(e => this.logger.error(e));
+        });
 
       await axios.delete(config.ENDP_JOBS_ALL, {
         data: {
@@ -68,12 +87,15 @@ export default class SendLikedJobs extends Component {
 
       this.setState({
         likedJobs: [],
-        loading: 0,
+        loading: false,
       });
 
-      this.logger.info('Sent liked jobs to your email');
+      Toast.show(status.emailSent);
     } catch (e) {
-      this.logger.error(e);
+      this.setState({
+        showErrorDisplay: true,
+        errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
+      });
     }
   }
 
@@ -95,12 +117,18 @@ export default class SendLikedJobs extends Component {
 
       this.logger.info(`Removed ${item.company}: ${index} from liked jobs`);
     } catch (e) {
-      this.logger.error(e);
+      this.setState({
+        showErrorDisplay: true,
+        errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
+      });
     }
   }
 
   render() {
-    const { loading, likedJobs } = this.state;
+    const {
+      loading, likedJobs, showErrorDisplay, errorDisplayText,
+    } = this.state;
+    const { navigation } = this.props;
     if (loading) return <Loader />;
 
     return (
@@ -108,7 +136,13 @@ export default class SendLikedJobs extends Component {
         <NavHeader
           testID="navHeaderLiked"
           title="Liked Jobs"
-          buttonOption="search"
+          rightButtonOption="menu"
+          onPressRightButton={() => navigation.navigate('Profile')}
+        />
+        <ErrorDisplay
+          showDisplay={showErrorDisplay}
+          setShowDisplay={show => this.setState({ showErrorDisplay: show })}
+          displayText={errorDisplayText}
         />
         <View style={styles.buttonSection}>
           <View style={styles.infoContainer}>

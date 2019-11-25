@@ -6,6 +6,7 @@ import Logger from 'js-logger';
 import Swiper from 'react-native-deck-swiper';
 import { object } from 'prop-types';
 
+import ErrorDisplay from '../../components/ErrorDisplay';
 import JobCard from '../../components/JobCard';
 import Loader from '../../components/Loader';
 import InfoDisplay from '../../components/InfoDisplay';
@@ -15,7 +16,7 @@ import OverlayLabel from '../../components/OverlayLabel/OverlayLabel';
 import config from '../../constants/config';
 import styles, { LOGO_SIZE } from './styles';
 import { colours } from '../../styles';
-import { status } from '../../constants/messages';
+import { status, errors } from '../../constants/messages';
 import icons from '../../constants/icons';
 
 export default class JobSwipe extends Component {
@@ -27,9 +28,11 @@ export default class JobSwipe extends Component {
       sharedJobs: [],
       sharedJobIndex: 0,
       friends: [],
-      loading: 1,
+      loading: true,
       isSharedJobsView: false,
       isJobShareModalVisible: false,
+      showErrorDisplay: false,
+      errorDisplayText: errors.default,
     };
     this.logger = Logger.get(this.constructor.name);
     this.jobTypes = {
@@ -48,38 +51,60 @@ export default class JobSwipe extends Component {
 
     this.logger.info(`User id is: ${userId}`);
     socket.emit(config.SOCKET_USERID, userId);
-    socket.on(config.SOCKET_SHARED, data => this.updateSharedJobs(data.result));
-    socket.on(config.SOCKET_FRIENDS, data => this.updateFriends(data.result));
+    socket.on(config.SOCKET_SHARED, data => this.updateSharedJobs(data));
+    socket.on(config.SOCKET_FRIENDS, data => this.updateFriends(data));
 
     this.fetchJobs(userId, this.jobTypes.MATCHED);
     this.fetchFriends(userId);
   }
 
   fetchFriends = async userId => {
-    const friendsResp = await axios.get(`${config.ENDP_FRIENDS}${userId}`)
-      .catch(e => this.logger.error(e));
-    const friends = friendsResp.data.result;
+    try {
+      const friendsResp = await axios.get(`${config.ENDP_FRIENDS}${userId}`);
+      const friends = friendsResp.data.result;
+
+      this.setState({
+        friends: friends.map(friend => ({ ...friend, sharedJob: false })),
+      });
+    } catch (e) {
+      this.setState({
+        showErrorDisplay: true,
+        errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
+      });
+    }
+  }
+
+  updateFriends = async data => {
+    const friends = data.result;
+    if (!friends) {
+      this.setState({
+        showErrorDisplay: true,
+        errorDisplayText: data.errorMessage,
+      });
+      return;
+    }
 
     this.setState({
       friends: friends.map(friend => ({ ...friend, sharedJob: false })),
     });
   }
 
-  updateFriends = async friends => {
-    this.logger.info(`Updating with  ${friends.length} friends`);
-    this.setState({
-      friends: friends.map(friend => ({ ...friend, sharedJob: false })),
-    });
-  }
-
-  updateSharedJobs = async sharedJobs => {
-    this.logger.info(`Updating with  ${sharedJobs.length} shared jobs`);
-    this.setState({
-      loading: 1,
-    });
+  updateSharedJobs = async data => {
+    const sharedJobs = data.result;
+    if (!sharedJobs) {
+      this.setState({
+        showErrorDisplay: true,
+        errorDisplayText: data.errorMessage,
+      });
+      return;
+    }
 
     this.setState({
-      loading: 0,
+      loading: true,
+    });
+
+    this.setState({
+      loading: false,
       sharedJobs: await this.fetchLogos(sharedJobs),
       sharedJobIndex: 0,
     });
@@ -88,42 +113,55 @@ export default class JobSwipe extends Component {
   fetchLogos = async jobs => {
     const logoJobs = jobs;
     await Promise.all(logoJobs.map(async (job, i) => {
-      const companyInfoResp = await axios.get(
-        `${config.ENDP_COMPANY_API}${job.company}`,
-      );
-      const companyInfo = companyInfoResp.data[0];
-      if (companyInfo) {
-        logoJobs[i].logo = `${companyInfo.logo}?size=${LOGO_SIZE}`;
-      } else {
+      try {
+        const companyInfoResp = await axios.get(
+          `${config.ENDP_COMPANY_API}${job.company}`,
+        );
+        const companyInfo = companyInfoResp.data[0];
+        if (companyInfo) {
+          logoJobs[i].logo = `${companyInfo.logo}?size=${LOGO_SIZE}`;
+        } else {
+          logoJobs[i].logo = null;
+        }
+      } catch (e) {
         logoJobs[i].logo = null;
       }
-    })).catch(e => this.logger.error(e));
+    }));
 
     return logoJobs;
   }
 
   fetchJobs = async (userId, jobType) => {
     this.setState({
-      loading: 1,
+      loading: true,
     });
 
-    const fetchSharedJobs = (jobType === this.jobTypes.SHARED);
+    try {
+      const fetchSharedJobs = (jobType === this.jobTypes.SHARED);
 
-    const jobsResp = await axios.get(`${fetchSharedJobs
-      ? config.ENDP_SHARED_JOBS : config.ENDP_JOBS_FIND}${userId}`).catch(e => this.logger.error(e));
-    const jobs = await this.fetchLogos(jobsResp.data.result);
+      const jobsResp = await axios.get(
+        `${fetchSharedJobs ? config.ENDP_SHARED_JOBS : config.ENDP_JOBS_FIND}${userId}`,
+      );
+      const jobs = await this.fetchLogos(jobsResp.data.result);
 
-    if (fetchSharedJobs) {
+      if (fetchSharedJobs) {
+        this.setState({
+          loading: false,
+          sharedJobs: jobs,
+          sharedJobIndex: 0,
+        });
+      } else {
+        this.setState({
+          loading: false,
+          matchedJobs: jobs,
+          matchedJobIndex: 0,
+        });
+      }
+    } catch (e) {
       this.setState({
-        loading: 0,
-        sharedJobs: jobs,
-        sharedJobIndex: 0,
-      });
-    } else {
-      this.setState({
-        loading: 0,
-        matchedJobs: jobs,
-        matchedJobIndex: 0,
+        loading: false,
+        showErrorDisplay: true,
+        errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
       });
     }
   }
@@ -158,7 +196,10 @@ export default class JobSwipe extends Component {
         friends: updatedFriends,
       });
     } catch (e) {
-      this.logger.error(e);
+      this.setState({
+        showErrorDisplay: true,
+        errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
+      });
     }
   }
 
@@ -175,15 +216,22 @@ export default class JobSwipe extends Component {
       this.setState({ sharedJobIndex: jobIndex + 1 });
     }
 
-    await axios.post(`${endpoint}`, {
-      userId,
-      jobId: jobs[oldIndex]._id,
-    }).catch(e => this.logger.error(e));
+    try {
+      await axios.post(`${endpoint}`, {
+        userId,
+        jobId: jobs[oldIndex]._id,
+      });
 
-    if (jobs.length === (oldIndex + 1)) {
-      // No need to fetch more shared jobs since websockets will take care of this.
-      // We simply wait for the sharedJobIndex array to be refilled.
-      this.setState({ sharedJobs: [] });
+      if (jobs.length === (oldIndex + 1)) {
+        // No need to fetch more shared jobs since websockets will take care of this.
+        // We simply wait for the sharedJobIndex array to be refilled.
+        this.setState({ sharedJobs: [] });
+      }
+    } catch (e) {
+      this.setState({
+        showErrorDisplay: true,
+        errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
+      });
     }
   };
 
@@ -205,13 +253,20 @@ export default class JobSwipe extends Component {
       });
     }
 
-    await axios.post(`${endpoint}`, {
-      userId,
-      jobId: jobs[oldIndex]._id,
-    }).catch(e => this.logger.error(e));
+    try {
+      await axios.post(`${endpoint}`, {
+        userId,
+        jobId: jobs[oldIndex]._id,
+      });
 
-    if (jobs.length === (oldIndex + 1)) {
-      this.fetchJobs(userId, this.jobTypes.MATCHED);
+      if (jobs.length === (oldIndex + 1)) {
+        this.fetchJobs(userId, this.jobTypes.MATCHED);
+      }
+    } catch (e) {
+      this.setState({
+        showErrorDisplay: true,
+        errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
+      });
     }
   };
 
@@ -229,8 +284,9 @@ export default class JobSwipe extends Component {
   render() {
     const {
       loading, isSharedJobsView, isJobShareModalVisible, matchedJobs, matchedJobIndex,
-      sharedJobs, sharedJobIndex, friends,
+      sharedJobs, sharedJobIndex, friends, showErrorDisplay, errorDisplayText,
     } = this.state;
+    const { navigation } = this.props;
     const jobs = isSharedJobsView ? sharedJobs : matchedJobs;
     const jobIndex = isSharedJobsView ? sharedJobIndex : matchedJobIndex;
     const jobType = isSharedJobsView ? this.jobTypes.SHARED : this.jobTypes.MATCHED;
@@ -243,7 +299,14 @@ export default class JobSwipe extends Component {
       <View style={styles.container} testID="jobSwipe">
         <MainHeader
           buttonIcon={buttonIcon}
-          onPress={() => this.toggleSharedJobsView()}
+          onPressLeft={() => this.toggleSharedJobsView()}
+          onPressRight={() => navigation.navigate('Profile')}
+        />
+        <ErrorDisplay
+          showDisplay={showErrorDisplay}
+          setShowDisplay={show => this.setState({ showErrorDisplay: show })}
+          displayText={errorDisplayText}
+          style={styles.errorDisplay}
         />
         {jobs.length === 0
           ? <InfoDisplay message={status.noSharedJobs} />
@@ -300,6 +363,9 @@ export default class JobSwipe extends Component {
               friends={friends}
               onPressSend={this.shareJob}
               extraData={this.state}
+              showErrorDisplay={showErrorDisplay}
+              setShowErrorDisplay={show => this.setState({ showErrorDisplay: show })}
+              errorDisplayText={errorDisplayText}
             />
           )}
       </View>

@@ -1,57 +1,51 @@
 import React, { Component } from 'react';
 import {
-  View, Image, TextInput, Text,
+  View, Image, Text, TextInput,
 } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
 
 import ErrorDisplay from '../../components/ErrorDisplay';
 import Button from '../../components/Button';
+import NavHeader from '../../components/NavHeader/NavHeader';
 import config from '../../constants/config';
-import images from '../../constants/images';
 import { errors } from '../../constants/messages';
-import { colours } from '../../styles';
 import styles from './styles';
+import { colours } from '../../styles';
+import images from '../../constants/images';
 
-
-export default class CreateUsername extends Component {
+export default class UpdateUserName extends Component {
   constructor(props) {
     super(props);
     this.state = {
       userName: '',
       invalidUserName: false,
-      emptyField: false,
+      blank: false,
       showErrorDisplay: false,
       errorDisplayText: errors.default,
     };
     this.logger = Logger.get(this.constructor.name);
   }
 
-  onPressConfirm = async () => {
-    const { userName } = this.state;
+  onPressUpdate = async () => {
     const { navigation } = this.props;
+    const { userName } = this.state;
+    const { userId } = global;
     if (userName.length === 0) {
-      this.setState({ emptyField: true });
+      this.setState({ blank: true });
       return;
     }
-    this.setState({ emptyField: false });
+    this.setState({ blank: false });
 
     try {
-      const ret = await axios.post(`${config.ENDP_USERS}`,
-        {
-          userData: {
-            credentials: {
-              email: global.newId.credentials.email,
-              idToken: global.newId.credentials.idToken,
-              firebaseToken: global.newId.credentials.firebaseToken,
-              userName,
-            },
-          },
-        });
-      global.userId = ret.data.result;
-      navigation.navigate('App');
+      this.logger.info(global.userId);
+      await axios.put(`${config.ENDP_UPDATE_USERNAME}${userId}`, {
+        userName,
+      });
+      this.logger.info('actually didnt fail');
+      navigation.navigate('Profile');
     } catch (e) {
-      if (!e.response || e.response.data.result !== 'userName') {
+      if (!e.response || e.response.data.status !== 400) {
         this.setState({
           showErrorDisplay: true,
           errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
@@ -63,42 +57,49 @@ export default class CreateUsername extends Component {
   }
 
   render() {
+    const { navigation } = this.props;
     const {
-      userName, invalidUserName, emptyField, showErrorDisplay, errorDisplayText,
+      userName, invalidUserName, blank, showErrorDisplay, errorDisplayText,
     } = this.state;
     return (
       <View style={styles.container}>
-        <Image
-          source={images.logoLight}
-          style={styles.logo}
+        <NavHeader
+          title="Update Username"
+          leftButtonOption="back"
+          onPressLeftButton={() => navigation.goBack()}
         />
         <ErrorDisplay
           showDisplay={showErrorDisplay}
           setShowDisplay={show => this.setState({ showErrorDisplay: show })}
           displayText={errorDisplayText}
+          style={styles.errorDisplay}
         />
         <Image
-          source={images.jobSeeker}
+          source={images.checkingDoc}
           style={styles.image}
         />
+        <Text style={styles.text}>
+          Change your account settings
+        </Text>
         <TextInput
           style={styles.inputContainer}
-          placeholder="Username"
+          placeholder="New Username"
           value={userName}
           placeholderTextColor={colours.lightGray}
           onChangeText={text => { this.setState({ userName: text, invalidUserName: false }); }}
         />
-        <Text style={styles.warning}>
-          { invalidUserName ? `Username "${userName}" already taken` : '' }
-        </Text>
+        {invalidUserName
+          ? <Text style={styles.warning}>{`Username "${userName}" already taken`}</Text>
+          : <Text />}
         <Button
-          title="Confirm Username"
-          textColor={colours.white}
           backgroundColor={colours.accentPrimary}
+          title="Update Username"
+          textColor={colours.white}
           style={styles.button}
-          onPress={this.onPressConfirm}
+          onPress={() => this.onPressUpdate()}
         />
-        <Text style={styles.warning}>{emptyField ? 'Fields must not be empty' : ''}</Text>
+        {blank ? <Text style={styles.warning}>Fields must not be blank</Text>
+          : <Text />}
       </View>
     );
   }

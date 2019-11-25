@@ -1,18 +1,17 @@
 import { StyleSheet } from 'react-native';
 
 import {
-  containers, padding, margin, elevation, border, colours,
+  containers, padding, margin, elevation, border, colours, fonts,
 } from '../../styles';
 
 const styles = StyleSheet.create({
   container: {
     ...containers.fullScreenContainer,
     flexDirection: 'column',
-    justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: padding.md,
   },
-  friendNavSection: {
+  buttonSection: {
     borderRadius: border.radius,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -36,15 +35,43 @@ const styles = StyleSheet.create({
     height: 70,
     width: '50%',
   },
+  button: {
+    width: '90%',
+    marginBottom: margin.sm,
+  },
+  bigText: {
+    fontSize: fonts.md,
+    fontFamily: fonts.bold,
+    color: colours.white,
+  },
+  normalText: {
+    fontSize: fonts.sm,
+    fontFamily: fonts.bold,
+    color: colours.secondary,
+  },
   listContainer: {
-    height: '65%',
-    width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    height: '65%',
+    width: '100%',
     backgroundColor: colours.white,
   },
+  inputContainer: {
+    height: 50,
+    width: '90%',
+    marginBottom: margin.sm,
+    paddingHorizontal: padding.sm,
+    borderRadius: border.radius,
+    backgroundColor: colours.lighterGray,
+    fontFamily: fonts.normal,
+  },
+  warning: {
+    fontFamily: fonts.normal,
+    fontSize: fonts.lg,
+    color: colours.red,
+  },
   errorDisplay: {
-    position: 'absolute',
+    height: '90%',
   },
 });
 
