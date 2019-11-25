@@ -276,7 +276,7 @@ export default class JobSwipe extends Component {
       });
 
       if (jobs.length === (oldIndex + 1)) {
-        this.fetchJobs(userId, this.jobTypes.MATCHED);
+        this.fetchMatchedJobs(userId, this.jobTypes.MATCHED);
       }
     } catch (e) {
       this.setState({
