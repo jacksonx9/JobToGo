@@ -103,11 +103,8 @@ class ResumeParser {
 
   // Remove all non-ascii characters, excess spaces, and stopwords
   _removeStopWords(text) {
-    // TODO: make it in one pass; don't trim, just remove empty strings
     const parsedText = stopword.removeStopwords(text
-      .replace(/[^ -~\w.\-+]/g, ' ')
-      .replace(/[ ]{2,}/g, ' ')
-      .replace(/[\r\n]/g, ' ')
+      .replace(/[^ -~\w.\-+]+[\r\n]+[ ]{2,}/g, ' ')
       .trim()
       .toLowerCase()
       .split(' ')).join(' ');
