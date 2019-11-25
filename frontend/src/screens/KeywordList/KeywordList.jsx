@@ -126,7 +126,7 @@ export default class KeywordList extends Component {
           testID="navHeaderKeyword"
           title="Keywords"
           leftButtonOption="back"
-          onPressRightButton={() => navigation.navigate('TabStack')}
+          onPressLeftButton={() => navigation.goBack()}
         />
         <ErrorDisplay
           showDisplay={showErrorDisplay}
