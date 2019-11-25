@@ -12,6 +12,11 @@ import logoPink from '../../assets/logo-pink.png';
 import logoPurple from '../../assets/logo-purple.png';
 import logoOrange from '../../assets/logo-orange.png';
 import logoYellow from '../../assets/logo-yellow.png';
+import iconCameraButton from '../../assets/icon-camera-button.png';
+import iconCameraFlip from '../../assets/icon-camera-flip.png';
+import iconFlashAuto from '../../assets/icon-flash-auto.png';
+import iconFlashOn from '../../assets/icon-flash-on.png';
+import iconFlashOff from '../../assets/icon-flash-off.png';
 
 const images = {
   logoLight,
@@ -28,6 +33,11 @@ const images = {
   logoPurple,
   logoOrange,
   logoYellow,
+  iconCameraButton,
+  iconCameraFlip,
+  iconFlashAuto,
+  iconFlashOff,
+  iconFlashOn,
 };
 
 export default images;
