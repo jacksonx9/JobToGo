@@ -27,7 +27,7 @@ export default class EditFriends extends Component {
       searchedUsers: [],
       pendingFriendsIndex: 0,
       searchText: '',
-      loading: 1,
+      loading: true,
       showPendingFriends: true,
       searchInProgress: false,
       optionsModalIsVisible: false,
@@ -54,11 +54,11 @@ export default class EditFriends extends Component {
       this.setState({
         friends: friends.data.result,
         pendingFriends: pendingFriends.data.result,
-        loading: 0,
+        loading: false,
       });
     } catch (e) {
       this.setState({
-        loading: 0,
+        loading: false,
         showErrorDisplay: true,
         errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
       });

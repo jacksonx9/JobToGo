@@ -28,7 +28,7 @@ export default class JobSwipe extends Component {
       sharedJobs: [],
       sharedJobIndex: 0,
       friends: [],
-      loading: 1,
+      loading: true,
       isSharedJobsView: false,
       isJobShareModalVisible: false,
       showErrorDisplay: false,
@@ -100,11 +100,11 @@ export default class JobSwipe extends Component {
     }
 
     this.setState({
-      loading: 1,
+      loading: true,
     });
 
     this.setState({
-      loading: 0,
+      loading: false,
       sharedJobs: await this.fetchLogos(sharedJobs),
       sharedJobIndex: 0,
     });
@@ -133,7 +133,7 @@ export default class JobSwipe extends Component {
 
   fetchJobs = async (userId, jobType) => {
     this.setState({
-      loading: 1,
+      loading: true,
     });
 
     try {
@@ -146,20 +146,20 @@ export default class JobSwipe extends Component {
 
       if (fetchSharedJobs) {
         this.setState({
-          loading: 0,
+          loading: false,
           sharedJobs: jobs,
           sharedJobIndex: 0,
         });
       } else {
         this.setState({
-          loading: 0,
+          loading: false,
           matchedJobs: jobs,
           matchedJobIndex: 0,
         });
       }
     } catch (e) {
       this.setState({
-        loading: 0,
+        loading: false,
         showErrorDisplay: true,
         errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
       });

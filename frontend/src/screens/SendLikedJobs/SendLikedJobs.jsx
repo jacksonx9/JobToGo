@@ -19,7 +19,7 @@ export default class SendLikedJobs extends Component {
     super(props);
     this.state = {
       likedJobs: [],
-      loading: 1,
+      loading: true,
       showErrorDisplay: false,
       errorDisplayText: errors.default,
     };
@@ -41,7 +41,7 @@ export default class SendLikedJobs extends Component {
       likedJobs = likedJobsResp.data.result;
     } catch (e) {
       this.setState({
-        loading: 0,
+        loading: false,
         showErrorDisplay: true,
         errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
       });
@@ -67,7 +67,7 @@ export default class SendLikedJobs extends Component {
 
     this.setState({
       likedJobs,
-      loading: 0,
+      loading: false,
     });
   }
 
@@ -87,7 +87,7 @@ export default class SendLikedJobs extends Component {
 
       this.setState({
         likedJobs: [],
-        loading: 0,
+        loading: false,
       });
 
       Toast.show(status.emailSent);

@@ -22,7 +22,7 @@ export default class KeywordList extends Component {
     this.state = {
       keywords: [],
       newSkill: '',
-      loading: 1,
+      loading: true,
       response: '',
       showErrorDisplay: false,
       errorDisplayText: errors.default,
@@ -43,11 +43,11 @@ export default class KeywordList extends Component {
 
       this.setState({
         keywords,
-        loading: 0,
+        loading: false,
       });
     } catch (e) {
       this.setState({
-        loading: 0,
+        loading: false,
         showErrorDisplay: true,
         errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
       });
