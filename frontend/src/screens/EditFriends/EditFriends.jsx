@@ -246,7 +246,7 @@ export default class EditFriends extends Component {
 
     return (
       <FlatList
-        testID="userList"
+        testID="searchableUserList"
         data={users}
         keyExtractor={item => item._id}
         renderItem={({ item, index }) => (
@@ -267,7 +267,7 @@ export default class EditFriends extends Component {
 
   pendingFriendsList = pendingFriends => (
     <FlatList
-      testID="userList"
+      testID="pendingUserList"
       data={pendingFriends}
       keyExtractor={item => item._id}
       renderItem={({ item, index }) => (
@@ -289,7 +289,7 @@ export default class EditFriends extends Component {
 
   friendsList = friends => (
     <FlatList
-      testID="userList"
+      testID="friendList"
       data={friends}
       keyExtractor={item => item._id}
       renderItem={({ item, index }) => (

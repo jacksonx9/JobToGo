@@ -45,7 +45,7 @@ export default class SignIn extends Component {
     this.setState({ emptyField: false });
 
     if (userName === 'secretUsername' && password === 'secretPassword') {
-      global.userId = '5dd399d45085530034b454e2';
+      global.userId = '5dd9b719146de1002e5c2517';
       navigation.navigate('App');
     }
 
