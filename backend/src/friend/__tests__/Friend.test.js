@@ -73,29 +73,29 @@ describe('Friend', () => {
       },
     });
     const job1 = await Jobs.create({
-      'title' : 'Real Programmers Only',
-      'url' : 'http://www.indeed.com/viewjob?from=appsharedroid&jk=c14a37f847778a31',
-      'company' : 'Jobot',
-      'location' : 'Cincinnati, OH 45241',
-      'postDate' : '',
-      'salary' : '$60,000 - $80,000 a year',
-      'description' : 'Rust rust sucks. Python is great',
-      'keywords': [
-          {
-              'name': 'rust',
-              'tfidf': 0.46209812037329684,
-              'count': 2,
-          },
-          {
-              'name': 'python',
-              'tfidf': 0.46209812037329684,
-              'count': 1,
-          },
-          {
-              'name': 'java',
-              'tfidf': 0,
-              'count': 0,
-          },
+      title: 'Real Programmers Only',
+      url: 'http://www.indeed.com/viewjob?from=appsharedroid&jk=c14a37f847778a31',
+      company: 'Jobot',
+      location: 'Cincinnati, OH 45241',
+      postDate: '',
+      salary: '$60,000 - $80,000 a year',
+      description: 'Rust rust sucks. Python is great',
+      keywords: [
+        {
+          name: 'rust',
+          tfidf: 0.46209812037329684,
+          count: 2,
+        },
+        {
+          name: 'python',
+          tfidf: 0.46209812037329684,
+          count: 1,
+        },
+        {
+          name: 'java',
+          tfidf: 0,
+          count: 0,
+        },
       ],
     });
     user1Id = user1._id.toString();

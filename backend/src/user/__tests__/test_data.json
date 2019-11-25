@@ -15,6 +15,38 @@
             }
         ]
     },
+    "user1DiffEmail": {
+        "credentials": {
+            "userName": "user1",
+            "email": "user1clone@mail.com",
+            "password": "testPassword",
+            "firebaseToken": "user1firebaseToken"
+        },
+        "keywordData": [
+            {
+                "name": "java",
+                "score": 0,
+                "jobCount": 0,
+                "timeStamp": "2016-05-18T16:00:00Z"
+            }
+        ]
+    },
+    "secondUser": {
+        "credentials": {
+            "userName": "secondUser",
+            "email": "user2@mail.com",
+            "password": "testPassword",
+            "firebaseToken": "user2firebaseToken"
+        },
+        "keywordData": [
+            {
+                "name": "java",
+                "score": 0,
+                "jobCount": 0,
+                "timeStamp": "2016-05-18T16:00:00Z"
+            }
+        ]
+    },
     "invalidUserData": {
         "credentials": {
             "userName": "invalidUser"

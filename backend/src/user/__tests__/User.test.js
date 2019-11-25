@@ -78,6 +78,15 @@ describe('User', () => {
     jest.clearAllMocks();
   });
 
+  // Helper function that tests functions with a single user id as the input
+  // Tests that an empty id will be rejected
+  const testEmptyId = async (func) => {
+    const response = 400;
+
+    const actualRes = await user[func](undefined);
+    expect(actualRes.status).toEqual(response);
+  };
+
   // Helper function that tests functions with two user ids as the input
   // Tests that one or more empty ids will be rejected
   const testEmptyIds = async (func) => {
@@ -103,6 +112,34 @@ describe('User', () => {
     expect(await user.createUser(testData.invalidUserData)).toEqual(expectedRes);
   });
 
+  test('createUser: Email Taken', async () => {
+    const expectedRes = new Response('email', 'Email is already used', 400);
+    expect(await user.createUser(testData.validUserData)).toEqual(expectedRes);
+  });
+
+  test('createUser: UserName Taken', async () => {
+    const expectedRes = new Response('userName', 'Username is already used', 400);
+    expect(await user.createUser(testData.user1DiffEmail)).toEqual(expectedRes);
+  });
+
+  test('editPassword: Invalid Inputs', async () => {
+    testEmptyIds('editPassword');
+  });
+
+  test('editUserName: Invalid Inputs', async () => {
+    testEmptyIds('editUserName');
+  });
+
+  test('editPassword: Valid Inputs', async () => {
+    const res = await user.editPassword(user1Id, 'asdf');
+    expect(res).toEqual(new Response(true, '', 200));
+  });
+
+  test('editUserName: Valid Inputs', async () => {
+    const res = await user.editPassword(user1Id, 'asdf');
+    expect(res).toEqual(new Response(true, '', 200));
+  });
+
   test('createUser: Valid User Data', async () => {
     await Users.deleteMany({});
     const res = await user.createUser(testData.validUserData);
@@ -121,6 +158,40 @@ describe('User', () => {
 
   test('loginGoogle: Invalid Inputs', async () => {
     testEmptyIds('loginGoogle');
+  });
+
+  test('getUserInfo: Invalid Inputs', async () => {
+    testEmptyId('getUserInfo');
+  });
+
+  test('getUserInfo: Created User', async () => {
+    const res = await user.getUserInfo(user1Id);
+    expect(res.result._id).toEqual(user1Id);
+    expect(res.status).toEqual(200);
+  });
+
+  test('searchUser, Invalid User', async () => {
+    const expectedRes = new Response(null, 'Invalid userId', 400);
+    expect(await User.searchUser(undefined, '')).toEqual(expectedRes);
+  });
+
+  test('searchUser, User Searching Itself', async () => {
+    const expectedRes = new Response([], '', 200);
+    expect(await User.searchUser(user1Id.toString(), 'user')).toEqual(expectedRes);
+  });
+
+  test('searchUser, User Searching Other User', async () => {
+    const secondUser = await Users.create(testData.secondUser);
+    const actualRes = await User.searchUser(user1Id, 'second');
+    expect(actualRes.result[0]._id).toEqual(secondUser._id);
+  });
+
+  test('addKeyword, Invalid Inputs', async () => {
+    testEmptyIds('addKeyword');
+  });
+
+  test('deleteKeyword, Invalid Inputs', async () => {
+    testEmptyIds('deleteKeyword');
   });
 
   test('loginGoogle: First Time User Logs In', async () => {
