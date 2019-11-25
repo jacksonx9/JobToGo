@@ -42,6 +42,11 @@ class User {
       res.status(response.status).send(response);
     });
 
+    app.delete('/users/keywords', async (req, res) => {
+      const response = await this.deleteKeyword(req.body.userId, req.body.keyword);
+      res.status(response.status).send(response);
+    });
+
     app.post('/users', async (req, res) => {
       const response = await this.createUser(req.body.userData);
       res.status(response.status).send(response);
@@ -350,7 +355,27 @@ class User {
       await user.save();
       return new Response(true, '', 200);
     } catch (e) {
-      return new Response(false, 'Invalid userId or keyword sss', 400);
+      return new Response(false, 'Invalid userId or keyword', 400);
+    }
+  }
+
+  async deleteKeyword(userId, keyword) {
+    if (!userId || !keyword) {
+      return new Response(false, 'Invalid userId or keyword', 400);
+    }
+
+    try {
+      await Users.findByIdAndUpdate(userId, {
+        $pull: {
+          keywords: {
+            name: keyword,
+          },
+        },
+      }).orFail();
+
+      return new Response(true, '', 200);
+    } catch (e) {
+      return new Response(false, 'Invalid userId or keyword', 400);
     }
   }
 
@@ -361,7 +386,7 @@ class User {
     }
 
     try {
-      const user = await Users.findById(userId).orFail();
+      const user = await Users.findById(userId, 'keywords').orFail();
       const skills = user.keywords.map(keyword => keyword.name);
 
       return new Response(skills, '', 200);
