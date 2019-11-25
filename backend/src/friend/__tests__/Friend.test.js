@@ -142,6 +142,16 @@ describe('Friend', () => {
     expect(usersBefore).toEqual(usersAfter);
   };
 
+  test('getRecommendedJobs: Empty Ids', async () => {
+    await testEmptyId('getRecommendedJobs');
+    expect(messenger.requestFriend).toHaveBeenCalledTimes(0);
+  });
+
+  test('getRecommendedJobs: Invalid Id', async () => {
+    await testInvalidUser('getRecommendedJobs');
+    expect(messenger.requestFriend).toHaveBeenCalledTimes(0);
+  });
+
   test('addFriend: Empty Ids', async () => {
     await testEmptyIds('addFriend');
     expect(messenger.requestFriend).toHaveBeenCalledTimes(0);
