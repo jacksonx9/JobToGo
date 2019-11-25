@@ -9,6 +9,7 @@ import Icon from 'react-native-vector-icons/Feather';
 
 import ErrorDisplay from '../../components/ErrorDisplay';
 import SelectableItem from '../../components/SelectableItem';
+import { JobDetailsExpanded } from '../../components/JobDetails';
 import InfoDisplay from '../../components/InfoDisplay';
 import Loader from '../../components/Loader';
 import NavHeader from '../../components/NavHeader';
