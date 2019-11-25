@@ -28,8 +28,8 @@ const styles = StyleSheet.create({
     marginBottom: 50,
   },
   button: {
+    height: 40,
     width: '90%',
-    marginTop: margin.md,
   },
   link: {
     fontFamily: fonts.normal,
@@ -42,16 +42,66 @@ const styles = StyleSheet.create({
   },
   warning: {
     fontFamily: fonts.normal,
-    fontSize: fonts.lg,
+    fontSize: fonts.sm,
     color: colours.red,
   },
   text: {
-    fontFamily: fonts.normal,
-    fontSize: fonts.lg,
+    marginTop: margin.xl,
+    fontFamily: fonts.bold,
+    fontSize: fonts.md,
+    marginBottom: margin.sm,
     color: colours.gray,
   },
   errorDisplay: {
     height: '90%',
+  },
+  profileContainer: {
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: '100%',
+    width: 200,
+    padding: padding.sm,
+  },
+  centeredText: {
+    fontFamily: fonts.bold,
+    fontSize: fonts.md,
+    color: colours.gray,
+    marginTop: margin.lg,
+    textAlign: 'center',
+  },
+  centeredTextLarge: {
+    fontFamily: fonts.bold,
+    fontSize: fonts.lg,
+    color: colours.gray,
+    marginTop: margin.lg,
+    textAlign: 'center',
+  },
+  title: {
+    fontFamily: fonts.extraBold,
+    color: colours.primary,
+    fontSize: fonts.xl,
+    marginBottom: margin.md,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    height: 40,
+    width: '100%',
+  },
+  navLinksContainer: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '35%',
+    width: '100%',
+  },
+  infoContainer: {
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    height: '50%',
+    width: '100%',
   },
 });
 

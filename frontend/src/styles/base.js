@@ -11,6 +11,7 @@ export const colours = {
   primary: '#2564C2',
   secondary: '#b9cbeb',
   accentPrimary: '#f4775a',
+  accentSecondary: '#ffbdad',
   gray: '#696969',
   lightGray: '#a6a6a6',
   lighterGray: '#ededed',
@@ -41,6 +42,7 @@ export const border = {
 };
 
 export const elevation = {
+  sm: 6,
   md: 10,
   lg: 20,
 };

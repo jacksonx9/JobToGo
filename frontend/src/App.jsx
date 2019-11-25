@@ -3,6 +3,7 @@ import { Platform, Alert, YellowBox } from 'react-native';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
+import { createDrawerNavigator } from 'react-navigation-drawer';
 import Icon from 'react-native-vector-icons/Feather';
 import firebase from 'react-native-firebase';
 import Logger from 'js-logger';
@@ -133,7 +134,7 @@ export default class App extends React.Component {
       return (<Icon name="upload" size={sizes.icon} color={tintColor} />);
     }
 
-    const TabStack = createBottomTabNavigator(
+    const Home = createBottomTabNavigator(
       {
         Home: {
           screen: props => <JobSwipe {...props} socket={this.socket} />,
@@ -181,29 +182,30 @@ export default class App extends React.Component {
       navConfig,
     );
 
-    const ProfileStack = createStackNavigator(
+    const ProfileStack = createDrawerNavigator(
       {
-        Profile,
+        Home,
         UpdateUserName,
         UpdatePassword,
         KeywordList,
       },
-      navConfig,
-    );
-
-    const AppStack = createStackNavigator(
       {
-        TabStack,
-        ProfileStack,
+        drawerPosition: 'right',
+        drawerWidth: 200,
+        drawerBackgroundColor: colours.white,
+        contentComponent: Profile,
+        headerMode: 'none',
+        navigationOptions: {
+          headerVisible: false,
+        },
       },
-      navConfig,
     );
 
     const AppContainer = createAppContainer(
       createSwitchNavigator(
         {
           Auth: AuthStack,
-          App: AppStack,
+          App: ProfileStack,
         },
         {
           initialRouteName: 'Auth',

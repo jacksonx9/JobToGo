@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-  View, Image, Text, TextInput,
+  View, Text, TextInput,
 } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
@@ -12,7 +12,6 @@ import config from '../../constants/config';
 import { errors } from '../../constants/messages';
 import styles from './styles';
 import { colours } from '../../styles';
-import images from '../../constants/images';
 
 export default class UpdateUserName extends Component {
   constructor(props) {
@@ -42,8 +41,7 @@ export default class UpdateUserName extends Component {
       await axios.put(`${config.ENDP_UPDATE_USERNAME}${userId}`, {
         userName,
       });
-      this.logger.info('actually didnt fail');
-      navigation.navigate('Profile');
+      navigation.goBack();
     } catch (e) {
       if (!e.response || e.response.data.status !== 400) {
         this.setState({
@@ -74,12 +72,8 @@ export default class UpdateUserName extends Component {
           displayText={errorDisplayText}
           style={styles.errorDisplay}
         />
-        <Image
-          source={images.checkingDoc}
-          style={styles.image}
-        />
         <Text style={styles.text}>
-          Change your account settings
+          Enter a new username
         </Text>
         <TextInput
           style={styles.inputContainer}

@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     marginRight: margin.lg,
   },
   descriptionText: {
-    fontSize: fonts.sm,
+    fontSize: fonts.md,
     fontFamily: fonts.bold,
   },
   topLineContainer: {
@@ -75,6 +75,17 @@ const styles = StyleSheet.create({
   infoContainer: {
     flexDirection: 'column',
     flex: 1,
+  },
+  containerShort: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 60,
+    width: '45%',
+    paddingHorizontal: padding.md,
+    margin: margin.xs,
+    marginLeft: margin.xs + 3,
+    borderRadius: border.radius,
+    elevation: 8,
   },
 });
 

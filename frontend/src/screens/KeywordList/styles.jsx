@@ -36,7 +36,8 @@ const styles = StyleSheet.create({
     width: '50%',
   },
   button: {
-    width: '90%',
+    width: '20%',
+    marginLeft: margin.xs,
     marginBottom: margin.sm,
   },
   bigText: {
@@ -52,13 +53,13 @@ const styles = StyleSheet.create({
   listContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    height: '65%',
+    height: '72%',
     width: '100%',
     backgroundColor: colours.white,
   },
   inputContainer: {
     height: 50,
-    width: '90%',
+    width: '70%',
     marginBottom: margin.sm,
     paddingHorizontal: padding.sm,
     borderRadius: border.radius,
@@ -67,11 +68,17 @@ const styles = StyleSheet.create({
   },
   warning: {
     fontFamily: fonts.normal,
-    fontSize: fonts.lg,
+    fontSize: fonts.sm,
     color: colours.red,
   },
   errorDisplay: {
     height: '90%',
+  },
+  addSkillSection: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    maxHeight: '20%',
+    width: '100%',
   },
 });
 

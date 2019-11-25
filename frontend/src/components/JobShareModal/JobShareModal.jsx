@@ -6,7 +6,7 @@ import {
 import Modal from 'react-native-modal';
 
 import ErrorDisplay from '../ErrorDisplay';
-import SelectableItem from '../SelectableItem';
+import { SelectableItemLong } from '../SelectableItem';
 import ImageButton from '../ImageButton';
 import images from '../../constants/images';
 import { colours } from '../../styles';
@@ -36,7 +36,7 @@ const JobShareModal = ({
           onPress={onPressExit}
         />
       </View>
-      <SelectableItem
+      <SelectableItemLong
         header={jobTitle}
         subHeader={jobCompany}
         onPress={() => {}}
@@ -56,10 +56,10 @@ const JobShareModal = ({
           keyExtractor={item => item._id}
           extraData={extraData}
           renderItem={({ item, index }) => (
-            <SelectableItem
+            <SelectableItemLong
               key={item._id}
               header={item.userName}
-              subHeader={item.sharedJob ? 'shared' : 'not shared'}
+              subHeader={item.sharedJob ? 'Shared' : 'Not shared'}
               iconName={icons.send}
               onPress={() => onPressSend(item, jobId, index)}
               noButton={item.sharedJob}

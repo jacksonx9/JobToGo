@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import Logger from 'js-logger';
 import axios from 'axios';
 import { GoogleSignin } from 'react-native-google-signin';
@@ -12,6 +12,8 @@ import config from '../../constants/config';
 import { errors } from '../../constants/messages';
 import styles from './styles';
 import { colours } from '../../styles';
+import IconButton from '../../components/IconButton';
+import icons from '../../constants/icons';
 
 export default class Profile extends Component {
   constructor(props) {
@@ -54,54 +56,59 @@ export default class Profile extends Component {
 
     if (loading) return <Loader />;
     return (
-      <View style={styles.container}>
-        <NavHeader
-          title="Account"
-          leftButtonOption="back"
-          onPressLeftButton={() => navigation.navigate('TabStack')}
-        />
-        <ErrorDisplay
-          showDisplay={showErrorDisplay}
-          setShowDisplay={show => this.setState({ showErrorDisplay: show })}
-          displayText={errorDisplayText}
-        />
-        <Text style={styles.text}>
-          {userName}
-        </Text>
-        <Text style={styles.text}>
-          {email}
-        </Text>
-        <Button
-          backgroundColor={colours.accentPrimary}
-          title="Update Username"
-          textColor={colours.white}
-          style={styles.button}
-          onPress={() => navigation.navigate('UpdateUserName')}
-        />
-        <Button
-          backgroundColor={colours.accentPrimary}
-          title="Update Password"
-          textColor={colours.white}
-          style={styles.button}
-          onPress={() => navigation.navigate('UpdatePassword')}
-        />
-        <Text style={styles.text}>
-          Change your account settings
-        </Text>
-        <Button
-          backgroundColor={colours.accentPrimary}
-          title="Update Keywords"
-          textColor={colours.white}
-          style={styles.button}
-          onPress={() => navigation.navigate('KeywordList')}
-        />
-        <Button
-          backgroundColor={colours.accentPrimary}
-          title="Log Out"
-          textColor={colours.white}
-          style={styles.button}
-          onPress={async () => { await GoogleSignin.signOut(); navigation.navigate('Auth'); }}
-        />
+      <View style={styles.profileContainer}>
+        <View style={styles.infoContainer}>
+          <View style={styles.buttonContainer}>
+            <IconButton
+              name={icons.chevronRight}
+              color={colours.gray}
+              size={icons.md}
+              onPress={() => navigation.goBack()}
+            />
+          </View>
+          <Text style={styles.title}>Account</Text>
+          <ErrorDisplay
+            showDisplay={showErrorDisplay}
+            setShowDisplay={show => this.setState({ showErrorDisplay: show })}
+            displayText={errorDisplayText}
+          />
+          <Text style={styles.centeredTextLarge}>
+            {userName}
+          </Text>
+          <Text style={styles.centeredText}>
+            {email}
+          </Text>
+        </View>
+        <View style={styles.navLinksContainer}>
+          <Button
+            backgroundColor={colours.white}
+            title="Update Username"
+            textColor={colours.primary}
+            style={styles.button}
+            onPress={() => navigation.navigate('UpdateUserName')}
+          />
+          <Button
+            backgroundColor={colours.white}
+            title="Update Password"
+            textColor={colours.primary}
+            style={styles.button}
+            onPress={() => navigation.navigate('UpdatePassword')}
+          />
+          <Button
+            backgroundColor={colours.white}
+            title="Update Keywords"
+            textColor={colours.primary}
+            style={styles.button}
+            onPress={() => navigation.navigate('KeywordList')}
+          />
+          <Button
+            backgroundColor={colours.white}
+            title="Log Out"
+            textColor={colours.accentPrimary}
+            style={styles.button}
+            onPress={async () => { await GoogleSignin.signOut(); navigation.navigate('Auth'); }}
+          />
+        </View>
       </View>
     );
   }

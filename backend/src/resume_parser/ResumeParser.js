@@ -3,10 +3,12 @@ import stopword from 'stopword';
 import axios from 'axios';
 import multer from 'multer';
 import Logger from 'js-logger';
+import vision from '@google-cloud/vision';
 
 import { Users } from '../schema';
 import Response from '../types';
-import credentials from '../../credentials/dandelion';
+import dandelionCredentials from '../../credentials/dandelion';
+import firebaseCredentials from '../../credentials/firebase';
 
 const EXTRACTION_ENDPOINT = 'https://api.dandelion.eu/datatxt/nex/v1/';
 const MIN_CONFIDENCE = 0.8; // Min confidence to accept keyword
@@ -16,12 +18,15 @@ const MAX_KEYWORD_LENGTH = 20;
 // Dandelion API request URI has a maximum length of 4096 characters
 export const MAX_REQUEST_URI_LENGTH = 4096;
 const MAX_REQUEST_TEXT_LENGTH = MAX_REQUEST_URI_LENGTH
-  - (EXTRACTION_ENDPOINT.length + credentials.token.length + String(MIN_CONFIDENCE).length + 29);
+  - (EXTRACTION_ENDPOINT.length + dandelionCredentials.token.length + String(MIN_CONFIDENCE).length + 29);
 
 class ResumeParser {
   constructor(app, user) {
     this.logger = Logger.get(this.constructor.name);
     this.user = user;
+    this.client = new vision.ImageAnnotatorClient({
+      credentials: firebaseCredentials,
+    });
 
     // Upload resume as multipart form data
     const upload = multer();
@@ -32,16 +37,13 @@ class ResumeParser {
   }
 
   async handleResume(userId, resume) {
+    let textResult;
     if (!userId || !resume) {
       return new Response(false, 'Invalid userId or resume', 400);
     }
 
     const { originalname, buffer, mimetype } = resume;
     this.logger.info(`Received: ${originalname}`);
-
-    if (mimetype !== 'application/pdf') {
-      return new Response(false, 'Invalid PDF', 400);
-    }
 
     // Verify user is valid before starting to parse
     try {
@@ -50,8 +52,15 @@ class ResumeParser {
       return new Response(false, 'Invalid userId or resume', 400);
     }
 
-    // Parse text out of resume
-    const textResult = await this.parse(buffer);
+    // If valid input, parse text out of resume
+    if (mimetype === 'application/pdf') {
+      textResult = await this.parsePdf(buffer);
+    } else if (mimetype.startsWith('image')) {
+      textResult = await this.parseImage(buffer);
+    } else {
+      return new Response(false, 'Invalid PDF or image', 400);
+    }
+
     if (textResult.status !== 200) {
       return textResult;
     }
@@ -67,24 +76,41 @@ class ResumeParser {
     return updateResult;
   }
 
-  async parse(buffer) {
+  async parsePdf(buffer) {
     let resume;
+
     try {
       resume = await pdfparse(buffer);
     } catch (e) {
       return new Response(false, 'Invalid PDF', 400);
     }
 
-    // Remove all non-ascii characters, excess spaces, and stopwords
-    const text = stopword.removeStopwords(resume.text
-      .replace(/[^ -~]/g, ' ')
+    return this._removeStopWords(resume.text);
+  }
+
+  async parseImage(buffer) {
+    const request = {
+      image: buffer,
+    };
+
+    try {
+      const [result] = await this.client.textDetection(request);
+      return this._removeStopWords(result.fullTextAnnotation.text);
+    } catch (e) {
+      return new Response(false, 'Invalid image', 400);
+    }
+  }
+
+  // Remove all non-ascii characters, excess spaces, and stopwords
+  _removeStopWords(text) {
+    const parsedText = stopword.removeStopwords(text
       .replace(/[^\w.\-+]/g, ' ')
       .replace(/[ ]{2,}/g, ' ')
       .trim()
       .toLowerCase()
       .split(' ')).join(' ');
 
-    return new Response(text, '', 200);
+    return new Response(parsedText, '', 200);
   }
 
   async extract(text) {
@@ -93,15 +119,20 @@ class ResumeParser {
       if (attempts >= REQUEST_MAX_ATTEMPTS) {
         return null;
       }
-
       try {
+        let encodeURI = encodeURIComponent(inputText).substring(0, MAX_REQUEST_TEXT_LENGTH);
+        while (encodeURI.length >= 2
+          && (encodeURI[encodeURI.length - 1] === '%' || encodeURI[encodeURI.length - 2] === '%')) {
+          encodeURI = encodeURI.slice(0, -1);
+        }
+
         // TODO: Don't just remove all characters over the limit
         // API call to extract keywords
         const res = await axios.get(
           `${EXTRACTION_ENDPOINT}?`
           + `min_confidence=${String(MIN_CONFIDENCE)}&`
-          + `text=${encodeURIComponent(inputText).substring(0, MAX_REQUEST_TEXT_LENGTH)}&`
-          + `token=${credentials.token}`,
+          + `text=${encodeURI}&`
+          + `token=${dandelionCredentials.token}`,
           { timeout: REQUEST_TIMEOUT },
         );
         return res.data;

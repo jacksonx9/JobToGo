@@ -1,18 +1,22 @@
 import React, { Component } from 'react';
-import { View, FlatList, Text } from 'react-native';
+import {
+  View, FlatList, Text, TouchableOpacity,
+} from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
 import Toast from 'react-native-simple-toast';
+import Icon from 'react-native-vector-icons/Feather';
 
 import ErrorDisplay from '../../components/ErrorDisplay';
-import SelectableItem from '../../components/SelectableItem';
+import { SelectableItemLong } from '../../components/SelectableItem';
+import InfoDisplay from '../../components/InfoDisplay';
 import Loader from '../../components/Loader';
 import NavHeader from '../../components/NavHeader';
-import Button from '../../components/Button';
 import config from '../../constants/config';
 import { errors, status } from '../../constants/messages';
 import styles from './styles';
 import { colours } from '../../styles';
+import icons from '../../constants/icons';
 
 export default class SendLikedJobs extends Component {
   constructor(props) {
@@ -137,51 +141,48 @@ export default class SendLikedJobs extends Component {
           testID="navHeaderLiked"
           title="Liked Jobs"
           rightButtonOption="menu"
-          onPressRightButton={() => navigation.navigate('Profile')}
+          onPressRightButton={() => navigation.openDrawer()}
         />
         <ErrorDisplay
           showDisplay={showErrorDisplay}
           setShowDisplay={show => this.setState({ showErrorDisplay: show })}
           displayText={errorDisplayText}
         />
-        <View style={styles.buttonSection}>
-          <View style={styles.infoContainer}>
-            <Text style={styles.bigText}>
-              {`${likedJobs.length} jobs`}
-            </Text>
-            <Text style={styles.normalText}>
-            are ready to be emailed
-            </Text>
-          </View>
-          <View styles={[styles.buttonContainer]}>
-            <Button
-              testID="sendJobs"
-              textColor={colours.white}
-              backgroundColor={colours.accentPrimary}
-              title="Send Jobs"
-              style={[styles.button]}
-              onPress={this.sendLikedJobs}
-            />
-          </View>
-        </View>
+        <TouchableOpacity
+          style={styles.buttonSection}
+          testID="sendJobs"
+          onPress={this.sendLikedJobs}
+        >
+          <Text style={styles.bigText}>
+            {`${likedJobs.length}`}
+          </Text>
+          <Icon
+            name={icons.send}
+            color={colours.white}
+            size={icons.lg}
+          />
+        </TouchableOpacity>
         <View style={styles.listContainer}>
-          <FlatList
-            testID="likedJobs"
-            showsVerticalScrollIndicator={false}
-            data={likedJobs}
-            keyExtractor={item => item._id}
-            renderItem={({ item, index }) => (
-              <SelectableItem
-                testID={`jobItem${index}`}
-                key={item._id}
-                header={item.company}
-                subHeader={item.title}
-                onPress={() => this.removeLikedJob(item, index)}
-                actionIcon="x"
-                imageSource={item.logo}
+          {likedJobs.length === 0 ? <InfoDisplay message={status.noLikedJobs} />
+            : (
+              <FlatList
+                testID="likedJobs"
+                showsVerticalScrollIndicator={false}
+                data={likedJobs}
+                keyExtractor={item => item._id}
+                renderItem={({ item, index }) => (
+                  <SelectableItemLong
+                    testID={`jobItem${index}`}
+                    key={item._id}
+                    header={item.company}
+                    subHeader={item.title}
+                    onPress={() => this.removeLikedJob(item, index)}
+                    actionIcon="x"
+                    imageSource={item.logo}
+                  />
+                )}
               />
             )}
-          />
         </View>
       </View>
     );

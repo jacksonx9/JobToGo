@@ -7,7 +7,7 @@ import Toast from 'react-native-simple-toast';
 
 import ErrorDisplay from '../../components/ErrorDisplay';
 import Search from '../../components/Search';
-import SelectableItem from '../../components/SelectableItem';
+import {SelectableItemLong} from '../../components/SelectableItem';
 import Loader from '../../components/Loader';
 import InfoDisplay from '../../components/InfoDisplay';
 import OptionsModal from '../../components/OptionsModal';
@@ -246,7 +246,7 @@ export default class EditFriends extends Component {
         data={users}
         keyExtractor={item => item._id}
         renderItem={({ item, index }) => (
-          <SelectableItem
+          <SelectableItemLong
             testID={`userItem${index}`}
             key={item._id}
             header={item.userName}
@@ -267,13 +267,16 @@ export default class EditFriends extends Component {
       data={pendingFriends}
       keyExtractor={item => item._id}
       renderItem={({ item, index }) => (
-        <SelectableItem
+        <SelectableItemLong
           testID={`userItem${index}`}
           key={item._id}
           header={item.userName}
           subHeader={item.email}
-          onPress={() => this.openOptionsModal(index)}
-          iconName={icons.moreVertical}
+          onPress={() => this.comfirmFriendRequest(item, index)}
+          iconName={icons.check}
+          enableButton2
+          iconName2={icons.x}
+          onPress2={() => this.removeFriendRequest(item, index)}
         />
       )}
     />
@@ -286,7 +289,7 @@ export default class EditFriends extends Component {
       data={friends}
       keyExtractor={item => item._id}
       renderItem={({ item, index }) => (
-        <SelectableItem
+        <SelectableItemLong
           testID={`userItem${index}`}
           key={item._id}
           header={item.userName}
@@ -373,7 +376,7 @@ export default class EditFriends extends Component {
             searchText: '',
           })}
           rightButtonOption="menu"
-          onPressRightButton={() => navigation.navigate('Profile')}
+          onPressRightButton={() => navigation.openDrawer()}
         />
         <SwitchableNav
           showNavOption1={showPendingFriends}

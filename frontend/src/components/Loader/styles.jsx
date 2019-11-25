@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: dimensions.screenHeight,
     width: dimensions.fullWidth,
-    backgroundColor: colours.primary,
+    backgroundColor: colours.white,
   },
   image: {
     height: 140,

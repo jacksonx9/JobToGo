@@ -1,4 +1,3 @@
-
 import React, { Component } from 'react';
 import { View } from 'react-native';
 import axios from 'axios';
@@ -29,7 +28,8 @@ export default class JobSwipe extends Component {
       sharedJobIndex: 0,
       friends: [],
       loading: true,
-      isSharedJobsView: false,
+      showSharedJobsView: false,
+      showJobDetails: false,
       isJobShareModalVisible: false,
       showErrorDisplay: false,
       errorDisplayText: errors.default,
@@ -54,8 +54,9 @@ export default class JobSwipe extends Component {
     socket.on(config.SOCKET_SHARED, data => this.updateSharedJobs(data));
     socket.on(config.SOCKET_FRIENDS, data => this.updateFriends(data));
 
-    this.fetchJobs(userId, this.jobTypes.MATCHED);
-    this.fetchFriends(userId);
+    await this.fetchFriends(userId);
+    await this.fetchMatchedJobs(userId, false);
+    await this.fetchSharedJobs(userId);
   }
 
   fetchFriends = async userId => {
@@ -131,32 +132,45 @@ export default class JobSwipe extends Component {
     return logoJobs;
   }
 
-  fetchJobs = async (userId, jobType) => {
+  fetchMatchedJobs = async userId => {
     this.setState({
       loading: true,
     });
 
     try {
-      const fetchSharedJobs = (jobType === this.jobTypes.SHARED);
-
-      const jobsResp = await axios.get(
-        `${fetchSharedJobs ? config.ENDP_SHARED_JOBS : config.ENDP_JOBS_FIND}${userId}`,
-      );
+      const jobsResp = await axios.get(`${config.ENDP_JOBS_FIND}${userId}`)
+        .catch(e => this.logger.error(e));
       const jobs = await this.fetchLogos(jobsResp.data.result);
 
-      if (fetchSharedJobs) {
-        this.setState({
-          loading: false,
-          sharedJobs: jobs,
-          sharedJobIndex: 0,
-        });
-      } else {
-        this.setState({
-          loading: false,
-          matchedJobs: jobs,
-          matchedJobIndex: 0,
-        });
-      }
+      this.setState({
+        loading: false,
+        matchedJobs: jobs.map(job => ({ ...job, showDetails: false })),
+        matchedJobIndex: 0,
+      });
+    } catch (e) {
+      this.setState({
+        loading: false,
+        showErrorDisplay: true,
+        errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
+      });
+    }
+  }
+
+  fetchSharedJobs = async (userId, shouldLoad = true) => {
+    this.setState({
+      loading: shouldLoad,
+    });
+
+    try {
+      const jobsResp = await axios.get(`${config.ENDP_SHARED_JOBS}${userId}`)
+        .catch(e => this.logger.error(e));
+      const jobs = await this.fetchLogos(jobsResp.data.result);
+
+      this.setState({
+        loading: false,
+        sharedJobs: jobs.map(job => ({ ...job, showDetails: false })),
+        sharedJobIndex: 0,
+      });
     } catch (e) {
       this.setState({
         loading: false,
@@ -173,9 +187,11 @@ export default class JobSwipe extends Component {
   }
 
   toggleSharedJobsView = () => {
-    const { isSharedJobsView } = this.state;
-    this.fetchJobs(global.userId, this.jobTypes.SHARED);
-    this.setState({ isSharedJobsView: !isSharedJobsView });
+    const { showSharedJobsView } = this.state;
+    this.fetchSharedJobs(global.userId);
+    this.setState({
+      showSharedJobsView: !showSharedJobsView,
+    });
   }
 
   shareJob = async (friend, jobId, index) => {
@@ -281,17 +297,56 @@ export default class JobSwipe extends Component {
     return this.swipeMatchedJob(jobs, jobIndex, swipeAction, userId);
   }
 
+  showJobDetails = (jobs, jobIndex, jobType) => {
+    const { showJobDetails } = this.state;
+    if (!showJobDetails) {
+      const updatedJobs = JSON.parse(JSON.stringify(jobs));
+      updatedJobs[jobIndex].showDetails = true;
+
+      if (jobType === this.jobTypes.MATCHED) {
+        this.setState({
+          matchedJobs: updatedJobs,
+          showJobDetails: true,
+        });
+      } else {
+        this.setState({
+          sharedJobs: updatedJobs,
+          showJobDetails: true,
+        });
+      }
+    }
+  }
+
+  hideJobDetails = (jobs, jobIndex, jobType) => {
+    const updatedJobs = JSON.parse(JSON.stringify(jobs));
+    updatedJobs[jobIndex].showDetails = false;
+
+    if (jobType === this.jobTypes.MATCHED) {
+      this.setState({
+        matchedJobs: updatedJobs,
+        showJobDetails: false,
+      });
+    } else {
+      this.setState({
+        sharedJobs: updatedJobs,
+        showJobDetails: false,
+      });
+    }
+  }
+
   render() {
     const {
-      loading, isSharedJobsView, isJobShareModalVisible, matchedJobs, matchedJobIndex,
-      sharedJobs, sharedJobIndex, friends, showErrorDisplay, errorDisplayText,
+      loading, isJobShareModalVisible, matchedJobs, matchedJobIndex,
+      sharedJobs, sharedJobIndex, friends, showJobDetails, showSharedJobsView,
+      showErrorDisplay, errorDisplayText,
     } = this.state;
     const { navigation } = this.props;
-    const jobs = isSharedJobsView ? sharedJobs : matchedJobs;
-    const jobIndex = isSharedJobsView ? sharedJobIndex : matchedJobIndex;
-    const jobType = isSharedJobsView ? this.jobTypes.SHARED : this.jobTypes.MATCHED;
+    const jobs = showSharedJobsView ? sharedJobs : matchedJobs;
+    const jobIndex = showSharedJobsView ? sharedJobIndex : matchedJobIndex;
+    const jobType = showSharedJobsView ? this.jobTypes.SHARED : this.jobTypes.MATCHED;
     const job = jobs[jobIndex];
-    const buttonIcon = isSharedJobsView ? icons.chevronLeft : icons.inbox;
+    const buttonIcon = showSharedJobsView ? icons.chevronLeft : icons.inbox;
+    const showInboxBadge = sharedJobs.length > 0 && !showSharedJobsView;
 
     if (loading) return <Loader />;
 
@@ -300,7 +355,8 @@ export default class JobSwipe extends Component {
         <MainHeader
           buttonIcon={buttonIcon}
           onPressLeft={() => this.toggleSharedJobsView()}
-          onPressRight={() => navigation.navigate('Profile')}
+          onPressRight={() => navigation.openDrawer()}
+          showBadge={showInboxBadge}
         />
         <ErrorDisplay
           showDisplay={showErrorDisplay}
@@ -308,11 +364,14 @@ export default class JobSwipe extends Component {
           displayText={errorDisplayText}
           style={styles.errorDisplay}
         />
-        {jobs.length === 0
+        {(jobs.length === 0 && showSharedJobsView)
           ? <InfoDisplay message={status.noSharedJobs} />
           : (
             <Swiper
+              horizontalSwipe={!showJobDetails}
+              verticalSwipe={!showJobDetails}
               cards={jobs}
+              onTapCard={() => this.showJobDetails(jobs, jobIndex, jobType)}
               renderCard={posting => (
                 <JobCard
                   testID={`card${matchedJobs.indexOf(posting)}`}
@@ -321,7 +380,10 @@ export default class JobSwipe extends Component {
                   title={posting.title}
                   location={posting.location}
                   description={posting.description}
+                  showDetails={posting.showDetails}
                   onPressShare={() => this.openJobShareModal()}
+                  onPressInfo={() => this.showJobDetails(jobs, jobIndex, jobType)}
+                  onPressHide={() => this.hideJobDetails(jobs, jobIndex, jobType)}
                 />
               )}
               onSwipedLeft={() => this.swipeJob(jobs, jobIndex, jobType,
