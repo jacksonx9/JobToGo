@@ -87,7 +87,7 @@ describe('Resume Parser', () => {
     // Disable console log in pdfparse
     jest.spyOn(console, 'log').mockImplementation();
     const invalidPdf = fs.readFileSync(`${__dirname}/test_files/invalid.pdf`);
-    const response = new Response(false, 'Invalid PDF or image', 400);
+    const response = new Response(false, 'Invalid PDF', 400);
 
     expect(await resumeParser.parsePdf(123)).toEqual(response);
     expect(await resumeParser.parsePdf('test')).toEqual(response);
@@ -177,12 +177,12 @@ describe('Resume Parser', () => {
       originalname: 'text.txt',
       buffer: 'text',
       mimetype: 'text/plain',
-    })).toEqual(invalidPdfRes);
+    })).toEqual(invalidPdfOrImageRes);
     expect(await resumeParser.handleResume(userId, {
       originalname: 'invalid.pdf',
       buffer: invalidPdf,
       mimetype: 'application/pdf',
-    })).toEqual(invalidPdfOrImageRes);
+    })).toEqual(invalidPdfRes);
     expect(user.updateSkills).toHaveBeenCalledTimes(0);
   });
 

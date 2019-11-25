@@ -58,7 +58,7 @@ class ResumeParser {
     } else if (mimetype.startsWith('image')) {
       textResult = await this.parseImage(buffer);
     } else {
-      return new Response(false, 'Invalid PDF', 400);
+      return new Response(false, 'Invalid PDF or image', 400);
     }
 
     if (textResult.status !== 200) {
@@ -82,7 +82,7 @@ class ResumeParser {
     try {
       resume = await pdfparse(buffer);
     } catch (e) {
-      return new Response(false, 'Invalid PDF or image', 400);
+      return new Response(false, 'Invalid PDF', 400);
     }
 
     return this._removeStopWords(resume.text);
