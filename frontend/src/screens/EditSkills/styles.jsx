@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 import {
-  containers, padding, margin, fonts, colours,
+  containers, padding, margin, elevation, fonts, colours,
 } from '../../styles';
 
 const styles = StyleSheet.create({
@@ -11,10 +11,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: padding.xxl,
   },
-  button: {
-    width: '100%',
-    marginTop: margin.md,
-    marginBottom: margin.sm,
+  buttonRow: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  buttonSection: {
+    height: 60,
+    width: 60,
+    justifyContent: 'center',
+    flexDirection: 'column',
+    alignItems: 'center',
+    borderRadius: 50,
+    backgroundColor: colours.accentPrimary,
+    zIndex: 4,
+    elevation: elevation.sm,
+    marginLeft: margin.sm,
+    marginRight: margin.sm,
   },
   image: {
     resizeMode: 'contain',

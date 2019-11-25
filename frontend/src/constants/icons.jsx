@@ -16,6 +16,8 @@ const icons = {
   job: 'briefcase',
   map: 'map-pin',
   info: 'info',
+  camera: 'camera',
+  upload: 'upload',
 };
 
 export default icons;
