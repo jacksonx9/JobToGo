@@ -146,8 +146,8 @@ class User {
   // return: userId if succeeds and null otherwise
   async createUser(userData) {
     if (!userData || !userData.credentials || !userData.credentials.email
-      || !userData.credentials.userName) {
-      return new Response(null, 'Invalid format, email, or userName', 400);
+      || !userData.credentials.userName || !userData.credentials.firebaseToken) {
+      return new Response(null, 'Invalid format, email, firebase token, or userName', 400);
     }
 
     // TODO: validation of password strength
