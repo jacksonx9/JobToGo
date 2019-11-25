@@ -125,7 +125,7 @@ export default class KeywordList extends Component {
     return (
       <View style={styles.container} testID="keywords">
         <NavHeader
-          testID="navHeaderKeyword"
+          testID="navHeaderKeywords"
           title="Keywords"
           leftButtonOption="back"
           onPressLeftButton={() => navigation.goBack()}

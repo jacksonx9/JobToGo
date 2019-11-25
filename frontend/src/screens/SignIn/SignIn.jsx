@@ -44,11 +44,6 @@ export default class SignIn extends Component {
     }
     this.setState({ emptyField: false });
 
-    if (userName === 'secretUsername' && password === 'secretPassword') {
-      global.userId = '5dd9b719146de1002e5c2517';
-      navigation.navigate('App');
-    }
-
     this.logger.info(`Firebase token: ${firebaseToken}`);
 
     try {
@@ -102,7 +97,7 @@ export default class SignIn extends Component {
         />
         <View style={styles.divider} />
         <TextInput
-          testID="email"
+          testID="usernameSignIn"
           style={styles.inputContainer}
           placeholder="Username"
           value={userName}
@@ -110,13 +105,13 @@ export default class SignIn extends Component {
           onChangeText={text => { this.setState({ userName: text, invalidLogin: false }); }}
         />
         <TextInput
-          testID="password"
+          testID="passwordSignIn"
           style={styles.inputContainer}
           placeholder="Password"
           value={password}
           secureTextEntry={showPassword}
           placeholderTextColor={colours.lightGray}
-          onChangeText={text => { this.setState({ password: text, invalidLogin: false }); }}
+          onChangeText={text => { this.setState({ password: text, invalidLogin: false, emptyField: false }); }}
         />
         <TouchableOpacity
           onPress={this.togglePasswordView}
@@ -131,8 +126,13 @@ export default class SignIn extends Component {
           style={styles.button}
           onPress={this.signIn}
         />
-        <Text style={styles.warning}>{invalidLogin ? 'Invalid Login' : ''}</Text>
-        <Text style={styles.warning}>{emptyField ? 'Fields must not be empty' : ''}</Text>
+        <TouchableOpacity
+          onPress={() => { navigation.navigate('SignUp'); }}
+        >
+          <Text style={[styles.link]}>Forgot Password</Text>
+        </TouchableOpacity>
+        <Text style={styles.warning} testID="incorrectSignIn">{invalidLogin ? 'Invalid Login' : ''}</Text>
+        <Text style={styles.warning} testID="emptySignIn">{emptyField ? 'Fields must not be empty' : ''}</Text>
       </View>
     );
   }

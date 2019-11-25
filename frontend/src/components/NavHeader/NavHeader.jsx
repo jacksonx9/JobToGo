@@ -24,6 +24,7 @@ const NavHeader = ({
   } else if (leftButtonOption === 'back') {
     leftButton = (
       <IconButton
+        testID={`${testID}Back`}
         name="chevron-left"
         color={colours.lightGray}
         size={sizes.icon}
@@ -38,7 +39,7 @@ const NavHeader = ({
   if (rightButtonOption === 'menu') {
     rightButton = (
       <IconButton
-        testID="menu"
+        testID={`${testID}Menu`}
         name="menu"
         color={colours.lightGray}
         size={sizes.icon}

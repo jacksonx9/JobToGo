@@ -47,6 +47,7 @@ const SelectableItemShort = ({
           style={styles.buttonContainer}
         >
           <IconButton
+            testID={`${testID}Remove`}
             name={iconName}
             color={colours.lightGray}
             size={icons.sm}

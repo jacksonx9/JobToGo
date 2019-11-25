@@ -41,6 +41,7 @@ export default class UpdateUserName extends Component {
       await axios.put(`${config.ENDP_UPDATE_USERNAME}${userId}`, {
         userName,
       });
+      this.setState({ userName: '' });
       navigation.goBack();
     } catch (e) {
       if (!e.response || e.response.data.status !== 400) {
@@ -62,6 +63,7 @@ export default class UpdateUserName extends Component {
     return (
       <View style={styles.container}>
         <NavHeader
+          testID="navHeaderUsername"
           title="Update Username"
           leftButtonOption="back"
           onPressLeftButton={() => navigation.goBack()}
@@ -76,6 +78,7 @@ export default class UpdateUserName extends Component {
           Enter a new username
         </Text>
         <TextInput
+          testID="usernameInput"
           style={styles.inputContainer}
           placeholder="New Username"
           value={userName}
@@ -86,14 +89,14 @@ export default class UpdateUserName extends Component {
           ? <Text style={styles.warning}>{`Username "${userName}" already taken`}</Text>
           : <Text />}
         <Button
+          testID="submitUsername"
           backgroundColor={colours.accentPrimary}
           title="Update Username"
           textColor={colours.white}
           style={styles.button}
           onPress={() => this.onPressUpdate()}
         />
-        {blank ? <Text style={styles.warning}>Fields must not be blank</Text>
-          : <Text />}
+        <Text style={styles.warning} testID="blankUsername">{blank ? 'Fields must not be blank' : ''}</Text>
       </View>
     );
   }

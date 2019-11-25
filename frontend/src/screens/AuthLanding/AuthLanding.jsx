@@ -113,7 +113,7 @@ export default class AuthLanding extends Component {
             onPress={() => navigation.navigate('SignIn')}
           />
           <Button
-            testID="signUp"
+            testID="signUpAuth"
             title="Sign Up"
             textColor={colours.accentPrimary}
             backgroundColor="transparent"

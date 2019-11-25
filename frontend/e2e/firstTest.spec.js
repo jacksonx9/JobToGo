@@ -3,9 +3,9 @@
 beforeEach(async () => {
   await device.reloadReactNative();
   await element(by.id('signInAuth')).tap();
-  element(by.id('email')).typeText('secretUsername\n');
-  await waitFor(element(by.id('password'))).toBeVisible().withTimeout(2000);
-  element(by.id('password')).typeText('secretPassword\n');
+  element(by.id('usernameSignIn')).typeText('jobtogo\n');
+  await waitFor(element(by.id('passwordSignIn'))).toBeVisible().withTimeout(2000);
+  element(by.id('passwordSignIn')).typeText('jobtogo\n');
   await waitFor(element(by.id('signIn'))).toBeVisible().withTimeout(2000);
   await element(by.id('signIn')).tap();
 });
@@ -20,32 +20,76 @@ describe('Auth Screens', () => {
 
     await element(by.id('signInAuth')).tap();
     await expect(element(by.id('logoSignin'))).toBeVisible();
-    await expect(element(by.id('email'))).toBeVisible();
-    await expect(element(by.id('password'))).toBeVisible();
+    await expect(element(by.id('usernameSignIn'))).toBeVisible();
+    await expect(element(by.id('passwordSignIn'))).toBeVisible();
     await expect(element(by.id('signIn'))).toBeVisible();
   });
 
   it('Correct login sequence', async () => {
     await device.reloadReactNative();
     await element(by.id('signInAuth')).tap();
-    await element(by.id('email')).typeText('secretUsername\n');
-    await waitFor(element(by.id('password'))).toBeVisible().withTimeout(2000);
-    await element(by.id('password')).typeText('secretPassword\n');
+    await element(by.id('usernameSignIn')).typeText('jobtogo\n');
+    await waitFor(element(by.id('passwordSignIn'))).toBeVisible().withTimeout(2000);
+    await element(by.id('passwordSignIn')).typeText('jobtogo\n');
     await waitFor(element(by.id('signIn'))).toBeVisible().withTimeout(2000);
     await element(by.id('signIn')).tap();
     await waitFor(element(by.id('jobSwipe'))).toBeVisible();
   });
 
+  it('Blank login sequence', async () => {
+    await device.reloadReactNative();
+    await element(by.id('signInAuth')).tap();
+    await element(by.id('usernameSignIn')).typeText('\n');
+    await waitFor(element(by.id('passwordSignIn'))).toBeVisible().withTimeout(2000);
+    await element(by.id('passwordSignIn')).typeText('\n');
+    await waitFor(element(by.id('signIn'))).toBeVisible().withTimeout(2000);
+    await element(by.id('signIn')).tap();
+    await expect(element(by.id('emptySignIn'))).toBeVisible();
+  });
+
   it('Incorrect login sequence', async () => {
     await device.reloadReactNative();
     await element(by.id('signInAuth')).tap();
-    await element(by.id('email')).typeText('\n');
-    await waitFor(element(by.id('password'))).toBeVisible().withTimeout(2000);
-    await element(by.id('password')).typeText('\n');
+    await element(by.id('usernameSignIn')).typeText('random\n');
+    await waitFor(element(by.id('passwordSignIn'))).toBeVisible().withTimeout(2000);
+    await element(by.id('passwordSignIn')).typeText('random\n');
     await waitFor(element(by.id('signIn'))).toBeVisible().withTimeout(2000);
-    // await element(by.id('signIn')).tap();
-    // await expect(element(by.id('loginErrorMsg'))).toBeVisible();
-    // TODO: test for difference error responses
+    await element(by.id('signIn')).tap();
+    await expect(element(by.id('incorrectSignIn'))).toBeVisible();
+  });
+
+  it('Blank Sign Up', async () => {
+    await device.reloadReactNative();
+    await element(by.id('signUpAuth')).tap();
+    await waitFor(element(by.id('signUp'))).toBeVisible().withTimeout(2000);
+    await element(by.id('signUp')).tap();
+    await expect(element(by.id('blankSignUp'))).toBeVisible();
+  });
+
+  it('Invalid Email Sign Up', async () => {
+    await device.reloadReactNative();
+    await element(by.id('signUpAuth')).tap();
+    await element(by.id('emailSignUp')).typeText('info.jobtogo@gmail.com\n');
+    await waitFor(element(by.id('usernameSignUp'))).toBeVisible().withTimeout(2000);
+    await element(by.id('usernameSignUp')).typeText('jobtogo\n');
+    await waitFor(element(by.id('passwordSignUp'))).toBeVisible().withTimeout(2000);
+    await element(by.id('passwordSignUp')).typeText('jobtogo\n');
+    await waitFor(element(by.id('signUp'))).toBeVisible().withTimeout(2000);
+    await element(by.id('signUp')).tap();
+    await expect(element(by.id('incorrectEmailSignUp'))).toBeVisible();
+  });
+
+  it('Invalid Username Sign Up', async () => {
+    await device.reloadReactNative();
+    await element(by.id('signUpAuth')).tap();
+    await element(by.id('emailSignUp')).typeText('job@gmail.com\n');
+    await waitFor(element(by.id('usernameSignUp'))).toBeVisible().withTimeout(2000);
+    await element(by.id('usernameSignUp')).typeText('jobtogo\n');
+    await waitFor(element(by.id('passwordSignUp'))).toBeVisible().withTimeout(2000);
+    await element(by.id('passwordSignUp')).typeText('jobtogo\n');
+    await waitFor(element(by.id('signUp'))).toBeVisible().withTimeout(2000);
+    await element(by.id('signUp')).tap();
+    await expect(element(by.id('incorrectUsernameSignUp'))).toBeVisible();
   });
 });
 
@@ -89,7 +133,6 @@ describe('Liked Screen', () => {
   it('Check Liked components', async () => {
     await element(by.id('liked')).tap();
     await expect(element(by.id('navHeaderLiked'))).toBeVisible();
-    await expect(element(by.id('user'))).toBeVisible();
     await expect(element(by.text('Liked Jobs'))).toBeVisible();
 
     await expect(element(by.id('sendJobs'))).toBeVisible();
@@ -105,7 +148,6 @@ describe('Friends Screen', () => {
     // Nav header
     await expect(element(by.id('navHeaderFriends'))).toBeVisible();
     await expect(element(by.id('search'))).toBeVisible();
-    // await expect(element(by.id('user'))).toBeVisible();
 
     // Switch navigator
     await expect(element(by.id('switchNav'))).toBeVisible();
@@ -115,7 +157,7 @@ describe('Friends Screen', () => {
     await expect(element(by.text('Your Friends'))).toBeVisible();
 
     // User should have no pending friends
-    // await expect(element(by.id('infoDisplay'))).toBeVisible();
+    await expect(element(by.id('navHeaderFriends'))).toBeVisible();
   });
 
   it('Navigate between Pending/Your Friends', async () => {
@@ -124,7 +166,7 @@ describe('Friends Screen', () => {
     await element(by.id('switchNavOption1')).tap();
 
     // xfail once friends are added to user
-    // await expect(element(by.id('infoDisplay'))).toBeVisible();
+    await expect(element(by.id('navHeaderFriends'))).toBeVisible();
   });
 
   it('Display 100 friends', async () => {
@@ -160,6 +202,18 @@ describe('Friends Screen', () => {
     // Go back to previous screen
     await expect(element(by.id('editFriends'))).toBeVisible();
   });
+
+  it('Users search sequence', async () => {
+    await element(by.id('friends')).tap();
+    await element(by.id('search')).tap();
+
+    element(by.id('searchInput')).typeText('0\n');
+    await expect(element(by.text('friend'))).toBeVisible();
+    await element(by.id('searchBack')).tap();
+
+    // Go back to previous screen
+    await expect(element(by.id('editFriends'))).toBeVisible();
+  });
 });
 
 describe('Resume Page', () => {
@@ -190,3 +244,79 @@ describe('Navigation', () => {
     await expect(element(by.id('sendLikedJobs'))).toBeVisible();
   });
 });
+
+describe('DrawerNavigation', () => {
+  it('Open and Close Drawer', async () => {
+
+    await element(by.id('liked')).tap();
+    await expect(element(by.id('navHeaderLiked')));
+    await element(by.id('navHeaderLikedMenu')).tap();
+    await expect(element(by.id('userNameDisplay')));
+    await expect(element(by.id('emailDisplay')));
+    await element(by.id('closeDrawer')).tap();
+  });
+
+  it('Use Drawer Navigator', async () => {
+    await element(by.id('Profile')).tap();
+    await element(by.id('updateUserName')).tap();
+    await element(by.id('navHeaderUsernameBack')).tap();
+    await element(by.id('Profile')).tap();
+    await element(by.id('updatePassword')).tap();
+    await element(by.id('navHeaderPasswordBack')).tap();
+    await element(by.id('Profile')).tap();
+    await element(by.id('updateKeywords')).tap();
+    await element(by.id('navHeaderKeywordsBack')).tap();
+
+    await element(by.id('liked')).tap();
+    await expect(element(by.id('navHeaderLiked')));
+    await element(by.id('navHeaderLikedMenu')).tap();
+    await element(by.id('updateUserName')).tap();
+    await element(by.id('navHeaderUsernameBack')).tap();
+    await element(by.id('navHeaderLikedMenu')).tap();
+    await element(by.id('updatePassword')).tap();
+    await element(by.id('navHeaderPasswordBack')).tap();
+    await element(by.id('navHeaderLikedMenu')).tap();
+    await element(by.id('updateKeywords')).tap();
+    await element(by.id('navHeaderKeywordsBack')).tap();
+  });
+
+  it('Log Out', async () => {
+    await element(by.id('Profile')).tap();
+    await element(by.id('logOut')).tap();
+    await waitFor(element(by.id('logoLight'))).toBeVisible().withTimeout(4000);
+    await expect(element(by.id('jobSeeker'))).toBeVisible();
+    await expect(element(by.id('google'))).toBeVisible();
+    await expect(element(by.id('signInAuth'))).toBeVisible();
+  });
+});
+
+
+describe('DrawerPages', () => {
+  it('Update Username Page', async () => {
+    await element(by.id('Profile')).tap();
+    await element(by.id('updateUserName')).tap();
+    await expect(element(by.id('navHeaderUsername')));
+    await element(by.id('submitUsername')).tap();
+    await expect(element(by.id('blankUsername')));
+  });
+
+  it('Update Password Page', async () => {
+    await element(by.id('Profile')).tap();
+    await element(by.id('updatePassword')).tap();
+    await expect(element(by.id('navHeaderPassword')));
+    await element(by.id('submitPassword')).tap();
+    await expect(element(by.id('blankPassword')));
+  });
+
+  it('Keyword List Page', async () => {
+    await element(by.id('Profile')).tap();
+    await element(by.id('updateKeywords')).tap();
+    await element(by.id('keywordInput')).tap();
+    element(by.id('keywordInput')).typeText('newSkill\n');
+    await element(by.id('submitKeyword')).tap();
+    await element(by.id('keyword2Remove')).tap();
+    await expect(element(by.id('keyword2Remove'))).toBeNotVisible();
+  });
+});
+
+

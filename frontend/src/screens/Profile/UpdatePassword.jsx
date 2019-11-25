@@ -79,6 +79,7 @@ export default class UpdatePassword extends Component {
     return (
       <View style={styles.container}>
         <NavHeader
+          testID="navHeaderPassword"
           title="Update Password"
           leftButtonOption="back"
           onPressLeftButton={() => navigation.goBack()}
@@ -104,18 +105,15 @@ export default class UpdatePassword extends Component {
         >
           <Text style={styles.link}>{showPasswordText}</Text>
         </TouchableOpacity>
-        {invalidPassword
-          ? <Text style={styles.warning}>{`password "${password}" already taken`}</Text>
-          : <Text />}
         <Button
+          testID="submitPassword"
           backgroundColor={colours.accentPrimary}
           title="Update password"
           textColor={colours.white}
           style={styles.button}
           onPress={() => this.onPressUpdate()}
         />
-        {blank ? <Text style={styles.warning}>Fields must not be blank</Text>
-          : <Text />}
+        <Text style={styles.warning} testID="blankPassword">{blank ? 'Fields must not be blank' : ''}</Text>
       </View>
     );
   }

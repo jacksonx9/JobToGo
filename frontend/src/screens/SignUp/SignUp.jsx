@@ -110,6 +110,7 @@ export default class SignUp extends Component {
         />
         <View style={styles.divider} />
         <TextInput
+          testID="emailSignUp"
           style={styles.inputContainer}
           placeholder="Email"
           value={email}
@@ -117,18 +118,20 @@ export default class SignUp extends Component {
           onChangeText={text => { this.setState({ email: text, invalidEmail: false }); }}
         />
 
-        <Text style={styles.warning}>{invalidEmail ? `Email "${email}" already taken` : ''}</Text>
+        <Text style={styles.warning} testID="incorrectEmailSignUp">{invalidEmail ? `Email "${email}" already taken` : ''}</Text>
         <TextInput
+          testID="usernameSignUp"
           style={styles.inputContainer}
           placeholder="Username"
           value={userName}
           placeholderTextColor={colours.lightGray}
           onChangeText={text => { this.setState({ userName: text, invalidUserName: false }); }}
         />
-        <Text style={styles.warning}>
+        <Text style={styles.warning} testID="incorrectUsernameSignUp">
           {invalidUserName ? `Username "${userName}" already taken` : ''}
         </Text>
         <TextInput
+          testID="passwordSignUp"
           style={styles.inputContainer}
           placeholder="Password"
           value={password}
@@ -144,13 +147,14 @@ export default class SignUp extends Component {
         </TouchableOpacity>
 
         <Button
+          testID="signUp"
           title="Sign Up"
           textColor={colours.white}
           backgroundColor={colours.accentPrimary}
           style={styles.button}
           onPress={this.onPressSignUp}
         />
-        <Text style={styles.warning}>{emptyField ? 'Fields must not be empty' : ''}</Text>
+        <Text style={styles.warning} testID="blankSignUp">{emptyField ? 'Fields must not be empty' : ''}</Text>
       </View>
     );
   }

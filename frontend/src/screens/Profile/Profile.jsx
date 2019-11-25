@@ -59,6 +59,7 @@ export default class Profile extends Component {
         <View style={styles.infoContainer}>
           <View style={styles.buttonContainer}>
             <IconButton
+              testID="closeDrawer"
               name={icons.chevronRight}
               color={colours.gray}
               size={icons.md}
@@ -71,15 +72,20 @@ export default class Profile extends Component {
             setShowDisplay={show => this.setState({ showErrorDisplay: show })}
             displayText={errorDisplayText}
           />
-          <Text style={styles.centeredTextLarge}>
+          <Text
+            style={styles.centeredTextLarge}
+            testID="userNameDisplay">
             {userName}
           </Text>
-          <Text style={styles.centeredText}>
+          <Text
+            style={styles.centeredText}
+            testID="emailDisplay">
             {email}
           </Text>
         </View>
         <View style={styles.navLinksContainer}>
           <Button
+            testID="updateUserName"
             backgroundColor={colours.white}
             title="Update Username"
             textColor={colours.primary}
@@ -87,6 +93,7 @@ export default class Profile extends Component {
             onPress={() => navigation.navigate('UpdateUserName')}
           />
           <Button
+            testID="updatePassword"
             backgroundColor={colours.white}
             title="Update Password"
             textColor={colours.primary}
@@ -94,6 +101,7 @@ export default class Profile extends Component {
             onPress={() => navigation.navigate('UpdatePassword')}
           />
           <Button
+            testID="updateKeywords"
             backgroundColor={colours.white}
             title="Update Keywords"
             textColor={colours.primary}
@@ -101,11 +109,12 @@ export default class Profile extends Component {
             onPress={() => navigation.navigate('KeywordList')}
           />
           <Button
+            testID="logOut"
             backgroundColor={colours.white}
             title="Log Out"
             textColor={colours.accentPrimary}
             style={styles.button}
-            onPress={async () => { await GoogleSignin.signOut(); navigation.navigate('Auth'); }}
+            onPress={async () => { navigation.navigate('Auth'); await GoogleSignin.signOut(); }}
           />
         </View>
       </View>
