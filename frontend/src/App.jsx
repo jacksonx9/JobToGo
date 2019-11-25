@@ -192,7 +192,7 @@ export default class App extends React.Component {
       {
         drawerPosition: 'right',
         drawerWidth: 200,
-        drawerBackgroundColor: 'orange',
+        drawerBackgroundColor: colours.white,
         contentComponent: Profile,
         headerMode: 'none',
         navigationOptions: {

@@ -8,6 +8,7 @@ const icons = {
   send: 'send',
   moreVertical: 'more-vertical',
   chevronLeft: 'chevron-left',
+  chevronRight: 'chevron-right',
   chevronDown: 'chevron-down',
   inbox: 'inbox',
   check: 'check',
