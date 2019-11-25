@@ -37,6 +37,11 @@ class User {
       res.status(response.status).send(response);
     });
 
+    app.post('/users/keywords', async (req, res) => {
+      const response = await this.addKeyword(req.body.userId, req.body.keyword);
+      res.status(response.status).send(response);
+    });
+
     app.post('/users', async (req, res) => {
       const response = await this.createUser(req.body.userData);
       res.status(response.status).send(response);
@@ -305,7 +310,7 @@ class User {
             name: skill,
             score: 0,
             jobCount: 0,
-            timestamp: Date.now(),
+            timeStamp: Date.now(),
           });
         }
       });
@@ -318,6 +323,34 @@ class User {
       return new Response(true, '', 200);
     } catch (e) {
       return new Response(false, 'Invalid userId or skills', 400);
+    }
+  }
+
+  async addKeyword(userId, keyword) {
+    if (!userId || !keyword) {
+      return new Response(false, 'Invalid userId or keyword', 400);
+    }
+
+    try {
+      const user = await Users.findById(userId).orFail();
+      const keywordNames = new Set(user.keywords.map(k => k.name));
+
+
+      if (keywordNames.has(keyword)) {
+        return new Response(true, 'User already has this keyword', 400);
+      }
+
+      user.keywords.push({
+        name: keyword,
+        score: 0,
+        jobCount: 0,
+        timeStamp: Date.now(),
+      });
+
+      await user.save();
+      return new Response(true, '', 200);
+    } catch (e) {
+      return new Response(false, 'Invalid userId or keyword sss', 400);
     }
   }
 
