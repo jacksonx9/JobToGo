@@ -107,15 +107,19 @@ class JobShortLister {
   }
 
   async unseenJob(userId, jobId) {
-    const res = await this.removeJob(userId, jobId, true);
-
-    if (res.status !== 200) {
-      return res;
+    if (!userId || !jobId) {
+      return new Response(false, 'Invalid userId or jobId', 400);
     }
 
     try {
       const job = await Jobs.findById(jobId).orFail();
       const user = await Users.findById(userId).orFail();
+
+      if (!user.seenJobs.includes(jobId)) {
+        return new Response(false, 'Not a seen job', 400);
+      }
+
+      const isLikedJob = user.likedJobs.includes(job._id.toString());
 
       // Increment and decrement the user's keywords' score
       job.keywords.forEach((jobKeywordData) => {
@@ -124,7 +128,12 @@ class JobShortLister {
         ));
 
         if (userKeywordIdx !== -1) {
-          user.keywords[userKeywordIdx].score -= jobKeywordData.count;
+          // console.log(user.keywords[userKeywordIdx]);
+          if (isLikedJob) {
+            user.keywords[userKeywordIdx].score -= jobKeywordData.count;
+          } else {
+            user.keywords[userKeywordIdx].score += jobKeywordData.count;
+          }
           user.keywords[userKeywordIdx].jobCount -= 1;
         }
       });
@@ -133,13 +142,14 @@ class JobShortLister {
 
       await user.save();
 
-      return new Response(true, '', 200);
+      return await this.removeJob(userId, jobId, true);
     } catch (e) {
       return new Response(false, 'Invalid userId or jobId', 400);
     }
   }
 
   async removeJob(userId, jobId, removeFromSeen) {
+    assert(removeFromSeen === true || removeFromSeen === false);
     if (!userId || !jobId) {
       return new Response(false, 'Invalid userId or jobId', 400);
     }
@@ -149,7 +159,7 @@ class JobShortLister {
       await Jobs.findById(jobId).orFail();
 
       if (!user.seenJobs.includes(jobId)) {
-        return new Response(false, 'Not a liked job', 400);
+        return new Response(false, 'Not a seen job', 400);
       }
 
       if (user.likedJobs.includes(jobId)) {
