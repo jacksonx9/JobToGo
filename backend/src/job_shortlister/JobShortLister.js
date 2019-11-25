@@ -121,14 +121,13 @@ class JobShortLister {
 
       const isLikedJob = user.likedJobs.includes(job._id.toString());
 
-      // Increment and decrement the user's keywords' score
+      // Unincrement and undecrement the user's keywords' score
       job.keywords.forEach((jobKeywordData) => {
         const userKeywordIdx = user.keywords.findIndex(userKeywordData => (
           jobKeywordData.name === userKeywordData.name
         ));
 
         if (userKeywordIdx !== -1) {
-          // console.log(user.keywords[userKeywordIdx]);
           if (isLikedJob) {
             user.keywords[userKeywordIdx].score -= jobKeywordData.count;
           } else {
