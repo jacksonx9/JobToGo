@@ -117,11 +117,17 @@ class User {
       '_id credentials.userName friends',
     ).lean();
 
-    const users = potentialUsers.map(user => ({
-      _id: user._id,
-      userName: user.credentials.userName,
-      isFriend: user.friends.includes(userId),
-    }));
+    const users = potentialUsers.reduce((otherUsers, user) => {
+      if (user._id.toString() !== userId) {
+        otherUsers.push({
+          _id: user._id,
+          userName: user.credentials.userName,
+          isFriend: user.friends.includes(userId),
+        });
+      }
+
+      return otherUsers;
+    }, []);
 
     return new Response(users, '', 200);
   }
