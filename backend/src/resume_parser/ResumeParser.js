@@ -82,7 +82,7 @@ class ResumeParser {
     try {
       resume = await pdfparse(buffer);
     } catch (e) {
-      return new Response(false, 'Invalid PDF', 400);
+      return new Response(false, 'Invalid PDF or image', 400);
     }
 
     return this._removeStopWords(resume.text);
@@ -97,14 +97,15 @@ class ResumeParser {
       const [result] = await this.client.textDetection(request);
       return this._removeStopWords(result.fullTextAnnotation.text);
     } catch (e) {
-      return new Response(false, 'Invalid Image', 400);
+      return new Response(false, 'Invalid image', 400);
     }
   }
 
   // Remove all non-ascii characters, excess spaces, and stopwords
   _removeStopWords(text) {
     const parsedText = stopword.removeStopwords(text
-      .replace(/[^ -~\w.\-+]+[\r\n]+[ ]{2,}/g, ' ')
+      .replace(/[^\w.\-+]/g, ' ')
+      .replace(/[ ]{2,}/g, ' ')
       .trim()
       .toLowerCase()
       .split(' ')).join(' ');

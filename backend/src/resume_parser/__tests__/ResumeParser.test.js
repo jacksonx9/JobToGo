@@ -87,19 +87,19 @@ describe('Resume Parser', () => {
     // Disable console log in pdfparse
     jest.spyOn(console, 'log').mockImplementation();
     const invalidPdf = fs.readFileSync(`${__dirname}/test_files/invalid.pdf`);
-    const response = new Response(false, 'Invalid PDF', 400);
+    const response = new Response(false, 'Invalid PDF or image', 400);
 
-    expect(await resumeParser.parse(123)).toEqual(response);
-    expect(await resumeParser.parse('test')).toEqual(response);
-    expect(await resumeParser.parse({})).toEqual(response);
-    expect(await resumeParser.parse(invalidPdf)).toEqual(response);
+    expect(await resumeParser.parsePdf(123)).toEqual(response);
+    expect(await resumeParser.parsePdf('test')).toEqual(response);
+    expect(await resumeParser.parsePdf({})).toEqual(response);
+    expect(await resumeParser.parsePdf(invalidPdf)).toEqual(response);
   });
 
   test('parse: Empty PDF', async () => {
     const emptyPdf = fs.readFileSync(`${__dirname}/test_files/empty.pdf`);
     const response = new Response('', '', 200);
 
-    expect(await resumeParser.parse(emptyPdf)).toEqual(response);
+    expect(await resumeParser.parsePdf(emptyPdf)).toEqual(response);
     expect(stopword.removeStopwords).toHaveBeenCalledTimes(1);
     expect(stopword.removeStopwords).toHaveBeenCalledWith(['']);
   });
@@ -108,7 +108,7 @@ describe('Resume Parser', () => {
     const resume = fs.readFileSync(`${__dirname}/test_files/resume.pdf`);
     const response = new Response(testData.parsedResumeText, '', 200);
 
-    expect(await resumeParser.parse(resume)).toEqual(response);
+    expect(await resumeParser.parsePdf(resume)).toEqual(response);
     expect(stopword.removeStopwords).toHaveBeenCalledTimes(1);
     expect(stopword.removeStopwords).toHaveBeenCalledWith(testData.parsedResumeText.split(' '));
   });
@@ -170,18 +170,19 @@ describe('Resume Parser', () => {
     jest.spyOn(console, 'log').mockImplementation();
 
     const invalidPdf = fs.readFileSync(`${__dirname}/test_files/invalid.pdf`);
-    const response = new Response(false, 'Invalid PDF', 400);
+    const invalidPdfRes = new Response(false, 'Invalid PDF', 400);
+    const invalidPdfOrImageRes = new Response(false, 'Invalid PDF or image', 400);
 
     expect(await resumeParser.handleResume(userId, {
       originalname: 'text.txt',
       buffer: 'text',
       mimetype: 'text/plain',
-    })).toEqual(response);
+    })).toEqual(invalidPdfRes);
     expect(await resumeParser.handleResume(userId, {
       originalname: 'invalid.pdf',
       buffer: invalidPdf,
       mimetype: 'application/pdf',
-    })).toEqual(response);
+    })).toEqual(invalidPdfOrImageRes);
     expect(user.updateSkills).toHaveBeenCalledTimes(0);
   });
 
