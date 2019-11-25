@@ -276,7 +276,7 @@ export default class JobSwipe extends Component {
       });
 
       if (jobs.length === (oldIndex + 1)) {
-        this.fetchJobs(userId, this.jobTypes.MATCHED);
+        this.fetchMatchedJobs(userId, this.jobTypes.MATCHED);
       }
     } catch (e) {
       this.setState({
@@ -306,7 +306,7 @@ export default class JobSwipe extends Component {
       if (jobType === this.jobTypes.MATCHED) {
         this.setState({
           matchedJobs: updatedJobs,
-          showJobDetails: true,
+          showJobDetails: !showJobDetails,
         });
       } else {
         this.setState({
@@ -368,8 +368,8 @@ export default class JobSwipe extends Component {
           ? <InfoDisplay message={status.noSharedJobs} />
           : (
             <Swiper
-              horizontalSwipe={!showJobDetails}
-              verticalSwipe={!showJobDetails}
+              // horizontalSwipe={!showJobDetails} TODO: Fix car locking bug
+              // verticalSwipe={!showJobDetails}
               cards={jobs}
               onTapCard={() => this.showJobDetails(jobs, jobIndex, jobType)}
               renderCard={posting => (

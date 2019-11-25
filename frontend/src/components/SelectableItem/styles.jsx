@@ -37,7 +37,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     marginRight: margin.sm,
-
   },
   titleText: {
     fontSize: fonts.sm,
