@@ -1,5 +1,7 @@
 import React from 'react';
-import { Image, View, Text } from 'react-native';
+import {
+  Image, View, Text, ViewPropTypes,
+} from 'react-native';
 import { string, number, object } from 'prop-types';
 
 import images from '../../constants/images';
@@ -34,7 +36,7 @@ InfoDisplay.defaultProps = {
   source: images.iconLogoGray,
   message: errors.default,
   button: null,
-  style: {},
+  style: [],
 };
 
 InfoDisplay.propTypes = {
@@ -42,7 +44,7 @@ InfoDisplay.propTypes = {
   message: string,
   /* eslint-disable react/forbid-prop-types */
   button: object,
-  style: object,
+  style: ViewPropTypes.style,
 };
 
 export default InfoDisplay;

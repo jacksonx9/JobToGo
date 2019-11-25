@@ -1,7 +1,7 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, ViewPropTypes } from 'react-native';
 import {
-  string, bool, func, object,
+  string, bool, func,
 } from 'prop-types';
 
 import Button from '../Button';
@@ -35,15 +35,14 @@ const ErrorDisplay = ({
 };
 
 ErrorDisplay.defaultProps = {
-  style: {},
+  style: [],
 };
 
 ErrorDisplay.propTypes = {
   showDisplay: bool.isRequired,
   setShowDisplay: func.isRequired,
   displayText: string.isRequired,
-  /* eslint-disable react/forbid-prop-types */
-  style: object,
+  style: ViewPropTypes.style,
 };
 
 export default ErrorDisplay;
