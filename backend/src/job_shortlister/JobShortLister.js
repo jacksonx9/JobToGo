@@ -33,6 +33,12 @@ class JobShortLister {
       res.status(response.status).send(response);
     });
 
+    app.post('/jobs/unseenJob', async (req, res) => {
+      const { userId, jobId } = req.body;
+      const response = await this.unseenJob(userId, jobId);
+      res.status(response.status).send(response);
+    });
+
     app.delete('/jobs/all', async (req, res) => {
       const response = await this.clearLikedJobs(req.body.userId);
       res.status(response.status).send(response);
@@ -101,7 +107,7 @@ class JobShortLister {
   }
 
   async unseenJob(userId, jobId) {
-    const res = this.removeJob(userId, jobId, true);
+    const res = await this.removeJob(userId, jobId, true);
 
     if (res.status !== 200) {
       return res;
