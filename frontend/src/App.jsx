@@ -19,6 +19,7 @@ import SendLikedJobs from './screens/SendLikedJobs/SendLikedJobs';
 import EditFriends from './screens/EditFriends/EditFriends';
 import EditSkills from './screens/EditSkills/EditSkills';
 import { Profile, UpdateUserName, UpdatePassword } from './screens/Profile';
+import KeywordList from './screens/KeywordList/KeywordList';
 import { colours, fonts, sizes } from './styles';
 import { serverIp } from '../credentials/credentials';
 
@@ -185,6 +186,7 @@ export default class App extends React.Component {
         Profile,
         UpdateUserName,
         UpdatePassword,
+        KeywordList,
       },
       navConfig,
     );

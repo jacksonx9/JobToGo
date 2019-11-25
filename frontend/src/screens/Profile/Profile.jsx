@@ -75,6 +75,13 @@ export default class Profile extends Component {
         </Text>
         <Button
           backgroundColor={colours.accentPrimary}
+          title="Update Keywords"
+          textColor={colours.white}
+          style={styles.button}
+          onPress={() => navigation.navigate('KeywordList')}
+        />
+        <Button
+          backgroundColor={colours.accentPrimary}
           title="Log Out"
           textColor={colours.white}
           style={styles.button}
