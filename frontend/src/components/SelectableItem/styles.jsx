@@ -76,6 +76,17 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     flex: 1,
   },
+  containerShort: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 60,
+    width: '45%',
+    paddingHorizontal: padding.md,
+    margin: margin.xs,
+    marginLeft: margin.xs + 3,
+    borderRadius: border.radius,
+    elevation: 8,
+  },
 });
 
 export default styles;

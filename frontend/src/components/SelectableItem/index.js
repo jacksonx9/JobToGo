@@ -1,3 +1,4 @@
-import SelectableItem from './SelectableItem';
+import SelectableItemLong from './SelectableItemLong';
+import SelectableItemShort from './SelectableItemShort';
 
-export default SelectableItem;
+export { SelectableItemLong, SelectableItemShort };

@@ -5,7 +5,8 @@ import { func, string, bool } from 'prop-types';
 import IconButton from '../IconButton';
 import images from '../../constants/images';
 import styles from './styles';
-import { colours, sizes } from '../../styles';
+import { colours } from '../../styles';
+import icons from '../../constants/icons';
 
 const MainHeader = ({
   onPressLeft, onPressRight, buttonIcon, showBadge,
@@ -16,7 +17,7 @@ const MainHeader = ({
         testID="inbox"
         name={buttonIcon}
         color={colours.lightGray}
-        size={sizes.iconLg}
+        size={icons.md}
         onPress={onPressLeft}
       />
       <View style={[styles.badge,
@@ -29,7 +30,7 @@ const MainHeader = ({
         testID="Profile"
         name="menu"
         color={colours.lightGray}
-        size={sizes.iconLg}
+        size={icons.md}
         onPress={onPressRight}
       />
     </View>

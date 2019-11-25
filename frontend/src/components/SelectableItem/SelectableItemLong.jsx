@@ -8,7 +8,7 @@ import { colours } from '../../styles';
 import icons from '../../constants/icons';
 import styles from './styles';
 
-const SelectableItem = ({
+const SelectableItemLong = ({
   header, subHeader, onPress,
   iconName, bannerText, // TODO: Possibly add buttonType, buttonText
   noButton, noBanner, imageSource, enableButton2, iconName2, onPress2,
@@ -78,7 +78,7 @@ const SelectableItem = ({
   </View>
 );
 
-SelectableItem.defaultProps = {
+SelectableItemLong.defaultProps = {
   subHeader: '',
   iconName: icons.x,
   bannerText: '',
@@ -94,7 +94,7 @@ SelectableItem.defaultProps = {
   testID: '',
 };
 
-SelectableItem.propTypes = {
+SelectableItemLong.propTypes = {
   header: string.isRequired,
   subHeader: string,
   onPress: func.isRequired,
@@ -112,4 +112,4 @@ SelectableItem.propTypes = {
   testID: string,
 };
 
-export default SelectableItem;
+export default SelectableItemLong;
