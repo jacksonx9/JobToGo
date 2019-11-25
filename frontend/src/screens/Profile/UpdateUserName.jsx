@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-  View, Image, Text, TextInput,
+  View, Text, TextInput,
 } from 'react-native';
 import axios from 'axios';
 import Logger from 'js-logger';
@@ -12,7 +12,6 @@ import config from '../../constants/config';
 import { errors } from '../../constants/messages';
 import styles from './styles';
 import { colours } from '../../styles';
-import images from '../../constants/images';
 
 export default class UpdateUserName extends Component {
   constructor(props) {
@@ -74,12 +73,8 @@ export default class UpdateUserName extends Component {
           displayText={errorDisplayText}
           style={styles.errorDisplay}
         />
-        <Image
-          source={images.checkingDoc}
-          style={styles.image}
-        />
         <Text style={styles.text}>
-          Change your account settings
+          Enter a new username
         </Text>
         <TextInput
           style={styles.inputContainer}

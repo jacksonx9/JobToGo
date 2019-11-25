@@ -8,7 +8,13 @@ const icons = {
   send: 'send',
   moreVertical: 'more-vertical',
   chevronLeft: 'chevron-left',
+  chevronDown: 'chevron-down',
   inbox: 'inbox',
+  check: 'check',
+  share: 'share-2',
+  job: 'briefcase',
+  map: 'map-pin',
+  info: 'info',
 };
 
 export default icons;

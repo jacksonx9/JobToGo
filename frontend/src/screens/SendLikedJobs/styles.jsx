@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 import {
-  containers, padding, margin, elevation, border, colours, fonts,
+  containers, padding, elevation, colours, fonts,
 } from '../../styles';
 
 const styles = StyleSheet.create({
@@ -12,16 +12,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: padding.md,
   },
   buttonSection: {
-    borderRadius: border.radius,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    height: 65,
+    width: 65,
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    height: 80,
-    width: '95%',
-    paddingHorizontal: padding.lg,
-    marginHorizontal: margin.sm,
-    marginBottom: margin.md,
-    backgroundColor: colours.primary,
+    position: 'absolute',
+    bottom: '3%',
+    right: '10%',
+    borderRadius: 50,
+    backgroundColor: colours.accentPrimary,
+    zIndex: 4,
     elevation: elevation.md,
   },
   infoContainer: {
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   bigText: {
     fontSize: fonts.md,
     fontFamily: fonts.bold,
-    color: colours.white,
+    color: colours.accentSecondary,
   },
   normalText: {
     fontSize: fonts.sm,
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   listContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    height: '65%',
+    height: '70%',
     width: '100%',
     backgroundColor: colours.white,
   },

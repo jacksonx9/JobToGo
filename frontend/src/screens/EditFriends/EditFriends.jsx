@@ -272,8 +272,11 @@ export default class EditFriends extends Component {
           key={item._id}
           header={item.userName}
           subHeader={item.email}
-          onPress={() => this.openOptionsModal(index)}
-          iconName={icons.moreVertical}
+          onPress={() => this.comfirmFriendRequest(item, index)}
+          iconName={icons.check}
+          enableButton2
+          iconName2={icons.x}
+          onPress2={() => this.removeFriendRequest(item, index)}
         />
       )}
     />
