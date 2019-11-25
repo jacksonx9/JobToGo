@@ -89,10 +89,6 @@ export default class UpdatePassword extends Component {
           displayText={errorDisplayText}
           style={styles.errorDisplay}
         />
-        <Image
-          source={images.checkingDoc}
-          style={styles.image}
-        />
         <Text style={styles.text}>
           Enter a new password
         </Text>

@@ -73,10 +73,6 @@ export default class UpdateUserName extends Component {
           displayText={errorDisplayText}
           style={styles.errorDisplay}
         />
-        <Image
-          source={images.checkingDoc}
-          style={styles.image}
-        />
         <Text style={styles.text}>
           Enter a new username
         </Text>

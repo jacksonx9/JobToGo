@@ -19,6 +19,9 @@ const MainHeader = ({
         size={sizes.iconLg}
         onPress={onPressLeft}
       />
+      <View style={[styles.badge,
+        { backgroundColor: showBadge ? colours.accentPrimary : 'transparent' }]}
+      />
       <View style={styles.logoContainer}>
         <Image source={images.logoLight} style={styles.logo} />
       </View>
@@ -29,11 +32,6 @@ const MainHeader = ({
         size={sizes.iconLg}
         onPress={onPressRight}
       />
-      {showBadge
-        ? <View style={styles.badge} /> : <View />}
-    </View>
-    <View style={styles.logoContainer}>
-      <Image source={images.logoLight} style={styles.logo} />
     </View>
   </View>
 );

@@ -54,8 +54,9 @@ export default class JobSwipe extends Component {
     socket.on(config.SOCKET_SHARED, data => this.updateSharedJobs(data));
     socket.on(config.SOCKET_FRIENDS, data => this.updateFriends(data));
 
-    this.fetchMatchedJobs(userId);
-    this.fetchFriends(userId);
+    await this.fetchFriends(userId);
+    await this.fetchMatchedJobs(userId, false);
+    await this.fetchSharedJobs(userId);
   }
 
   fetchFriends = async userId => {
@@ -155,9 +156,9 @@ export default class JobSwipe extends Component {
     }
   }
 
-  fetchSharedJobs = async userId => {
+  fetchSharedJobs = async (userId, shouldLoad = true) => {
     this.setState({
-      loading: true,
+      loading: shouldLoad,
     });
 
     try {
@@ -187,8 +188,7 @@ export default class JobSwipe extends Component {
 
   toggleSharedJobsView = () => {
     const { showSharedJobsView } = this.state;
-    const { userId } = global;
-    this.fetchSharedJobs(userId);
+    this.fetchSharedJobs(global.userId);
     this.setState({
       showSharedJobsView: !showSharedJobsView,
     });
@@ -336,14 +336,14 @@ export default class JobSwipe extends Component {
 
   render() {
     const {
-      loading, isSharedJobsView, isJobShareModalVisible, matchedJobs, matchedJobIndex,
+      loading, isJobShareModalVisible, matchedJobs, matchedJobIndex,
       sharedJobs, sharedJobIndex, friends, showJobDetails, showSharedJobsView,
       showErrorDisplay, errorDisplayText,
     } = this.state;
     const { navigation } = this.props;
-    const jobs = isSharedJobsView ? sharedJobs : matchedJobs;
-    const jobIndex = isSharedJobsView ? sharedJobIndex : matchedJobIndex;
-    const jobType = isSharedJobsView ? this.jobTypes.SHARED : this.jobTypes.MATCHED;
+    const jobs = showSharedJobsView ? sharedJobs : matchedJobs;
+    const jobIndex = showSharedJobsView ? sharedJobIndex : matchedJobIndex;
+    const jobType = showSharedJobsView ? this.jobTypes.SHARED : this.jobTypes.MATCHED;
     const job = jobs[jobIndex];
     const buttonIcon = showSharedJobsView ? icons.chevronLeft : icons.inbox;
     const showInboxBadge = sharedJobs.length > 0 && !showSharedJobsView;
