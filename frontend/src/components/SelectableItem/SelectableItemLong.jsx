@@ -64,6 +64,7 @@ const SelectableItemLong = ({
           style={styles.buttonContainer}
         >
           <IconButton
+            testID={`${testID}FirstButton`}
             name={iconName}
             color={colours.lightGray}
             size={icons.sm}

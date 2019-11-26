@@ -164,6 +164,7 @@ export default class EditFriends extends Component {
         searchInProgress: false,
       });
     } catch (e) {
+      console.log(e);
       this.setState({
         showErrorDisplay: true,
         errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
