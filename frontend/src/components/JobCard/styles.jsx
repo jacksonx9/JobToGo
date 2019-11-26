@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
   },
   shareContainer: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     alignItems: 'center',
     height: '10%',
     width: '100%',
