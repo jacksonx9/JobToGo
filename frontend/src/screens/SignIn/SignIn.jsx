@@ -126,11 +126,6 @@ export default class SignIn extends Component {
           style={styles.button}
           onPress={this.signIn}
         />
-        <TouchableOpacity
-          onPress={() => { navigation.navigate('SignUp'); }}
-        >
-          <Text style={[styles.link]}>Forgot Password</Text>
-        </TouchableOpacity>
         <Text style={styles.warning} testID="incorrectSignIn">{invalidLogin ? 'Invalid Login' : ''}</Text>
         <Text style={styles.warning} testID="emptySignIn">{emptyField ? 'Fields must not be empty' : ''}</Text>
       </View>

@@ -44,10 +44,10 @@ describe('Friends Screen', () => {
     await element(by.id('switchNavOption2')).tap();
     const userNums = Array.from(Array(NON_FUNC_REQ_FRIEND_COUNT).keys());
 
-    await Promise.all(userNums.map(async num => {
-      await waitFor(element(by.id(`userItem${num}`)))
+    for (let i = 0; i < NON_FUNC_REQ_FRIEND_COUNT; i++) {
+      await waitFor(element(by.id(`friends${i}`)))
         .toBeVisible().whileElement(by.id('friendList')).scroll(300, 'down');
-    }));
+    }
   });
 
   it('Check user search component', async () => {

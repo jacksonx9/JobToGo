@@ -22,28 +22,6 @@ describe('Home Screen', () => {
     await element(by.id('inbox')).tap();
     await expect(element(by.id('mainHeader'))).toBeVisible();
   });
-
-  it('Check share modal', async () => {
-    // Check the share job modal
-    await element(by.id('card0')).tap();
-    await expect(element(by.id('shareModal'))).toBeVisible();
-
-    // Close the share job modal
-    await element(by.id('closeShare')).tap();
-    await expect(element(by.id('shareModal'))).toBeNotVisible();
-    await expect(element(by.id('mainHeader'))).toBeVisible();
-  });
-
-  it('Check info modal', async () => {
-    // Check the share job modal
-    await element(by.id('card0Open')).tap();
-    await waitFor(element(by.id('card0Description'))).toBeVisible().withTimeout(2000);
-    await expect(element(by.id('card0Description'))).toBeVisible();
-
-    // Close the share job modal
-    await element(by.id('card0Close')).tap();
-    await expect(element(by.id('card0Description'))).toBeNotVisible();
-  });
 });
 
 describe('Liked Screen', () => {
