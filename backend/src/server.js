@@ -131,15 +131,17 @@ class Server {
 
   shutdown() {
     return new Promise((resolve) => {
-      this.redisClient.quit();
-      this.logger.info('Redis disconnected');
-
       mongoose.disconnect().then(() => {
         this.logger.info('MongoDB disconnected.');
-        this.socket.close();
-        this.server.close(() => {
-          this.logger.info('Server shut down.');
-          resolve();
+
+        this.socket.close(() => {
+          this.redisClient.quit();
+          this.logger.info('Redis disconnected.');
+
+          this.server.close(() => {
+            this.logger.info('Server shut down.');
+            resolve();
+          });
         });
       });
     });
