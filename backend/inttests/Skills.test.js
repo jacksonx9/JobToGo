@@ -1,7 +1,9 @@
 import scheduler from 'node-schedule';
 import Logger from 'js-logger';
 import supertest from 'supertest';
+import vision from '@google-cloud/vision';
 import { forEachAsync } from 'foreachasync';
+import fs from 'fs';
 
 import Server from '../src/server';
 import * as constants from '../src/constants';
@@ -13,6 +15,22 @@ jest.mock('firebase-admin');
 jest.mock('nodemailer');
 jest.mock('stopword');
 jest.mock('axios');
+jest.mock('@google-cloud/vision');
+
+vision.ImageAnnotatorClient.prototype.textDetection = jest.fn(request => new Promise((resolve) => {
+  const validBuffer = fs.readFileSync(`${__dirname}/data/resume.png`);
+  if (request !== null && request.image !== null && validBuffer.equals(request.image)) {
+    resolve([
+      {
+        fullTextAnnotation: {
+          text: 'Skills: c, python, java! ♫',
+        },
+      },
+    ]);
+  } else {
+    throw Error('invalid idToken');
+  }
+}));
 
 describe('Skills', () => {
   let server;
@@ -68,7 +86,35 @@ describe('Skills', () => {
     await jest.restoreAllMocks();
   });
 
-  test('Upload resume', async () => {
+  test('Upload image resume', async () => {
+    // Check no skills
+    let response = await request.get(`/users/skills/${userId}`);
+    expect(response.body.result).toEqual([]);
+
+    // Upload resume
+    response = await request
+      .post('/resume')
+      .field('userId', userId)
+      .attach('resume', `${__dirname}/data/resume.png`);
+    expect(response.body.result).toBe(true);
+
+    // Check skills have been added
+    response = await request.get(`/users/skills/${userId}`);
+    expect(response.body.result).toEqual(testData.skills);
+
+    // Upload resume again
+    response = await request
+      .post('/resume')
+      .field('userId', userId)
+      .attach('resume', `${__dirname}/data/resume.pdf`);
+    expect(response.body.result).toBe(true);
+
+    // Check skills are the same
+    response = await request.get(`/users/skills/${userId}`);
+    expect(response.body.result).toEqual(testData.skills);
+  });
+
+  test('Upload PDF resume', async () => {
     // Check no skills
     let response = await request.get(`/users/skills/${userId}`);
     expect(response.body.result).toEqual([]);
@@ -96,12 +142,19 @@ describe('Skills', () => {
     expect(response.body.result).toEqual(testData.skills);
   });
 
-  test('Upload resume errors', async () => {
+  test('Upload PDF resume errors', async () => {
     // Disable resume logs
     jest.spyOn(console, 'log').mockImplementation();
 
-    // Invalid user
+    // Empty userId error
     let response = await request
+      .post('/resume')
+      .field('userId', '')
+      .attach('resume', `${__dirname}/data/resume.pdf`);
+    expect(response.body.result).toBe(false);
+
+    // Invalid user
+    response = await request
       .post('/resume')
       .field('userId', invalidUserId)
       .attach('resume', `${__dirname}/data/resume.pdf`);
@@ -121,6 +174,45 @@ describe('Skills', () => {
     expect(response.body.result).toBe(false);
 
     // Attach a non-pdf
+    response = await request
+      .post('/resume')
+      .field('userId', userId)
+      .attach('resume', `${__dirname}/data/test_data.json`);
+    expect(response.body.result).toBe(false);
+  });
+
+  test('Upload image resume errors', async () => {
+    // Disable resume logs
+    jest.spyOn(console, 'log').mockImplementation();
+
+    // Empty userId
+    let response = await request
+      .post('/resume')
+      .field('userId', '')
+      .attach('resume', `${__dirname}/data/resume.png`);
+    expect(response.body.result).toBe(false);
+
+    // Invalid user
+    response = await request
+      .post('/resume')
+      .field('userId', invalidUserId)
+      .attach('resume', `${__dirname}/data/resume.png`);
+    expect(response.body.result).toBe(false);
+
+    // Upload empty image
+    response = await request
+      .post('/resume')
+      .field('userId', userId)
+      .attach('resume', `${__dirname}/data/empty.png`);
+    expect(response.body.result).toBe(false);
+
+    // Don't attach a resume
+    response = await request
+      .post('/resume')
+      .field('userId', userId);
+    expect(response.body.result).toBe(false);
+
+    // Attach a non-image
     response = await request
       .post('/resume')
       .field('userId', userId)
