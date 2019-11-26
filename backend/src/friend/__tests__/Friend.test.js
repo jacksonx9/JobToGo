@@ -36,6 +36,7 @@ describe('Friend', () => {
     app = new Express();
     messenger = new Messenger();
     messenger.requestFriend = jest.fn(() => new Response(true, '', 200));
+    messenger.sendFriendJob = jest.fn(() => new Response(true, '', 200));
     redisClient = redis.createClient({
       host: REDIS_IP,
     });
@@ -217,8 +218,9 @@ describe('Friend', () => {
         friends: user1Id,
       },
     });
-    const response = new Response(undefined, '', 200);
-    expect(await friend.sendJob(user1Id, user2Id, job1Id)).toEqual(response);
+    const expectedRes = new Response(true, '', 200);
+    const res = await friend.sendJob(user1Id, user2Id, job1Id);
+    expect(res).toEqual(expectedRes);
   });
 
   test('addFriend: Empty Ids', async () => {
