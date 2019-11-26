@@ -96,7 +96,7 @@ class Friend {
 
       // Send push notification
       const messageResponse = await this.messenger.sendFriendJob(userId, friendId, jobId);
-      return new Response(messageResponse, '', 200);
+      return messageResponse;
     } catch (e) {
       return new Response(false, 'Invalid userId, friendId, or jobId', 400);
     }
