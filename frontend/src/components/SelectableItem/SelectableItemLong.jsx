@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, TouchableOpacity } from 'react-native';
 import { string, func, bool } from 'prop-types';
 
 import IconButton from '../IconButton';
@@ -9,12 +9,17 @@ import icons from '../../constants/icons';
 import styles from './styles';
 
 const SelectableItemLong = ({
-  header, subHeader, onPress,
+  header, subHeader, onPress, enableSelect, onSelect,
   iconName, bannerText, // TODO: Possibly add buttonType, buttonText
   noButton, noBanner, imageSource, enableButton2, iconName2, onPress2,
   backgroundColor, titleColor, descriptionColor, testID,
 }) => (
-  <View style={[styles.container, { backgroundColor }]} testID={testID}>
+  <TouchableOpacity
+    style={[styles.container, { backgroundColor }]}
+    testID={testID}
+    disabled={enableSelect}
+    onPress={() => onSelect()}
+  >
     <View style={styles.contentContainer}>
       <JobImage
         logo={imageSource}
@@ -75,7 +80,7 @@ const SelectableItemLong = ({
             ) : <View />}
         </View>
       )}
-  </View>
+  </TouchableOpacity>
 );
 
 SelectableItemLong.defaultProps = {

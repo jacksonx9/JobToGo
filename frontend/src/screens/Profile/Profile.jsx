@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text } from 'react-native';
 import Logger from 'js-logger';
 import axios from 'axios';
 import { GoogleSignin } from 'react-native-google-signin';
@@ -7,7 +7,6 @@ import { GoogleSignin } from 'react-native-google-signin';
 import ErrorDisplay from '../../components/ErrorDisplay';
 import Loader from '../../components/Loader';
 import Button from '../../components/Button';
-import NavHeader from '../../components/NavHeader/NavHeader';
 import config from '../../constants/config';
 import { errors } from '../../constants/messages';
 import styles from './styles';
