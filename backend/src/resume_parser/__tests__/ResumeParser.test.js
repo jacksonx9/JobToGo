@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import stopword from 'stopword';
 import axios from 'axios';
 import { Express } from 'jest-express/lib/express';
+import vision from '@google-cloud/vision';
 import fs from 'fs';
 
 import ResumeParser, { MAX_REQUEST_URI_LENGTH } from '../ResumeParser';
@@ -13,6 +14,22 @@ import testData from './test_data';
 jest.mock('../../user');
 jest.mock('stopword');
 jest.mock('axios');
+jest.mock('@google-cloud/vision');
+
+vision.ImageAnnotatorClient.prototype.textDetection = jest.fn(request => new Promise((resolve) => {
+  const validBuffer = fs.readFileSync(`${__dirname}/test_files/resume.png`);
+  if (request !== null && request.image !== null && validBuffer.equals(request.image)) {
+    resolve([
+      {
+        fullTextAnnotation: {
+          text: 'valid image text',
+        },
+      },
+    ]);
+  } else {
+    throw Error('invalid idToken');
+  }
+}));
 
 class HTTPError extends Error {
   constructor(code, status) {
@@ -83,7 +100,7 @@ describe('Resume Parser', () => {
     jest.clearAllMocks();
   });
 
-  test('parse: Invalid PDF', async () => {
+  test('parsePdf: Invalid PDF', async () => {
     // Disable console log in pdfparse
     jest.spyOn(console, 'log').mockImplementation();
     const invalidPdf = fs.readFileSync(`${__dirname}/test_files/invalid.pdf`);
@@ -95,7 +112,7 @@ describe('Resume Parser', () => {
     expect(await resumeParser.parsePdf(invalidPdf)).toEqual(response);
   });
 
-  test('parse: Empty PDF', async () => {
+  test('parsePdf: Empty PDF', async () => {
     const emptyPdf = fs.readFileSync(`${__dirname}/test_files/empty.pdf`);
     const response = new Response('', '', 200);
 
@@ -104,7 +121,36 @@ describe('Resume Parser', () => {
     expect(stopword.removeStopwords).toHaveBeenCalledWith(['']);
   });
 
-  test('parse: Success', async () => {
+  test('parseImage: Empty Image', async () => {
+    // Disable console log in parseImage
+    jest.spyOn(console, 'log').mockImplementation();
+    const emptyImage = fs.readFileSync(`${__dirname}/test_files/empty.png`);
+    const response = new Response(false, 'Invalid image', 400);
+
+    expect(await resumeParser.parseImage(emptyImage)).toEqual(response);
+    expect(stopword.removeStopwords).toHaveBeenCalledTimes(0);
+  });
+
+  test('parseImage: Invalid Image', async () => {
+    // Disable console log in parseImage
+    jest.spyOn(console, 'log').mockImplementation();
+    const response = new Response(false, 'Invalid image', 400);
+
+    expect(await resumeParser.parseImage(123)).toEqual(response);
+    expect(await resumeParser.parseImage('test')).toEqual(response);
+    expect(await resumeParser.parseImage({})).toEqual(response);
+  });
+
+  test('parseImage: Success', async () => {
+    const resume = fs.readFileSync(`${__dirname}/test_files/resume.png`);
+    const response = new Response(testData.parsedPhotoResumeText, '', 200);
+
+    expect(await resumeParser.parseImage(resume)).toEqual(response);
+    expect(stopword.removeStopwords).toHaveBeenCalledTimes(1);
+    expect(stopword.removeStopwords).toHaveBeenCalledWith(testData.parsedPhotoResumeText.split(' '));
+  });
+
+  test('parsePdf: Success', async () => {
     const resume = fs.readFileSync(`${__dirname}/test_files/resume.pdf`);
     const response = new Response(testData.parsedResumeText, '', 200);
 

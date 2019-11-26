@@ -14,5 +14,6 @@
         }
     ],
     "parsedResumeText": "this is a resume right -- +right.",
+    "parsedPhotoResumeText": "valid image text",
     "skills": ["skill1", "skill2", "looooooooooooooooonnnnggskill"]
 }
