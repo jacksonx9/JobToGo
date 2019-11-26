@@ -6,6 +6,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import styles from './styles';
 import { colours } from '../../styles';
 import icons from '../../constants/icons';
+import JobDetailsExpanded from './JobDetailsExpanded';
 
 const JobDetails = ({
   company, title, location, testID,
@@ -33,11 +34,15 @@ const JobDetails = ({
   </View>
 );
 
+JobDetails.defaultProps = {
+  testID: '',
+};
+
 JobDetails.propTypes = {
   company: string.isRequired,
   title: string.isRequired,
   location: string.isRequired,
-  testID: string.isRequired,
+  testID: string,
 };
 
 export default JobDetails;

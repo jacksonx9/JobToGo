@@ -13,9 +13,8 @@ const JobCard = ({
   logo, company, title, location, description,
   onPressShare, onPressHide, onPressUndo, testID, showDetails,
 }) => (
-  <View style={styles.container}>
+  <View style={styles.container} testID={testID}>
     <JobDetailsExpanded
-      testID={testID}
       logo={logo}
       company={company}
       title={title}
@@ -26,7 +25,6 @@ const JobCard = ({
     />
     <View style={styles.shareContainer}>
       <IconButton
-        testID={testID}
         name={icons.goBack}
         color={colours.primary}
         size={sizes.icon}
@@ -35,7 +33,6 @@ const JobCard = ({
         }}
       />
       <IconButton
-        testID={testID}
         name={icons.share}
         color={colours.primary}
         size={sizes.icon}
@@ -48,7 +45,6 @@ const JobCard = ({
         code={company}
       />
       <JobDetails
-        testID={testID}
         logo={logo}
         company={company}
         title={title}

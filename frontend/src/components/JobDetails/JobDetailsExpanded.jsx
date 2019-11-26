@@ -66,6 +66,7 @@ const JobDetailsExpanded = ({
 
 JobDetailsExpanded.defaultProps = {
   logo: null,
+  testID: '',
 };
 
 JobDetailsExpanded.propTypes = {
@@ -76,7 +77,7 @@ JobDetailsExpanded.propTypes = {
   logo: string,
   onPressHide: func.isRequired,
   isVisible: bool.isRequired,
-  testID: string.isRequired,
+  testID: string,
 };
 
 export default JobDetailsExpanded;
