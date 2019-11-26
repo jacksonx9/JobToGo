@@ -335,4 +335,93 @@ describe('User', () => {
     response = await request.get(`/users/skills/${user._id.toString()}`);
     expect(response.body.result).toEqual([]);
   });
+
+  test('Add Keywords', async () => {
+    // Login with google first time, should create user
+    let response = await request.post('/users/googleLogin').send({
+      idToken: 'idToken',
+      firebaseToken: testData.users[0].credentials.firebaseToken,
+    });
+    response = await request.post('/users').send({
+      userData: {
+        credentials: {
+          userName: testData.users[0].credentials.userName,
+          email: response.body.result.credentials.email,
+          idToken: response.body.result.credentials.idToken,
+          firebaseToken: response.body.result.credentials.firebaseToken,
+        },
+      },
+    });
+    const user = await Users.findOne({});
+    expect(response.body.result).toEqual(user._id.toString());
+
+    // Add keyword with invalid user id, should fail
+    response = await request.post('/users/keywords').send({
+      userId: null,
+      keyword: 'new keyword',
+    });
+    expect(response.body.result).toBe(false);
+
+    // Add keyword with valid user id
+    response = await request.post('/users/keywords').send({
+      userId: user._id.toString(),
+      keyword: 'new keyword',
+    });
+    expect(response.body.result).toBe(true);
+
+    // Add exisiting keyword with valid user id
+    response = await request.post('/users/keywords').send({
+      userId: user._id.toString(),
+      keyword: 'new keyword',
+    });
+    expect(response.body.result).toBe(true);
+  });
+
+  test('Delete Keywords', async () => {
+    // Login with google first time, should create user
+    let response = await request.post('/users/googleLogin').send({
+      idToken: 'idToken',
+      firebaseToken: testData.users[0].credentials.firebaseToken,
+    });
+    response = await request.post('/users').send({
+      userData: {
+        credentials: {
+          userName: testData.users[0].credentials.userName,
+          email: response.body.result.credentials.email,
+          idToken: response.body.result.credentials.idToken,
+          firebaseToken: response.body.result.credentials.firebaseToken,
+        },
+      },
+    });
+    const user = await Users.findOne({});
+    expect(response.body.result).toEqual(user._id.toString());
+
+    // Add keyword with invalid user id, should fail
+    response = await request.delete('/users/keywords').send({
+      userId: null,
+      keyword: 'old keyword',
+    });
+    expect(response.body.result).toBe(false);
+
+    // Insert keyword with valid user id
+    response = await request.post('/users/keywords').send({
+      userId: user._id.toString(),
+      keyword: 'new keyword',
+    });
+    expect(response.body.result).toBe(true);
+
+    // Delete non existant keyword with valid user id
+    response = await request.delete('/users/keywords').send({
+      userId: user._id.toString(),
+      keyword: 'non existant keyword',
+    });
+    expect(response.body.result).toBe(true);
+
+    // Delete exisiting keyword with valid user id
+    response = await request.delete('/users/keywords').send({
+      userId: user._id.toString(),
+      keyword: 'new keyword',
+    });
+    expect(response.body.result).toBe(true);
+  });
 });
