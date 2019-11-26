@@ -1,10 +1,12 @@
 import scheduler from 'node-schedule';
 import Logger from 'js-logger';
 import supertest from 'supertest';
+import io from 'socket.io-client';
 
 import Server from '../src/server';
 import * as constants from '../src/constants';
 import { Users } from '../src/schema';
+import Response from '../src/types';
 import { mockMessenger, mockUser } from './utils/Mock';
 import testData from './data/test_data';
 
@@ -16,6 +18,8 @@ describe('User', () => {
   let server;
   let constantsCopy;
   let request;
+  let socket;
+  let socket2;
 
   beforeAll(async () => {
     constantsCopy = JSON.parse(JSON.stringify(constants));
@@ -38,12 +42,16 @@ describe('User', () => {
   });
 
   beforeEach(async () => {
+    socket = io.connect(`http://localhost:${constants.PORT}`);
+    socket2 = io.connect(`http://localhost:${constants.PORT}`);
     // Mock external APIs
     mockMessenger();
     mockUser();
   });
 
   afterEach(async () => {
+    socket.disconnect();
+    socket2.disconnect();
     await Users.deleteMany({});
     await jest.clearAllMocks();
     await jest.restoreAllMocks();
@@ -423,5 +431,86 @@ describe('User', () => {
       keyword: 'new keyword',
     });
     expect(response.body.result).toBe(true);
+  });
+
+  test('Search users', async (done) => {
+    // Create user1
+    let response = await request.post('/users/').send({
+      userData: testData.users[0],
+    });
+    const user1 = await Users.findOne({});
+    const user1Id = user1._id.toString();
+    expect(response.body.result).toEqual(user1Id);
+
+    // Create user2
+    response = await request.post('/users/').send({
+      userData: testData.users[1],
+    });
+    const user2 = await Users.findOne({
+      'credentials.userName': testData.users[1].credentials.userName,
+    });
+    const user2Id = user2._id.toString();
+    expect(response.body.result).toEqual(user2Id);
+
+    // Check userId is received
+    socket.on('userId', (userIdData) => {
+      expect(userIdData).toEqual(new Response(true, '', 200));
+
+      // Search non existent user
+      socket.on('users', (nonExistentUserData) => {
+        expect(nonExistentUserData).toEqual(new Response([], '', 200));
+        socket.off('users');
+
+        // Search for user2
+        socket.on('users', (user2Data) => {
+          expect(user2Data).toEqual(new Response([{
+            _id: user2Id,
+            userName: testData.users[1].credentials.userName,
+            isFriend: false,
+          }], '', 200));
+          done();
+        });
+        socket.emit('users-search', testData.users[1].credentials.userName);
+      });
+      socket.emit('users-search', 'invalidUser');
+    });
+    socket.emit('userId', user1Id);
+  });
+
+  test('Search users errors', async (done) => {
+    // Create user1
+    const response = await request.post('/users/').send({
+      userData: testData.users[0],
+    });
+    const user1 = await Users.findOne({});
+    const user1Id = user1._id.toString();
+    expect(response.body.result).toEqual(user1Id);
+
+    // Invalid userId
+    socket.on('userId', (invalidUserIdData) => {
+      expect(invalidUserIdData).toEqual(new Response(false, 'Invalid userId', 400));
+      socket.off('userId');
+
+      // Check userId is received
+      socket.on('userId', (userIdData) => {
+        expect(userIdData).toEqual(new Response(true, '', 200));
+
+        // Search for self
+        socket.on('users', (data) => {
+          expect(data).toEqual(new Response([], '', 200));
+          done();
+        });
+        socket.emit('users-search', testData.users[0].credentials.userName);
+      });
+      socket.emit('userId', user1Id);
+    });
+    socket.emit('userId', 'test');
+
+    // Unregistered user
+    socket2.on('users', (data) => {
+      expect(data).toEqual(new Response(null, 'Invalid userId', 400));
+      done();
+    });
+    socket2.emit('users-search', testData.users[0].credentials.userName);
   });
 });

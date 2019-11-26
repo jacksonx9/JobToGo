@@ -190,14 +190,58 @@ describe('User', () => {
     testEmptyIds('addKeyword');
   });
 
+  test('addKeyword, Valid Inputs', async () => {
+    const res = await user.addKeyword(user1Id, 'c++');
+    expect(res).toEqual(new Response(true, '', 200));
+    const userData = await Users.findById(user1Id);
+    expect(userData.keywords[0].name).toEqual('c++');
+  });
+
+  test('addKeyword, Existing Keyword', async () => {
+    await Users.findByIdAndUpdate(user1Id, {
+      $push: {
+        keywords: {
+          name: 'c++',
+          score: 0,
+          jobCount: 0,
+          timeStamp: Date.now(),
+        },
+      },
+    });
+
+    const res = await user.addKeyword(user1Id, 'c++');
+    expect(res).toEqual(new Response(true, 'User already has this keyword', 400));
+  });
+
   test('deleteKeyword, Invalid Inputs', async () => {
     testEmptyIds('deleteKeyword');
+  });
+
+  test('deleteKeyword, Valid Inputs', async () => {
+    await Users.findByIdAndUpdate(user1Id, {
+      $push: {
+        keywords: {
+          name: 'c++',
+          score: 0,
+          jobCount: 0,
+          timeStamp: Date.now(),
+        },
+      },
+    });
+
+    const res = await user.deleteKeyword(user1Id, 'c++');
+    expect(res).toEqual(new Response(true, '', 200));
   });
 
   test('loginGoogle: First Time User Logs In', async () => {
     await Users.deleteMany({});
     const res = await user.loginGoogle('idToken', testData.validUserData.credentials.firebaseToken);
     expect(res.status).toEqual(400);
+  });
+
+  test('loginGoogle: Account already exists', async () => {
+    const res = await user.loginGoogle('idToken', testData.validUserData.credentials.firebaseToken);
+    expect(res).toEqual(new Response(user1Id, '', 200));
   });
 
   test('updateUserInfo: Invalid Inputs', async () => {
@@ -274,5 +318,16 @@ describe('User', () => {
     const res = await user.getSkills(user1Id);
     expect(res.status).toEqual(200);
     expect(res.result).toEqual([jobName]);
+  });
+
+  test('handleUserId: Invalid Inputs', async () => {
+    testEmptyIds('handleUserId');
+  });
+
+  test('handleUserId: Valid Inputs', async () => {
+    const res = await user.handleUserId(user1Id.toString(), 'test');
+    expect(res).toEqual(new Response(true, '', 200));
+    expect(await user.redisClient.getAsync(user1Id.toString())).toEqual('test');
+    expect(await user.redisClient.getAsync('test')).toEqual(user1Id.toString());
   });
 });
