@@ -12,4 +12,5 @@ export const status = {
   passwordUpdated: 'Password updated successfully!',
   friendRequestSent: 'Friend request sent!',
   noLikedJobs: 'You currently have no liked jobs.',
+  firstJobInStack: 'No more jobs to undo.',
 };

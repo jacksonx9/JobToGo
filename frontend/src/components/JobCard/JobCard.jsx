@@ -11,7 +11,7 @@ import icons from '../../constants/icons';
 
 const JobCard = ({
   logo, company, title, location, description,
-  onPressShare, onPressInfo, onPressHide, testID, showDetails,
+  onPressShare, onPressHide, onPressUndo, testID, showDetails,
 }) => (
   <View style={styles.container}>
     <JobDetailsExpanded
@@ -25,6 +25,15 @@ const JobCard = ({
       onPressHide={onPressHide}
     />
     <View style={styles.shareContainer}>
+      <IconButton
+        testID={testID}
+        name={icons.goBack}
+        color={colours.primary}
+        size={sizes.icon}
+        onPress={() => {
+          onPressUndo();
+        }}
+      />
       <IconButton
         testID={testID}
         name={icons.share}
@@ -45,7 +54,6 @@ const JobCard = ({
         title={title}
         location={location}
         description={description}
-        onPressInfo={onPressInfo}
       />
     </View>
   </View>
@@ -66,7 +74,7 @@ JobCard.propTypes = {
   description: string.isRequired,
   onPressShare: func.isRequired,
   onPressHide: func.isRequired,
-  onPressInfo: func.isRequired,
+  onPressUndo: func.isRequired,
   showDetails: bool,
   testID: string,
 };

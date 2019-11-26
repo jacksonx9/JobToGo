@@ -13,6 +13,7 @@ const icons = {
   inbox: 'inbox',
   check: 'check',
   share: 'share-2',
+  goBack: 'rotate-ccw',
   job: 'briefcase',
   map: 'map-pin',
   info: 'info',

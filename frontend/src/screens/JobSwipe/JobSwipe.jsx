@@ -4,6 +4,7 @@ import axios from 'axios';
 import Logger from 'js-logger';
 import Swiper from 'react-native-deck-swiper';
 import { object } from 'prop-types';
+import Toast from 'react-native-simple-toast';
 
 import ErrorDisplay from '../../components/ErrorDisplay';
 import JobCard from '../../components/JobCard';
@@ -300,6 +301,7 @@ export default class JobSwipe extends Component {
     const oldIndex = jobIndex;
     if (oldIndex > 0) {
       this.setState({
+        loading: true,
         matchedJobIndex: jobIndex - 1,
       });
       this.logger.info(`Reverted job with company ${jobs[oldIndex - 1].company}`);
@@ -309,12 +311,19 @@ export default class JobSwipe extends Component {
           userId,
           jobId: jobs[oldIndex - 1]._id,
         });
+        this.setState({
+          loading: false,
+          matchedJobIndex: jobIndex - 1,
+        });
       } catch (e) {
         this.setState({
+          loading: false,
           showErrorDisplay: true,
           errorDisplayText: !e.response ? errors.default : e.response.data.errorMessage,
         });
       }
+    } else {
+      Toast.show(status.firstJobInStack);
     }
   }
 
@@ -387,7 +396,6 @@ export default class JobSwipe extends Component {
             <Swiper
               horizontalSwipe={!showJobDetails}
               verticalSwipe={!showJobDetails}
-              goBackToPreviousCardOnSwipeTop={jobIndex > 0 && !showSharedJobsView}
               disableTopSwipe={jobIndex === 0 || showSharedJobsView}
               disableBottomSwipe
               cards={jobs}
@@ -402,11 +410,10 @@ export default class JobSwipe extends Component {
                   description={posting.description}
                   showDetails={posting.showDetails}
                   onPressShare={() => this.openJobShareModal()}
-                  onPressInfo={() => this.showJobDetails(jobs, jobIndex, jobType)}
                   onPressHide={() => this.hideJobDetails(jobs, jobType)}
+                  onPressUndo={() => this.revertJob(jobs, jobIndex)}
                 />
               )}
-              onSwipedTop={index => this.revertJob(jobs, index)}
               onSwipedLeft={index => this.swipeJob(jobs, index, jobType,
                 this.swipeActionTypes.DISLIKE)}
               onSwipedRight={index => this.swipeJob(jobs, index, jobType,
