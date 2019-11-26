@@ -252,7 +252,7 @@ export default class EditFriends extends Component {
         keyExtractor={item => item._id}
         renderItem={({ item, index }) => (
           <SelectableItemLong
-            testID={`userItem${index}`}
+            testID={`search${index}`}
             key={item._id}
             header={item.userName}
             subHeader={item.email}
@@ -273,7 +273,7 @@ export default class EditFriends extends Component {
       keyExtractor={item => item._id}
       renderItem={({ item, index }) => (
         <SelectableItemLong
-          testID={`userItem${index}`}
+          testID={`pending${index}`}
           key={item._id}
           header={item.userName}
           subHeader={item.email}
@@ -295,7 +295,7 @@ export default class EditFriends extends Component {
       keyExtractor={item => item._id}
       renderItem={({ item, index }) => (
         <SelectableItemLong
-          testID={`userItem${index}`}
+          testID={`friend${index}`}
           key={item._id}
           header={item.userName}
           subHeader={item.email}

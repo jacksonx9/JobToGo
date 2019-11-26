@@ -57,7 +57,7 @@ describe('Friends Screen', () => {
     await expect(element(by.id('searchInput'))).toBeVisible();
   });
 
-  it('Users search sequence', async () => {
+  it('Users fail search sequence', async () => {
     await element(by.id('friends')).tap();
     await element(by.id('search')).tap();
 
@@ -89,18 +89,6 @@ describe('Friends Screen', () => {
     await element(by.id('search')).tap();
 
     element(by.id('searchInput')).typeText('newFriend\n');
-    await expect(element(by.id('userItem0\n'))).toBeVisible();
-    // await element(by.id('userItem0FirstButton')).tap();
-    // await element(by.id('navHeaderFriendsMenu')).tap();
-    // await element(by.id('logOut')).tap();
-    // await element(by.id('signInAuth')).tap();
-    // element(by.id('usernameSignIn')).typeText('newFriend\n');
-    // await waitFor(element(by.id('passwordSignIn'))).toBeVisible().withTimeout(2000);
-    // element(by.id('passwordSignIn')).typeText('newFriend\n');
-    // await waitFor(element(by.id('signIn'))).toBeVisible().withTimeout(2000);
-    // await element(by.id('signIn')).tap();
-    // await element(by.id('friends')).tap();
-
-    // Go back to previous screen
+    await expect(element(by.id('search0FirstButton'))).toBeVisible();
   });
 });

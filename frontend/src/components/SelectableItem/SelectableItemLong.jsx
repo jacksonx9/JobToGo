@@ -73,6 +73,7 @@ const SelectableItemLong = ({
           {enableButton2
             ? (
               <IconButton
+                testID={`${testID}SecondButton`}
                 name={iconName2}
                 color={colours.lightGray}
                 size={icons.sm}
