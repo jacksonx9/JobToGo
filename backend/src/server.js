@@ -53,94 +53,93 @@ class Server {
   }
 
   setupDB() {
-    // Connect to mongodb
-    mongoose.connect(MONGO_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useFindAndModify: false,
-      useCreateIndex: true,
-    }).then(() => this.logger.info('MongoDB connected.'));
-
-    // Connect to redis
-    this.redisClient = redis.createClient({
-      host: REDIS_IP,
+    return new Promise((resolve, reject) => {
+      // Connect to mongodb
+      mongoose.connect(MONGO_URL, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false,
+        useCreateIndex: true,
+      }).then(() => {
+        this.logger.info('MongoDB connected.');
+        // Connect to redis
+        this.redisClient = redis.createClient({
+          host: REDIS_IP,
+        });
+        this.redisClient.on('error', async () => {
+          this.redisClient.quit();
+          reject(new Error('Failed to connect to redis'));
+        });
+        this.redisClient.on('connect', () => {
+          this.logger.info('Redis connected.');
+          this.redisClient.flushall();
+          resolve();
+        });
+      }).catch(e => reject(e));
     });
-    this.redisClient.on('error', () => {
-      throw new Error('Failed to connect to redis');
-    });
-    this.redisClient.on('connect', () => {
-      this.logger.info('Redis connected.');
-    });
-    this.redisClient.flushall();
   }
 
   start() {
     return new Promise((resolve) => {
-      this.setupDB();
+      this.setupDB().then(() => {
+        // Setup modules
+        AllSkills.setup().then(async () => {
+          const shortlister = new JobShortLister(this.app);
+          const messenger = new Messenger(this.app, shortlister);
+          const jobAnalyzer = new JobAnalyzer(this.app, shortlister);
+          const allSkills = new AllSkills(jobAnalyzer);
+          const searcher = new JobSearcher(jobAnalyzer);
 
-      // Setup modules
-      AllSkills.setup().then(async () => {
-        const shortlister = new JobShortLister(this.app);
-        const messenger = new Messenger(this.app, shortlister);
-        const jobAnalyzer = new JobAnalyzer(this.app, shortlister);
-        const allSkills = new AllSkills(jobAnalyzer);
-        const searcher = new JobSearcher(jobAnalyzer);
+          await searcher.updateJobStore();
 
-        await searcher.updateJobStore();
-
-        // Start the server
-        this.server = this.app.listen(PORT, async () => {
-          if (IS_TEST_SERVER) {
-            await generateFriends();
-          }
-          this.logger.info(`Server running on port ${PORT}`);
-        });
-
-        this.socket = socketio(this.server);
-        this.socket.on('connection', (clientSocket) => {
-          this.logger.info(`${clientSocket.id} connected.`);
-
-          clientSocket.use((packet, next) => {
-            // Log socket endpoints
-            this.logger.info(`SOCKET ${packet[0]} ${packet.slice(1)}`);
-            next();
-          });
-          clientSocket.on('disconnect', async () => {
-            // Delete userId, socketId mappings
-            const userId = await this.redisClient.getAsync(clientSocket.id);
-            if (userId) {
-              await this.redisClient.delAsync(userId);
+          // Start the server
+          this.server = this.app.listen(PORT, async () => {
+            if (IS_TEST_SERVER) {
+              await generateFriends();
             }
-            await this.redisClient.delAsync(clientSocket.id);
-            this.logger.info(`${clientSocket.id} disconnected.`);
+            this.logger.info(`Server running on port ${PORT}`);
           });
-        });
 
-        const user = new User(this.app, this.redisClient, this.socket, allSkills);
-        new ResumeParser(this.app, user);
-        new Friend(this.app, this.redisClient, this.socket, messenger);
-        resolve();
+          this.socket = socketio(this.server);
+          this.socket.on('connection', (clientSocket) => {
+            this.logger.info(`${clientSocket.id} connected.`);
+
+            clientSocket.use((packet, next) => {
+              // Log socket endpoints
+              this.logger.info(`SOCKET ${packet[0]} ${packet.slice(1)}`);
+              next();
+            });
+            clientSocket.on('disconnect', async () => {
+              // Delete userId, socketId mappings
+              const userId = await this.redisClient.getAsync(clientSocket.id);
+              if (userId) {
+                await this.redisClient.delAsync(userId);
+              }
+              await this.redisClient.delAsync(clientSocket.id);
+              this.logger.info(`${clientSocket.id} disconnected.`);
+            });
+          });
+
+          const user = new User(this.app, this.redisClient, this.socket, allSkills);
+          new ResumeParser(this.app, user);
+          new Friend(this.app, this.redisClient, this.socket, messenger);
+          resolve();
+        });
       });
     });
   }
 
   shutdown() {
-    return new Promise((resolve, reject) => {
-      if (this.redisClient.quit()) {
-        this.logger.info('Redis disconnected.');
-      } else {
-        this.logger.error('Redis failed to disconnect.');
-      }
+    return new Promise((resolve) => {
+      this.redisClient.quit();
+      this.logger.info('Redis disconnected');
+
       mongoose.disconnect().then(() => {
         this.logger.info('MongoDB disconnected.');
         this.socket.close();
-        this.server.close((err) => {
-          if (err) {
-            reject(err);
-          } else {
-            this.logger.info('Server shut down.');
-            resolve();
-          }
+        this.server.close(() => {
+          this.logger.info('Server shut down.');
+          resolve();
         });
       });
     });
