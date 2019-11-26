@@ -1,3 +1,4 @@
+import assert from 'assert';
 import { OAuth2Client } from 'google-auth-library';
 import Logger from 'js-logger';
 
@@ -244,7 +245,8 @@ class User {
   }
 
   async _updateCredentials(userId, credName, credValue) {
-    if (!userId || !credName || !credValue) {
+    assert(credName === 'password' || credName === 'userName');
+    if (!userId || !credValue) {
       return new Response(false, 'Invalid userId or userData', 400);
     }
 

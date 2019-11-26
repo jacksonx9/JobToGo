@@ -7,7 +7,7 @@ import bluebird from 'bluebird';
 import Friend from '..';
 import Messenger from '../../messenger';
 import Response from '../../types';
-import { Users } from '../../schema';
+import { Users, Jobs } from '../../schema';
 import { REDIS_IP } from '../../constants';
 
 jest.mock('../../messenger');
@@ -20,6 +20,7 @@ describe('Friend', () => {
   let app;
   let user1Id;
   let user2Id;
+  let job1Id;
   let invalidUserId;
   let redisClient;
 
@@ -71,9 +72,36 @@ describe('Friend', () => {
         email: 'invalidUser@mail.com',
       },
     });
+    const job1 = await Jobs.create({
+      title: 'Real Programmers Only',
+      url: 'http://www.indeed.com/viewjob?from=appsharedroid&jk=c14a37f847778a31',
+      company: 'Jobot',
+      location: 'Cincinnati, OH 45241',
+      postDate: '',
+      salary: '$60,000 - $80,000 a year',
+      description: 'Rust rust sucks. Python is great',
+      keywords: [
+        {
+          name: 'rust',
+          tfidf: 0.46209812037329684,
+          count: 2,
+        },
+        {
+          name: 'python',
+          tfidf: 0.46209812037329684,
+          count: 1,
+        },
+        {
+          name: 'java',
+          tfidf: 0,
+          count: 0,
+        },
+      ],
+    });
     user1Id = user1._id.toString();
     user2Id = user2._id.toString();
     invalidUserId = invalidUser._id.toString();
+    job1Id = job1._id.toString();
     // Delete the user to invalidate the id
     await Users.findByIdAndDelete(invalidUserId);
   });
@@ -81,6 +109,7 @@ describe('Friend', () => {
   afterEach(async () => {
     // Delete all users after each test
     await Users.deleteMany({});
+    await Jobs.deleteMany({});
     // Make sure to clear all mock state (e.g. number of times called)
     jest.clearAllMocks();
   });
@@ -100,12 +129,13 @@ describe('Friend', () => {
   // Helper function that tests functions with two user ids as the input
   // Tests that one or more empty ids will be rejected
   const testEmptyIds = async (func) => {
-    const response = new Response(false, 'Invalid userId or friendId', 400);
     const usersBefore = await Users.find({});
-
-    expect(await friend[func](undefined, undefined)).toEqual(response);
-    expect(await friend[func](user1Id, undefined)).toEqual(response);
-    expect(await friend[func](undefined, user2Id)).toEqual(response);
+    let actualResponse = await friend[func](undefined, undefined);
+    expect(actualResponse.status).toEqual(400);
+    actualResponse = await friend[func](user1Id, undefined);
+    expect(actualResponse.status).toEqual(400);
+    actualResponse = await friend[func](undefined, user2Id);
+    expect(actualResponse.status).toEqual(400);
 
     const usersAfter = await Users.find({});
     expect(usersBefore).toEqual(usersAfter);
@@ -129,18 +159,67 @@ describe('Friend', () => {
   // Helper function that tests functions with two user ids as the input
   // Tests that one or more invalid ids will be rejected
   const testInvalidUsers = async (func) => {
-    const response = new Response(false, 'Invalid userId or friendId', 400);
     const usersBefore = await Users.find({});
 
-    expect(await friend[func](user1Id, invalidUserId)).toEqual(response);
-    expect(await friend[func](invalidUserId, user2Id)).toEqual(response);
-    expect(await friend[func](123, user2Id)).toEqual(response);
-    expect(await friend[func]('test', user2Id)).toEqual(response);
-    expect(await friend[func]({}, user2Id)).toEqual(response);
+    let actualResponse = await friend[func](user1Id, invalidUserId);
+    expect(actualResponse.status).toEqual(400);
+    actualResponse = await friend[func](invalidUserId, user2Id);
+    expect(actualResponse.status).toEqual(400);
+    actualResponse = await friend[func](123, user2Id);
+    expect(actualResponse.status).toEqual(400);
+    actualResponse = await friend[func]('test', user2Id);
+    expect(actualResponse.status).toEqual(400);
+    actualResponse = await friend[func]({}, user2Id);
+    expect(actualResponse.status).toEqual(400);
 
     const usersAfter = await Users.find({});
     expect(usersBefore).toEqual(usersAfter);
   };
+
+  test('getRecommendedJobs: Empty Id', async () => {
+    await testEmptyId('getRecommendedJobs');
+    expect(messenger.requestFriend).toHaveBeenCalledTimes(0);
+  });
+
+  test('getRecommendedJobs: Invalid Id', async () => {
+    await testInvalidUser('getRecommendedJobs');
+    expect(messenger.requestFriend).toHaveBeenCalledTimes(0);
+  });
+
+  test('confirmJob: Empty Ids', async () => {
+    await testEmptyIds('confirmJob');
+    expect(messenger.requestFriend).toHaveBeenCalledTimes(0);
+  });
+
+  test('confirmJob: Invalid Ids', async () => {
+    await testInvalidUsers('confirmJob');
+    expect(messenger.requestFriend).toHaveBeenCalledTimes(0);
+  });
+
+  test('confirmJob: Valid User and Job', async () => {
+    await Users.findByIdAndUpdate(user1Id, {
+      $push: {
+        friendSuggestedJobs: job1Id,
+      },
+    });
+    const response = new Response(true, '', 200);
+    expect(await friend.confirmJob(user1Id, job1Id)).toEqual(response);
+  });
+
+  test('sendJob: Valid send Job', async () => {
+    await Users.findByIdAndUpdate(user1Id, {
+      $push: {
+        friends: user2Id,
+      },
+    });
+    await Users.findByIdAndUpdate(user2Id, {
+      $push: {
+        friends: user1Id,
+      },
+    });
+    const response = new Response(undefined, '', 200);
+    expect(await friend.sendJob(user1Id, user2Id, job1Id)).toEqual(response);
+  });
 
   test('addFriend: Empty Ids', async () => {
     await testEmptyIds('addFriend');

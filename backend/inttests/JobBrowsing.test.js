@@ -85,6 +85,20 @@ describe('Job Browsing', () => {
       expect(response.body.result).toBe(true);
     });
 
+    // Empty userId during dislikedJob
+    response = await request.post('/jobs/dislike').send({
+      userId: '',
+      jobId: jobIds[1],
+    });
+    expect(response.body.result).toBe(false);
+
+    // Invalid userId during dislikedJob
+    response = await request.post('/jobs/dislike').send({
+      userId: 123,
+      jobId: jobIds[1],
+    });
+    expect(response.body.result).toBe(false);
+
     // Dislike job 1
     response = await request.post('/jobs/dislike').send({
       userId,
@@ -111,6 +125,18 @@ describe('Job Browsing', () => {
       testData.jobs[2], testData.jobs[3],
     ]);
 
+    // Empty userId when attempting to clear all jobs
+    response = await request.delete('/jobs/all').send({
+      userId: '',
+    });
+    expect(response.body.result).toBe(false);
+
+    // Invalid userId when attempting to clear all jobs
+    response = await request.delete('/jobs/all').send({
+      userId: 123,
+    });
+    expect(response.body.result).toBe(false);
+
     // Clear all liked jobs
     response = await request.delete('/jobs/all').send({
       userId,
@@ -128,6 +154,20 @@ describe('Job Browsing', () => {
     expect(response.body.result).toMatchObject([
       testData.jobs[0], testData.jobs[1], testData.jobs[2], testData.jobs[3],
     ]);
+
+    // Empty userId during likedJob
+    response = await request.post('/jobs/like').send({
+      userId: '',
+      jobId: jobIds[0],
+    });
+    expect(response.body.result).toBe(false);
+
+    // Invalid userId during likedJob
+    response = await request.post('/jobs/like').send({
+      userId: 123,
+      jobId: jobIds[0],
+    });
+    expect(response.body.result).toBe(false);
 
     // Like job 0
     response = await request.post('/jobs/like').send({
@@ -154,6 +194,85 @@ describe('Job Browsing', () => {
     response = await request.delete('/jobs').send({
       userId,
       jobId: jobIds[1],
+    });
+    expect(response.body.result).toBe(false);
+  });
+
+  test('unseenJob liked job', async () => {
+    // Find 4 jobs
+    let response = await request.get(`/jobs/find/${userId}`);
+    expect(response.body.result).toMatchObject([
+      testData.jobs[0], testData.jobs[1], testData.jobs[2], testData.jobs[3],
+    ]);
+
+    // Like job 0
+    response = await request.post('/jobs/like').send({
+      userId,
+      jobId: jobIds[0],
+    });
+    expect(response.body.result).toBe(true);
+
+    // Empty userId
+    response = await request.post('/jobs/unseenJob').send({
+      userId: '',
+      jobId: jobIds[0],
+    });
+    expect(response.body.result).toBe(false);
+
+    // Invalid userId
+    response = await request.post('/jobs/unseenJob').send({
+      userId: 123,
+      jobId: jobIds[0],
+    });
+    expect(response.body.result).toBe(false);
+
+    // Unseen the job
+    response = await request.post('/jobs/unseenJob').send({
+      userId,
+      jobId: jobIds[0],
+    });
+    expect(response.body.result).toBe(true);
+
+    // Can not unseen a job that has not been seen
+    response = await request.post('/jobs/unseenJob').send({
+      userId,
+      jobId: jobIds[0],
+    });
+    expect(response.body.result).toBe(false);
+  });
+
+  test('unseenJob disliked job', async () => {
+    // Find 4 jobs
+    let response = await request.get(`/jobs/find/${userId}`);
+    expect(response.body.result).toMatchObject([
+      testData.jobs[0], testData.jobs[1], testData.jobs[2], testData.jobs[3],
+    ]);
+
+    // Dislike job 0
+    response = await request.post('/jobs/dislike').send({
+      userId,
+      jobId: jobIds[0],
+    });
+    expect(response.body.result).toBe(true);
+
+    // Invalid userId
+    response = await request.post('/jobs/unseenJob').send({
+      userId: '',
+      jobId: jobIds[0],
+    });
+    expect(response.body.result).toBe(false);
+
+    // Unseen the job
+    response = await request.post('/jobs/unseenJob').send({
+      userId,
+      jobId: jobIds[0],
+    });
+    expect(response.body.result).toBe(true);
+
+    // Can not unseen a job that has not been seen
+    response = await request.post('/jobs/unseenJob').send({
+      userId,
+      jobId: jobIds[0],
     });
     expect(response.body.result).toBe(false);
   });
@@ -236,5 +355,30 @@ describe('Job Browsing', () => {
     });
     expect(response.body.result).toBe(true);
     expect(sendMail).toHaveBeenCalledTimes(1);
+  });
+
+  test('Email liked jobs invalid inputs', async () => {
+    // Find 4 jobs
+    let response = await request.get(`/jobs/find/${userId}`);
+    expect(response.body.result).toMatchObject([
+      testData.jobs[0], testData.jobs[1], testData.jobs[2], testData.jobs[3],
+    ]);
+
+
+    // Email liked jobs, empty userId
+    response = await request.post('/messenger/email').send({
+      userId: '',
+    });
+    expect(response.body.status).toEqual(400);
+    expect(response.body.result).toBe(false);
+    expect(sendMail).toHaveBeenCalledTimes(0);
+
+    // Email liked jobs, invalid userId
+    response = await request.post('/messenger/email').send({
+      userId: 'invalidId',
+    });
+    expect(response.body.status).toEqual(400);
+    expect(response.body.result).toBe(false);
+    expect(sendMail).toHaveBeenCalledTimes(0);
   });
 });

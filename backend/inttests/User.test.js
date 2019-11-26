@@ -219,4 +219,209 @@ describe('User', () => {
     });
     expect(response.body.result).toBe(true);
   });
+
+  test('Get username and password', async () => {
+    // Login with google first time, should create user
+    let response = await request.post('/users/googleLogin').send({
+      idToken: 'idToken',
+      firebaseToken: testData.users[0].credentials.firebaseToken,
+    });
+    response = await request.post('/users').send({
+      userData: {
+        credentials: {
+          userName: testData.users[0].credentials.userName,
+          email: response.body.result.credentials.email,
+          idToken: response.body.result.credentials.idToken,
+          firebaseToken: response.body.result.credentials.firebaseToken,
+        },
+      },
+    });
+    const user = await Users.findOne({});
+    expect(response.body.result).toEqual(user._id.toString());
+
+    // Get user info with invalid user id, should fail
+    response = await request.get('/users/userInfo/1}');
+    expect(response.body.result).toBe(false);
+
+    // Get user info with valid user id
+    response = await request.get(`/users/userInfo/${user._id.toString()}`);
+    expect(response.body.result._id.toString()).toEqual(user._id.toString());
+  });
+
+  test('Change Username', async () => {
+    // Login with google first time, should create user
+    let response = await request.post('/users/googleLogin').send({
+      idToken: 'idToken',
+      firebaseToken: testData.users[0].credentials.firebaseToken,
+    });
+    response = await request.post('/users').send({
+      userData: {
+        credentials: {
+          userName: testData.users[0].credentials.userName,
+          email: response.body.result.credentials.email,
+          idToken: response.body.result.credentials.idToken,
+          firebaseToken: response.body.result.credentials.firebaseToken,
+        },
+      },
+    });
+    const user = await Users.findOne({});
+    expect(response.body.result).toEqual(user._id.toString());
+
+    // Change Username with invalid user id, should fail
+    response = await request.put('/users/userName/1}');
+    expect(response.body.result).toBe(false);
+
+    // Change Username with valid user id
+    response = await request.put(`/users/userName/${user._id.toString()}`).send({
+      userName: 'changed name',
+    });
+    expect(response.body.result).toBe(true);
+  });
+
+  test('Change Password', async () => {
+    // Login with google first time, should create user
+    let response = await request.post('/users/googleLogin').send({
+      idToken: 'idToken',
+      firebaseToken: testData.users[0].credentials.firebaseToken,
+    });
+    response = await request.post('/users').send({
+      userData: {
+        credentials: {
+          userName: testData.users[0].credentials.userName,
+          email: response.body.result.credentials.email,
+          idToken: response.body.result.credentials.idToken,
+          firebaseToken: response.body.result.credentials.firebaseToken,
+        },
+      },
+    });
+    const user = await Users.findOne({});
+    expect(response.body.result).toEqual(user._id.toString());
+
+    // Change password with invalid user id, should fail
+    response = await request.put('/users/password/1}');
+    expect(response.body.result).toBe(false);
+
+    // Change password with valid user id
+    response = await request.put(`/users/password/${user._id.toString()}`).send({
+      password: 'changed password',
+    });
+    expect(response.body.result).toBe(true);
+  });
+
+  test('Get Keywords', async () => {
+    // Login with google first time, should create user
+    let response = await request.post('/users/googleLogin').send({
+      idToken: 'idToken',
+      firebaseToken: testData.users[0].credentials.firebaseToken,
+    });
+    response = await request.post('/users').send({
+      userData: {
+        credentials: {
+          userName: testData.users[0].credentials.userName,
+          email: response.body.result.credentials.email,
+          idToken: response.body.result.credentials.idToken,
+          firebaseToken: response.body.result.credentials.firebaseToken,
+        },
+      },
+    });
+    const user = await Users.findOne({});
+    expect(response.body.result).toEqual(user._id.toString());
+
+    // Get Skills with invalid user id, should fail
+    response = await request.get('/users/skills/1}');
+    expect(response.body.result).toBeNull();
+
+    // Get Skills with valid user id
+    response = await request.get(`/users/skills/${user._id.toString()}`);
+    expect(response.body.result).toEqual([]);
+  });
+
+  test('Add Keywords', async () => {
+    // Login with google first time, should create user
+    let response = await request.post('/users/googleLogin').send({
+      idToken: 'idToken',
+      firebaseToken: testData.users[0].credentials.firebaseToken,
+    });
+    response = await request.post('/users').send({
+      userData: {
+        credentials: {
+          userName: testData.users[0].credentials.userName,
+          email: response.body.result.credentials.email,
+          idToken: response.body.result.credentials.idToken,
+          firebaseToken: response.body.result.credentials.firebaseToken,
+        },
+      },
+    });
+    const user = await Users.findOne({});
+    expect(response.body.result).toEqual(user._id.toString());
+
+    // Add keyword with invalid user id, should fail
+    response = await request.post('/users/keywords').send({
+      userId: null,
+      keyword: 'new keyword',
+    });
+    expect(response.body.result).toBe(false);
+
+    // Add keyword with valid user id
+    response = await request.post('/users/keywords').send({
+      userId: user._id.toString(),
+      keyword: 'new keyword',
+    });
+    expect(response.body.result).toBe(true);
+
+    // Add exisiting keyword with valid user id
+    response = await request.post('/users/keywords').send({
+      userId: user._id.toString(),
+      keyword: 'new keyword',
+    });
+    expect(response.body.result).toBe(true);
+  });
+
+  test('Delete Keywords', async () => {
+    // Login with google first time, should create user
+    let response = await request.post('/users/googleLogin').send({
+      idToken: 'idToken',
+      firebaseToken: testData.users[0].credentials.firebaseToken,
+    });
+    response = await request.post('/users').send({
+      userData: {
+        credentials: {
+          userName: testData.users[0].credentials.userName,
+          email: response.body.result.credentials.email,
+          idToken: response.body.result.credentials.idToken,
+          firebaseToken: response.body.result.credentials.firebaseToken,
+        },
+      },
+    });
+    const user = await Users.findOne({});
+    expect(response.body.result).toEqual(user._id.toString());
+
+    // Add keyword with invalid user id, should fail
+    response = await request.delete('/users/keywords').send({
+      userId: null,
+      keyword: 'old keyword',
+    });
+    expect(response.body.result).toBe(false);
+
+    // Insert keyword with valid user id
+    response = await request.post('/users/keywords').send({
+      userId: user._id.toString(),
+      keyword: 'new keyword',
+    });
+    expect(response.body.result).toBe(true);
+
+    // Delete non existant keyword with valid user id
+    response = await request.delete('/users/keywords').send({
+      userId: user._id.toString(),
+      keyword: 'non existant keyword',
+    });
+    expect(response.body.result).toBe(true);
+
+    // Delete exisiting keyword with valid user id
+    response = await request.delete('/users/keywords').send({
+      userId: user._id.toString(),
+      keyword: 'new keyword',
+    });
+    expect(response.body.result).toBe(true);
+  });
 });

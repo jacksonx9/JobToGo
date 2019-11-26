@@ -166,6 +166,43 @@ describe('JobShortLister', () => {
     expect(await jobShortLister.getSeenJobIds(userId)).toEqual(jobIds);
   });
 
+  test('unseenJob: Empty Ids', async () => {
+    await testEmptyIds('unseenJob');
+  });
+
+  test('unseenJob: Invalid Ids', async () => {
+    await testInvalidUserJobs('unseenJob');
+  });
+
+  test('unseenJob: Job that has not been seen', async () => {
+    const expectRes = new Response(false, 'Not a seen job', 400);
+    const actualRes = await jobShortLister.unseenJob(userId, jobId);
+    expect(actualRes).toEqual(expectRes);
+  });
+
+  test('unseenJob: Liked Job', async () => {
+    await Users.findByIdAndUpdate(userId, {
+      $addToSet: {
+        likedJobs: jobId,
+        seenJobs: jobId,
+      },
+    });
+    const expectRes = new Response(true, '', 200);
+    const actualRes = await jobShortLister.unseenJob(userId, jobId);
+    expect(actualRes).toEqual(expectRes);
+  });
+
+  test('unseenJob: Disliked Job', async () => {
+    await Users.findByIdAndUpdate(userId, {
+      $addToSet: {
+        seenJobs: jobId,
+      },
+    });
+    const expectRes = new Response(true, '', 200);
+    const actualRes = await jobShortLister.unseenJob(userId, jobId);
+    expect(actualRes).toEqual(expectRes);
+  });
+
   test('addLikedJobs: Empty Ids', async () => {
     await testEmptyIds('addLikedJobs');
   });

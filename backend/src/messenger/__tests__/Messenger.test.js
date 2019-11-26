@@ -6,7 +6,7 @@ import { Express } from 'jest-express/lib/express';
 import Messenger from '..';
 import JobShortlister from '../../job_shortlister';
 import Response from '../../types';
-import { Users } from '../../schema';
+import { Users, Jobs } from '../../schema';
 import credentials from '../../../credentials/google';
 import testData from './test_data';
 
@@ -20,6 +20,7 @@ describe('Messenger', () => {
   let user1Id;
   let user2Id;
   let invalidUserId;
+  let job1Id;
   let send;
   let sendMail;
 
@@ -55,9 +56,11 @@ describe('Messenger', () => {
     const user1 = await Users.create(testData.users[0]);
     const user2 = await Users.create(testData.users[1]);
     const invalidUser = await Users.create(testData.users[2]);
+    const job1 = await Jobs.create(testData.jobs[0]);
     user1Id = user1._id;
     user2Id = user2._id;
     invalidUserId = invalidUser._id;
+    job1Id = job1._id;
     // Delete the user to invalidate the id
     await Users.findByIdAndDelete(invalidUserId);
 
@@ -74,6 +77,7 @@ describe('Messenger', () => {
   afterEach(async () => {
     // Delete all users after each test
     await Users.deleteMany({});
+    await Jobs.deleteMany({});
     // Make sure to clear all mock state (e.g. number of times called)
     jest.restoreAllMocks();
   });
@@ -149,5 +153,46 @@ describe('Messenger', () => {
       subject: 'Shortlisted jobs',
       text: emailText,
     });
+  });
+
+  test('sendFriendJob: Empty ids', async () => {
+    const response = new Response(false, 'Invalid userId or friendId', 400);
+    expect(await messenger.sendFriendJob(undefined, undefined, undefined)).toEqual(response);
+    expect(await messenger.sendFriendJob(user1Id, undefined, undefined)).toEqual(response);
+    expect(await messenger.sendFriendJob(undefined, user2Id, undefined)).toEqual(response);
+  });
+
+  test('sendFriendJob: Invalid users', async () => {
+    const response = new Response(false, 'Invalid userId or friendId', 400);
+    expect(await messenger.sendFriendJob(invalidUserId, user2Id, job1Id)).toEqual(response);
+    expect(await messenger.sendFriendJob(user1Id, invalidUserId, user1Id)).toEqual(response);
+    expect(await messenger.sendFriendJob(123, user2Id, job1Id)).toEqual(response);
+    expect(await messenger.sendFriendJob('test', user2Id, job1Id)).toEqual(response);
+    expect(await messenger.sendFriendJob({}, user2Id, user1Id)).toEqual(response);
+  });
+
+  test('sendFriendJob: Success', async () => {
+    const response = new Response(true, '', 200);
+    expect(await messenger.sendFriendJob(user1Id, user2Id,job1Id)).toEqual(response);
+    expect(admin.messaging().send).toHaveBeenCalledTimes(2);
+    const name = testData.users[0].credentials.userName;
+    const title = testData.jobs[0].title;
+    const company = testData.jobs[0].company;
+    expect(admin.messaging().send).toHaveBeenCalledWith({
+      token: testData.users[1].credentials.firebaseToken,
+      notification: {
+        title: 'Friend sent you a job!',
+        body: `${name} thinks you would be a good fit for ${title} at ${company}!`,
+      },
+    });
+  });
+
+  test('sendFriendJob: Firebase messaging error', async () => {
+    // Make firebase messaging throw an error
+    admin.messaging = jest.fn(() => ({
+      send: jest.fn(() => { throw new Error(); }),
+    }));
+    const response = new Response(false, 'Internal server error', 500);
+    expect(await messenger.sendFriendJob(user1Id, user2Id, job1Id)).toEqual(response);
   });
 });
