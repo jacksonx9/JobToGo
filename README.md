@@ -17,6 +17,11 @@
   <img src="screenshots/jobtogo.gif" alt="Demo"
 </p>
 
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=-J0DWfPJhk4&feature=youtu.be">View the full demo of Job To Go</a>
+</p>
+
+
 ## Running the server
 
 ```bash
