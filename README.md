@@ -1,7 +1,7 @@
 # JobToGo
 [![Build Status](https://travis-ci.com/jacksonx9/JobToGo.svg?token=TUsnJznHqMLLvpddyrtn&branch=master)](https://travis-ci.com/jacksonx9/JobToGo)
 
-> Effortless job search on the go
+> Effortless job search on the go<br/>
 ![](screenshots/jobtogo.gif)
 
 ## Running the server
