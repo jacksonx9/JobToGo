@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <a href="https://www.youtube.com/watch?v=-J0DWfPJhk4&feature=youtu.be">View the full demo of Job To Go</a>
+  <a href="https://www.youtube.com/watch?v=-J0DWfPJhk4&feature=youtu.be">View the full demo of JobToGo</a>
 </p>
 
 
