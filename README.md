@@ -1,4 +1,5 @@
 # JobToGo
+![](screenshots/jobtogo.gif)
 
 [![Build Status](https://travis-ci.com/jacksonx9/JobToGo.svg?token=TUsnJznHqMLLvpddyrtn&branch=master)](https://travis-ci.com/jacksonx9/JobToGo)
 
