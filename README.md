@@ -1,8 +1,21 @@
-# JobToGo
-[![Build Status](https://travis-ci.com/jacksonx9/JobToGo.svg?token=TUsnJznHqMLLvpddyrtn&branch=master)](https://travis-ci.com/jacksonx9/JobToGo)
-
-> Effortless job search on the go<br/>
-![](screenshots/jobtogo.gif)
+<p align="center">
+  <img width=290 height=83 src="frontend/assets/logo-light.png" />
+</p>
+<h3 align="center">Effortless job search on the go</h3>
+<h4 align="center">First Place Winner for UBC Software Engineering 2019</h4>
+<p align="center">
+  <img
+    src="https://travis-ci.com/jacksonx9/JobToGo.svg?token=TUsnJznHqMLLvpddyrtn&branch=master"
+    alt="Build Status"
+  />
+  <img
+    src="https://api.codacy.com/project/badge/Grade/7d44b3adcee346a58e50d496938f7f4c"
+    alt="Code Coverage"
+  />
+</p>
+<p align="center">
+  <img src="screenshots/jobtogo.gif" alt="Demo"
+</p>
 
 ## Running the server
 
@@ -15,7 +28,7 @@ sudo docker-compose up
 
 Read the tutorial at <https://facebook.github.io/react-native/docs/getting-started> using react-native-cli to set up the environment.
 
-Then, with your device connected, 
+Then, with your device connected,
 
 ```bash
 cd frontend
